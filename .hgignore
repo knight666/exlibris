@@ -1,3 +1,15 @@
+# Project
+syntax: regexp
+Build/.*(Debug|Release)\.lib
+
+# CMake
+syntax: glob
+*/CMakeFiles/*
+*CMakeCache.txt
+*ALL_BUILD.vcxproj
+*INSTALL.vcxproj
+*ZERO_CHECK.vcxproj
+
 # Visual Studio 2010
 syntax: glob
 Intermediate/*
