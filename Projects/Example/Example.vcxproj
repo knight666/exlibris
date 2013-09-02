@@ -35,6 +35,7 @@
     <Import Project="..\..\Properties\OutDebug.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLEW.props" />
+    <Import Project="..\..\Properties\LibFreeImage.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -42,6 +43,7 @@
     <Import Project="..\..\Properties\OutRelease.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLEW.props" />
+    <Import Project="..\..\Properties\LibFreeImage.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
