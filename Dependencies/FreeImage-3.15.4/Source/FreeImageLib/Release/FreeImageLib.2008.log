@@ -1,0 +1,198 @@
+﻿Build started 2-9-2013 15:45:26.
+     1>Project "H:\Projects\ExLibrisGL\Dependencies\FreeImage-3.15.4\Source\FreeImageLib\FreeImageLib.2008.vcxproj" on node 5 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating ".\Release\FreeImageLib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         e:\Programs\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\ /I..\ZLib /I..\DeprecationManager /I..\OpenEXR\Half /I..\OpenEXR\Iex /I..\OpenEXR\IlmImf /I..\OpenEXR\Imath /I..\OpenEXR\IlmThread /Zi /nologo /W3 /WX- /MP /O2 /Ob2 /Oi /Ot /Oy /GT /GL /D WIN32 /D NDEBUG /D OPJ_STATIC /D FREEIMAGE_LIB /D _CRT_SECURE_NO_DEPRECATE /D LIBRAW_NODLL /D NDEBUG /D _SECURE_SCL=0 /D WIN32 /D _WINDOWS /D _CRT_SECURE_NO_DEPRECATE /D _VC80_UPGRADE=0x0710 /D _MBCS /GF /Gm- /EHsc /MD /GS- /Gy /arch:SSE2 /fp:fast /Zc:wchar_t /Zc:forScope /Fo".\Release/" /Fd".\Release/vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\FreeImage\BitmapAccess.cpp ..\FreeImage\ColorLookup.cpp ..\FreeImage\FreeImage.cpp ..\FreeImage\FreeImageIO.cpp ..\FreeImage\GetType.cpp ..\FreeImage\MemoryIO.cpp ..\FreeImage\PixelAccess.cpp ..\FreeImage\NNQuantizer.cpp ..\FreeImage\WuQuantizer.cpp ..\FreeImage\Conversion.cpp ..\FreeImage\Conversion16_555.cpp ..\FreeImage\Conversion16_565.cpp ..\FreeImage\Conversion24.cpp ..\FreeImage\Conversion32.cpp ..\FreeImage\Conversion4.cpp ..\FreeImage\Conversion8.cpp ..\FreeImage\ConversionFloat.cpp ..\FreeImage\ConversionRGB16.cpp ..\FreeImage\ConversionRGBF.cpp ..\FreeImage\ConversionType.cpp ..\FreeImage\ConversionUINT16.cpp ..\FreeImage\Halftoning.cpp ..\FreeImage\tmoColorConvert.cpp ..\FreeImage\tmoDrago03.cpp ..\FreeImage\tmoFattal02.cpp ..\FreeImage\tmoReinhard05.cpp ..\FreeImage\ToneMapping.cpp ..\FreeImage\J2KHelper.cpp ..\FreeImage\MNGHelper.cpp ..\FreeImage\Plugin.cpp ..\FreeImage\PluginBMP.cpp ..\FreeImage\PluginCUT.cpp ..\FreeImage\PluginDDS.cpp ..\FreeImage\PluginEXR.cpp ..\FreeImage\PluginG3.cpp ..\FreeImage\PluginGIF.cpp ..\FreeImage\PluginHDR.cpp ..\FreeImage\PluginICO.cpp ..\FreeImage\PluginIFF.cpp ..\FreeImage\PluginJ2K.cpp ..\FreeImage\PluginJNG.cpp ..\FreeImage\PluginJP2.cpp ..\FreeImage\PluginJPEG.cpp ..\FreeImage\PluginKOALA.cpp ..\FreeImage\PluginMNG.cpp ..\FreeImage\PluginPCD.cpp ..\FreeImage\PluginPCX.cpp ..\FreeImage\PluginPFM.cpp ..\FreeImage\PluginPICT.cpp ..\FreeImage\PluginPNG.cpp ..\FreeImage\PluginPNM.cpp ..\FreeImage\PluginPSD.cpp ..\FreeImage\PluginRAS.cpp ..\FreeImage\PluginRAW.cpp ..\FreeImage\PluginSGI.cpp ..\FreeImage\PluginTARGA.cpp ..\FreeImage\PluginTIFF.cpp ..\FreeImage\PluginWBMP.cpp ..\FreeImage\PluginXBM.cpp ..\FreeImage\PluginXPM.cpp ..\FreeImage\PSDParser.cpp ..\FreeImage\TIFFLogLuv.cpp ..\DeprecationManager\Deprecated.cpp ..\DeprecationManager\DeprecationMgr.cpp ..\FreeImage\CacheFile.cpp ..\FreeImage\MultiPage.cpp ..\FreeImage\ZLibInterface.cpp ..\Metadata\Exif.cpp ..\Metadata\FIRational.cpp ..\Metadata\FreeImageTag.cpp ..\Metadata\IPTC.cpp ..\Metadata\TagConversion.cpp ..\Metadata\TagLib.cpp ..\Metadata\XTIFF.cpp ..\FreeImageToolkit\Background.cpp ..\FreeImageToolkit\BSplineRotate.cpp ..\FreeImageToolkit\Channels.cpp ..\FreeImageToolkit\ClassicRotate.cpp ..\FreeImageToolkit\Colors.cpp ..\FreeImageToolkit\CopyPaste.cpp ..\FreeImageToolkit\Display.cpp ..\FreeImageToolkit\Flip.cpp ..\FreeImageToolkit\JPEGTransform.cpp ..\FreeImageToolkit\MultigridPoissonSolver.cpp ..\FreeImageToolkit\Rescale.cpp ..\FreeImageToolkit\Resize.cpp
+         BitmapAccess.cpp
+         ColorLookup.cpp
+         FreeImage.cpp
+         FreeImageIO.cpp
+         GetType.cpp
+         MemoryIO.cpp
+         PixelAccess.cpp
+         NNQuantizer.cpp
+         WuQuantizer.cpp
+         Conversion.cpp
+         Conversion16_555.cpp
+         Conversion16_565.cpp
+         Conversion24.cpp
+         Conversion32.cpp
+         Conversion4.cpp
+         Conversion8.cpp
+         ConversionFloat.cpp
+         ConversionRGB16.cpp
+         ConversionRGBF.cpp
+         ConversionType.cpp
+         ConversionUINT16.cpp
+         Halftoning.cpp
+         tmoColorConvert.cpp
+         tmoDrago03.cpp
+         tmoFattal02.cpp
+         tmoReinhard05.cpp
+         ToneMapping.cpp
+         J2KHelper.cpp
+         MNGHelper.cpp
+         Plugin.cpp
+         PluginBMP.cpp
+         PluginCUT.cpp
+         PluginDDS.cpp
+         PluginEXR.cpp
+         PluginG3.cpp
+         PluginGIF.cpp
+         PluginHDR.cpp
+         PluginICO.cpp
+         PluginIFF.cpp
+         PluginJ2K.cpp
+         PluginJNG.cpp
+         PluginJP2.cpp
+         PluginJPEG.cpp
+         PluginKOALA.cpp
+         PluginMNG.cpp
+         PluginPCD.cpp
+         PluginPCX.cpp
+         PluginPFM.cpp
+         PluginPICT.cpp
+         PluginPNG.cpp
+         PluginPNM.cpp
+         PluginPSD.cpp
+         PluginRAS.cpp
+         PluginRAW.cpp
+         PluginSGI.cpp
+         PluginTARGA.cpp
+         PluginTIFF.cpp
+         PluginWBMP.cpp
+         PluginXBM.cpp
+         PluginXPM.cpp
+         PSDParser.cpp
+         TIFFLogLuv.cpp
+         Deprecated.cpp
+         DeprecationMgr.cpp
+         CacheFile.cpp
+         MultiPage.cpp
+         ZLibInterface.cpp
+         Exif.cpp
+         FIRational.cpp
+         FreeImageTag.cpp
+         IPTC.cpp
+         TagConversion.cpp
+         TagLib.cpp
+         XTIFF.cpp
+         Background.cpp
+         BSplineRotate.cpp
+         Channels.cpp
+         ClassicRotate.cpp
+         Colors.cpp
+         CopyPaste.cpp
+         Display.cpp
+         Flip.cpp
+         JPEGTransform.cpp
+         MultigridPoissonSolver.cpp
+         Rescale.cpp
+         Resize.cpp
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(H:\Projects\ExLibrisGL\Dependencies\FreeImage-3.15.4\Source\FreeImageLib\.\Release\FreeImageLibRelease.lib) does not match the Library's OutputFile property value (H:\Projects\ExLibrisGL\Dependencies\FreeImage-3.15.4\Source\FreeImageLib\Release\FreeImage.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1153,5): warning MSB8012: TargetName(FreeImageLibRelease) does not match the Library's OutputFile property value (FreeImage). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         e:\Programs\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"Release\FreeImage.lib" /NOLOGO .\Release/BitmapAccess.obj
+         .\Release/ColorLookup.obj
+         .\Release/FreeImage.obj
+         .\Release/FreeImageIO.obj
+         .\Release/GetType.obj
+         .\Release/MemoryIO.obj
+         .\Release/PixelAccess.obj
+         .\Release/NNQuantizer.obj
+         .\Release/WuQuantizer.obj
+         .\Release/Conversion.obj
+         .\Release/Conversion16_555.obj
+         .\Release/Conversion16_565.obj
+         .\Release/Conversion24.obj
+         .\Release/Conversion32.obj
+         .\Release/Conversion4.obj
+         .\Release/Conversion8.obj
+         .\Release/ConversionFloat.obj
+         .\Release/ConversionRGB16.obj
+         .\Release/ConversionRGBF.obj
+         .\Release/ConversionType.obj
+         .\Release/ConversionUINT16.obj
+         .\Release/Halftoning.obj
+         .\Release/tmoColorConvert.obj
+         .\Release/tmoDrago03.obj
+         .\Release/tmoFattal02.obj
+         .\Release/tmoReinhard05.obj
+         .\Release/ToneMapping.obj
+         .\Release/J2KHelper.obj
+         .\Release/MNGHelper.obj
+         .\Release/Plugin.obj
+         .\Release/PluginBMP.obj
+         .\Release/PluginCUT.obj
+         .\Release/PluginDDS.obj
+         .\Release/PluginEXR.obj
+         .\Release/PluginG3.obj
+         .\Release/PluginGIF.obj
+         .\Release/PluginHDR.obj
+         .\Release/PluginICO.obj
+         .\Release/PluginIFF.obj
+         .\Release/PluginJ2K.obj
+         .\Release/PluginJNG.obj
+         .\Release/PluginJP2.obj
+         .\Release/PluginJPEG.obj
+         .\Release/PluginKOALA.obj
+         .\Release/PluginMNG.obj
+         .\Release/PluginPCD.obj
+         .\Release/PluginPCX.obj
+         .\Release/PluginPFM.obj
+         .\Release/PluginPICT.obj
+         .\Release/PluginPNG.obj
+         .\Release/PluginPNM.obj
+         .\Release/PluginPSD.obj
+         .\Release/PluginRAS.obj
+         .\Release/PluginRAW.obj
+         .\Release/PluginSGI.obj
+         .\Release/PluginTARGA.obj
+         .\Release/PluginTIFF.obj
+         .\Release/PluginWBMP.obj
+         .\Release/PluginXBM.obj
+         .\Release/PluginXPM.obj
+         .\Release/PSDParser.obj
+         .\Release/TIFFLogLuv.obj
+         .\Release/Deprecated.obj
+         .\Release/DeprecationMgr.obj
+         .\Release/CacheFile.obj
+         .\Release/MultiPage.obj
+         .\Release/ZLibInterface.obj
+         .\Release/Exif.obj
+         .\Release/FIRational.obj
+         .\Release/FreeImageTag.obj
+         .\Release/IPTC.obj
+         .\Release/TagConversion.obj
+         .\Release/TagLib.obj
+         .\Release/XTIFF.obj
+         .\Release/Background.obj
+         .\Release/BSplineRotate.obj
+         .\Release/Channels.obj
+         .\Release/ClassicRotate.obj
+         .\Release/Colors.obj
+         .\Release/CopyPaste.obj
+         .\Release/Display.obj
+         .\Release/Flip.obj
+         .\Release/JPEGTransform.obj
+         .\Release/MultigridPoissonSolver.obj
+         .\Release/Rescale.obj
+         .\Release/Resize.obj
+         Resize.obj : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
+         FreeImageLib.2008.vcxproj -> H:\Projects\ExLibrisGL\Dependencies\FreeImage-3.15.4\Source\FreeImageLib\.\Release\FreeImageLibRelease.lib
+       PostBuildEvent:
+         copy Release\FreeImage.lib ..\..\Dist
+         copy ..\FreeImage.h ..\..\Dist
+         
+         :VCEnd
+                 1 bestand(en) gekopieerd.
+                 1 bestand(en) gekopieerd.
+       FinalizeBuildStatus:
+         Deleting file ".\Release\FreeImageLib.unsuccessfulbuild".
+         Touching ".\Release\FreeImageLib.lastbuildstate".
+     1>Done Building Project "H:\Projects\ExLibrisGL\Dependencies\FreeImage-3.15.4\Source\FreeImageLib\FreeImageLib.2008.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:35.37
