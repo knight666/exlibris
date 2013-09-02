@@ -36,6 +36,7 @@
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibFreeImage.props" />
+    <Import Project="..\..\Properties\LibFreeType.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -44,6 +45,7 @@
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibFreeImage.props" />
+    <Import Project="..\..\Properties\LibFreeType.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -59,7 +61,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FontLoaderFreetype.cpp" />
     <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FontLoaderFreetype.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

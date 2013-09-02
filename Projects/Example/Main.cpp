@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "FontLoaderFreetype.h"
+
 static void OnGlfwError(int error, const char* description)
 {
 	std::cerr << description << std::endl;
@@ -15,6 +17,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 int main(int argc, const char** argv)
 {
+	ExLibris::FontLoaderFreetype loader;
+	FT_Face font_face = loader.LoadFontFace("Fonts/Roboto/Roboto-Regular.ttf");
+
 	GLFWwindow* window;
 
 	glfwSetErrorCallback(OnGlfwError);
