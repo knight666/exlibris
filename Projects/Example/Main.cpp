@@ -1,6 +1,8 @@
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
 #include <iostream>
+#include <map>
 
 #include "FontLoaderFreetype.h"
 
@@ -15,10 +17,42 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
+struct GlyphMetrics
+{
+	unsigned int codepoint;
+	glm::vec2 offset;
+	float advance;
+};
+
 int main(int argc, const char** argv)
 {
 	ExLibris::FontLoaderFreetype loader;
 	FT_Face font_face = loader.LoadFontFace("Fonts/Roboto/Roboto-Regular.ttf");
+
+	FT_Error errors = 0;
+
+	errors = FT_Set_Char_Size(font_face, 0, 24 << 6, 0, 96);
+
+	std::map<unsigned int, GlyphMetrics*> font_metrics;
+
+	FT_UInt codepoint = 0;
+	FT_ULong glyph_index = FT_Get_First_Char(font_face, &codepoint);
+	do
+	{
+		errors = FT_Load_Glyph(font_face, codepoint, FT_LOAD_DEFAULT);
+		FT_Glyph_Metrics& glyph_metrics = font_face->glyph->metrics;
+
+		GlyphMetrics* metrics = new GlyphMetrics;
+		metrics->codepoint = (unsigned int)glyph_index;
+		metrics->offset.x = (float)((glyph_metrics.horiBearingX) >> 6);
+		metrics->offset.y = (float)((glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) >> 6);
+		metrics->advance = (float)((glyph_metrics.horiAdvance) >> 6);
+
+		font_metrics.insert(std::make_pair(metrics->codepoint, metrics));
+
+		glyph_index = FT_Get_Next_Char(font_face, glyph_index, &codepoint);
+	}
+	while (codepoint != 0);
 
 	GLFWwindow* window;
 
