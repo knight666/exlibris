@@ -1,6 +1,7 @@
 # Project
 syntax: regexp
 Build/.*(Debug|Release)\.lib
+Build/.*(Debug|Release)\.exe
 
 # CMake
 syntax: glob
