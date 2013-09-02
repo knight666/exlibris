@@ -63,11 +63,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FaceMetrics.cpp" />
     <ClCompile Include="FontLoaderFreetype.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FaceMetrics.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
+    <ClInclude Include="GlyphMetrics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
