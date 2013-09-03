@@ -120,8 +120,8 @@ GLuint CreateTexture(const std::map<unsigned int, Glyph*>& a_Glyphs, unsigned in
 glm::vec2 FreetypeToGlm(const FT_Vector* a_Position)
 {
 	return glm::vec2(
-		(float)(a_Position->x >> 6),
-		(float)(a_Position->y >> 6)
+		(float)(a_Position->x) / 64.0f,
+		(float)(a_Position->y) / 64.0f
 	);
 }
 
@@ -170,12 +170,32 @@ int CallbackConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_U
 
 	GlyphOutline* outline = (GlyphOutline*)a_User;
 
-	LineSegment segment;
-	segment.start = outline->start;
-	segment.end = FreetypeToGlm(a_To);
+	glm::vec2 a = outline->start;
+	glm::vec2 b = FreetypeToGlm(a_To);
+	glm::vec2 c = FreetypeToGlm(a_Control);
 
-	outline->lines.push_back(segment);
-	outline->start = segment.end;
+	int precision = 10;
+	glm::vec2 delta_precision((float)precision, (float)precision);
+
+	glm::vec2 delta_ac = (c - a) / delta_precision;
+	glm::vec2 delta_cb = (b - c) / delta_precision;
+
+	LineSegment segment;
+	segment.start = a;
+
+	for (int j = 1; j < precision + 1; ++j)
+	{
+		a += delta_ac;
+		c += delta_cb;
+
+		segment.end = a + ((c - a) / delta_precision) * (float)j;
+
+		outline->lines.push_back(segment);
+
+		segment.start = segment.end;
+	}
+
+	outline->start = b;
 
 	return 0;
 }
@@ -219,7 +239,7 @@ int main(int argc, const char** argv)
 
 	GlyphOutline outline;
 
-	FT_UInt outline_codepoint = FT_Get_Char_Index(font_face, (FT_ULong)'Q');
+	FT_UInt outline_codepoint = FT_Get_Char_Index(font_face, (FT_ULong)'@');
 	errors = FT_Load_Glyph(font_face, outline_codepoint, FT_LOAD_DEFAULT);
 	errors = FT_Outline_Decompose(&font_face->glyph->outline, &outline_callbacks, &outline);
 
