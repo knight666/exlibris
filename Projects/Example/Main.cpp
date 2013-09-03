@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+﻿#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -206,28 +206,45 @@ int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, co
 
 	GlyphOutline* outline = (GlyphOutline*)a_User;
 
-	LineSegment segment;
-	segment.start = outline->start;
-	segment.end = FreetypeToGlm(a_To);
+	glm::vec2 a = outline->start;
+	glm::vec2 b = FreetypeToGlm(a_To);
+	glm::vec2 c = FreetypeToGlm(a_ControlA);
+	glm::vec2 d = FreetypeToGlm(a_ControlB);
 
-	outline->lines.push_back(segment);
-	outline->start = segment.end;
+	int precision = 10;
+	glm::vec2 delta_precision((float)precision, (float)precision);
+
+	glm::vec2 delta_ac = (c - a) / delta_precision;
+	glm::vec2 delta_cd = (d - c) / delta_precision;
+	glm::vec2 delta_db = (b - d) / delta_precision;
+
+	LineSegment segment;
+	segment.start = a;
+
+	for (int j = 1; j < precision + 1; ++j)
+	{
+		a += delta_ac;
+		c += delta_cd;
+		d += delta_db;
+
+		glm::vec2 ac = a + ((c - a) / delta_precision) * (float)j;
+		glm::vec2 cd = c + ((d - c) / delta_precision) * (float)j;
+
+		segment.end = ac + ((cd - ac) / delta_precision) * (float)j;
+
+		outline->lines.push_back(segment);
+
+		segment.start = segment.end;
+	}
+
+	outline->start = b;
 
 	return 0;
 }
 
-int main(int argc, const char** argv)
+GlyphOutline CreateOutline(FT_Face a_FontFace, wchar_t a_Character)
 {
-	ExLibris::FontLoaderFreetype loader;
-	FT_Face font_face = loader.LoadFontFace("Fonts/Roboto/Roboto-Regular.ttf");
-
 	FT_Error errors = 0;
-
-	errors = FT_Set_Char_Size(font_face, 0, 24 << 6, 0, 96);
-	float font_face_height = (float)(font_face->size->metrics.height >> 6);
-
-	ExLibris::FaceMetrics face_metrics;
-	std::map<unsigned int, Glyph*> font_glyphs;
 
 	FT_Outline_Funcs outline_callbacks;
 	outline_callbacks.move_to = &CallbackMoveTo;
@@ -237,11 +254,29 @@ int main(int argc, const char** argv)
 	outline_callbacks.shift = 0;
 	outline_callbacks.delta = 0;
 
-	GlyphOutline outline;
+	FT_UInt outline_codepoint = FT_Get_Char_Index(a_FontFace, (FT_ULong)a_Character);
+	errors = FT_Load_Glyph(a_FontFace, outline_codepoint, FT_LOAD_DEFAULT);
 
-	FT_UInt outline_codepoint = FT_Get_Char_Index(font_face, (FT_ULong)'@');
-	errors = FT_Load_Glyph(font_face, outline_codepoint, FT_LOAD_DEFAULT);
-	errors = FT_Outline_Decompose(&font_face->glyph->outline, &outline_callbacks, &outline);
+	GlyphOutline outline;
+	errors = FT_Outline_Decompose(&a_FontFace->glyph->outline, &outline_callbacks, &outline);
+
+	return outline;
+}
+
+int main(int argc, const char** argv)
+{
+	ExLibris::FontLoaderFreetype loader;
+	FT_Face font_face = loader.LoadFontFace("Fonts/Mathilde/mathilde.otf");
+
+	FT_Error errors = 0;
+
+	errors = FT_Set_Char_Size(font_face, 0, 24 << 6, 0, 96);
+	float font_face_height = (float)(font_face->size->metrics.height >> 6);
+
+	ExLibris::FaceMetrics face_metrics;
+	std::map<unsigned int, Glyph*> font_glyphs;
+
+	GlyphOutline outline = CreateOutline(font_face, L'Q');
 
 	FT_UInt codepoint = 0;
 	FT_ULong glyph_index = FT_Get_First_Char(font_face, &codepoint);
@@ -333,7 +368,7 @@ int main(int argc, const char** argv)
 	glEnable(GL_TEXTURE_2D);
 
 	std::wstring text = L"Hello World!";
-	GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
+	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
 
 	GLuint vertex_buffer;
 	glGenBuffers(1, &vertex_buffer);
@@ -394,7 +429,7 @@ int main(int argc, const char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_PROJECTION);
-		glm::mat4x4 projection = glm::ortho<float>(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+		glm::mat4x4 projection = glm::ortho<float>(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 		glLoadMatrixf(glm::value_ptr(projection));
 
 		glMatrixMode(GL_MODELVIEW);
