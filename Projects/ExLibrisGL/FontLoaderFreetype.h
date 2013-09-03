@@ -1,11 +1,6 @@
 #ifndef _FONTLOADERFREETYPE_H_
 #define _FONTLOADERFREETYPE_H_
 
-#include <ft2build.h>
-#include <freetype/freetype.h>
-
-#include <string>
-
 namespace ExLibris
 {
 

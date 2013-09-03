@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExLibrisGL", "Projects\ExLibrisGL\ExLibrisGL.vcxproj", "{BBC4F8F8-9B70-4A49-89F8-B8B669D26E80}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example", "Projects\Example\Example.vcxproj", "{7D254F53-73C2-4A9D-B079-9FA8C51F7275}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BBC4F8F8-9B70-4A49-89F8-B8B669D26E80} = {BBC4F8F8-9B70-4A49-89F8-B8B669D26E80}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
