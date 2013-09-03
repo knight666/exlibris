@@ -17,6 +17,8 @@ namespace ExLibris
 		FontLoaderFreetype();
 		~FontLoaderFreetype();
 
+		FT_Library GetLibrary() const;
+
 		FT_Face LoadFontFace(const std::string& a_Path);
 	
 	private:
