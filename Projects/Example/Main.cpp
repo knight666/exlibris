@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <freetype/ftoutln.h>
 #include <iostream>
 #include <string>
 #include <map>
@@ -114,6 +115,85 @@ GLuint CreateTexture(const std::map<unsigned int, Glyph*>& a_Glyphs, unsigned in
 	return texture;
 }
 
+glm::vec2 FreetypeToGlm(const FT_Vector* a_Position)
+{
+	return glm::vec2(
+		(float)(a_Position->x >> 6),
+		(float)(a_Position->y >> 6)
+	);
+}
+
+struct LineSegment
+{
+	glm::vec2 start;
+	glm::vec2 end;
+};
+
+struct GlyphOutline
+{
+	glm::vec2 start;
+	std::vector<LineSegment> lines;
+};
+
+int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
+{
+	std::cout << "Move to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ")" << std::endl;
+
+	GlyphOutline* outline = (GlyphOutline*)a_User;
+
+	outline->start = FreetypeToGlm(a_To);
+
+	return 0;
+}
+
+int CallbackLineTo(const FT_Vector* a_To, void* a_User)
+{
+	std::cout << "Line to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ")" << std::endl;
+
+	GlyphOutline* outline = (GlyphOutline*)a_User;
+
+	LineSegment segment;
+	segment.start = outline->start;
+	segment.end = FreetypeToGlm(a_To);
+	
+	outline->lines.push_back(segment);
+	outline->start = segment.end;
+
+	return 0;
+}
+
+int CallbackConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
+{
+	std::cout << "Conic to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ") via (" << (a_Control->x >> 6) << ", " << (a_Control->y >> 6) << ")" << std::endl;
+
+	GlyphOutline* outline = (GlyphOutline*)a_User;
+
+	LineSegment segment;
+	segment.start = outline->start;
+	segment.end = FreetypeToGlm(a_To);
+
+	outline->lines.push_back(segment);
+	outline->start = segment.end;
+
+	return 0;
+}
+
+int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
+{
+	std::cout << "Cubic to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ") via (" << (a_ControlA->x >> 6) << ", " << (a_ControlA->y >> 6) << ") and (" << (a_ControlB->x >> 6) << ", " << (a_ControlB->y >> 6) << std::endl;
+
+	GlyphOutline* outline = (GlyphOutline*)a_User;
+
+	LineSegment segment;
+	segment.start = outline->start;
+	segment.end = FreetypeToGlm(a_To);
+
+	outline->lines.push_back(segment);
+	outline->start = segment.end;
+
+	return 0;
+}
+
 int main(int argc, const char** argv)
 {
 	ExLibris::FontLoaderFreetype loader;
@@ -126,6 +206,19 @@ int main(int argc, const char** argv)
 
 	ExLibris::FaceMetrics face_metrics;
 	std::map<unsigned int, Glyph*> font_glyphs;
+
+	FT_Outline_Funcs outline_callbacks;
+	outline_callbacks.move_to = &CallbackMoveTo;
+	outline_callbacks.line_to = &CallbackLineTo;
+	outline_callbacks.conic_to = &CallbackConicTo;
+	outline_callbacks.cubic_to = &CallbackCubicTo;
+	outline_callbacks.shift = 0;
+	outline_callbacks.delta = 0;
+
+	GlyphOutline outline;
+
+	errors = FT_Load_Glyph(font_face, (unsigned int)'Q', FT_LOAD_DEFAULT);
+	errors = FT_Outline_Decompose(&font_face->glyph->outline, &outline_callbacks, &outline);
 
 	FT_UInt codepoint = 0;
 	FT_ULong glyph_index = FT_Get_First_Char(font_face, &codepoint);

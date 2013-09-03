@@ -17,6 +17,11 @@ namespace ExLibris
 		FT_Done_FreeType(m_Library);
 	}
 
+	FT_Library FontLoaderFreetype::GetLibrary() const
+	{
+		return m_Library;
+	}
+
 	FT_Face FontLoaderFreetype::LoadFontFace(const std::string& a_Path)
 	{
 		std::fstream font_file(a_Path, std::fstream::in | std::fstream::binary);
