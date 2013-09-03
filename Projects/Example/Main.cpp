@@ -1,5 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <freetype/ftoutln.h>
 #include <iostream>
@@ -217,7 +219,8 @@ int main(int argc, const char** argv)
 
 	GlyphOutline outline;
 
-	errors = FT_Load_Glyph(font_face, (unsigned int)'Q', FT_LOAD_DEFAULT);
+	FT_UInt outline_codepoint = FT_Get_Char_Index(font_face, (FT_ULong)'Q');
+	errors = FT_Load_Glyph(font_face, outline_codepoint, FT_LOAD_DEFAULT);
 	errors = FT_Outline_Decompose(&font_face->glyph->outline, &outline_callbacks, &outline);
 
 	FT_UInt codepoint = 0;
@@ -371,11 +374,26 @@ int main(int argc, const char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-		glMatrixMode(GL_MODELVIEW);
+		glm::mat4x4 projection = glm::ortho<float>(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+		glLoadMatrixf(glm::value_ptr(projection));
 
-		glActiveTexture(GL_TEXTURE0);
+		glMatrixMode(GL_MODELVIEW);
+		glm::mat4x4 modelview;
+		modelview = glm::scale(modelview, glm::vec3(5.0f, 5.0f, 5.0f));
+		glLoadMatrixf(glm::value_ptr(modelview));
+
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		for (std::vector<LineSegment>::iterator segment_it = outline.lines.begin(); segment_it != outline.lines.end(); ++segment_it)
+		{
+			LineSegment& segment = *segment_it;
+
+			glVertex2fv(glm::value_ptr(segment.start));
+			glVertex2fv(glm::value_ptr(segment.end));
+		}
+		glEnd();
+
+		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, text_texture);
 
 		glEnable(GL_BLEND);
@@ -394,7 +412,7 @@ int main(int argc, const char** argv)
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glDisable(GL_BLEND);
+		glDisable(GL_BLEND);*/
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
