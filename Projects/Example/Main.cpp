@@ -1,17 +1,30 @@
-﻿#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+﻿// STL
 
-#include <freetype/ftoutln.h>
 #include <iostream>
 #include <string>
 #include <map>
 #include <vector>
 
-#include "FaceMetrics.h"
-#include "FontLoaderFreetype.h"
-#include "GlyphMetrics.h"
+// Freetype
+
+#include <freetype/ftbbox.h>
+#include <freetype/ftoutln.h>
+
+// GLM
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+// OpenGL
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+// ExLibris
+
+#include <FaceMetrics.h>
+#include <FontLoaderFreetype.h>
+#include <GlyphMetrics.h>
 
 static void OnGlfwError(int error, const char* description)
 {
@@ -23,6 +36,31 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
+
+glm::vec2 FreetypeToGlm(const FT_Vector* a_Position)
+{
+	return glm::vec2(
+		(float)(a_Position->x) / 64.0f,
+		(float)(a_Position->y) / 64.0f
+	);
+}
+
+struct LineSegment
+{
+	glm::vec2 start;
+	glm::vec2 end;
+};
+
+struct GlyphContour
+{
+	std::vector<glm::vec2> points;
+};
+
+struct GlyphOutline
+{
+	glm::vec2 start;
+	std::vector<LineSegment> lines;
+};
 
 struct GlyphBitmap
 {
@@ -116,26 +154,6 @@ GLuint CreateTexture(const std::map<unsigned int, Glyph*>& a_Glyphs, unsigned in
 
 	return texture;
 }
-
-glm::vec2 FreetypeToGlm(const FT_Vector* a_Position)
-{
-	return glm::vec2(
-		(float)(a_Position->x) / 64.0f,
-		(float)(a_Position->y) / 64.0f
-	);
-}
-
-struct LineSegment
-{
-	glm::vec2 start;
-	glm::vec2 end;
-};
-
-struct GlyphOutline
-{
-	glm::vec2 start;
-	std::vector<LineSegment> lines;
-};
 
 int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
 {
@@ -292,6 +310,14 @@ int main(int argc, const char** argv)
 		metrics->offset.x = (float)((glyph_metrics.horiBearingX) >> 6);
 		metrics->offset.y = (float)((glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) >> 6);
 		metrics->advance = (float)((glyph_metrics.horiAdvance) >> 6);
+
+		FT_BBox bounding_box;
+		errors = FT_Outline_Get_BBox(&font_face->glyph->outline, &bounding_box);
+
+		metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
+		metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
+		metrics->bounding_box.maximum.x = (float)bounding_box.xMax / 64.0f;
+		metrics->bounding_box.maximum.y = (float)bounding_box.yMax / 64.0f;
 
 		face_metrics.AddGlyphMetrics(metrics);
 

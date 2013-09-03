@@ -38,6 +38,7 @@
     <Import Project="..\..\Properties\LibFreeImage.props" />
     <Import Project="..\..\Properties\LibFreeType.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -48,6 +49,7 @@
     <Import Project="..\..\Properties\LibFreeImage.props" />
     <Import Project="..\..\Properties\LibFreeType.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -63,14 +65,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FaceMetrics.cpp" />
-    <ClCompile Include="FontLoaderFreetype.cpp" />
     <ClCompile Include="Main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="FaceMetrics.h" />
-    <ClInclude Include="FontLoaderFreetype.h" />
-    <ClInclude Include="GlyphMetrics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,6 @@
-#include "FontLoaderFreetype.h"
+#include "ExLibrisGL.PCH.h"
 
-#include <fstream>
-#include <iostream>
+#include "FontLoaderFreetype.h"
 
 namespace ExLibris
 {

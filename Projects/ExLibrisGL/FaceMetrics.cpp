@@ -1,3 +1,5 @@
+#include "ExLibrisGL.PCH.h"
+
 #include "FaceMetrics.h"
 
 #include "GlyphMetrics.h"
