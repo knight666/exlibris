@@ -90,34 +90,6 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule H:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2/src/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"E:\Programs\CMake 2.8\bin\cmake.exe" -HH:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2 -BH:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2 --check-stamp-file H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">H:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2/src/CMakeLists.txt;H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeLists.txt;H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeFiles\generate.stamp</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule H:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2/src/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"E:\Programs\CMake 2.8\bin\cmake.exe" -HH:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2 -BH:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2 --check-stamp-file H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">H:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2/src/CMakeLists.txt;H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeLists.txt;H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">H:\Projects\ExLibrisGL\Dependencies\glfw-3.0.2\src\CMakeFiles\generate.stamp</Outputs>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="internal.h" />
     <ClInclude Include="..\include\GLFW\glfw3.h" />
@@ -141,11 +113,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="win32_time.c" />
     <ClCompile Include="win32_window.c" />
     <ClCompile Include="wgl_context.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="H:/Projects/ExLibrisGL/Dependencies/glfw-3.0.2/ZERO_CHECK.vcxproj">
-      <Project>5C54EAF3-9BB3-441A-A919-40205195AC83</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
