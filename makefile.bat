@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 
 set VisualStudioVersion=2010
 
@@ -45,11 +46,11 @@ goto :eof
 	echo.
 	if "%VisualStudioVersion%" == "2008" (
 		call "%VS90COMNTOOLS%vsvars32.bat"
-		set "MSBUILD=%FrameworkDir%\%Framework35Version%\msbuild.exe"
+		set "MSBUILD=!FrameworkDir!\!Framework35Version!\msbuild.exe"
 	)
 	if "%VisualStudioVersion%" == "2010" (
 		call "%VS100COMNTOOLS%vsvars32.bat"
-		set "MSBUILD=%FrameworkDir32%%FrameworkVersion32%\msbuild.exe"
+		set "MSBUILD=!FrameworkDir32!!FrameworkVersion32!\msbuild.exe"
 	)
 	echo.
 	goto :eof
@@ -93,4 +94,5 @@ goto :eof
 	
 :Exit
 	echo --- Done
+	endlocal
 	goto :eof
