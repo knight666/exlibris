@@ -3,7 +3,7 @@
 set VisualStudioVersion=2010
 
 if [%1]==[] (
-	goto :Help
+	call :All
 )
 for %%A in (%*) do (
 	if "%%A"=="-help" (
@@ -16,11 +16,13 @@ for %%A in (%*) do (
 	if "%%A"=="-project" (
 		call :SetupEnvironment
 		call :BuildProject
+		call :RunTests
+	)
+	if "%%A"=="-tests" (
+		call :RunTests
 	)
 	if "%%A"=="-all" (
-		call :SetupEnvironment
-		call :BuildDependencies
-		call :BuildProject
+		call :All
 	)
 )
 call :Exit
@@ -33,9 +35,10 @@ goto :eof
 	echo -help              Display this message
 	echo -dependencies      Build dependencies
 	echo -project           Build project
-	echo -all               Build dependencies and project
+	echo -tests             Run all tests
+	echo -all               Build dependencies and project and run tests
 	echo.
-	goto :Exit
+	goto :eof
 	
 :SetupEnvironment
 	echo --- Setting up environment
@@ -58,6 +61,7 @@ goto :eof
 	%MSBUILD% /nologo /p:Configuration=Release "ExLibrisGL.Dependencies.sln"
 	echo.
 	echo --- Completed building the dependencies.
+	echo.
 	goto :eof
 	
 :BuildProject
@@ -67,8 +71,26 @@ goto :eof
 	%MSBUILD% /nologo /p:Configuration=Release "ExLibrisGL.sln"
 	echo.
 	echo --- Completed building the project.
+	echo.
 	goto :eof
-
+	
+:RunTests
+	echo --- Running tests
+	echo.
+	call "Build/ExLibris.TestDebug.exe"
+	echo.
+	goto :eof
+	
+:All
+	echo --- All
+	echo.
+	call :SetupEnvironment
+	call :BuildDependencies
+	call :BuildProject
+	call :RunTests
+	echo.
+	goto :eof
+	
 :Exit
-	echo --- Done.
+	echo --- Done
 	goto :eof
