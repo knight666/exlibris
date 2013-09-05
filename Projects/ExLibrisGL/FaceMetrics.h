@@ -1,8 +1,6 @@
 #ifndef _FACEMETRICS_H_
 #define _FACEMETRICS_H_
 
-#include <map>
-
 namespace ExLibris
 {
 	struct GlyphMetrics;
