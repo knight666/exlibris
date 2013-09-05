@@ -21,7 +21,7 @@ namespace ExLibris
 		return m_Library;
 	}
 
-	FT_Face FontLoaderFreetype::LoadFontFace(const std::string& a_Path)
+	FontFreetype* FontLoaderFreetype::LoadFontFace(const std::string& a_Path)
 	{
 		std::fstream font_file(a_Path, std::fstream::in | std::fstream::binary);
 		if (!font_file.is_open())
@@ -38,20 +38,21 @@ namespace ExLibris
 
 		font_file.close();
 
-		FT_Face result;
-		m_Error = FT_New_Memory_Face(m_Library, font_file_data, (FT_Long)font_file_size, 0, &result);
-
-		if (result->charmap == nullptr)
+		FT_Face font_loaded;
+		m_Error = FT_New_Memory_Face(m_Library, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
+		if (m_Error != 0)
 		{
-			FT_Select_Charmap(result, FT_ENCODING_UNICODE);
-			if (result->charmap == nullptr)
-			{
-				FT_Done_Face(result);
-				return nullptr;
-			}
+			return nullptr;
 		}
 
-		return result;
+		FontFreetype* font = new FontFreetype(font_loaded->family_name);
+		if (!font->LoadFontData(font_loaded))
+		{
+			delete font;
+			return nullptr;
+		}
+
+		return font;
 	}
 
 }; // namespace ExLibris

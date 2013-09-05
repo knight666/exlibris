@@ -284,7 +284,7 @@ GlyphOutline CreateOutline(FT_Face a_FontFace, wchar_t a_Character)
 int main(int argc, const char** argv)
 {
 	ExLibris::FontLoaderFreetype loader;
-	FT_Face font_face = loader.LoadFontFace("Fonts/Mathilde/mathilde.otf");
+	/*FT_Face font_face = loader.LoadFontFace("Fonts/Mathilde/mathilde.otf");
 
 	FT_Error errors = 0;
 
@@ -362,7 +362,7 @@ int main(int argc, const char** argv)
 
 		glyph_index = FT_Get_Next_Char(font_face, glyph_index, &codepoint);
 	}
-	while (codepoint != 0);
+	while (codepoint != 0);*/
 
 	GLFWwindow* window;
 
@@ -463,7 +463,7 @@ int main(int argc, const char** argv)
 		modelview = glm::scale(modelview, glm::vec3(5.0f, 5.0f, 5.0f));
 		glLoadMatrixf(glm::value_ptr(modelview));
 
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		/*glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glBegin(GL_LINES);
 		for (std::vector<LineSegment>::iterator segment_it = outline.lines.begin(); segment_it != outline.lines.end(); ++segment_it)
 		{

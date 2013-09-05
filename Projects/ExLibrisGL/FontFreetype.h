@@ -17,14 +17,19 @@ namespace ExLibris
 	
 	public:
 	
-		FontFreetype(FT_Face a_Font);
+		FontFreetype(const std::string& a_FamilyName);
 		~FontFreetype();
+
+		const std::string& GetFamilyName() const;
+
+		bool LoadFontData(FT_Face a_Font);
 	
 		FontFaceFreetype* CreateFace(float a_Size) const;
 
 	private:
 
 		FT_Face m_Font;
+		std::string m_FamilyName;
 	
 	}; // class FontFreetype
 
