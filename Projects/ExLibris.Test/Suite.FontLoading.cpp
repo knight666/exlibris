@@ -13,3 +13,11 @@ TEST(FontLoaderFreetype, LoadFont)
 
 	EXPECT_STREQ("Roboto", font_loaded->GetFamilyName().c_str());
 }
+
+TEST(FontLoaderFreetype, LoadFontFileNotFound)
+{
+	FontLoaderFreetype loader;
+
+	FontFreetype* font_loaded = loader.LoadFontFace("Fonts/Arial.ttf");
+	EXPECT_EQ(nullptr, font_loaded);
+}
