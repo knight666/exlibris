@@ -1,6 +1,8 @@
 #ifndef _FONTLOADERFREETYPE_H_
 #define _FONTLOADERFREETYPE_H_
 
+#include "FontFreetype.h"
+
 namespace ExLibris
 {
 
@@ -14,7 +16,7 @@ namespace ExLibris
 
 		FT_Library GetLibrary() const;
 
-		FT_Face LoadFontFace(const std::string& a_Path);
+		FontFreetype* LoadFontFace(const std::string& a_Path);
 	
 	private:
 
