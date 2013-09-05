@@ -17,9 +17,12 @@ for %%A in (%*) do (
 	if "%%A"=="-project" (
 		call :SetupEnvironment
 		call :BuildProject
+		call :BuildTests
 		call :RunTests
 	)
 	if "%%A"=="-tests" (
+		call :SetupEnvironment
+		call :BuildTests
 		call :RunTests
 	)
 	if "%%A"=="-all" (
@@ -36,7 +39,7 @@ exit /B 0
 	echo -help              Display this message
 	echo -dependencies      Build dependencies
 	echo -project           Build project
-	echo -tests             Run all tests
+	echo -tests             Build and run all tests
 	echo -all               Build dependencies and project and run tests
 	echo.
 	goto :eof
@@ -58,8 +61,8 @@ exit /B 0
 :BuildDependencies
 	echo --- Building dependencies
 	echo.
-	%MSBUILD% /nologo /p:Configuration=Debug "ExLibrisGL.Dependencies.sln"
-	%MSBUILD% /nologo /p:Configuration=Release "ExLibrisGL.Dependencies.sln"
+	%MSBUILD% "ExLibrisGL.Dependencies.sln" /nologo /p:Configuration=Debug
+	%MSBUILD% "ExLibrisGL.Dependencies.sln" /nologo /p:Configuration=Release
 	echo.
 	echo --- Completed building the dependencies.
 	echo.
@@ -68,10 +71,20 @@ exit /B 0
 :BuildProject
 	echo --- Building project
 	echo.
-	%MSBUILD% /nologo /p:Configuration=Debug "ExLibrisGL.sln"
-	%MSBUILD% /nologo /p:Configuration=Release "ExLibrisGL.sln"
+	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibrisGL;Build /t:Example;Build
+	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Release /t:ExLibrisGL;Build /t:Example;Build
 	echo.
 	echo --- Completed building the project.
+	echo.
+	goto :eof
+	
+:BuildTests
+	echo --- Building tests
+	echo.
+	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibris_Test;Build
+	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Release /t:ExLibris_Test;Build
+	echo.
+	echo --- Completed building the tests.
 	echo.
 	goto :eof
 	
@@ -90,6 +103,7 @@ exit /B 0
 	call :SetupEnvironment
 	call :BuildDependencies
 	call :BuildProject
+	call :BuildTests
 	call :RunTests
 	echo.
 	goto :eof
