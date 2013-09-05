@@ -3,16 +3,30 @@
 
 namespace ExLibris
 {
+	class FontFreetype;
+}
+
+namespace ExLibris
+{
 
 	class FontFaceFreetype
 	{
 	
 	public:
 	
-		FontFaceFreetype(FT_Face a_FontFace);
+		FontFaceFreetype(FontFreetype* a_Font);
 		~FontFaceFreetype();
 	
-		bool LoadGlyphs(float a_Size);
+		FontFreetype* GetFont() const;
+
+		float GetSize() const;
+
+		bool LoadGlyphs(FT_Face a_FontData, float a_Size);
+
+	private:
+
+		FontFreetype* m_Font;
+		float m_Size;
 	
 	}; // class FontFaceFreetype
 
