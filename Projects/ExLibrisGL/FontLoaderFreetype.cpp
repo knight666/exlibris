@@ -46,8 +46,6 @@ namespace ExLibris
 			FT_Select_Charmap(result, FT_ENCODING_UNICODE);
 			if (result->charmap == nullptr)
 			{
-				std::cerr << "Could not parse font." << std::endl;
-
 				FT_Done_Face(result);
 				return nullptr;
 			}

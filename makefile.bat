@@ -27,7 +27,7 @@ for %%A in (%*) do (
 	)
 )
 call :Exit
-goto :eof
+exit /B 0
 
 :Help
 	echo.
@@ -78,7 +78,9 @@ goto :eof
 :RunTests
 	echo --- Running tests
 	echo.
-	call "Build/ExLibris.TestDebug.exe"
+	pushd Build
+	call "ExLibris.TestDebug.exe"
+	popd
 	echo.
 	goto :eof
 	
@@ -95,4 +97,3 @@ goto :eof
 :Exit
 	echo --- Done
 	endlocal
-	goto :eof
