@@ -28,6 +28,11 @@ namespace ExLibris
 
 	bool FontFreetype::LoadFontData(FT_Face a_Font)
 	{
+		if (a_Font == nullptr)
+		{
+			return false;
+		}
+
 		FT_Error errors = 0;
 		
 		errors = FT_Select_Charmap(a_Font, FT_ENCODING_UNICODE);

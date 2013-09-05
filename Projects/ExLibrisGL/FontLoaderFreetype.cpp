@@ -21,7 +21,7 @@ namespace ExLibris
 		return m_Library;
 	}
 
-	FontFreetype* FontLoaderFreetype::LoadFontFace(const std::string& a_Path)
+	FontFreetype* FontLoaderFreetype::LoadFont(const std::string& a_Path)
 	{
 		std::fstream font_file(a_Path, std::fstream::in | std::fstream::binary);
 		if (!font_file.is_open())
