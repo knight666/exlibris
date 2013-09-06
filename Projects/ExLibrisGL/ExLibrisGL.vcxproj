@@ -87,6 +87,7 @@
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
+    <ClInclude Include="FreetypeConversion.h" />
     <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphContour.h" />

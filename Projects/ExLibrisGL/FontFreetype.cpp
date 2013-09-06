@@ -3,6 +3,7 @@
 #include "FontFreetype.h"
 
 #include "FontFace.h"
+#include "FreetypeConversion.h"
 #include "Glyph.h"
 
 namespace ExLibris
@@ -61,7 +62,7 @@ namespace ExLibris
 
 		FT_Error errors = 0;
 
-		errors = FT_Set_Char_Size(m_Font, 0, ((FT_F26Dot6)a_Size) << 6, 0, 96);
+		errors = FT_Set_Char_Size(m_Font, 0, Fixed26Dot6::ToFixed(a_Size), 0, 96);
 		if (errors != 0)
 		{
 			return nullptr;
@@ -69,25 +70,23 @@ namespace ExLibris
 
 		FontFace* face = new FontFace(this);
 		face->SetSize(a_Size);
-		face->SetLineHeight((float)(m_Font->size->metrics.height >> 6));
+		face->SetLineHeight(Fixed26Dot6::ToFloat(m_Font->size->metrics.height));
 
 		FT_UInt codepoint = 0;
 		FT_ULong glyph_index = FT_Get_First_Char(m_Font, &codepoint);
 		do
 		{
 			errors = FT_Load_Glyph(m_Font, codepoint, FT_LOAD_DEFAULT);
-			if (errors != 0)
+			if (errors == 0)
 			{
-				continue;
+				Glyph* glyph = new Glyph;
+				glyph->index = (unsigned int)codepoint;
+
+				_LoadMetrics(m_Font->glyph, glyph);
+				_LoadBitmap(m_Font->glyph, glyph);
+
+				face->AddGlyph(glyph);
 			}
-
-			Glyph* glyph = new Glyph;
-			glyph->index = (unsigned int)codepoint;
-
-			_LoadMetrics(m_Font->glyph, glyph);
-			_LoadBitmap(m_Font->glyph, glyph);
-
-			face->AddGlyph(glyph);
 
 			glyph_index = FT_Get_Next_Char(m_Font, glyph_index, &codepoint);
 		}
@@ -103,9 +102,9 @@ namespace ExLibris
 		FT_Glyph_Metrics& glyph_metrics = a_Slot->metrics;
 
 		a_Glyph->metrics = new GlyphMetrics;
-		a_Glyph->metrics->offset.x = (float)glyph_metrics.horiBearingX / 64.0f;
-		a_Glyph->metrics->offset.y = (float)(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) / 64.0f;
-		a_Glyph->metrics->advance = (float)glyph_metrics.horiAdvance / 64.0f;
+		a_Glyph->metrics->offset.x = Fixed26Dot6::ToFloat(glyph_metrics.horiBearingX);
+		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY);
+		a_Glyph->metrics->advance = Fixed26Dot6::ToFloat(glyph_metrics.horiAdvance);
 
 		// bounding box
 
@@ -113,10 +112,10 @@ namespace ExLibris
 		errors = FT_Outline_Get_BBox(&a_Slot->outline, &bounding_box);
 		if (errors == 0)
 		{
-			a_Glyph->metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
-			a_Glyph->metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
-			a_Glyph->metrics->bounding_box.maximum.x = (float)bounding_box.xMax / 64.0f;
-			a_Glyph->metrics->bounding_box.maximum.y = (float)bounding_box.yMax / 64.0f;
+			a_Glyph->metrics->bounding_box.minimum.x = Fixed26Dot6::ToFloat(bounding_box.xMin);
+			a_Glyph->metrics->bounding_box.minimum.y = Fixed26Dot6::ToFloat(bounding_box.yMin);
+			a_Glyph->metrics->bounding_box.maximum.x = Fixed26Dot6::ToFloat(bounding_box.xMax);
+			a_Glyph->metrics->bounding_box.maximum.y = Fixed26Dot6::ToFloat(bounding_box.yMax);
 		}
 
 		return true;
