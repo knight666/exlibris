@@ -1,9 +1,11 @@
 #include "ExLibris.Test.PCH.h"
 
-#include "FontFace.h"
-#include "FontFreetype.h"
-#include "FontLoaderFreetype.h"
-#include "Glyph.h"
+#include <FontFace.h>
+#include <FontFreetype.h>
+#include <FontLoaderFreetype.h>
+#include <Glyph.h>
+
+#include "Mock.Font.h"
 
 using namespace ExLibris;
 
@@ -18,15 +20,43 @@ TEST(FontFace, Construct)
 
 TEST(FontFace, ConstructFromFont)
 {
-	FontFreetype* font = new FontFreetype("Broom 2.0");
-	FontFace* face = new FontFace(font);
+	MockFont* font = new MockFont("Broom 2.0");
+
+	FontFace* face = font->CreateFace(12.0f);
+	ASSERT_NE(nullptr, face);
 
 	EXPECT_EQ(font, face->GetFont());
+	EXPECT_FLOAT_EQ(12.0f, face->GetSize());
+	EXPECT_FLOAT_EQ(24.0f, face->GetLineHeight());
 }
 
-TEST(FontFace, FindGlyphNoFontEmpty)
+TEST(FontFace, FindGlyph)
+{
+	MockFont* font = new MockFont("Best Greetings");
+
+	FontFace* face = new FontFace(font);
+
+	Glyph* glyph = new Glyph;
+	glyph->index = 25;
+	face->AddGlyph(glyph);
+
+	Glyph* glyph_found = face->FindGlyph(25);
+	ASSERT_EQ(glyph, glyph_found);
+}
+
+TEST(FontFace, FindGlyphNoFont)
 {
 	FontFace* face = new FontFace(nullptr);
+
+	Glyph* glyph = face->FindGlyph(32);
+	ASSERT_EQ(nullptr, glyph);
+}
+
+TEST(FontFace, FindGlyphEmpty)
+{
+	MockFont* font = new MockFont("Smexy");
+	
+	FontFace* face = new FontFace(font);
 
 	Glyph* glyph = face->FindGlyph(32);
 	ASSERT_EQ(nullptr, glyph);
