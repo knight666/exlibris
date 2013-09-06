@@ -21,11 +21,13 @@ namespace ExLibris
 		const FontFreetype* GetFont() const;
 
 		float GetSize() const;
+		void SetSize(float a_Size);
+
 		float GetLineHeight() const;
+		void SetLineHeight(float a_LineHeight);
 
+		void AddGlyph(Glyph* a_Glyph);
 		Glyph* FindGlyph(unsigned int a_CodepointUtf32) const;
-
-		bool LoadGlyphs(FT_Face a_FontData, float a_Size);
 
 	private:
 

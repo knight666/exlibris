@@ -24,6 +24,14 @@ TEST(FontFaceFreetype, ConstructFromFont)
 	EXPECT_EQ(font, face->GetFont());
 }
 
+TEST(FontFaceFreetype, FindGlyphNoFontEmpty)
+{
+	FontFaceFreetype* face = new FontFaceFreetype(nullptr);
+
+	Glyph* glyph = face->FindGlyph(32);
+	ASSERT_EQ(nullptr, glyph);
+}
+
 class FaceContext
 	: public ::testing::Test
 {
