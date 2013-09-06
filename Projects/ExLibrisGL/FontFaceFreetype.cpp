@@ -7,7 +7,7 @@
 namespace ExLibris
 {
 
-	FontFaceFreetype::FontFaceFreetype(FontFreetype* a_Font)
+	FontFaceFreetype::FontFaceFreetype(const FontFreetype* a_Font)
 		: m_Font(a_Font)
 		, m_Size(0.0f)
 	{
@@ -17,7 +17,7 @@ namespace ExLibris
 	{
 	}
 
-	FontFreetype* FontFaceFreetype::GetFont() const
+	const FontFreetype* FontFaceFreetype::GetFont() const
 	{
 		return m_Font;
 	}

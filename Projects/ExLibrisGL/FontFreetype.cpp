@@ -53,8 +53,8 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		FontFaceFreetype* face = new FontFaceFreetype(m_Font);
-		if (!face->LoadGlyphs(a_Size))
+		FontFaceFreetype* face = new FontFaceFreetype(this);
+		if (!face->LoadGlyphs(m_Font, a_Size))
 		{
 			delete face;
 			return nullptr;
