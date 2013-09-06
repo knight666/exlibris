@@ -2,13 +2,13 @@
 
 #include "FontFace.h"
 
-#include "FontFreetype.h"
 #include "Glyph.h"
+#include "IFont.h"
 
 namespace ExLibris
 {
 
-	FontFace::FontFace(const FontFreetype* a_Font)
+	FontFace::FontFace(const IFont* a_Font)
 		: m_Font(a_Font)
 		, m_Size(0.0f)
 		, m_LineHeight(0.0f)
@@ -24,7 +24,7 @@ namespace ExLibris
 		m_Glyphs.clear();
 	}
 
-	const FontFreetype* FontFace::GetFont() const
+	const IFont* FontFace::GetFont() const
 	{
 		return m_Font;
 	}
