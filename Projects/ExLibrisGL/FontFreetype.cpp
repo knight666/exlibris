@@ -2,7 +2,7 @@
 
 #include "FontFreetype.h"
 
-#include "FontFaceFreetype.h"
+#include "FontFace.h"
 #include "Glyph.h"
 
 namespace ExLibris
@@ -57,7 +57,7 @@ namespace ExLibris
 		return true;
 	}
 
-	FontFaceFreetype* FontFreetype::CreateFace(float a_Size) const
+	FontFace* FontFreetype::CreateFace(float a_Size) const
 	{
 		if (m_Font == nullptr)
 		{
@@ -72,7 +72,7 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		FontFaceFreetype* face = new FontFaceFreetype(this);
+		FontFace* face = new FontFace(this);
 		face->SetSize(a_Size);
 		face->SetLineHeight((float)(m_Font->size->metrics.height >> 6));
 

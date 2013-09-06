@@ -71,7 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FaceMetrics.cpp" />
-    <ClCompile Include="FontFaceFreetype.cpp" />
+    <ClCompile Include="FontFace.cpp" />
     <ClCompile Include="FontFreetype.cpp" />
     <ClCompile Include="FontLoaderFreetype.cpp" />
     <ClCompile Include="ExLibrisGL.PCH.cpp">
@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FaceMetrics.h" />
-    <ClInclude Include="FontFaceFreetype.h" />
+    <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
     <ClInclude Include="Glyph.h" />

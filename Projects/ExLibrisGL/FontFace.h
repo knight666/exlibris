@@ -1,5 +1,5 @@
-#ifndef _FONTFACEFREETYPE_H_
-#define _FONTFACEFREETYPE_H_
+#ifndef _FONTFACE_H_
+#define _FONTFACE_H_
 
 namespace ExLibris
 {
@@ -10,13 +10,13 @@ namespace ExLibris
 namespace ExLibris
 {
 
-	class FontFaceFreetype
+	class FontFace
 	{
 	
 	public:
 	
-		FontFaceFreetype(const FontFreetype* a_Font);
-		~FontFaceFreetype();
+		FontFace(const FontFreetype* a_Font);
+		~FontFace();
 	
 		const FontFreetype* GetFont() const;
 
@@ -36,7 +36,7 @@ namespace ExLibris
 		float m_LineHeight;
 		std::map<unsigned int, Glyph*> m_Glyphs;
 	
-	}; // class FontFaceFreetype
+	}; // class FontFace
 
 }; // namespace ExLibris
 

@@ -1,32 +1,32 @@
 #include "ExLibris.Test.PCH.h"
 
-#include "FontFaceFreetype.h"
+#include "FontFace.h"
 #include "FontFreetype.h"
 #include "FontLoaderFreetype.h"
 #include "Glyph.h"
 
 using namespace ExLibris;
 
-TEST(FontFaceFreetype, Construct)
+TEST(FontFace, Construct)
 {
-	FontFaceFreetype* face = new FontFaceFreetype(nullptr);
+	FontFace* face = new FontFace(nullptr);
 
 	EXPECT_EQ(nullptr, face->GetFont());
 	EXPECT_FLOAT_EQ(0.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(0.0f, face->GetLineHeight());
 }
 
-TEST(FontFaceFreetype, ConstructFromFont)
+TEST(FontFace, ConstructFromFont)
 {
 	FontFreetype* font = new FontFreetype("Broom 2.0");
-	FontFaceFreetype* face = new FontFaceFreetype(font);
+	FontFace* face = new FontFace(font);
 
 	EXPECT_EQ(font, face->GetFont());
 }
 
-TEST(FontFaceFreetype, FindGlyphNoFontEmpty)
+TEST(FontFace, FindGlyphNoFontEmpty)
 {
-	FontFaceFreetype* face = new FontFaceFreetype(nullptr);
+	FontFace* face = new FontFace(nullptr);
 
 	Glyph* glyph = face->FindGlyph(32);
 	ASSERT_EQ(nullptr, glyph);
@@ -56,7 +56,7 @@ protected:
 
 	FontLoaderFreetype* loader;
 	FontFreetype* font;
-	FontFaceFreetype* face;
+	FontFace* face;
 
 };
 
