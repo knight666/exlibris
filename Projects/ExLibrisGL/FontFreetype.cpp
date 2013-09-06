@@ -111,7 +111,7 @@ namespace ExLibris
 
 		FT_BBox bounding_box;
 		errors = FT_Outline_Get_BBox(&a_Slot->outline, &bounding_box);
-		if (errors != 0)
+		if (errors == 0)
 		{
 			a_Glyph->metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
 			a_Glyph->metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
