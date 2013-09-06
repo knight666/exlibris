@@ -79,6 +79,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Glyph.cpp" />
+    <ClCompile Include="IFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FaceMetrics.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
+    <ClInclude Include="IFont.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

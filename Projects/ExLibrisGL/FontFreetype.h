@@ -4,15 +4,13 @@
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
-namespace ExLibris
-{
-	class FontFace;
-}
+#include "IFont.h"
 
 namespace ExLibris
 {
 
 	class FontFreetype
+		: public IFont
 	{
 	
 	public:
@@ -20,18 +18,15 @@ namespace ExLibris
 		FontFreetype(const std::string& a_FamilyName);
 		~FontFreetype();
 
-		const std::string& GetFamilyName() const;
-
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
 
-		bool LoadFontData(FT_Face a_Font);
-	
 		FontFace* CreateFace(float a_Size) const;
+
+		bool LoadFontData(FT_Face a_Font);
 
 	private:
 
 		FT_Face m_Font;
-		std::string m_FamilyName;
 	
 	}; // class FontFreetype
 
