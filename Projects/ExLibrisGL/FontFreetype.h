@@ -38,6 +38,7 @@ namespace ExLibris
 	private:
 
 		FT_Face m_Font;
+		FT_Outline_Funcs m_OutlineCallbacks;
 	
 	}; // class FontFreetype
 

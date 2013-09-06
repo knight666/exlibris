@@ -112,6 +112,20 @@ TEST_F(FaceContext, FindGlyph)
 	EXPECT_FLOAT_EQ(23.000000f, glyph->metrics->bounding_box.maximum.y);
 }
 
+TEST_F(FaceContext, FindGlyphOutline)
+{
+	Glyph* glyph = face->FindGlyph((unsigned int)'-');
+	ASSERT_NE(nullptr, glyph);
+
+	ASSERT_NE(nullptr, glyph->outline);
+	EXPECT_EQ(1, glyph->outline->contours.size());
+
+	GlyphContour* contour = glyph->outline->contours[0];
+	EXPECT_EQ(5, contour->points.size());
+	EXPECT_FLOAT_EQ(8.2031250f, contour->points[0].x);
+	EXPECT_FLOAT_EQ(8.5937500f, contour->points[0].y);
+}
+
 TEST_F(FaceContext, FindGlyphNotFound)
 {
 	Glyph* glyph = face->FindGlyph(0x777126);

@@ -1,6 +1,8 @@
 #ifndef _FONTFACE_H_
 #define _FONTFACE_H_
 
+#include <map>
+
 namespace ExLibris
 {
 	struct Glyph;

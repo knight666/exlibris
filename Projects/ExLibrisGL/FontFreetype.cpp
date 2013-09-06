@@ -9,10 +9,93 @@
 namespace ExLibris
 {
 
+	int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
+	{
+		GlyphOutline* outline = (GlyphOutline*)a_User;
+
+		GlyphContour* contour = new GlyphContour;
+		outline->contours.push_back(contour);
+
+		glm::vec2 position = Fixed26Dot6::ToFloatVec2(a_To);
+		contour->points.push_back(position);
+
+		return 0;
+	}
+
+	int CallbackLineTo(const FT_Vector* a_To, void* a_User)
+	{
+		GlyphOutline* outline = (GlyphOutline*)a_User;
+		if (outline == nullptr || outline->contours.size() == 0)
+		{
+			return -1;
+		}
+
+		GlyphContour* contour = outline->contours.back();
+
+		glm::vec2 position = Fixed26Dot6::ToFloatVec2(a_To);
+		contour->points.push_back(position);
+
+		return 0;
+	}
+
+	int CallbackConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
+	{
+		GlyphOutline* outline = (GlyphOutline*)a_User;
+		if (outline == nullptr || outline->contours.size() == 0)
+		{
+			return -1;
+		}
+
+		GlyphContour* contour = outline->contours.back();
+		if (contour->points.size() == 0)
+		{
+			return -1;
+		}
+
+		glm::vec2 a = contour->points.front();
+		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
+		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_Control);
+
+		int precision = 10;
+		glm::vec2 delta_precision((float)precision, (float)precision);
+
+		glm::vec2 delta_ac = (c - a) / delta_precision;
+		glm::vec2 delta_cb = (b - c) / delta_precision;
+
+		glm::vec2 start = a;
+
+		for (int j = 1; j < precision; ++j)
+		{
+			a += delta_ac;
+			c += delta_cb;
+
+			glm::vec2 end = a + ((c - a) / delta_precision) * (float)j;
+
+			contour->points.push_back(end);
+
+			start = end;
+		}
+
+		contour->points.push_back(b);
+
+		return 0;
+	}
+
+	int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
+	{
+		return 0;
+	}
+
 	FontFreetype::FontFreetype(const std::string& a_Family)
 		: IFont(a_Family)
 		, m_Font(nullptr)
 	{
+		m_OutlineCallbacks.move_to = &CallbackMoveTo;
+		m_OutlineCallbacks.line_to = &CallbackLineTo;
+		m_OutlineCallbacks.conic_to = &CallbackConicTo;
+		m_OutlineCallbacks.cubic_to = &CallbackCubicTo;
+		m_OutlineCallbacks.shift = 0;
+		m_OutlineCallbacks.delta = 0;
 	}
 	
 	FontFreetype::~FontFreetype()
@@ -84,6 +167,7 @@ namespace ExLibris
 
 				_LoadMetrics(m_Font->glyph, glyph);
 				_LoadBitmap(m_Font->glyph, glyph);
+				_LoadOutline(m_Font->glyph, glyph);
 
 				face->AddGlyph(glyph);
 			}
@@ -176,7 +260,25 @@ namespace ExLibris
 
 	bool FontFreetype::_LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
 	{
-		return false;
+		if (a_Slot->outline.n_contours <= 0)
+		{
+			return false;
+		}
+
+		FT_Error errors = 0;
+
+		a_Glyph->outline = new GlyphOutline;
+
+		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph->outline);
+		if (errors != 0)
+		{
+			delete a_Glyph->outline;
+			a_Glyph->outline = nullptr;
+
+			return false;
+		}
+
+		return true;
 	}
 
 }; // namespace ExLibris
