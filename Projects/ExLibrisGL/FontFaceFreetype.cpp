@@ -32,6 +32,8 @@ namespace ExLibris
 	{
 		FT_Error errors = 0;
 
+		m_Size = a_Size;
+
 		errors = FT_Set_Char_Size(a_FontData, 0, ((FT_F26Dot6)a_Size) << 6, 0, 96);
 		m_LineHeight = (float)(a_FontData->size->metrics.height >> 6);
 
