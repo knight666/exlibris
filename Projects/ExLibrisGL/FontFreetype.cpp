@@ -175,4 +175,9 @@ namespace ExLibris
 		return true;
 	}
 
+	bool FontFreetype::_LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	{
+		return false;
+	}
+
 }; // namespace ExLibris
