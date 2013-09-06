@@ -23,8 +23,9 @@
 // ExLibris
 
 #include <FaceMetrics.h>
+#include <FontFace.h>
 #include <FontLoaderFreetype.h>
-#include <GlyphMetrics.h>
+#include <Glyph.h>
 
 static void OnGlfwError(int error, const char* description)
 {
@@ -284,85 +285,11 @@ GlyphOutline CreateOutline(FT_Face a_FontFace, wchar_t a_Character)
 int main(int argc, const char** argv)
 {
 	ExLibris::FontLoaderFreetype loader;
-	/*FT_Face font_face = loader.LoadFontFace("Fonts/Mathilde/mathilde.otf");
+	//ExLibris::IFont* font = loader.LoadFont("Fonts/Mathilde/mathilde.otf");
+	ExLibris::IFont* font = loader.LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+	ExLibris::FontFace* face_size24 = font->CreateFace(24.0f);
 
-	FT_Error errors = 0;
-
-	errors = FT_Set_Char_Size(font_face, 0, 24 << 6, 0, 96);
-	float font_face_height = (float)(font_face->size->metrics.height >> 6);
-
-	ExLibris::FaceMetrics face_metrics;
-	std::map<unsigned int, Glyph*> font_glyphs;
-
-	GlyphOutline outline = CreateOutline(font_face, L'Q');
-
-	FT_UInt codepoint = 0;
-	FT_ULong glyph_index = FT_Get_First_Char(font_face, &codepoint);
-	do
-	{
-		Glyph* cached = new Glyph;
-
-		errors = FT_Load_Glyph(font_face, codepoint, FT_LOAD_DEFAULT);
-		FT_Glyph_Metrics& glyph_metrics = font_face->glyph->metrics;
-
-		ExLibris::GlyphMetrics* metrics = new ExLibris::GlyphMetrics;
-		metrics->codepoint = (unsigned int)glyph_index;
-		metrics->offset.x = (float)((glyph_metrics.horiBearingX) >> 6);
-		metrics->offset.y = (float)((glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) >> 6);
-		metrics->advance = (float)((glyph_metrics.horiAdvance) >> 6);
-
-		FT_BBox bounding_box;
-		errors = FT_Outline_Get_BBox(&font_face->glyph->outline, &bounding_box);
-
-		metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
-		metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
-		metrics->bounding_box.maximum.x = (float)bounding_box.xMax / 64.0f;
-		metrics->bounding_box.maximum.y = (float)bounding_box.yMax / 64.0f;
-
-		face_metrics.AddGlyphMetrics(metrics);
-
-		cached->metrics = metrics;
-
-		errors = FT_Render_Glyph(font_face->glyph, FT_RENDER_MODE_NORMAL);
-		FT_Bitmap& glyph_bitmap = font_face->glyph->bitmap;
-
-		cached->bitmap = new GlyphBitmap;
-		cached->bitmap->width = glyph_bitmap.width;
-		cached->bitmap->height = glyph_bitmap.rows;
-		cached->bitmap->pixels = new unsigned char[cached->bitmap->width * cached->bitmap->height * 4];
-
-		unsigned char* src_line = glyph_bitmap.buffer;
-		unsigned int src_pitch = glyph_bitmap.pitch;
-
-		unsigned char* dst_line = cached->bitmap->pixels;
-		unsigned int dst_pitch = cached->bitmap->width * 4;
-
-		for (int y = 0; y < glyph_bitmap.rows; y++)
-		{
-			unsigned char* src = src_line;
-			unsigned char* dst = dst_line;
-
-			for (int x = 0; x < glyph_bitmap.width; x++)
-			{
-				char value = *src;
-				dst[0] = value;
-				dst[1] = value;
-				dst[2] = value;
-				dst[3] = value;
-
-				dst += 4;
-				src++;
-			}
-
-			src_line += src_pitch;
-			dst_line += dst_pitch;
-		}
-
-		font_glyphs.insert(std::make_pair(cached->metrics->codepoint, cached));
-
-		glyph_index = FT_Get_Next_Char(font_face, glyph_index, &codepoint);
-	}
-	while (codepoint != 0);*/
+	ExLibris::Glyph* glyph = face_size24->FindGlyph((unsigned int)'Q');
 
 	GLFWwindow* window;
 
@@ -463,16 +390,19 @@ int main(int argc, const char** argv)
 		modelview = glm::scale(modelview, glm::vec3(5.0f, 5.0f, 5.0f));
 		glLoadMatrixf(glm::value_ptr(modelview));
 
-		/*glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		glBegin(GL_LINES);
-		for (std::vector<LineSegment>::iterator segment_it = outline.lines.begin(); segment_it != outline.lines.end(); ++segment_it)
-		{
-			LineSegment& segment = *segment_it;
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-			glVertex2fv(glm::value_ptr(segment.start));
-			glVertex2fv(glm::value_ptr(segment.end));
+		for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
+		{
+			ExLibris::GlyphContour* contour = *contour_it;
+
+			glBegin(GL_LINE_LOOP);
+			for (std::vector<glm::vec2>::iterator position_it = contour->points.begin(); position_it != contour->points.end(); ++position_it)
+			{
+				glVertex2fv(glm::value_ptr(*position_it));
+			}
+			glEnd();
 		}
-		glEnd();
 
 		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, text_texture);

@@ -52,7 +52,7 @@ namespace ExLibris
 			return -1;
 		}
 
-		glm::vec2 a = contour->points.front();
+		glm::vec2 a = contour->points.back();
 		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
 		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_Control);
 
@@ -83,6 +83,50 @@ namespace ExLibris
 
 	int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
 	{
+		GlyphOutline* outline = (GlyphOutline*)a_User;
+		if (outline == nullptr || outline->contours.size() == 0)
+		{
+			return -1;
+		}
+
+		GlyphContour* contour = outline->contours.back();
+		if (contour->points.size() == 0)
+		{
+			return -1;
+		}
+
+		glm::vec2 a = contour->points.back();
+		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
+		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_ControlA);
+		glm::vec2 d = Fixed26Dot6::ToFloatVec2(a_ControlB);
+
+		int precision = 10;
+		glm::vec2 delta_precision((float)precision, (float)precision);
+
+		glm::vec2 delta_ac = (c - a) / delta_precision;
+		glm::vec2 delta_cd = (d - c) / delta_precision;
+		glm::vec2 delta_db = (b - d) / delta_precision;
+
+		glm::vec2 start = a;
+
+		for (int j = 1; j < precision; ++j)
+		{
+			a += delta_ac;
+			c += delta_cd;
+			d += delta_db;
+
+			glm::vec2 ac = a + ((c - a) / delta_precision) * (float)j;
+			glm::vec2 cd = c + ((d - c) / delta_precision) * (float)j;
+
+			glm::vec2 end = ac + ((cd - ac) / delta_precision) * (float)j;
+
+			contour->points.push_back(end);
+
+			start = end;
+		}
+
+		contour->points.push_back(b);
+
 		return 0;
 	}
 
