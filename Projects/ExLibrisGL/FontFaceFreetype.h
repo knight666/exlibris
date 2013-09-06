@@ -14,10 +14,10 @@ namespace ExLibris
 	
 	public:
 	
-		FontFaceFreetype(FontFreetype* a_Font);
+		FontFaceFreetype(const FontFreetype* a_Font);
 		~FontFaceFreetype();
 	
-		FontFreetype* GetFont() const;
+		const FontFreetype* GetFont() const;
 
 		float GetSize() const;
 
@@ -25,7 +25,7 @@ namespace ExLibris
 
 	private:
 
-		FontFreetype* m_Font;
+		const FontFreetype* m_Font;
 		float m_Size;
 	
 	}; // class FontFaceFreetype
