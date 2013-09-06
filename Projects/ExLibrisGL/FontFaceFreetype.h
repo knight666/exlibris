@@ -20,6 +20,7 @@ namespace ExLibris
 		const FontFreetype* GetFont() const;
 
 		float GetSize() const;
+		float GetLineHeight() const;
 
 		bool LoadGlyphs(FT_Face a_FontData, float a_Size);
 
@@ -27,6 +28,7 @@ namespace ExLibris
 
 		const FontFreetype* m_Font;
 		float m_Size;
+		float m_LineHeight;
 	
 	}; // class FontFaceFreetype
 

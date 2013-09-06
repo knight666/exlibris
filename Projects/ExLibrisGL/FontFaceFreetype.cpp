@@ -10,6 +10,7 @@ namespace ExLibris
 	FontFaceFreetype::FontFaceFreetype(const FontFreetype* a_Font)
 		: m_Font(a_Font)
 		, m_Size(0.0f)
+		, m_LineHeight(0.0f)
 	{
 	}
 	
@@ -29,7 +30,17 @@ namespace ExLibris
 
 	bool FontFaceFreetype::LoadGlyphs(FT_Face a_FontData, float a_Size)
 	{
-		return false;
+		FT_Error errors = 0;
+
+		errors = FT_Set_Char_Size(a_FontData, 0, ((FT_F26Dot6)a_Size) << 6, 0, 96);
+		m_LineHeight = (float)(a_FontData->size->metrics.height >> 6);
+
+		return true;
+	}
+
+	float FontFaceFreetype::GetLineHeight() const
+	{
+		return m_LineHeight;
 	}
 
 }; // namespace ExLibris
