@@ -1,6 +1,7 @@
 #ifndef _GLYPH_H_
 #define _GLYPH_H_
 
+#include "GlyphBitmap.h"
 #include "GlyphMetrics.h"
 
 namespace ExLibris
@@ -17,6 +18,7 @@ namespace ExLibris
 
 		unsigned int index;
 		GlyphMetrics* metrics;
+		GlyphBitmap* bitmap;
 	
 	}; // struct Glyph
 
