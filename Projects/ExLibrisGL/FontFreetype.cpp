@@ -78,27 +78,14 @@ namespace ExLibris
 			errors = FT_Load_Glyph(m_Font, codepoint, FT_LOAD_DEFAULT);
 			if (errors != 0)
 			{
-				delete face;
-				return nullptr;
+				continue;
 			}
-
-			FT_Glyph_Metrics& glyph_metrics = m_Font->glyph->metrics;
 
 			Glyph* glyph = new Glyph;
 			glyph->index = (unsigned int)codepoint;
 
-			glyph->metrics = new GlyphMetrics;
-			glyph->metrics->offset.x = (float)glyph_metrics.horiBearingX / 64.0f;
-			glyph->metrics->offset.y = (float)(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) / 64.0f;
-			glyph->metrics->advance = (float)glyph_metrics.horiAdvance / 64.0f;
-
-			FT_BBox bounding_box;
-			errors = FT_Outline_Get_BBox(&m_Font->glyph->outline, &bounding_box);
-
-			glyph->metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
-			glyph->metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
-			glyph->metrics->bounding_box.maximum.x = (float)bounding_box.xMax / 64.0f;
-			glyph->metrics->bounding_box.maximum.y = (float)bounding_box.yMax / 64.0f;
+			_LoadMetrics(m_Font->glyph, glyph);
+			_LoadBitmap(m_Font->glyph, glyph);
 
 			face->AddGlyph(glyph);
 
@@ -107,6 +94,85 @@ namespace ExLibris
 		while (codepoint != 0);
 
 		return face;
+	}
+
+	bool FontFreetype::_LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	{
+		FT_Error errors = 0;
+
+		FT_Glyph_Metrics& glyph_metrics = a_Slot->metrics;
+
+		a_Glyph->metrics = new GlyphMetrics;
+		a_Glyph->metrics->offset.x = (float)glyph_metrics.horiBearingX / 64.0f;
+		a_Glyph->metrics->offset.y = (float)(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) / 64.0f;
+		a_Glyph->metrics->advance = (float)glyph_metrics.horiAdvance / 64.0f;
+
+		// bounding box
+
+		FT_BBox bounding_box;
+		errors = FT_Outline_Get_BBox(&a_Slot->outline, &bounding_box);
+		if (errors != 0)
+		{
+			a_Glyph->metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
+			a_Glyph->metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
+			a_Glyph->metrics->bounding_box.maximum.x = (float)bounding_box.xMax / 64.0f;
+			a_Glyph->metrics->bounding_box.maximum.y = (float)bounding_box.yMax / 64.0f;
+		}
+
+		return true;
+	}
+
+	bool FontFreetype::_LoadBitmap(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	{
+		FT_Error errors = 0;
+
+		errors = FT_Render_Glyph(a_Slot, FT_RENDER_MODE_NORMAL);
+		if (errors != 0)
+		{
+			return false;
+		}
+
+		FT_Bitmap& glyph_bitmap = a_Slot->bitmap;
+
+		unsigned int data_length = glyph_bitmap.width * glyph_bitmap.rows * 4;
+		if (data_length == 0)
+		{
+			return false;
+		}
+
+		a_Glyph->bitmap = new GlyphBitmap;
+		a_Glyph->bitmap->width = glyph_bitmap.width;
+		a_Glyph->bitmap->height = glyph_bitmap.rows;
+		a_Glyph->bitmap->data = new unsigned char[data_length];
+
+		unsigned char* src_line = glyph_bitmap.buffer;
+		unsigned int src_pitch = glyph_bitmap.pitch;
+
+		unsigned char* dst_line = a_Glyph->bitmap->data;
+		unsigned int dst_pitch = a_Glyph->bitmap->width * 4;
+
+		for (int y = 0; y < glyph_bitmap.rows; ++y)
+		{
+			unsigned char* src = src_line;
+			unsigned char* dst = dst_line;
+
+			for (int x = 0; x < glyph_bitmap.width; ++x)
+			{
+				char value = *src;
+				dst[0] = value;
+				dst[1] = value;
+				dst[2] = value;
+				dst[3] = value;
+
+				dst += 4;
+				src++;
+			}
+
+			src_line += src_pitch;
+			dst_line += dst_pitch;
+		}
+
+		return true;
 	}
 
 }; // namespace ExLibris

@@ -8,6 +8,11 @@
 
 namespace ExLibris
 {
+	struct Glyph;
+}
+
+namespace ExLibris
+{
 
 	class FontFreetype
 		: public IFont
@@ -23,6 +28,11 @@ namespace ExLibris
 		FontFace* CreateFace(float a_Size) const;
 
 		bool LoadFontData(FT_Face a_Font);
+
+	private:
+
+		bool _LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
+		bool _LoadBitmap(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
 
 	private:
 

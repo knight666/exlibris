@@ -79,6 +79,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Glyph.cpp" />
+    <ClCompile Include="GlyphBitmap.cpp" />
     <ClCompile Include="IFont.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +88,7 @@
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
     <ClInclude Include="Glyph.h" />
+    <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
     <ClInclude Include="IFont.h" />
