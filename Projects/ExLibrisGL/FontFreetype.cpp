@@ -11,12 +11,18 @@ namespace ExLibris
 
 	int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
 	{
-		GlyphOutline* outline = (GlyphOutline*)a_User;
+		Glyph* glyph = (Glyph*)a_User;
+
+		GlyphOutline* outline = glyph->outline;
 
 		GlyphContour* contour = new GlyphContour;
 		outline->contours.push_back(contour);
 
 		glm::vec2 position = Fixed26Dot6::ToFloatVec2(a_To);
+
+		float y_maximum = glyph->metrics->bounding_box.maximum.y;
+		position.y = y_maximum - position.y;
+
 		contour->points.push_back(position);
 
 		return 0;
@@ -24,7 +30,9 @@ namespace ExLibris
 
 	int CallbackLineTo(const FT_Vector* a_To, void* a_User)
 	{
-		GlyphOutline* outline = (GlyphOutline*)a_User;
+		Glyph* glyph = (Glyph*)a_User;
+
+		GlyphOutline* outline = glyph->outline;
 		if (outline == nullptr || outline->contours.size() == 0)
 		{
 			return -1;
@@ -33,6 +41,10 @@ namespace ExLibris
 		GlyphContour* contour = outline->contours.back();
 
 		glm::vec2 position = Fixed26Dot6::ToFloatVec2(a_To);
+
+		float y_maximum = glyph->metrics->bounding_box.maximum.y;
+		position.y = y_maximum - position.y;
+
 		contour->points.push_back(position);
 
 		return 0;
@@ -40,7 +52,9 @@ namespace ExLibris
 
 	int CallbackConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
 	{
-		GlyphOutline* outline = (GlyphOutline*)a_User;
+		Glyph* glyph = (Glyph*)a_User;
+
+		GlyphOutline* outline = glyph->outline;
 		if (outline == nullptr || outline->contours.size() == 0)
 		{
 			return -1;
@@ -55,6 +69,10 @@ namespace ExLibris
 		glm::vec2 a = contour->points.back();
 		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
 		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_Control);
+
+		float y_maximum = glyph->metrics->bounding_box.maximum.y;
+		b.y = y_maximum - b.y;
+		c.y = y_maximum - c.y;
 
 		int precision = 10;
 		glm::vec2 delta_precision((float)precision, (float)precision);
@@ -83,7 +101,9 @@ namespace ExLibris
 
 	int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
 	{
-		GlyphOutline* outline = (GlyphOutline*)a_User;
+		Glyph* glyph = (Glyph*)a_User;
+
+		GlyphOutline* outline = glyph->outline;
 		if (outline == nullptr || outline->contours.size() == 0)
 		{
 			return -1;
@@ -99,6 +119,11 @@ namespace ExLibris
 		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
 		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_ControlA);
 		glm::vec2 d = Fixed26Dot6::ToFloatVec2(a_ControlB);
+
+		float y_maximum = glyph->metrics->bounding_box.maximum.y;
+		b.y = y_maximum - b.y;
+		c.y = y_maximum - c.y;
+		d.y = y_maximum - d.y;
 
 		int precision = 10;
 		glm::vec2 delta_precision((float)precision, (float)precision);
@@ -313,7 +338,7 @@ namespace ExLibris
 
 		a_Glyph->outline = new GlyphOutline;
 
-		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph->outline);
+		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph);
 		if (errors != 0)
 		{
 			delete a_Glyph->outline;
