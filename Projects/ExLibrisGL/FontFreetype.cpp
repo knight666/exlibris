@@ -88,9 +88,17 @@ namespace ExLibris
 			glyph->index = (unsigned int)codepoint;
 
 			glyph->metrics = new GlyphMetrics;
-			glyph->metrics->offset.x = (float)((glyph_metrics.horiBearingX) >> 6);
-			glyph->metrics->offset.y = (float)((glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) >> 6);
-			glyph->metrics->advance = (float)((glyph_metrics.horiAdvance) >> 6);
+			glyph->metrics->offset.x = (float)glyph_metrics.horiBearingX / 64.0f;
+			glyph->metrics->offset.y = (float)(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY) / 64.0f;
+			glyph->metrics->advance = (float)glyph_metrics.horiAdvance / 64.0f;
+
+			FT_BBox bounding_box;
+			errors = FT_Outline_Get_BBox(&m_Font->glyph->outline, &bounding_box);
+
+			glyph->metrics->bounding_box.minimum.x = (float)bounding_box.xMin / 64.0f;
+			glyph->metrics->bounding_box.minimum.y = (float)bounding_box.yMin / 64.0f;
+			glyph->metrics->bounding_box.maximum.x = (float)bounding_box.xMax / 64.0f;
+			glyph->metrics->bounding_box.maximum.y = (float)bounding_box.yMax / 64.0f;
 
 			face->AddGlyph(glyph);
 

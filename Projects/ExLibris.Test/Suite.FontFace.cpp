@@ -76,6 +76,10 @@ TEST_F(FaceContext, FindGlyph)
 	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
 	EXPECT_FLOAT_EQ(2.0f, glyph->metrics->offset.x);
 	EXPECT_FLOAT_EQ(19.0f, glyph->metrics->offset.y);
+	EXPECT_FLOAT_EQ(2.0625000f, glyph->metrics->bounding_box.minimum.x);
+	EXPECT_FLOAT_EQ(0.0000000f, glyph->metrics->bounding_box.minimum.y);
+	EXPECT_FLOAT_EQ(16.859375f, glyph->metrics->bounding_box.maximum.x);
+	EXPECT_FLOAT_EQ(23.000000f, glyph->metrics->bounding_box.maximum.y);
 }
 
 TEST_F(FaceContext, FindGlyphNotFound)
