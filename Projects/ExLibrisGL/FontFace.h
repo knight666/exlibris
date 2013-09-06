@@ -3,8 +3,8 @@
 
 namespace ExLibris
 {
-	class FontFreetype;
 	struct Glyph;
+	class IFont;
 }
 
 namespace ExLibris
@@ -15,10 +15,10 @@ namespace ExLibris
 	
 	public:
 	
-		FontFace(const FontFreetype* a_Font);
+		FontFace(const IFont* a_Font);
 		~FontFace();
 	
-		const FontFreetype* GetFont() const;
+		const IFont* GetFont() const;
 
 		float GetSize() const;
 		void SetSize(float a_Size);
@@ -31,7 +31,7 @@ namespace ExLibris
 
 	private:
 
-		const FontFreetype* m_Font;
+		const IFont* m_Font;
 		float m_Size;
 		float m_LineHeight;
 		std::map<unsigned int, Glyph*> m_Glyphs;
