@@ -4,35 +4,50 @@ setlocal enabledelayedexpansion
 set VisualStudioVersion=2010
 
 if [%1]==[] (
-	call :All
+	call :DoAll
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
 ) else (
 	for %%A in (%*) do (
 		if "%%A"=="-help" (
 			call :Help
 		)
 		if "%%A"=="-dependencies" (
-			call :SetupEnvironment
-			call :BuildDependencies
+			call :DoDependencies
+			if not %ERRORLEVEL%==0 (
+				exit /B 1
+			)
 		)
 		if "%%A"=="-project" (
-			call :SetupEnvironment
-			call :BuildProject
-			call :BuildTests
-			call :RunTests
+			call :DoProject
+			if not %ERRORLEVEL%==0 (
+				exit /B 1
+			)
 		)
 		if "%%A"=="-tests" (
-			call :SetupEnvironment
-			call :BuildTests
-			call :RunTests
+			call :DoTests
+			if not %ERRORLEVEL%==0 (
+				exit /B 1
+			)
 		)
 		if "%%A"=="-testsfast" (
-			call :SetupEnvironment
-			call :FastTests
+			call :DoFastTests
+			if not %ERRORLEVEL%==0 (
+				exit /B 1
+			)
 		)
 		if "%%A"=="-all" (
-			call :All
+			call :DoAll
+			if not %ERRORLEVEL%==0 (
+				exit /B 1
+			)
 		)
 	)
+)
+if not %ERRORLEVEL%==0 (
+	call :BuildFailed
+	exit /B 1
 )
 call :Exit
 exit /B 0
@@ -61,7 +76,6 @@ exit /B 0
 		call "%VS100COMNTOOLS%vsvars32.bat"
 		set "MSBUILD=!FrameworkDir32!!FrameworkVersion32!\msbuild.exe"
 	)
-	echo.
 	goto :eof
 
 :BuildDependencies
@@ -70,16 +84,15 @@ exit /B 0
 	%MSBUILD% "ExLibrisGL.Dependencies.sln" /nologo /p:Configuration=Debug
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build project.
-		call :BuildFailed
+		exit /B 1
 	)
 	%MSBUILD% "ExLibrisGL.Dependencies.sln" /nologo /p:Configuration=Release
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build project.
-		call :BuildFailed
+		exit /B 1
 	)
 	echo.
 	echo --- Completed building the dependencies.
-	echo.
 	goto :eof
 	
 :BuildProject
@@ -88,16 +101,15 @@ exit /B 0
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibrisGL;Build /t:Example;Build
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build project.
-		call :BuildFailed
+		exit /B 1
 	)
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Release /t:ExLibrisGL;Build /t:Example;Build
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build project.
-		call :BuildFailed
+		exit /B 1
 	)
 	echo.
 	echo --- Completed building the project.
-	echo.
 	goto :eof
 	
 :BuildTests
@@ -106,57 +118,138 @@ exit /B 0
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibris_Test;Build
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build tests.
-		call :BuildFailed
+		exit /B 1
 	)
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Release /t:ExLibris_Test;Build
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build tests.
-		call :BuildFailed
+		exit /B 1
 	)
 	echo.
 	echo --- Completed building the tests.
-	echo.
 	goto :eof
 	
 :RunTests
-	pushd Build
 	echo --- Running tests (debug)
 	echo.
-	call "ExLibris.TestDebug.exe"
-	echo.
-	echo --- Running tests (release)
-	echo.
-	call "ExLibris.TestRelease.exe"
-	echo.
+	pushd Build
+		call "ExLibris.TestDebug.exe"
+		echo.
+		echo --- Running tests (release)
+		echo.
+		call "ExLibris.TestRelease.exe"
 	popd
 	goto :eof
+
+:DoDependencies
+	call :SetupEnvironment
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :BuildDependencies
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	goto :eof
 	
-:FastTests
+:DoProject
+	call :SetupEnvironment
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :BuildProject
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :BuildTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :RunTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	goto :eof
+	
+:DoTests
+	call :SetupEnvironment
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :BuildTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :RunTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	goto :eof
+	
+:DoFastTests
+	call :SetupEnvironment
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
 	echo --- Building tests
 	echo.
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibris_Test;Build
 	if not %ERRORLEVEL% == 0 (
 		set FAILEDMESSAGE=Failed to build tests.
-		call :BuildFailed
+		exit /B 1
 	)
 	echo.
 	echo --- Running tests
 	echo.
 	pushd Build
 	call "ExLibris.TestDebug.exe"
-	echo.
 	popd
+	echo.
 	goto :eof
-	
-:All
+
+:DoAll
 	echo --- All
 	echo.
 	call :SetupEnvironment
-	call :BuildDependencies
-	call :BuildProject
-	call :BuildTests
-	call :RunTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
 	echo.
+	call :BuildDependencies
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :BuildProject
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :BuildTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	call :RunTests
+	if not %ERRORLEVEL%==0 (
+		exit /B 1
+	)
+	echo.
+	goto :eof
+
+:Exit
+	echo --- Done
+	endlocal
 	goto :eof
 	
 :BuildFailed
@@ -164,17 +257,4 @@ exit /B 0
 	echo --- Build failed
 	echo.
 	echo %FAILEDMESSAGE%
-	echo.
-	goto :Exit
-	
-:Exit
-	echo --- Done
-	endlocal
-	
-	rem In order to actually exit the script, we generate a syntax error.
-	rem Batch scripts are weird.
-	call :ExitHelper 2> nul
-	
-:ExitHelper
-	()
-	exit /B
+	exit /B 1
