@@ -62,7 +62,15 @@ exit /B 0
 	echo --- Building dependencies
 	echo.
 	%MSBUILD% "ExLibrisGL.Dependencies.sln" /nologo /p:Configuration=Debug
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build project.
+		call :BuildFailed
+	)
 	%MSBUILD% "ExLibrisGL.Dependencies.sln" /nologo /p:Configuration=Release
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build project.
+		call :BuildFailed
+	)
 	echo.
 	echo --- Completed building the dependencies.
 	echo.
