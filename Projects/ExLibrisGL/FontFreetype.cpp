@@ -9,8 +9,8 @@ namespace ExLibris
 {
 
 	FontFreetype::FontFreetype(const std::string& a_Family)
-		: m_Font(nullptr)
-		, m_FamilyName(a_Family)
+		: IFont(a_Family)
+		, m_Font(nullptr)
 	{
 	}
 	
@@ -20,11 +20,6 @@ namespace ExLibris
 		{
 			FT_Done_Face(m_Font);
 		}
-	}
-
-	const std::string& FontFreetype::GetFamilyName() const
-	{
-		return m_FamilyName;
 	}
 
 	unsigned int FontFreetype::GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const
