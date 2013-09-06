@@ -5,28 +5,33 @@ set VisualStudioVersion=2010
 
 if [%1]==[] (
 	call :All
-)
-for %%A in (%*) do (
-	if "%%A"=="-help" (
-		call :Help
-	)
-	if "%%A"=="-dependencies" (
-		call :SetupEnvironment
-		call :BuildDependencies
-	)
-	if "%%A"=="-project" (
-		call :SetupEnvironment
-		call :BuildProject
-		call :BuildTests
-		call :RunTests
-	)
-	if "%%A"=="-tests" (
-		call :SetupEnvironment
-		call :BuildTests
-		call :RunTests
-	)
-	if "%%A"=="-all" (
-		call :All
+) else (
+	for %%A in (%*) do (
+		if "%%A"=="-help" (
+			call :Help
+		)
+		if "%%A"=="-dependencies" (
+			call :SetupEnvironment
+			call :BuildDependencies
+		)
+		if "%%A"=="-project" (
+			call :SetupEnvironment
+			call :BuildProject
+			call :BuildTests
+			call :RunTests
+		)
+		if "%%A"=="-tests" (
+			call :SetupEnvironment
+			call :BuildTests
+			call :RunTests
+		)
+		if "%%A"=="-testsfast" (
+			call :SetupEnvironment
+			call :FastTests
+		)
+		if "%%A"=="-all" (
+			call :All
+		)
 	)
 )
 call :Exit
@@ -40,6 +45,7 @@ exit /B 0
 	echo -dependencies      Build dependencies
 	echo -project           Build project
 	echo -tests             Build and run all tests
+	echo -testsfast         Build and run only the debug version of tests
 	echo -all               Build dependencies and project and run tests
 	echo.
 	goto :eof
@@ -113,12 +119,33 @@ exit /B 0
 	goto :eof
 	
 :RunTests
+	pushd Build
+	echo --- Running tests (debug)
+	echo.
+	call "ExLibris.TestDebug.exe"
+	echo.
+	echo --- Running tests (release)
+	echo.
+	call "ExLibris.TestRelease.exe"
+	echo.
+	popd
+	goto :eof
+	
+:FastTests
+	echo --- Building tests
+	echo.
+	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibris_Test;Build
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build tests.
+		call :BuildFailed
+	)
+	echo.
 	echo --- Running tests
 	echo.
 	pushd Build
 	call "ExLibris.TestDebug.exe"
-	popd
 	echo.
+	popd
 	goto :eof
 	
 :All
