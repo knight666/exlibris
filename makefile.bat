@@ -72,7 +72,15 @@ exit /B 0
 	echo --- Building project
 	echo.
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibrisGL;Build /t:Example;Build
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build project.
+		call :BuildFailed
+	)
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Release /t:ExLibrisGL;Build /t:Example;Build
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build project.
+		call :BuildFailed
+	)
 	echo.
 	echo --- Completed building the project.
 	echo.
@@ -82,7 +90,15 @@ exit /B 0
 	echo --- Building tests
 	echo.
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Debug /t:ExLibris_Test;Build
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build tests.
+		call :BuildFailed
+	)
 	%MSBUILD% "ExLibrisGL.sln" /nologo /p:Configuration=Release /t:ExLibris_Test;Build
+	if not %ERRORLEVEL% == 0 (
+		set FAILEDMESSAGE=Failed to build tests.
+		call :BuildFailed
+	)
 	echo.
 	echo --- Completed building the tests.
 	echo.
@@ -108,6 +124,22 @@ exit /B 0
 	echo.
 	goto :eof
 	
+:BuildFailed
+	echo.
+	echo --- Build failed
+	echo.
+	echo %FAILEDMESSAGE%
+	echo.
+	goto :Exit
+	
 :Exit
 	echo --- Done
 	endlocal
+	
+	rem In order to actually exit the script, we generate a syntax error.
+	rem Batch scripts are weird.
+	call :ExitHelper 2> nul
+	
+:ExitHelper
+	()
+	exit /B
