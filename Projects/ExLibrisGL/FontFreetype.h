@@ -6,7 +6,7 @@
 
 namespace ExLibris
 {
-	class FontFaceFreetype;
+	class FontFace;
 }
 
 namespace ExLibris
@@ -26,7 +26,7 @@ namespace ExLibris
 
 		bool LoadFontData(FT_Face a_Font);
 	
-		FontFaceFreetype* CreateFace(float a_Size) const;
+		FontFace* CreateFace(float a_Size) const;
 
 	private:
 
