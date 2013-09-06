@@ -14,7 +14,6 @@ namespace ExLibris
 
 	struct GlyphMetrics
 	{
-		unsigned int codepoint;
 		glm::vec2 offset;
 		float advance;
 		BoundingBox bounding_box;

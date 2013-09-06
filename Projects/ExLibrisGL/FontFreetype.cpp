@@ -26,6 +26,16 @@ namespace ExLibris
 		return m_FamilyName;
 	}
 
+	unsigned int FontFreetype::GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const
+	{
+		if (m_Font == nullptr)
+		{
+			return 0;
+		}
+
+		return (unsigned int)FT_Get_Char_Index(m_Font, (FT_ULong)a_CodepointUtf32);
+	}
+
 	bool FontFreetype::LoadFontData(FT_Face a_Font)
 	{
 		if (a_Font == nullptr)

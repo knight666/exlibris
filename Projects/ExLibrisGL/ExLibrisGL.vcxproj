@@ -78,12 +78,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Glyph.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FaceMetrics.h" />
     <ClInclude Include="FontFaceFreetype.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
+    <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
   </ItemGroup>

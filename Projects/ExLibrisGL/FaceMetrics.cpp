@@ -22,7 +22,7 @@ namespace ExLibris
 
 	void FaceMetrics::AddGlyphMetrics(GlyphMetrics* a_Metrics)
 	{
-		m_Metrics.insert(std::make_pair(a_Metrics->codepoint, a_Metrics));
+		//m_Metrics.insert(std::make_pair(a_Metrics->codepoint, a_Metrics));
 	}
 
 	GlyphMetrics* FaceMetrics::FindGlyphMetrics(unsigned int a_CodePoint) const

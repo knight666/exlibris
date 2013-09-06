@@ -22,6 +22,8 @@ namespace ExLibris
 
 		const std::string& GetFamilyName() const;
 
+		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
+
 		bool LoadFontData(FT_Face a_Font);
 	
 		FontFaceFreetype* CreateFace(float a_Size) const;

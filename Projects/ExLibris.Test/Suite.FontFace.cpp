@@ -3,6 +3,7 @@
 #include "FontFaceFreetype.h"
 #include "FontFreetype.h"
 #include "FontLoaderFreetype.h"
+#include "Glyph.h"
 
 using namespace ExLibris;
 
@@ -55,4 +56,22 @@ TEST_F(FaceContext, LineHeight)
 {
 	EXPECT_FLOAT_EQ(24.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(42.0f, face->GetLineHeight());
+}
+
+TEST_F(FaceContext, FindGlyph)
+{
+	Glyph* glyph = face->FindGlyph((unsigned int)'6');
+	ASSERT_NE(nullptr, glyph);
+
+	EXPECT_EQ(25, glyph->index);
+	ASSERT_NE(nullptr, glyph->metrics);
+	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
+	EXPECT_FLOAT_EQ(2.0f, glyph->metrics->offset.x);
+	EXPECT_FLOAT_EQ(19.0f, glyph->metrics->offset.y);
+}
+
+TEST_F(FaceContext, FindGlyphNotFound)
+{
+	Glyph* glyph = face->FindGlyph(0x777126);
+	ASSERT_EQ(nullptr, glyph);
 }
