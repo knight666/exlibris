@@ -285,8 +285,8 @@ GlyphOutline CreateOutline(FT_Face a_FontFace, wchar_t a_Character)
 int main(int argc, const char** argv)
 {
 	ExLibris::FontLoaderFreetype loader;
-	//ExLibris::IFont* font = loader.LoadFont("Fonts/Mathilde/mathilde.otf");
-	ExLibris::IFont* font = loader.LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+	ExLibris::IFont* font = loader.LoadFont("Fonts/Mathilde/mathilde.otf");
+	//ExLibris::IFont* font = loader.LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
 	ExLibris::FontFace* face_size24 = font->CreateFace(24.0f);
 
 	ExLibris::Glyph* glyph = face_size24->FindGlyph((unsigned int)'Q');
