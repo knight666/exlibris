@@ -3,6 +3,7 @@
 
 #include "GlyphBitmap.h"
 #include "GlyphMetrics.h"
+#include "GlyphOutline.h"
 
 namespace ExLibris
 {
@@ -19,6 +20,7 @@ namespace ExLibris
 		unsigned int index;
 		GlyphMetrics* metrics;
 		GlyphBitmap* bitmap;
+		GlyphOutline* outline;
 	
 	}; // struct Glyph
 

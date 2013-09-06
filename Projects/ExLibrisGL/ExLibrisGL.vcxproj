@@ -89,8 +89,10 @@
     <ClInclude Include="FontLoaderFreetype.h" />
     <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphBitmap.h" />
+    <ClInclude Include="GlyphContour.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
+    <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
