@@ -55,11 +55,51 @@ TEST(FontFace, FindGlyphNoFont)
 TEST(FontFace, FindGlyphEmpty)
 {
 	MockFont* font = new MockFont("Smexy");
-	
 	FontFace* face = new FontFace(font);
 
 	Glyph* glyph = face->FindGlyph(32);
 	ASSERT_EQ(nullptr, glyph);
+}
+
+TEST(FontFace, TryGetKerning)
+{
+	MockFont* font = new MockFont("Elderberries 2.0");
+	FontFace* face = new FontFace(font);
+
+	Glyph* glyph = new Glyph;
+	glyph->index = 1;
+
+	Glyph* glyph_other = new Glyph;
+	glyph_other->index = 2;
+
+	face->AddGlyph(glyph);
+	face->AddGlyph(glyph_other);
+
+	glm::vec2 kerning_expected(-4.5f, 22.0f);
+	glyph->kernings.insert(std::make_pair(glyph_other->index, kerning_expected));
+
+	glm::vec2 kerning_actual;
+	EXPECT_TRUE(face->TryGetKerning(glyph, glyph_other, kerning_actual));
+
+	EXPECT_FLOAT_EQ(-4.5f, kerning_actual.x);
+	EXPECT_FLOAT_EQ(22.0f, kerning_actual.y);
+}
+
+TEST(FontFace, TryGetKerningNotFound)
+{
+	MockFont* font = new MockFont("Roller");
+	FontFace* face = new FontFace(font);
+
+	Glyph* glyph = new Glyph;
+	glyph->index = 166;
+
+	Glyph* glyph_other = new Glyph;
+	glyph_other->index = 78;
+
+	face->AddGlyph(glyph);
+
+	glm::vec2 kerning_actual;
+	EXPECT_FALSE(face->TryGetKerning(glyph, glyph_other, kerning_actual));
 }
 
 class FaceContext

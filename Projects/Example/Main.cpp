@@ -26,7 +26,6 @@
 
 // ExLibris
 
-#include <FaceMetrics.h>
 #include <FontFace.h>
 #include <FontLoaderFreetype.h>
 #include <Glyph.h>
