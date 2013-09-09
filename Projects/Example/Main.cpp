@@ -33,8 +33,8 @@
 
 // Options
 
-static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
-//static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
+//static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
+static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
 static float g_FontSize = 24.0f;
 static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 
@@ -484,7 +484,7 @@ int main(int argc, const char** argv)
 
 		glMatrixMode(GL_MODELVIEW);
 		glm::mat4x4 modelview;
-		modelview = glm::scale(modelview, glm::vec3(5.0f, 5.0f, 5.0f));
+		//modelview = glm::scale(modelview, glm::vec3(5.0f, 5.0f, 5.0f));
 		glLoadMatrixf(glm::value_ptr(modelview));
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

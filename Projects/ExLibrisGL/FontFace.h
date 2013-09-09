@@ -3,9 +3,10 @@
 
 #include <map>
 
+#include "Glyph.h"
+
 namespace ExLibris
 {
-	struct Glyph;
 	class IFont;
 }
 
