@@ -21,6 +21,7 @@ namespace ExLibris
 		GlyphMetrics* metrics;
 		GlyphBitmap* bitmap;
 		GlyphOutline* outline;
+		std::map<unsigned int, glm::vec2> kernings;
 	
 	}; // struct Glyph
 

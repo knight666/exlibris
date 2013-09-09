@@ -224,6 +224,8 @@ namespace ExLibris
 		face->SetSize(a_Size);
 		face->SetLineHeight(Fixed26Dot6::ToFloat(m_Font->size->metrics.height));
 
+		std::vector<Glyph*> glyphs;
+
 		FT_UInt codepoint = 0;
 		FT_ULong glyph_index = FT_Get_First_Char(m_Font, &codepoint);
 		do
@@ -238,12 +240,47 @@ namespace ExLibris
 				_LoadBitmap(m_Font->glyph, glyph);
 				_LoadOutline(m_Font->glyph, glyph);
 
-				face->AddGlyph(glyph);
+				glyphs.push_back(glyph);
 			}
 
 			glyph_index = FT_Get_Next_Char(m_Font, glyph_index, &codepoint);
 		}
 		while (codepoint != 0);
+
+		// kerning
+
+		for (std::vector<Glyph*>::iterator glyph_left_it = glyphs.begin(); glyph_left_it != glyphs.end(); ++glyph_left_it)
+		{
+			Glyph* glyph_left = *glyph_left_it;
+
+			if (glyph_left_it + 1 != glyphs.end())
+			{
+				for (std::vector<Glyph*>::iterator glyph_right_it = glyph_left_it + 1; glyph_right_it != glyphs.end(); ++glyph_right_it)
+				{
+					Glyph* glyph_right = *glyph_right_it;
+
+					FT_Vector kerning_fixed;
+
+					errors = FT_Get_Kerning(m_Font, glyph_left->index, glyph_right->index, FT_KERNING_DEFAULT, &kerning_fixed);
+					if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+					{
+						glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
+
+						glyph_left->kernings.insert(std::make_pair(glyph_right->index, kerning));
+					}
+
+					errors = FT_Get_Kerning(m_Font, glyph_right->index, glyph_left->index, FT_KERNING_DEFAULT, &kerning_fixed);
+					if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+					{
+						glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
+
+						glyph_right->kernings.insert(std::make_pair(glyph_left->index, kerning));
+					}
+				}
+			}
+
+			face->AddGlyph(glyph_left);
+		}
 
 		return face;
 	}

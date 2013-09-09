@@ -230,7 +230,7 @@ int main(int argc, const char** argv)
 	ExLibris::FontLoaderFreetype loader;
 	ExLibris::IFont* font = loader.LoadFont("Fonts/Mathilde/mathilde.otf");
 	//ExLibris::IFont* font = loader.LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-	ExLibris::FontFace* face_size24 = font->CreateFace(24.0f);
+	ExLibris::FontFace* face_size24 = font->CreateFace(12.0f);
 
 	ExLibris::Glyph* glyph = face_size24->FindGlyph((unsigned int)'Q');
 
@@ -263,7 +263,7 @@ int main(int argc, const char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_TEXTURE_2D);
 
-	std::wstring text = L"Hello World!";
+	std::wstring text = L"Pa's wijze lynx";
 	TextOutline outline = CreateTextOutline(face_size24, text);
 
 	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
