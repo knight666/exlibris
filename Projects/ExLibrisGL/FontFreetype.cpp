@@ -20,6 +20,12 @@ namespace ExLibris
 
 		GlyphOutline* outline = glyph->outline;
 
+		if (outline->contours.size() > 0)
+		{
+			GlyphContour* contour_previous = outline->contours.back();
+			contour_previous->points.pop_back();
+		}
+
 		GlyphContour* contour = new GlyphContour;
 		outline->contours.push_back(contour);
 
@@ -381,6 +387,12 @@ namespace ExLibris
 			a_Glyph->outline = nullptr;
 
 			return false;
+		}
+
+		if (a_Glyph->outline->contours.size() > 0)
+		{
+			GlyphContour* contour_last = a_Glyph->outline->contours.back();
+			contour_last->points.pop_back();
 		}
 
 		return true;
