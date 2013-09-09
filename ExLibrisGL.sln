@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExLibris.Test", "Projects\E
 		{BBC4F8F8-9B70-4A49-89F8-B8B669D26E80} = {BBC4F8F8-9B70-4A49-89F8-B8B669D26E80}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FrameworkGL", "Projects\FrameworkGL\FrameworkGL.vcxproj", "{7C129A70-911A-49AF-9B93-D23C6A55E5D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{C67E0543-2630-4DF8-9D4B-4AA6DAEF5745}.Debug|Win32.Build.0 = Debug|Win32
 		{C67E0543-2630-4DF8-9D4B-4AA6DAEF5745}.Release|Win32.ActiveCfg = Release|Win32
 		{C67E0543-2630-4DF8-9D4B-4AA6DAEF5745}.Release|Win32.Build.0 = Release|Win32
+		{7C129A70-911A-49AF-9B93-D23C6A55E5D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7C129A70-911A-49AF-9B93-D23C6A55E5D6}.Debug|Win32.Build.0 = Debug|Win32
+		{7C129A70-911A-49AF-9B93-D23C6A55E5D6}.Release|Win32.ActiveCfg = Release|Win32
+		{7C129A70-911A-49AF-9B93-D23C6A55E5D6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
