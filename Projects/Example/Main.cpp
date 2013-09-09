@@ -35,45 +35,16 @@ static void OnGlfwError(int error, const char* description)
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
 }
-
-glm::vec2 FreetypeToGlm(const FT_Vector* a_Position)
-{
-	return glm::vec2(
-		(float)(a_Position->x) / 64.0f,
-		(float)(a_Position->y) / 64.0f
-	);
-}
-
-struct LineSegment
-{
-	glm::vec2 start;
-	glm::vec2 end;
-};
-
-struct GlyphContour
-{
-	std::vector<glm::vec2> points;
-};
-
-struct GlyphOutline
-{
-	glm::vec2 start;
-	std::vector<LineSegment> lines;
-};
 
 struct GlyphBitmap
 {
 	unsigned char* pixels;
 	unsigned int width;
 	unsigned int height;
-};
-
-struct Glyph
-{
-	ExLibris::GlyphMetrics* metrics;
-	GlyphBitmap* bitmap;
 };
 
 struct GlyphVertex
@@ -88,7 +59,7 @@ struct GlyphVertex
 	glm::vec2 texture_coordinate;
 };
 
-GLuint CreateTexture(const std::map<unsigned int, Glyph*>& a_Glyphs, unsigned int a_LineHeight, const std::wstring& a_Text)
+/*GLuint CreateTexture(const std::map<unsigned int, Glyph*>& a_Glyphs, unsigned int a_LineHeight, const std::wstring& a_Text)
 {
 	unsigned int texture_width = 0;
 	unsigned int texture_height = a_LineHeight;
@@ -154,130 +125,102 @@ GLuint CreateTexture(const std::map<unsigned int, Glyph*>& a_Glyphs, unsigned in
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return texture;
-}
+}*/
 
-int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
+struct TextGlyphOutline
 {
-	std::cout << "Move to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ")" << std::endl;
+	unsigned int start;
+	unsigned int count;
+};
 
-	GlyphOutline* outline = (GlyphOutline*)a_User;
-
-	outline->start = FreetypeToGlm(a_To);
-
-	return 0;
-}
-
-int CallbackLineTo(const FT_Vector* a_To, void* a_User)
+struct TextOutline
 {
-	std::cout << "Line to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ")" << std::endl;
+	GLuint vertex_buffer;
+	unsigned int vertex_count;
+	std::vector<TextGlyphOutline> contours;
+};
 
-	GlyphOutline* outline = (GlyphOutline*)a_User;
-
-	LineSegment segment;
-	segment.start = outline->start;
-	segment.end = FreetypeToGlm(a_To);
-	
-	outline->lines.push_back(segment);
-	outline->start = segment.end;
-
-	return 0;
-}
-
-int CallbackConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
+TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 {
-	std::cout << "Conic to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ") via (" << (a_Control->x >> 6) << ", " << (a_Control->y >> 6) << ")" << std::endl;
+	TextOutline outline;
+	outline.vertex_buffer = 0;
+	outline.vertex_count = 0;
 
-	GlyphOutline* outline = (GlyphOutline*)a_User;
+	std::vector<ExLibris::Glyph*> glyphs;
 
-	glm::vec2 a = outline->start;
-	glm::vec2 b = FreetypeToGlm(a_To);
-	glm::vec2 c = FreetypeToGlm(a_Control);
-
-	int precision = 10;
-	glm::vec2 delta_precision((float)precision, (float)precision);
-
-	glm::vec2 delta_ac = (c - a) / delta_precision;
-	glm::vec2 delta_cb = (b - c) / delta_precision;
-
-	LineSegment segment;
-	segment.start = a;
-
-	for (int j = 1; j < precision + 1; ++j)
+	for (std::wstring::const_iterator char_it = a_Text.begin(); char_it != a_Text.end(); ++char_it)
 	{
-		a += delta_ac;
-		c += delta_cb;
+		unsigned int character = (unsigned int)*char_it;
 
-		segment.end = a + ((c - a) / delta_precision) * (float)j;
+		ExLibris::Glyph* glyph = a_Face->FindGlyph(character);
+		if (glyph == nullptr)
+		{
+			continue;
+		}
 
-		outline->lines.push_back(segment);
+		if (glyph->outline != nullptr)
+		{
+			for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
+			{
+				ExLibris::GlyphContour* contour = *contour_it;
 
-		segment.start = segment.end;
+				outline.vertex_count += contour->points.size();
+			}
+		}
+
+		glyphs.push_back(glyph);
 	}
 
-	outline->start = b;
-
-	return 0;
-}
-
-int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
-{
-	std::cout << "Cubic to (" << (a_To->x >> 6) << ", " << (a_To->y >> 6) << ") via (" << (a_ControlA->x >> 6) << ", " << (a_ControlA->y >> 6) << ") and (" << (a_ControlB->x >> 6) << ", " << (a_ControlB->y >> 6) << std::endl;
-
-	GlyphOutline* outline = (GlyphOutline*)a_User;
-
-	glm::vec2 a = outline->start;
-	glm::vec2 b = FreetypeToGlm(a_To);
-	glm::vec2 c = FreetypeToGlm(a_ControlA);
-	glm::vec2 d = FreetypeToGlm(a_ControlB);
-
-	int precision = 10;
-	glm::vec2 delta_precision((float)precision, (float)precision);
-
-	glm::vec2 delta_ac = (c - a) / delta_precision;
-	glm::vec2 delta_cd = (d - c) / delta_precision;
-	glm::vec2 delta_db = (b - d) / delta_precision;
-
-	LineSegment segment;
-	segment.start = a;
-
-	for (int j = 1; j < precision + 1; ++j)
+	if (outline.vertex_count == 0)
 	{
-		a += delta_ac;
-		c += delta_cd;
-		d += delta_db;
-
-		glm::vec2 ac = a + ((c - a) / delta_precision) * (float)j;
-		glm::vec2 cd = c + ((d - c) / delta_precision) * (float)j;
-
-		segment.end = ac + ((cd - ac) / delta_precision) * (float)j;
-
-		outline->lines.push_back(segment);
-
-		segment.start = segment.end;
+		return outline;
 	}
 
-	outline->start = b;
+	glm::vec2 cursor_offset;
 
-	return 0;
-}
+	glm::vec2* position_data = new glm::vec2[outline.vertex_count];
+	unsigned int position_index = 0;
 
-GlyphOutline CreateOutline(FT_Face a_FontFace, wchar_t a_Character)
-{
-	FT_Error errors = 0;
+	for (std::vector<ExLibris::Glyph*>::iterator glyph_it = glyphs.begin(); glyph_it != glyphs.end(); ++glyph_it)
+	{
+		ExLibris::Glyph* glyph = *glyph_it;
 
-	FT_Outline_Funcs outline_callbacks;
-	outline_callbacks.move_to = &CallbackMoveTo;
-	outline_callbacks.line_to = &CallbackLineTo;
-	outline_callbacks.conic_to = &CallbackConicTo;
-	outline_callbacks.cubic_to = &CallbackCubicTo;
-	outline_callbacks.shift = 0;
-	outline_callbacks.delta = 0;
+		if (glyph->outline != nullptr)
+		{
+			glm::vec2 position_local = cursor_offset + glyph->metrics->offset;
 
-	FT_UInt outline_codepoint = FT_Get_Char_Index(a_FontFace, (FT_ULong)a_Character);
-	errors = FT_Load_Glyph(a_FontFace, outline_codepoint, FT_LOAD_DEFAULT);
+			for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
+			{
+				ExLibris::GlyphContour* contour = *contour_it;
 
-	GlyphOutline outline;
-	errors = FT_Outline_Decompose(&a_FontFace->glyph->outline, &outline_callbacks, &outline);
+				TextGlyphOutline glyph_contour;
+				glyph_contour.start = position_index;
+
+				std::vector<glm::vec2>::iterator position_it = contour->points.begin();
+				while (position_it != contour->points.end())
+				{
+					position_data[position_index] = *position_it + position_local;
+
+					++position_index;
+					++position_it;
+				}
+
+				glyph_contour.count = position_index - glyph_contour.start;
+
+				outline.contours.push_back(glyph_contour);
+			}
+		}
+		
+		cursor_offset.x += glyph->metrics->advance;
+	}
+
+	glGenBuffers(1, &outline.vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, outline.vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, outline.vertex_count * sizeof(glm::vec2), position_data, GL_STATIC_DRAW);
+
+	delete [] position_data;
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return outline;
 }
@@ -321,6 +264,8 @@ int main(int argc, const char** argv)
 	glEnable(GL_TEXTURE_2D);
 
 	std::wstring text = L"Hello World!";
+	TextOutline outline = CreateTextOutline(face_size24, text);
+
 	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
 
 	GLuint vertex_buffer;
@@ -368,7 +313,7 @@ int main(int argc, const char** argv)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_total * sizeof(GLuint), element_data, GL_STATIC_DRAW);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	while (glfwWindowShouldClose(window) == 0)
 	{
@@ -392,17 +337,18 @@ int main(int argc, const char** argv)
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-		for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
-		{
-			ExLibris::GlyphContour* contour = *contour_it;
+		glBindBuffer(GL_ARRAY_BUFFER, outline.vertex_buffer);
 
-			glBegin(GL_LINE_LOOP);
-			for (std::vector<glm::vec2>::iterator position_it = contour->points.begin(); position_it != contour->points.end(); ++position_it)
-			{
-				glVertex2fv(glm::value_ptr(*position_it));
-			}
-			glEnd();
+		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+		
+		for (std::vector<TextGlyphOutline>::iterator contour_it = outline.contours.begin(); contour_it != outline.contours.end(); ++contour_it)
+		{
+			TextGlyphOutline& contour = *contour_it;
+
+			glDrawArrays(GL_LINE_LOOP, contour.start, contour.count);
 		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, text_texture);
