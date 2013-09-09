@@ -20,12 +20,23 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+// Poly2Tri
+
+#include <poly2tri/poly2tri.h>
+
 // ExLibris
 
 #include <FaceMetrics.h>
 #include <FontFace.h>
 #include <FontLoaderFreetype.h>
 #include <Glyph.h>
+
+// Options
+
+static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
+//static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
+static float g_FontSize = 24.0f;
+static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 
 static void OnGlfwError(int error, const char* description)
 {
@@ -140,6 +151,19 @@ struct TextOutline
 	std::vector<TextGlyphOutline> contours;
 };
 
+struct TextGlyphMesh
+{
+	unsigned int start;
+	unsigned int count;
+};
+
+struct TextMesh
+{
+	GLuint vertex_buffer;
+	unsigned int vertex_count;
+	std::vector<TextGlyphMesh> meshes;
+};
+
 TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 {
 	TextOutline outline;
@@ -244,14 +268,122 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 	return outline;
 }
 
+std::vector<p2t::Point*> ConvertContourToPolyline(const glm::vec2& a_Cursor, ExLibris::GlyphContour* a_Contour)
+{
+	std::vector<p2t::Point*> polyline;
+
+	for (std::vector<glm::vec2>::iterator point_it = a_Contour->points.begin(); point_it != a_Contour->points.end(); ++point_it)
+	{
+		glm::vec2 point = *point_it + a_Cursor;
+
+		polyline.push_back(new p2t::Point((double)point.x, (double)point.y));
+	}
+
+	return polyline;
+}
+
+TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
+{
+	glm::vec2 cursor_offset;
+
+	TextMesh mesh;
+	mesh.vertex_count = 0;
+
+	std::vector<ExLibris::Glyph*> glyphs;
+
+	for (std::wstring::const_iterator char_it = a_Text.begin(); char_it != a_Text.end(); ++char_it)
+	{
+		unsigned int character = (unsigned int)*char_it;
+
+		ExLibris::Glyph* glyph = a_Face->FindGlyph(character);
+		if (glyph != nullptr)
+		{
+			glyphs.push_back(glyph);
+		}
+	}
+
+	std::vector<p2t::Triangle*> triangles;
+
+	std::vector<ExLibris::Glyph*>::iterator glyph_next_it = glyphs.begin() + 1;
+
+	for (std::vector<ExLibris::Glyph*>::iterator glyph_it = glyphs.begin(); glyph_it != glyphs.end(); ++glyph_it)
+	{
+		ExLibris::Glyph* glyph = *glyph_it;
+
+		if (glyph->outline != nullptr)
+		{
+			glm::vec2 position_local = cursor_offset;
+			position_local.y += glyph->metrics->offset.y;
+
+			std::vector<p2t::Point*> outline = ConvertContourToPolyline(position_local, glyph->outline->contours[0]);
+			p2t::CDT* cdt = new p2t::CDT(outline);
+
+			if (glyph->outline->contours.size() > 1)
+			{
+				for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin() + 1; contour_it != glyph->outline->contours.end(); ++contour_it)
+				{
+					ExLibris::GlyphContour* contour = *contour_it;
+
+					std::vector<p2t::Point*> hole = ConvertContourToPolyline(position_local, contour);
+					cdt->AddHole(hole);
+				}
+			}
+
+			cdt->Triangulate();
+
+			std::vector<p2t::Triangle*> cdt_triangles = cdt->GetTriangles();
+			triangles.insert(triangles.end(), cdt_triangles.begin(), cdt_triangles.end());
+		}
+
+		cursor_offset.x += glyph->metrics->advance;
+
+		if (glyph_next_it != glyphs.end())
+		{
+			glyph_next_it++;
+		}
+	}
+
+	mesh.vertex_count = triangles.size() * 3;
+
+	glm::vec2* position_data = new glm::vec2[mesh.vertex_count];
+	glm::vec2* dst_position_data = position_data;
+
+	for (std::vector<p2t::Triangle*>::const_iterator triangle_it = triangles.begin(); triangle_it != triangles.end(); ++triangle_it)
+	{
+		p2t::Triangle* triangle = *triangle_it;
+
+		p2t::Point* point_a = triangle->GetPoint(0);
+		dst_position_data->x = (float)point_a->x;
+		dst_position_data->y = (float)point_a->y;
+		++dst_position_data;
+
+		p2t::Point* point_b = triangle->GetPoint(1);
+		dst_position_data->x = (float)point_b->x;
+		dst_position_data->y = (float)point_b->y;
+		++dst_position_data;
+
+		p2t::Point* point_c = triangle->GetPoint(2);
+		dst_position_data->x = (float)point_c->x;
+		dst_position_data->y = (float)point_c->y;
+		++dst_position_data;
+	}
+
+	glGenBuffers(1, &mesh.vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, mesh.vertex_count * sizeof(glm::vec2), position_data, GL_STATIC_DRAW);
+
+	delete [] position_data;
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	return mesh;
+}
+
 int main(int argc, const char** argv)
 {
 	ExLibris::FontLoaderFreetype loader;
-	ExLibris::IFont* font = loader.LoadFont("Fonts/Mathilde/mathilde.otf");
-	//ExLibris::IFont* font = loader.LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-	ExLibris::FontFace* face_size24 = font->CreateFace(12.0f);
-
-	ExLibris::Glyph* glyph = face_size24->FindGlyph((unsigned int)'Q');
+	ExLibris::IFont* font = loader.LoadFont(g_FontPath);
+	ExLibris::FontFace* face_size24 = font->CreateFace(g_FontSize);
 
 	GLFWwindow* window;
 
@@ -282,8 +414,9 @@ int main(int argc, const char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_TEXTURE_2D);
 
-	std::wstring text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
-	TextOutline outline = CreateTextOutline(face_size24, text);
+	TextOutline outline = CreateTextOutline(face_size24, g_Text);
+
+	TextMesh mesh = CreateMesh(face_size24, g_Text);
 
 	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
 
@@ -356,10 +489,17 @@ int main(int argc, const char** argv)
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-		glBindBuffer(GL_ARRAY_BUFFER, outline.vertex_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
+		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+
+		glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		/*glBindBuffer(GL_ARRAY_BUFFER, outline.vertex_buffer);
 
 		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
-		
+
 		for (std::vector<TextGlyphOutline>::iterator contour_it = outline.contours.begin(); contour_it != outline.contours.end(); ++contour_it)
 		{
 			TextGlyphOutline& contour = *contour_it;
@@ -367,7 +507,7 @@ int main(int argc, const char** argv)
 			glDrawArrays(GL_LINE_LOOP, contour.start, contour.count);
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
 		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, text_texture);

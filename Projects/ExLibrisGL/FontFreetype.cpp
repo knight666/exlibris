@@ -75,7 +75,7 @@ namespace ExLibris
 		glm::vec2 b = ConvertOutlinePosition(glyph, a_To);
 		glm::vec2 c = ConvertOutlinePosition(glyph, a_Control);
 
-		int precision = 10;
+		int precision = 5;
 		glm::vec2 delta_precision((float)precision, (float)precision);
 
 		glm::vec2 delta_ac = (c - a) / delta_precision;
@@ -121,7 +121,7 @@ namespace ExLibris
 		glm::vec2 c = ConvertOutlinePosition(glyph, a_ControlA);
 		glm::vec2 d = ConvertOutlinePosition(glyph, a_ControlB);
 
-		int precision = 10;
+		int precision = 5;
 		glm::vec2 delta_precision((float)precision, (float)precision);
 
 		glm::vec2 delta_ac = (c - a) / delta_precision;
