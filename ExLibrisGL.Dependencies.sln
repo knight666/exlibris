@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLib", "Dependencies\FreeIm
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtest", "Dependencies\gtest-1.7.0-rc1\gtest.vcxproj", "{77AAF550-1FE4-4EF9-B6ED-88092654AAFF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Poly2Tri", "Dependencies\poly2tri-0.3.3\poly2tri\Poly2Tri.vcxproj", "{5FB48BD6-5FE8-4DD7-B61F-F7C2389DE73D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -109,6 +111,10 @@ Global
 		{77AAF550-1FE4-4EF9-B6ED-88092654AAFF}.Debug|Win32.Build.0 = Debug|Win32
 		{77AAF550-1FE4-4EF9-B6ED-88092654AAFF}.Release|Win32.ActiveCfg = Release|Win32
 		{77AAF550-1FE4-4EF9-B6ED-88092654AAFF}.Release|Win32.Build.0 = Release|Win32
+		{5FB48BD6-5FE8-4DD7-B61F-F7C2389DE73D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5FB48BD6-5FE8-4DD7-B61F-F7C2389DE73D}.Debug|Win32.Build.0 = Debug|Win32
+		{5FB48BD6-5FE8-4DD7-B61F-F7C2389DE73D}.Release|Win32.ActiveCfg = Release|Win32
+		{5FB48BD6-5FE8-4DD7-B61F-F7C2389DE73D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
