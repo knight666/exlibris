@@ -9,6 +9,7 @@ namespace ExLibris
 		: index(0)
 		, metrics(nullptr)
 		, bitmap(nullptr)
+		, outline(nullptr)
 	{
 	}
 
