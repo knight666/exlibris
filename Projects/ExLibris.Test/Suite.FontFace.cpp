@@ -105,7 +105,7 @@ TEST_F(FaceContext, FindGlyph)
 	ASSERT_NE(nullptr, glyph->metrics);
 	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
 	EXPECT_FLOAT_EQ(2.0f, glyph->metrics->offset.x);
-	EXPECT_FLOAT_EQ(19.0f, glyph->metrics->offset.y);
+	EXPECT_FLOAT_EQ(34.0f, glyph->metrics->offset.y);
 	EXPECT_FLOAT_EQ(2.0625000f, glyph->metrics->bounding_box.minimum.x);
 	EXPECT_FLOAT_EQ(0.0000000f, glyph->metrics->bounding_box.minimum.y);
 	EXPECT_FLOAT_EQ(16.859375f, glyph->metrics->bounding_box.maximum.x);
@@ -121,9 +121,9 @@ TEST_F(FaceContext, FindGlyphOutline)
 	EXPECT_EQ(1, glyph->outline->contours.size());
 
 	GlyphContour* contour = glyph->outline->contours[0];
-	EXPECT_EQ(5, contour->points.size());
+	EXPECT_EQ(4, contour->points.size());
 	EXPECT_FLOAT_EQ(8.2031250f, contour->points[0].x);
-	EXPECT_FLOAT_EQ(8.5937500f, contour->points[0].y);
+	EXPECT_FLOAT_EQ(-8.5937500f, contour->points[0].y);
 }
 
 TEST_F(FaceContext, FindGlyphNotFound)
