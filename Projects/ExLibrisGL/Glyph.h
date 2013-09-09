@@ -11,9 +11,29 @@ namespace ExLibris
 	struct Glyph
 	{
 
-	public:
+		Glyph()
+			: index(0)
+			, metrics(nullptr)
+			, bitmap(nullptr)
+			, outline(nullptr)
+		{
+		}
 
-		Glyph();
+		~Glyph()
+		{
+			if (metrics != nullptr)
+			{
+				delete metrics;
+			}
+			if (bitmap != nullptr)
+			{
+				delete bitmap;
+			}
+			if (outline != nullptr)
+			{
+				delete outline;
+			}
+		}
 
 	public:
 

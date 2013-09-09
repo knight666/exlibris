@@ -7,10 +7,20 @@ namespace ExLibris
 	struct GlyphBitmap
 	{
 
-	public:
+		GlyphBitmap()
+			: width(0)
+			, height(0)
+			, data(nullptr)
+		{
+		}
 
-		GlyphBitmap();
-		~GlyphBitmap();
+		~GlyphBitmap()
+		{
+			if (data != nullptr)
+			{
+				delete [] data;
+			}
+		}
 
 	public:
 
