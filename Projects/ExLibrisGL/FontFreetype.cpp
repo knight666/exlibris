@@ -226,8 +226,8 @@ namespace ExLibris
 				Glyph* glyph = new Glyph;
 				glyph->index = (unsigned int)codepoint;
 
-				_LoadBitmap(m_Font->glyph, glyph);
 				_LoadMetrics(m_Font->glyph, glyph, m_Font->size->metrics.ascender);
+				_LoadBitmap(m_Font->glyph, glyph);
 				_LoadOutline(m_Font->glyph, glyph);
 
 				glyphs.push_back(glyph);

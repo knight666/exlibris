@@ -181,6 +181,8 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 	glm::vec2* position_data = new glm::vec2[outline.vertex_count];
 	unsigned int position_index = 0;
 
+	std::vector<ExLibris::Glyph*>::iterator glyph_next_it = glyphs.begin() + 1;
+
 	for (std::vector<ExLibris::Glyph*>::iterator glyph_it = glyphs.begin(); glyph_it != glyphs.end(); ++glyph_it)
 	{
 		ExLibris::Glyph* glyph = *glyph_it;
@@ -189,6 +191,17 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 		{
 			glm::vec2 position_local = cursor_offset;
 			position_local.y += glyph->metrics->offset.y;
+
+			if (glyph_next_it != glyphs.end())
+			{
+				ExLibris::Glyph* glyph_next = *glyph_next_it;
+
+				glm::vec2 kerning;
+				if (a_Face->TryGetKerning(glyph, glyph_next, kerning))
+				{
+					position_local += kerning;
+				}
+			}
 
 			for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
 			{
@@ -213,6 +226,11 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 		}
 		
 		cursor_offset.x += glyph->metrics->advance;
+
+		if (glyph_next_it != glyphs.end())
+		{
+			glyph_next_it++;
+		}
 	}
 
 	glGenBuffers(1, &outline.vertex_buffer);
