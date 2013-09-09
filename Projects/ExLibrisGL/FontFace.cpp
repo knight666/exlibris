@@ -76,4 +76,24 @@ namespace ExLibris
 		return nullptr;
 	}
 
+	bool FontFace::TryGetKerning(Glyph* a_Left, Glyph* a_Right, glm::vec2& a_Target) const
+	{
+		if (a_Left == nullptr || a_Right == nullptr)
+		{
+			return false;
+		}
+
+		std::map<unsigned int, glm::vec2>::const_iterator found = a_Left->kernings.find(a_Right->index);
+		if (found != a_Left->kernings.end())
+		{
+			a_Target = found->second;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 }; // namespace ExLibris
