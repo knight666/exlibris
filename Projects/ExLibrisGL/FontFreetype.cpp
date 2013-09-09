@@ -9,6 +9,11 @@
 namespace ExLibris
 {
 
+	glm::vec2 ConvertOutlinePosition(Glyph* a_Glyph, const FT_Vector* a_Position)
+	{
+		return Fixed26Dot6::ToFloatVec2(a_Position);
+	}
+
 	int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
 	{
 		Glyph* glyph = (Glyph*)a_User;
@@ -18,10 +23,7 @@ namespace ExLibris
 		GlyphContour* contour = new GlyphContour;
 		outline->contours.push_back(contour);
 
-		glm::vec2 position = Fixed26Dot6::ToFloatVec2(a_To);
-
-		float y_maximum = glyph->metrics->bounding_box.maximum.y;
-		position.y = y_maximum - position.y;
+		glm::vec2 position = ConvertOutlinePosition(glyph, a_To);
 
 		contour->points.push_back(position);
 
@@ -40,10 +42,7 @@ namespace ExLibris
 
 		GlyphContour* contour = outline->contours.back();
 
-		glm::vec2 position = Fixed26Dot6::ToFloatVec2(a_To);
-
-		float y_maximum = glyph->metrics->bounding_box.maximum.y;
-		position.y = y_maximum - position.y;
+		glm::vec2 position = ConvertOutlinePosition(glyph, a_To);
 
 		contour->points.push_back(position);
 
@@ -67,12 +66,8 @@ namespace ExLibris
 		}
 
 		glm::vec2 a = contour->points.back();
-		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
-		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_Control);
-
-		float y_maximum = glyph->metrics->bounding_box.maximum.y;
-		b.y = y_maximum - b.y;
-		c.y = y_maximum - c.y;
+		glm::vec2 b = ConvertOutlinePosition(glyph, a_To);
+		glm::vec2 c = ConvertOutlinePosition(glyph, a_Control);
 
 		int precision = 10;
 		glm::vec2 delta_precision((float)precision, (float)precision);
@@ -116,14 +111,9 @@ namespace ExLibris
 		}
 
 		glm::vec2 a = contour->points.back();
-		glm::vec2 b = Fixed26Dot6::ToFloatVec2(a_To);
-		glm::vec2 c = Fixed26Dot6::ToFloatVec2(a_ControlA);
-		glm::vec2 d = Fixed26Dot6::ToFloatVec2(a_ControlB);
-
-		float y_maximum = glyph->metrics->bounding_box.maximum.y;
-		b.y = y_maximum - b.y;
-		c.y = y_maximum - c.y;
-		d.y = y_maximum - d.y;
+		glm::vec2 b = ConvertOutlinePosition(glyph, a_To);
+		glm::vec2 c = ConvertOutlinePosition(glyph, a_ControlA);
+		glm::vec2 d = ConvertOutlinePosition(glyph, a_ControlB);
 
 		int precision = 10;
 		glm::vec2 delta_precision((float)precision, (float)precision);
@@ -236,8 +226,8 @@ namespace ExLibris
 				Glyph* glyph = new Glyph;
 				glyph->index = (unsigned int)codepoint;
 
-				_LoadMetrics(m_Font->glyph, glyph);
 				_LoadBitmap(m_Font->glyph, glyph);
+				_LoadMetrics(m_Font->glyph, glyph, m_Font->size->metrics.ascender);
 				_LoadOutline(m_Font->glyph, glyph);
 
 				glyphs.push_back(glyph);
@@ -285,7 +275,7 @@ namespace ExLibris
 		return face;
 	}
 
-	bool FontFreetype::_LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	bool FontFreetype::_LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Pos a_Ascender) const
 	{
 		FT_Error errors = 0;
 
@@ -293,7 +283,8 @@ namespace ExLibris
 
 		a_Glyph->metrics = new GlyphMetrics;
 		a_Glyph->metrics->offset.x = Fixed26Dot6::ToFloat(glyph_metrics.horiBearingX);
-		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY);
+		//a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY);
+		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(a_Ascender);
 		a_Glyph->metrics->advance = Fixed26Dot6::ToFloat(glyph_metrics.horiAdvance);
 
 		// bounding box
@@ -374,6 +365,14 @@ namespace ExLibris
 		FT_Error errors = 0;
 
 		a_Glyph->outline = new GlyphOutline;
+
+		FT_Matrix transform_flipped;
+		transform_flipped.xx = Fixed16Dot16::ToFixed(1.0f);
+		transform_flipped.xy = 0;
+		transform_flipped.yx = 0;
+		transform_flipped.yy = Fixed16Dot16::ToFixed(-1.0f);
+
+		FT_Outline_Transform(&a_Slot->outline, &transform_flipped);
 
 		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph);
 		if (errors != 0)

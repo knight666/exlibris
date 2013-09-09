@@ -187,7 +187,8 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 
 		if (glyph->outline != nullptr)
 		{
-			glm::vec2 position_local = cursor_offset + glyph->metrics->offset;
+			glm::vec2 position_local = cursor_offset;
+			position_local.y += glyph->metrics->offset.y;
 
 			for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
 			{
@@ -263,7 +264,7 @@ int main(int argc, const char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_TEXTURE_2D);
 
-	std::wstring text = L"Pa's wijze lynx";
+	std::wstring text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 	TextOutline outline = CreateTextOutline(face_size24, text);
 
 	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
