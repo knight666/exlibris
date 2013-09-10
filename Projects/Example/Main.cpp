@@ -45,19 +45,38 @@
 //static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
 static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
 static float g_FontSize = 36.0f;
-//static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
-static std::wstring g_Text = L"agjklipqsdf";
+static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
+//static std::wstring g_Text = L"agjklipqsdf";
+
+static Framework::ShaderLoader* g_ShaderLoader;
+static Framework::ShaderProgram* g_ShaderProgram = nullptr;
 
 static void OnGlfwError(int error, const char* description)
 {
 	std::cerr << description << std::endl;
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void LoadShaders()
+{
+	if (g_ShaderProgram != nullptr)
+	{
+		delete g_ShaderProgram;
+	}
+
+	g_ShaderProgram = g_ShaderLoader->LoadProgram("Default", "Shaders/Default");
+	g_ShaderProgram->Compile();
+	g_ShaderProgram->Link();
+}
+
+static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	else if (key == GLFW_KEY_F5 && action == GLFW_RELEASE)
+	{
+		LoadShaders();
 	}
 }
 
@@ -415,6 +434,7 @@ int main(int argc, const char** argv)
 		exit(EXIT_FAILURE);
 	}
 
+	glfwSetKeyCallback(window, OnKey);
 	glfwMakeContextCurrent(window);
 
 	if (glewInit() != GLEW_OK)
@@ -428,10 +448,8 @@ int main(int argc, const char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_TEXTURE_2D);
 
-	Framework::ShaderLoader loader_shaders;
-	Framework::ShaderProgram* program = loader_shaders.LoadProgram("Default", "Shaders/Default");
-	program->Compile();
-	program->Link();
+	g_ShaderLoader = new Framework::ShaderLoader();
+	LoadShaders();
 
 	TextOutline outline = CreateTextOutline(face_size24, g_Text);
 
@@ -520,17 +538,20 @@ int main(int argc, const char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4x4 projection = glm::ortho<float>(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+		
 		glm::mat4x4 modelview;
+		modelview = glm::translate(modelview, glm::vec3(0.0f, 100.0f, 0.0f));
+
 		glm::mat4x4 mvp = projection * modelview;
 
 		glm::vec4 color(1.0f, 0.0f, 0.0f, 1.0f);
 
-		glUseProgram(program->GetHandle());
-		glUniformMatrix4fv(program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
-		glUniform4fv(program->GetUniform("uniColor"), 1, glm::value_ptr(color));
-		glUniform1f(program->GetUniform("uniTime"), timer);
+		glUseProgram(g_ShaderProgram->GetHandle());
+		glUniformMatrix4fv(g_ShaderProgram->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform4fv(g_ShaderProgram->GetUniform("uniColor"), 1, glm::value_ptr(color));
+		glUniform1f(g_ShaderProgram->GetUniform("uniTime"), timer);
 
-		GLint attribute_position = program->GetAttribute("attrPosition");
+		GLint attribute_position = g_ShaderProgram->GetAttribute("attrPosition");
 		glEnableVertexAttribArray(attribute_position);
 
 		for (std::vector<TextGlyphMesh*>::iterator mesh_it = mesh.glyphs.begin(); mesh_it != mesh.glyphs.end(); ++mesh_it)
@@ -538,7 +559,7 @@ int main(int argc, const char** argv)
 			TextGlyphMesh* glyph_mesh = *mesh_it;
 			//TextGlyphMesh* glyph_mesh = mesh.glyphs[0];
 
-			glUniform2fv(program->GetUniform("uniOffset"), 1, glm::value_ptr(glyph_mesh->offset));
+			glUniform2fv(g_ShaderProgram->GetUniform("uniOffset"), 1, glm::value_ptr(glyph_mesh->offset));
 			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
 
 			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
