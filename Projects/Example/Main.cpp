@@ -5,6 +5,10 @@
 #include <map>
 #include <vector>
 
+// Windows
+
+#include <windows.h>
+
 // Freetype
 
 #include <freetype/ftbbox.h>
@@ -41,7 +45,8 @@
 //static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
 static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
 static float g_FontSize = 36.0f;
-static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
+//static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
+static std::wstring g_Text = L"agjklipqsdf";
 
 static void OnGlfwError(int error, const char* description)
 {
@@ -158,15 +163,14 @@ struct TextOutline
 
 struct TextGlyphMesh
 {
-	unsigned int start;
-	unsigned int count;
+	GLuint vertex_buffer;
+	unsigned int vertex_count;
+	glm::vec2 offset;
 };
 
 struct TextMesh
 {
-	GLuint vertex_buffer;
-	unsigned int vertex_count;
-	std::vector<TextGlyphMesh> meshes;
+	std::vector<TextGlyphMesh*> glyphs;
 };
 
 TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
@@ -291,8 +295,7 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 {
 	glm::vec2 cursor_offset;
 
-	TextMesh mesh;
-	mesh.vertex_count = 0;
+	TextMesh text_mesh;
 
 	std::vector<ExLibris::Glyph*> glyphs;
 
@@ -307,7 +310,7 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 		}
 	}
 
-	std::vector<p2t::Triangle*> triangles;
+	text_mesh.glyphs.reserve(glyphs.size());
 
 	std::vector<ExLibris::Glyph*>::iterator glyph_next_it = glyphs.begin() + 1;
 
@@ -317,8 +320,13 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 
 		if (glyph->outline != nullptr)
 		{
-			glm::vec2 position_local = cursor_offset;
-			position_local.y += glyph->metrics->offset.y;
+			TextGlyphMesh* glyph_mesh = new TextGlyphMesh;
+
+			glm::vec2 position_local;
+			//position_local.y += glyph->metrics->offset.y;
+
+			glyph_mesh->offset = cursor_offset;
+			glyph_mesh->offset.y += glyph->metrics->offset.y;
 
 			std::vector<p2t::Point*> outline = ConvertContourToPolyline(position_local, glyph->outline->contours[0]);
 			p2t::CDT* cdt = new p2t::CDT(outline);
@@ -337,7 +345,39 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 			cdt->Triangulate();
 
 			std::vector<p2t::Triangle*> cdt_triangles = cdt->GetTriangles();
-			triangles.insert(triangles.end(), cdt_triangles.begin(), cdt_triangles.end());
+
+			glyph_mesh->vertex_count = cdt_triangles.size() * 3;
+
+			glm::vec2* position_data = new glm::vec2[glyph_mesh->vertex_count];
+			glm::vec2* dst_position_data = position_data;
+
+			for (std::vector<p2t::Triangle*>::const_iterator triangle_it = cdt_triangles.begin(); triangle_it != cdt_triangles.end(); ++triangle_it)
+			{
+				p2t::Triangle* triangle = *triangle_it;
+
+				p2t::Point* point_a = triangle->GetPoint(0);
+				dst_position_data->x = (float)point_a->x;
+				dst_position_data->y = (float)point_a->y;
+				++dst_position_data;
+
+				p2t::Point* point_b = triangle->GetPoint(1);
+				dst_position_data->x = (float)point_b->x;
+				dst_position_data->y = (float)point_b->y;
+				++dst_position_data;
+
+				p2t::Point* point_c = triangle->GetPoint(2);
+				dst_position_data->x = (float)point_c->x;
+				dst_position_data->y = (float)point_c->y;
+				++dst_position_data;
+			}
+
+			glGenBuffers(1, &glyph_mesh->vertex_buffer);
+			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
+			glBufferData(GL_ARRAY_BUFFER, glyph_mesh->vertex_count * sizeof(glm::vec2), position_data, GL_STATIC_DRAW);
+
+			//delete [] position_data;
+
+			text_mesh.glyphs.push_back(glyph_mesh);
 		}
 
 		cursor_offset.x += glyph->metrics->advance;
@@ -348,40 +388,9 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 		}
 	}
 
-	mesh.vertex_count = triangles.size() * 3;
-
-	glm::vec2* position_data = new glm::vec2[mesh.vertex_count];
-	glm::vec2* dst_position_data = position_data;
-
-	for (std::vector<p2t::Triangle*>::const_iterator triangle_it = triangles.begin(); triangle_it != triangles.end(); ++triangle_it)
-	{
-		p2t::Triangle* triangle = *triangle_it;
-
-		p2t::Point* point_a = triangle->GetPoint(0);
-		dst_position_data->x = (float)point_a->x;
-		dst_position_data->y = (float)point_a->y;
-		++dst_position_data;
-
-		p2t::Point* point_b = triangle->GetPoint(1);
-		dst_position_data->x = (float)point_b->x;
-		dst_position_data->y = (float)point_b->y;
-		++dst_position_data;
-
-		p2t::Point* point_c = triangle->GetPoint(2);
-		dst_position_data->x = (float)point_c->x;
-		dst_position_data->y = (float)point_c->y;
-		++dst_position_data;
-	}
-
-	glGenBuffers(1, &mesh.vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, mesh.vertex_count * sizeof(glm::vec2), position_data, GL_STATIC_DRAW);
-
-	delete [] position_data;
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return mesh;
+	return text_mesh;
 }
 
 int main(int argc, const char** argv)
@@ -427,6 +436,8 @@ int main(int argc, const char** argv)
 	TextOutline outline = CreateTextOutline(face_size24, g_Text);
 
 	TextMesh mesh = CreateMesh(face_size24, g_Text);
+
+	float time = 0.0f;
 
 	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
 
@@ -474,11 +485,31 @@ int main(int argc, const char** argv)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_total * sizeof(GLuint), element_data, GL_STATIC_DRAW);
 
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	float timer = 0.0f;
 
-	while (glfwWindowShouldClose(window) == 0)
+	unsigned long time_start = GetTickCount();
+	float physics_time = 0.0f;
+	float physics_frame = 1000.0f / 60.0f;
+
+	do 
 	{
+		unsigned long time_current = GetTickCount();
+		float time_delta = (float)(time_current - time_start);
+		time_start = time_current;
+
+		physics_time += time_delta;
+
+		// update
+
+		while (physics_time > physics_frame)
+		{
+			timer += 0.05f;
+
+			physics_time -= physics_frame;
+		}
+
+		// render
+
 		float ratio;
 		int width, height;
 
@@ -497,12 +528,23 @@ int main(int argc, const char** argv)
 		glUseProgram(program->GetHandle());
 		glUniformMatrix4fv(program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
 		glUniform4fv(program->GetUniform("uniColor"), 1, glm::value_ptr(color));
+		glUniform1f(program->GetUniform("uniTime"), timer);
 
-		glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
-		glVertexAttribPointer(program->GetAttribute("attrPosition"), 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-		glEnableVertexAttribArray(program->GetAttribute("attrPosition"));
+		GLint attribute_position = program->GetAttribute("attrPosition");
+		glEnableVertexAttribArray(attribute_position);
 
-		glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
+		for (std::vector<TextGlyphMesh*>::iterator mesh_it = mesh.glyphs.begin(); mesh_it != mesh.glyphs.end(); ++mesh_it)
+		{
+			TextGlyphMesh* glyph_mesh = *mesh_it;
+			//TextGlyphMesh* glyph_mesh = mesh.glyphs[0];
+
+			glUniform2fv(program->GetUniform("uniOffset"), 1, glm::value_ptr(glyph_mesh->offset));
+			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
+
+			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+			glDrawArrays(GL_TRIANGLES, 0, glyph_mesh->vertex_count);
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glUseProgram(0);
@@ -544,6 +586,7 @@ int main(int argc, const char** argv)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	while (glfwWindowShouldClose(window) == 0);
 
 	glfwDestroyWindow(window);
 
