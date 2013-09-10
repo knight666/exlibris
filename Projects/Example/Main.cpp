@@ -24,6 +24,12 @@
 
 #include <poly2tri/poly2tri.h>
 
+// Framework
+
+#include <ShaderLoader.h>
+#include <ShaderProgram.h>
+#include <ShaderSource.h>
+
 // ExLibris
 
 #include <FontFace.h>
@@ -34,7 +40,7 @@
 
 //static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
 static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
-static float g_FontSize = 24.0f;
+static float g_FontSize = 36.0f;
 static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 
 static void OnGlfwError(int error, const char* description)
@@ -413,6 +419,11 @@ int main(int argc, const char** argv)
 	glCullFace(GL_BACK);
 	glEnable(GL_TEXTURE_2D);
 
+	Framework::ShaderLoader loader_shaders;
+	Framework::ShaderProgram* program = loader_shaders.LoadProgram("Default", "Shaders/Default");
+	program->Compile();
+	program->Link();
+
 	TextOutline outline = CreateTextOutline(face_size24, g_Text);
 
 	TextMesh mesh = CreateMesh(face_size24, g_Text);
@@ -463,7 +474,7 @@ int main(int argc, const char** argv)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_total * sizeof(GLuint), element_data, GL_STATIC_DRAW);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_VERTEX_ARRAY);
 	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	while (glfwWindowShouldClose(window) == 0)
@@ -477,23 +488,24 @@ int main(int argc, const char** argv)
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glMatrixMode(GL_PROJECTION);
 		glm::mat4x4 projection = glm::ortho<float>(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
-		glLoadMatrixf(glm::value_ptr(projection));
-
-		glMatrixMode(GL_MODELVIEW);
 		glm::mat4x4 modelview;
-		//modelview = glm::scale(modelview, glm::vec3(5.0f, 5.0f, 5.0f));
-		glLoadMatrixf(glm::value_ptr(modelview));
+		glm::mat4x4 mvp = projection * modelview;
 
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glm::vec4 color(1.0f, 0.0f, 0.0f, 1.0f);
+
+		glUseProgram(program->GetHandle());
+		glUniformMatrix4fv(program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform4fv(program->GetUniform("uniColor"), 1, glm::value_ptr(color));
 
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
-		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+		glVertexAttribPointer(program->GetAttribute("attrPosition"), 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(program->GetAttribute("attrPosition"));
 
 		glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glUseProgram(0);
 
 		/*glBindBuffer(GL_ARRAY_BUFFER, outline.vertex_buffer);
 
