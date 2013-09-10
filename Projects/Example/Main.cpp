@@ -340,12 +340,9 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 		if (glyph->outline != nullptr)
 		{
 			TextGlyphMesh* glyph_mesh = new TextGlyphMesh;
+			glyph_mesh->offset = glm::vec2(0.0f, glyph->metrics->offset.y);
 
-			glm::vec2 position_local;
-			//position_local.y += glyph->metrics->offset.y;
-
-			glyph_mesh->offset = cursor_offset;
-			glyph_mesh->offset.y += glyph->metrics->offset.y;
+			glm::vec2 position_local = cursor_offset;
 
 			std::vector<p2t::Point*> outline = ConvertContourToPolyline(position_local, glyph->outline->contours[0]);
 			p2t::CDT* cdt = new p2t::CDT(outline);
