@@ -185,8 +185,14 @@ namespace Framework
 		if (info_log_length > 1)
 		{
 			m_Log = new GLchar[info_log_length + 1];
-			glGetProgramInfoLog(m_Handle, info_log_length, 0, m_Log);
-			if (strcmp(m_Log, "No errors."))
+			glGetShaderInfoLog(m_Handle, info_log_length, 0, m_Log);
+
+			// some video card manufacturers (Intel) like to use the log to
+			// output a message explicitly saying that there were... no errors.
+			// we skip this message because it's specific to this manufacturer
+			// and it's never ever going to be useful information
+
+			if (!strcmp(m_Log, "No errors.\n"))
 			{
 				delete [] m_Log;
 				m_Log = nullptr;
