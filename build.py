@@ -20,8 +20,12 @@ def Usage():
 	print '\t\tSpecify a project to build'
 	print '-f or --fast'
 	print '\t\tBuild only the release target'
+	print '--debug'
+	print '\t\tDebug mode'
 	print '--tests'
 	print '\t\tBuild and run all tests'
+	print '--all'
+	print '\t\tBuild and run dependencies, project and tests'
 	print ''
 
 def PauseAndExit(code):
@@ -66,52 +70,62 @@ setupVSEnv(100)
 
 cpp_compiler = os.environ['FrameworkDir'] + os.environ['FrameworkVersion'] + "\\msbuild.exe"
 	
-# check command line arguments
+# options
 
-try:
-	command_line = sys.argv[1:]
-	options, arguments = getopt.getopt(
-		command_line,
-		"hp:f",
-		['help', 'project=', 'fast', 'tests']
-	)
-except getopt.GetoptError:
-	Usage()
-	sys.exit(2)
-	
 projects = []
 fast = False
+debug = False
 
-for option, argument in options:
-	if option in ('-h', '--help'):
+# check command line arguments
+
+if len(sys.argv) == 1:
+	projects.append('Dependencies')
+	projects.append('Project')
+	projects.append('Tests')
+else:
+	try:
+		command_line = sys.argv[1:]
+		options, arguments = getopt.getopt(
+			command_line,
+			"hp:f",
+			['help', 'project=', 'fast', 'tests', 'debug', 'all']
+		)
+	except getopt.GetoptError:
 		Usage()
-		sys.exit()
-	elif option in ('-p', '--project'):
-		projects = argument.split(';')
-	elif option in ('-f', '--fast'):
-		fast = True
-	elif option == '--tests':
-		projects.append('Tests')
-		fast = True
+		sys.exit(2)
+		
+	for option, argument in options:
+		if option in ('-h', '--help'):
+			Usage()
+			sys.exit()
+		elif option in ('-p', '--project'):
+			projects = argument.split(';')
+		elif option in ('-f', '--fast'):
+			fast = True
+		elif option == '--debug':
+			debug = True
+		elif option == '--all':
+			projects.append('Dependencies')
+			projects.append('Project')
+			projects.append('Tests')
+		elif option == '--tests':
+			projects.append('Tests')
+			fast = True
 		
 # build
 
 class Solution:
-	projects = []
-	targets = []
-	
 	def __init__(self, solution):
 		self.solution = solution
+		self.projects = []
+		self.targets = []
 
 	def build(self, project, target, platform):
 		flags = '/nologo'
 		
-		if not project:
-			print 'No project specified.'
-			return False
-
-		safe_project = urllib.quote(project.replace('.', '_'))
-		flags += ' /t:\"' + safe_project + '\"'
+		if project:
+			safe_project = urllib.quote(project.replace('.', '_'))
+			flags += ' /t:\"' + safe_project + '\"'
 		
 		if target:
 			flags += ' /p:Configuration=' + target;
@@ -119,24 +133,43 @@ class Solution:
 		if platform:
 			flags += ' /p:Platform=' + platform;
 		
+		success = True
+		
 		try:
 			command = '\"' + cpp_compiler + '\" \"' + self.solution + '\" ' + flags
+			if debug:
+				print command
+				print ''
+				
 			output = subprocess.check_call(command)
+			if not output == 0:
+				success = False
 		except subprocess.CalledProcessError:
+			success = False
 			print ''
-			print 'Could not build project.'
-			return False
+			print '--- Failed to compile project.'
 			
-		return True
+		return success
 		
 	def build_list(self):
-		for target in self.targets:
-			for project in self.projects:
-				if not self.build(project, target, 'Win32'):
-					print ''
-					print 'Failed to build \"' + project + '\" on ' + target + '.'
-					return False
+		print self.solution
+		print self.projects
 					
+		for target in self.targets:
+			if len(self.projects) > 0:
+				for project in self.projects:
+					if not self.build(project, target, 'Win32'):
+						print ''
+						print '--- Failed to build \"' + project + '\" on ' + target + '.'
+						print ''
+						return False
+			else:
+				if not self.build(None, target, 'Win32'):
+					print ''
+					print '--- Failed to build \"' + project + '\" on ' + target + '.'
+					print ''
+					return False
+						
 		return True
 
 solutions = []
@@ -148,7 +181,7 @@ if 'Dependencies' in projects:
 	
 if 'Project' in projects or 'Tests' in projects:
 	s = Solution('ExLibrisGL.sln')
-	
+
 	if 'Project' in projects:
 		print '--- Building project'
 		print ''
@@ -160,10 +193,13 @@ if 'Project' in projects or 'Tests' in projects:
 		print ''
 		
 		s.projects.append('ExLibris.Test')
-		tests.append('ExLibris.TestRelease.exe')
-		if not fast:
+		
+		if fast:
+			tests.append('ExLibris.TestRelease.exe')
+		else:
 			tests.append('ExLibris.TestDebug.exe')
-	
+			tests.append('ExLibris.TestRelease.exe')
+			
 	solutions.append(s)
 	
 # build projects
@@ -172,13 +208,21 @@ if len(solutions) > 0:
 	print '--- Executing'
 	print ''
 	
+	if debug:
+		for s in solutions:
+			print s.solution
+			print s.projects
+			print ''
+			
 	for s in solutions:
-		s.targets.append('Release')
-		
-		if not fast:
+		if fast:
+			s.targets.append('Release')
+		else:
 			s.targets.append('Debug')
+			s.targets.append('Release')
 		
-		s.build_list()
+		if not s.build_list():
+			break
 		
 		print ''
 else:
@@ -195,6 +239,9 @@ if len(tests) > 0:
 			print ''
 			
 			command = 'pushd Build && call \"' + t + '\" && popd'
+			if debug:
+				print command
+				
 			subprocess.call(command, shell=True)
 			print ''
 		except subprocess.CalledProcessError:
