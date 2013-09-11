@@ -12,9 +12,17 @@ import urllib
 
 def Usage():
 	print ''
+	print 'build.py [-h] [-p=(Project|Tests|Dependencies)] [-f]'
+	print ''
+	print '-h or --help'
+	print '\t\tDisplay this message'
+	print '-p or --project'
+	print '\t\tSpecify a project to build'
+	print '-f or --fast'
+	print '\t\tBuild only the release target'
+	print ''
 
 def PauseAndExit(code):
-	print ''
 	raw_input("Press ENTER to exit.")
 	sys.exit(code)	
 
@@ -149,9 +157,9 @@ if 'Project' in projects or 'Tests' in projects:
 		print ''
 		
 		s.projects.append('ExLibris.Test')
-		tests.append('ExLibris.TestDebug.exe')
+		tests.append('ExLibris.TestRelease.exe')
 		if not fast:
-			tests.append('ExLibris.TestRelease.exe')
+			tests.append('ExLibris.TestDebug.exe')
 	
 	solutions.append(s)
 	
@@ -162,22 +170,22 @@ if len(solutions) > 0:
 	print ''
 	
 	for s in solutions:
-		s.targets.append('Debug')
+		s.targets.append('Release')
+		
 		if not fast:
-			s.targets.append('Release')
+			s.targets.append('Debug')
 		
 		s.build_list()
 		
 		print ''
 else:
-	print 'Nothing to do.'
-	print ''
+	Usage()
+	PauseAndExit(0)
 
 # run tests
 
 if len(tests) > 0:
 	print '--- Running tests'
-	print ''
 	
 	for t in tests:
 		try:
