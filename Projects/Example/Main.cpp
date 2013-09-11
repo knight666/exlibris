@@ -189,6 +189,7 @@ struct TextGlyphMesh
 
 struct TextMesh
 {
+	glm::vec2 dimensions;
 	std::vector<TextGlyphMesh*> glyphs;
 };
 
@@ -391,7 +392,7 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
 			glBufferData(GL_ARRAY_BUFFER, glyph_mesh->vertex_count * sizeof(glm::vec2), position_data, GL_STATIC_DRAW);
 
-			//delete [] position_data;
+			delete [] position_data;
 
 			text_mesh.glyphs.push_back(glyph_mesh);
 		}
@@ -403,6 +404,9 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 			glyph_next_it++;
 		}
 	}
+
+	text_mesh.dimensions.x = cursor_offset.x;
+	text_mesh.dimensions.y = a_Face->GetLineHeight();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -547,6 +551,7 @@ int main(int argc, const char** argv)
 		glUniformMatrix4fv(g_ShaderProgram->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
 		glUniform4fv(g_ShaderProgram->GetUniform("uniColor"), 1, glm::value_ptr(color));
 		glUniform1f(g_ShaderProgram->GetUniform("uniTime"), timer);
+		glUniform2fv(g_ShaderProgram->GetUniform("uniTextDimensions"), 1, glm::value_ptr(mesh.dimensions));
 
 		GLint attribute_position = g_ShaderProgram->GetAttribute("attrPosition");
 		glEnableVertexAttribArray(attribute_position);
@@ -554,7 +559,6 @@ int main(int argc, const char** argv)
 		for (std::vector<TextGlyphMesh*>::iterator mesh_it = mesh.glyphs.begin(); mesh_it != mesh.glyphs.end(); ++mesh_it)
 		{
 			TextGlyphMesh* glyph_mesh = *mesh_it;
-			//TextGlyphMesh* glyph_mesh = mesh.glyphs[0];
 
 			glUniform2fv(g_ShaderProgram->GetUniform("uniOffset"), 1, glm::value_ptr(glyph_mesh->offset));
 			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
