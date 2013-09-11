@@ -67,6 +67,7 @@
     </ClCompile>
     <ClCompile Include="Suite.FontFace.cpp" />
     <ClCompile Include="Suite.FontLoading.cpp" />
+    <ClCompile Include="Suite.ShapePath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExLibris.Test.PCH.h" />

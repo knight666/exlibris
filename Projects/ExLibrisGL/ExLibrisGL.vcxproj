@@ -78,6 +78,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="IFont.cpp" />
+    <ClCompile Include="ShapePath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FontFace.h" />
@@ -91,6 +92,8 @@
     <ClInclude Include="ExLibrisGL.PCH.h" />
     <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
+    <ClInclude Include="ShapePath.h" />
+    <ClInclude Include="IShapePathVisitor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
