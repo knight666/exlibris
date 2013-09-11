@@ -1,0 +1,17 @@
+Makefile
+
+- Python build script
+
+Contours
+
+- Separate class for converting splines to contours
+	- Tests
+	
+ContourSplinePainter(Contour&)
+- SetPrecisionHint(amount);
+- SetPrecisionType((eFixed | eDynamic));
+- Clear()
+- MovePen(position)
+- LineTo(position)
+- ConicTo(position, control);
+- CubicTo(position, controlA, controlB);
