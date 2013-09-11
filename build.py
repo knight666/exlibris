@@ -12,7 +12,7 @@ import urllib
 
 def Usage():
 	print ''
-	print 'build.py [-h] [-p=(Project|Tests|Dependencies)] [-f]'
+	print 'build.py [-h][-f] [-p=(Project|Tests|Dependencies)] [--tests]'
 	print ''
 	print '-h or --help'
 	print '\t\tDisplay this message'
@@ -20,6 +20,8 @@ def Usage():
 	print '\t\tSpecify a project to build'
 	print '-f or --fast'
 	print '\t\tBuild only the release target'
+	print '--tests'
+	print '\t\tBuild and run all tests'
 	print ''
 
 def PauseAndExit(code):
@@ -71,11 +73,11 @@ try:
 	options, arguments = getopt.getopt(
 		command_line,
 		"hp:f",
-		['help', '--project', '--fast']
+		['help', 'project=', 'fast', 'tests']
 	)
 except getopt.GetoptError:
 	Usage()
-	PauseAndExit(2)
+	sys.exit(2)
 	
 projects = []
 fast = False
@@ -87,6 +89,9 @@ for option, argument in options:
 	elif option in ('-p', '--project'):
 		projects = argument.split(';')
 	elif option in ('-f', '--fast'):
+		fast = True
+	elif option == '--tests':
+		projects.append('Tests')
 		fast = True
 		
 # build
@@ -116,12 +121,10 @@ class Solution:
 		
 		try:
 			command = '\"' + cpp_compiler + '\" \"' + self.solution + '\" ' + flags
-			print command
-			
 			output = subprocess.check_call(command)
 		except subprocess.CalledProcessError:
 			print ''
-			print 'Could not setup Visual Studio 2010 environment.'
+			print 'Could not build project.'
 			return False
 			
 		return True
@@ -180,7 +183,7 @@ if len(solutions) > 0:
 		print ''
 else:
 	Usage()
-	PauseAndExit(0)
+	sys.exit(2)
 
 # run tests
 
