@@ -36,15 +36,28 @@ namespace ExLibris
 	{
 		std::vector<glm::vec2>::iterator position_it = m_Positions.begin();
 		glm::vec2 position_previous;
+		int shape_count = 0;
 
 		for (std::vector<CommandType>::iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
 		{
+			if (*command_it != eCommandType_Move && shape_count == 0)
+			{
+				a_Visitor.VisitCurveStart();
+			}
+
 			switch (*command_it)
 			{
 
 			case eCommandType_Move:
 				{
+					if (shape_count > 0)
+					{
+						a_Visitor.VisitCurveEnd();
+					}
+
 					a_Visitor.VisitCurveStart();
+					shape_count++;
+
 					a_Visitor.VisitCurvePosition(*position_it);
 
 				} break;
@@ -79,7 +92,8 @@ namespace ExLibris
 					}
 					
 					a_Visitor.VisitCurvePosition(to);
-				}
+
+				} break;
 
 			}
 
