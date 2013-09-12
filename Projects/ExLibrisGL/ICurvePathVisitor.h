@@ -1,17 +1,17 @@
-#ifndef _ISHAPEPATHVISITOR_H_
-#define _ISHAPEPATHVISITOR_H_
+#ifndef _ICURVEPATHVISITOR_H_
+#define _ICURVEPATHVISITOR_H_
 
 #include <glm/glm.hpp>
 
 namespace ExLibris
 {
 
-	class IShapePathVisitor
+	class ICurvePathVisitor
 	{
 	
 	public:
 	
-		virtual ~IShapePathVisitor()
+		virtual ~ICurvePathVisitor()
 		{
 		}
 	
@@ -19,7 +19,7 @@ namespace ExLibris
 		virtual void VisitShapePosition(const glm::vec2& a_Position) = 0;
 		virtual void VisitShapeEnd() = 0;
 	
-	}; // class IShapePathVisitor
+	}; // class ICurvePathVisitor
 
 }; // namespace ExLibris
 

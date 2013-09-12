@@ -1,16 +1,16 @@
 #include "ExLibris.Test.PCH.h"
 
-#include "ShapePath.h"
+#include "CurvePath.h"
 
 using namespace ExLibris;
 
-class MockShapePathVisitor
-	: public IShapePathVisitor
+class MockCurvePathVisitor
+	: public ICurvePathVisitor
 {
 
 public:
 
-	~MockShapePathVisitor()
+	~MockCurvePathVisitor()
 	{
 	}
 
@@ -40,13 +40,13 @@ public:
 
 };
 
-TEST(ShapePath, PathLine)
+TEST(CurvePath, PathLine)
 {
-	ShapePath path;
+	CurvePath path;
 	path.Move(glm::vec2(10.0f, 10.0f));
 	path.LineTo(glm::vec2(25.0f, 10.0f));
 
-	MockShapePathVisitor visitor;
+	MockCurvePathVisitor visitor;
 	path.Accept(visitor);
 
 	ASSERT_EQ(1, visitor.contours.size());
