@@ -61,12 +61,12 @@ namespace ExLibris
 					glm::vec2 control = *position_it++;
 					glm::vec2 to = *position_it;
 
-					if (a_Settings.precision > 0)
+					if (a_Settings.precision > 1)
 					{
 						float delta = 1.0f / (float)a_Settings.precision;
 						float time = delta;
 
-						for (int step = 0; step < a_Settings.precision; ++step)
+						for (int step = 1; step < a_Settings.precision; ++step)
 						{
 							glm::vec2 ac = glm::mix(from, control, time);
 							glm::vec2 cb = glm::mix(control, to, time);
@@ -77,11 +77,8 @@ namespace ExLibris
 							time += delta;
 						}
 					}
-					else
-					{
-						a_Visitor.VisitCurvePosition(to);
-					}
 					
+					a_Visitor.VisitCurvePosition(to);
 				}
 
 			}
