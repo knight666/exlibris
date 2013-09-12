@@ -187,3 +187,33 @@ TEST(CurvePath, PathConicTwoCurves)
 	EXPECT_FLOAT_EQ(200.0f, visitor.contours[0].positions[6].x);
 	EXPECT_FLOAT_EQ(100.0f, visitor.contours[0].positions[6].y);
 }
+
+TEST(CurvePath, PathQuadratic)
+{
+	CurvePath path;
+	path.Move(glm::vec2(5.0f, 5.0f));
+	path.QuadraticCurveTo(
+		glm::vec2(5.0f, -25.0f),
+		glm::vec2(25.0f, -25.0f),
+		glm::vec2(25.0f, 5.0f)
+	);
+
+	CurveSettings settings;
+	settings.precision = 4;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(5, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(5.0f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(5.0f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(8.125f, visitor.contours[0].positions[1].x);
+	EXPECT_FLOAT_EQ(-11.875f, visitor.contours[0].positions[1].y);
+	EXPECT_FLOAT_EQ(15.0f, visitor.contours[0].positions[2].x);
+	EXPECT_FLOAT_EQ(-17.5f, visitor.contours[0].positions[2].y);
+	EXPECT_FLOAT_EQ(21.875f, visitor.contours[0].positions[3].x);
+	EXPECT_FLOAT_EQ(-11.875f, visitor.contours[0].positions[3].y);
+	EXPECT_FLOAT_EQ(25.0f, visitor.contours[0].positions[4].x);
+	EXPECT_FLOAT_EQ(5.0f, visitor.contours[0].positions[4].y);
+}

@@ -32,6 +32,14 @@ namespace ExLibris
 		m_Positions.push_back(a_To);
 	}
 
+	void CurvePath::QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To)
+	{
+		m_Commands.push_back(eCommandType_CurveQuadratic);
+		m_Positions.push_back(a_ControlA);
+		m_Positions.push_back(a_ControlB);
+		m_Positions.push_back(a_To);
+	}
+
 	void CurvePath::Accept(ICurvePathVisitor& a_Visitor, const CurveSettings& a_Settings)
 	{
 		std::vector<glm::vec2>::iterator position_it = m_Positions.begin();
@@ -91,6 +99,39 @@ namespace ExLibris
 						}
 					}
 					
+					a_Visitor.VisitCurvePosition(to);
+
+				} break;
+
+			case eCommandType_CurveQuadratic:
+				{
+					glm::vec2 from = position_previous;
+					glm::vec2 control_a = *position_it++;
+					glm::vec2 control_b = *position_it++;
+					glm::vec2 to = *position_it;
+
+					if (a_Settings.precision > 1)
+					{
+						float delta = 1.0f / (float)a_Settings.precision;
+						float time = delta;
+
+						for (int step = 1; step < a_Settings.precision; ++step)
+						{
+							glm::vec2 ab = glm::mix(from, control_a, time);
+							glm::vec2 bc = glm::mix(control_a, control_b, time);
+							glm::vec2 cd = glm::mix(control_b, to, time);
+
+							glm::vec2 mixed_a = glm::mix(ab, bc, time);
+							glm::vec2 mixed_b = glm::mix(bc, cd, time);
+
+							glm::vec2 mixed = glm::mix(mixed_a, mixed_b, time);
+
+							a_Visitor.VisitCurvePosition(mixed);
+
+							time += delta;
+						}
+					}
+
 					a_Visitor.VisitCurvePosition(to);
 
 				} break;
