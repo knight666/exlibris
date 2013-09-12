@@ -65,12 +65,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Suite.CurvePath.cpp" />
     <ClCompile Include="Suite.FontFace.cpp" />
     <ClCompile Include="Suite.FontLoading.cpp" />
-    <ClCompile Include="Suite.CurvePath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExLibris.Test.PCH.h" />
+    <ClInclude Include="Mock.CurvePathVisitor.h" />
     <ClInclude Include="Mock.Font.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

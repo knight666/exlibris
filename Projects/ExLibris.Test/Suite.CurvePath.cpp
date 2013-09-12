@@ -1,44 +1,9 @@
 #include "ExLibris.Test.PCH.h"
 
 #include "CurvePath.h"
+#include "Mock.CurvePathVisitor.h"
 
 using namespace ExLibris;
-
-class MockCurvePathVisitor
-	: public ICurvePathVisitor
-{
-
-public:
-
-	~MockCurvePathVisitor()
-	{
-	}
-
-	void VisitCurveStart()
-	{
-		Contour contour;
-		contours.push_back(contour);
-	}
-
-	void VisitCurvePosition(const glm::vec2& a_Position)
-	{
-		Contour& contour = contours.back();
-		contour.positions.push_back(a_Position);
-	}
-
-	void VisitCurveEnd()
-	{
-	}
-
-public:
-
-	struct Contour
-	{
-		std::vector<glm::vec2> positions;
-	};
-	std::vector<Contour> contours;
-
-};
 
 TEST(CurvePath, PathMove)
 {
@@ -117,4 +82,66 @@ TEST(CurvePath, PathConic)
 	EXPECT_FLOAT_EQ(17.5f, visitor.contours[0].positions[1].y);
 	EXPECT_FLOAT_EQ(20.0f, visitor.contours[0].positions[2].x);
 	EXPECT_FLOAT_EQ(20.0f, visitor.contours[0].positions[2].y);
+}
+
+TEST(CurvePath, PathConicPrecisionHigh)
+{
+	CurvePath path;
+	path.Move(glm::vec2(100.0f, 100.0f));
+	path.ConicCurveTo(glm::vec2(50.0f, 50.0f), glm::vec2(100.0f, 25.0f));
+
+	CurveSettings settings;
+	settings.precision = 10;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(11, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(100.0f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(100.0f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(75.0f, visitor.contours[0].positions[5].x);
+	EXPECT_FLOAT_EQ(56.25f, visitor.contours[0].positions[5].y);
+	EXPECT_FLOAT_EQ(100.0f, visitor.contours[0].positions[10].x);
+	EXPECT_FLOAT_EQ(25.0f, visitor.contours[0].positions[10].y);
+}
+
+TEST(CurvePath, PathConicPrecisionOne)
+{
+	CurvePath path;
+	path.Move(glm::vec2(36.0f, 21.0f));
+	path.ConicCurveTo(glm::vec2(15.3f, 56.2f), glm::vec2(-30.0f, -88.8f));
+
+	CurveSettings settings;
+	settings.precision = 1;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(2, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(36.0f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(21.0f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(-30.0f, visitor.contours[0].positions[1].x);
+	EXPECT_FLOAT_EQ(-88.8f, visitor.contours[0].positions[1].y);
+}
+
+TEST(CurvePath, PathConicPrecisionNone)
+{
+	CurvePath path;
+	path.Move(glm::vec2(22.4f, 87.3f));
+	path.ConicCurveTo(glm::vec2(15.3f, 56.2f), glm::vec2(-30.0f, -88.8f));
+
+	CurveSettings settings;
+	settings.precision = 1;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(2, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(22.4f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(87.3f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(-30.0f, visitor.contours[0].positions[1].x);
+	EXPECT_FLOAT_EQ(-88.8f, visitor.contours[0].positions[1].y);
 }
