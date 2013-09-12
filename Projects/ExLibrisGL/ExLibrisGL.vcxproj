@@ -81,6 +81,7 @@
     <ClCompile Include="CurvePath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
