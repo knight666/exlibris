@@ -21,7 +21,7 @@ namespace ExLibris
 		void Move(const glm::vec2& a_Position);
 		void LineTo(const glm::vec2& a_To);
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
-		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControLB, const glm::vec2& a_To);
+		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To);
 
 		void Accept(ICurvePathVisitor& a_Visitor, const CurveSettings& a_Settings);
 
