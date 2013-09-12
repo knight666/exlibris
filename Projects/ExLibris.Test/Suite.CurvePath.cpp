@@ -96,3 +96,25 @@ TEST(CurvePath, PathTwoLines)
 	EXPECT_FLOAT_EQ(17.0f, visitor.contours[0].positions[2].x);
 	EXPECT_FLOAT_EQ(17.0f, visitor.contours[0].positions[2].y);
 }
+
+TEST(CurvePath, PathConic)
+{
+	CurvePath path;
+	path.Move(glm::vec2(10.0f, 20.0f));
+	path.ConicCurveTo(glm::vec2(15.0f, 15.0f), glm::vec2(20.0f, 20.0f));
+
+	CurveSettings settings;
+	settings.precision = 2;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(3, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(10.0f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(20.0f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(15.0f, visitor.contours[0].positions[1].x);
+	EXPECT_FLOAT_EQ(17.5f, visitor.contours[0].positions[1].y);
+	EXPECT_FLOAT_EQ(20.0f, visitor.contours[0].positions[2].x);
+	EXPECT_FLOAT_EQ(20.0f, visitor.contours[0].positions[2].y);
+}
