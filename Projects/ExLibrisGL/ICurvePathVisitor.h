@@ -15,9 +15,9 @@ namespace ExLibris
 		{
 		}
 	
-		virtual void VisitShapeStart() = 0;
-		virtual void VisitShapePosition(const glm::vec2& a_Position) = 0;
-		virtual void VisitShapeEnd() = 0;
+		virtual void VisitCurveStart() = 0;
+		virtual void VisitCurvePosition(const glm::vec2& a_Position) = 0;
+		virtual void VisitCurveEnd() = 0;
 	
 	}; // class ICurvePathVisitor
 

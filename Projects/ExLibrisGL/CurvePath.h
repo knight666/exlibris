@@ -1,6 +1,7 @@
 #ifndef _CURVEPATH_H_
 #define _CURVEPATH_H_
 
+#include "CurveSettings.h"
 #include "ICurvePathVisitor.h"
 
 #include <glm/glm.hpp>
@@ -22,7 +23,7 @@ namespace ExLibris
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
 		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControLB, const glm::vec2& a_To);
 
-		void Accept(ICurvePathVisitor& a_Visitor);
+		void Accept(ICurvePathVisitor& a_Visitor, const CurveSettings& a_Settings);
 
 	private:
 

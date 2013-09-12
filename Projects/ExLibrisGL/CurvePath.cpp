@@ -25,7 +25,7 @@ namespace ExLibris
 		m_Positions.push_back(a_To);
 	}
 
-	void CurvePath::Accept(ICurvePathVisitor& a_Visitor)
+	void CurvePath::Accept(ICurvePathVisitor& a_Visitor, const CurveSettings& a_Settings)
 	{
 		std::vector<glm::vec2>::iterator position_it = m_Positions.begin();
 
@@ -36,21 +36,21 @@ namespace ExLibris
 
 			case eCommandType_Move:
 				{
-					a_Visitor.VisitShapeStart();
-					a_Visitor.VisitShapePosition(*position_it++);
+					a_Visitor.VisitCurveStart();
+					a_Visitor.VisitCurvePosition(*position_it++);
 
 				} break;
 
 			case eCommandType_Line:
 				{
-					a_Visitor.VisitShapePosition(*position_it++);
+					a_Visitor.VisitCurvePosition(*position_it++);
 
 				} break;
 
 			}
 		}
 
-		a_Visitor.VisitShapeEnd();
+		a_Visitor.VisitCurveEnd();
 	}
 
 }; // namespace ExLibris
