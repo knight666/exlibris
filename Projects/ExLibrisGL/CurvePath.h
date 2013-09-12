@@ -1,7 +1,7 @@
-#ifndef _SHAPEPATH_H_
-#define _SHAPEPATH_H_
+#ifndef _CURVEPATH_H_
+#define _CURVEPATH_H_
 
-#include "IShapePathVisitor.h"
+#include "ICurvePathVisitor.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -9,20 +9,20 @@
 namespace ExLibris
 {
 
-	class ShapePath
+	class CurvePath
 	{
 	
 	public:
 	
-		ShapePath();
-		~ShapePath();
+		CurvePath();
+		~CurvePath();
 
 		void Move(const glm::vec2& a_Position);
 		void LineTo(const glm::vec2& a_To);
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
 		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControLB, const glm::vec2& a_To);
 
-		void Accept(IShapePathVisitor& a_Visitor);
+		void Accept(ICurvePathVisitor& a_Visitor);
 
 	private:
 
@@ -38,7 +38,7 @@ namespace ExLibris
 		std::vector<CommandType> m_Commands;
 		std::vector<glm::vec2> m_Positions;
 
-	}; // class ShapePath
+	}; // class CurvePath
 
 }; // namespace ExLibris
 
