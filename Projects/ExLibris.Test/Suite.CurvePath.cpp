@@ -217,3 +217,105 @@ TEST(CurvePath, PathQuadratic)
 	EXPECT_FLOAT_EQ(25.0f, visitor.contours[0].positions[4].x);
 	EXPECT_FLOAT_EQ(5.0f, visitor.contours[0].positions[4].y);
 }
+
+TEST(CurvePath, PathQuadraticNoStartPoint)
+{
+	CurvePath path;
+	path.QuadraticCurveTo(
+		glm::vec2(15.0f, 26.0f),
+		glm::vec2(33.4f, 19.2f),
+		glm::vec2(-12.0f, 29.9f)
+	);
+
+	CurveSettings settings;
+	settings.precision = 3;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(3, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(-12.0f, visitor.contours[0].positions[2].x);
+	EXPECT_FLOAT_EQ(29.9f, visitor.contours[0].positions[2].y);
+}
+
+TEST(CurvePath, PathQuadraticPrecisionHigh)
+{
+	CurvePath path;
+	path.Move(glm::vec2(24.0f, 87.2f));
+	path.QuadraticCurveTo(
+		glm::vec2(15.9f, 33.1f),
+		glm::vec2(18.9f, 118.2f),
+		glm::vec2(33.91f, 88.91f)
+	);
+
+	CurveSettings settings;
+	settings.precision = 16;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(17, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(24.0f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(87.2f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(19.618299f, visitor.contours[0].positions[6].x);
+	EXPECT_FLOAT_EQ(71.68959f, visitor.contours[0].positions[6].y);
+	EXPECT_FLOAT_EQ(33.91f, visitor.contours[0].positions[16].x);
+	EXPECT_FLOAT_EQ(88.91f, visitor.contours[0].positions[16].y);
+}
+
+TEST(CurvePath, PathQuadraticPrecisionOne)
+{
+	CurvePath path;
+	path.Move(glm::vec2(57.36f, 14.25f));
+	path.QuadraticCurveTo(
+		glm::vec2(-65.32f, -478.25f),
+		glm::vec2(-53.24f, 45.36f),
+		glm::vec2(63.57f, 49.886f)
+	);
+
+	CurveSettings settings;
+	settings.precision = 1;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(2, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(57.36f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(14.25f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(63.57f, visitor.contours[0].positions[1].x);
+	EXPECT_FLOAT_EQ(49.886f, visitor.contours[0].positions[1].y);
+}
+
+TEST(CurvePath, PathQuadraticPrecisionTwoCurves)
+{
+	CurvePath path;
+	path.Move(glm::vec2(222.8f, 34.9f));
+	path.QuadraticCurveTo(
+		glm::vec2(12.87f, 912.9f),
+		glm::vec2(15.9f, 99.1f),
+		glm::vec2(88.8812f, -12.9f)
+	);
+	path.QuadraticCurveTo(
+		glm::vec2(67.9f, 15.98f),
+		glm::vec2(-98.12f, -54.31f),
+		glm::vec2(16.87f, 912.08f)
+	);
+
+	CurveSettings settings;
+	settings.precision = 14;
+
+	MockCurvePathVisitor visitor;
+	path.Accept(visitor, settings);
+
+	ASSERT_EQ(1, visitor.contours.size());
+	ASSERT_EQ(29, visitor.contours[0].positions.size());
+	EXPECT_FLOAT_EQ(222.8f, visitor.contours[0].positions[0].x);
+	EXPECT_FLOAT_EQ(34.9f, visitor.contours[0].positions[0].y);
+	EXPECT_FLOAT_EQ(88.8812f, visitor.contours[0].positions[14].x);
+	EXPECT_FLOAT_EQ(-12.9f, visitor.contours[0].positions[14].y);
+	EXPECT_FLOAT_EQ(16.87f, visitor.contours[0].positions[28].x);
+	EXPECT_FLOAT_EQ(912.08f, visitor.contours[0].positions[28].y);
+}
