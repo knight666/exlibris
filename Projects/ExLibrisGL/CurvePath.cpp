@@ -40,39 +40,45 @@ namespace ExLibris
 		m_Positions.push_back(a_To);
 	}
 
-	void CurvePath::Accept(ICurvePathVisitor& a_Visitor, const CurveSettings& a_Settings)
+	std::vector<Shape> CurvePath::ConvertToShapes(const CurveSettings& a_Settings) const
 	{
-		std::vector<glm::vec2>::iterator position_it = m_Positions.begin();
-		glm::vec2 position_previous;
-		int shape_count = 0;
+		std::vector<Shape> shapes;
 
-		for (std::vector<CommandType>::iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
+		if (m_Commands.size() == 0)
 		{
-			if (*command_it != eCommandType_Move && shape_count == 0)
-			{
-				a_Visitor.VisitCurveStart();
-			}
+			return shapes;
+		}
+
+		Shape shape;
+		shapes.push_back(shape);
+
+		std::vector<glm::vec2>::const_iterator position_it = m_Positions.begin();
+		glm::vec2 position_previous;
+
+		for (std::vector<CommandType>::const_iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
+		{
+			Shape& shape_current = shapes.back();
 
 			switch (*command_it)
 			{
 
 			case eCommandType_Move:
 				{
-					if (shape_count > 0)
+					// check if it's actually a new shape and not the first move command
+
+					if (command_it != m_Commands.begin())
 					{
-						a_Visitor.VisitCurveEnd();
+						Shape shape;
+						shapes.push_back(shape);
 					}
 
-					a_Visitor.VisitCurveStart();
-					shape_count++;
-
-					a_Visitor.VisitCurvePosition(*position_it);
+					shape_current.positions.push_back(*position_it);
 
 				} break;
 
 			case eCommandType_Line:
 				{
-					a_Visitor.VisitCurvePosition(*position_it);
+					shape_current.positions.push_back(*position_it);
 
 				} break;
 
@@ -93,13 +99,13 @@ namespace ExLibris
 							glm::vec2 cb = glm::mix(control, to, time);
 							glm::vec2 mixed = glm::mix(ac, cb, time);
 
-							a_Visitor.VisitCurvePosition(mixed);
+							shape_current.positions.push_back(mixed);
 
 							time += delta;
 						}
 					}
-					
-					a_Visitor.VisitCurvePosition(to);
+
+					shape_current.positions.push_back(to);
 
 				} break;
 
@@ -126,13 +132,13 @@ namespace ExLibris
 
 							glm::vec2 mixed = glm::mix(mixed_a, mixed_b, time);
 
-							a_Visitor.VisitCurvePosition(mixed);
+							shape_current.positions.push_back(mixed);
 
 							time += delta;
 						}
 					}
 
-					a_Visitor.VisitCurvePosition(to);
+					shape_current.positions.push_back(to);
 
 				} break;
 
@@ -141,7 +147,7 @@ namespace ExLibris
 			position_previous = *position_it++;
 		}
 
-		a_Visitor.VisitCurveEnd();
+		return shapes;
 	}
 
 }; // namespace ExLibris

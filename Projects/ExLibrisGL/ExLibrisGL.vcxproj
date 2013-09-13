@@ -94,7 +94,7 @@
     <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
-    <ClInclude Include="ICurvePathVisitor.h" />
+    <ClInclude Include="Shape.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
