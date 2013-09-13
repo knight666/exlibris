@@ -19,6 +19,25 @@ TEST(CurvePath, PathMove)
 	EXPECT_FLOAT_EQ(15.5f, shapes[0].positions[0].y);
 }
 
+TEST(CurvePath, PathMoveTwice)
+{
+	CurvePath path;
+	path.Move(glm::vec2(66.78f, 91.91f));
+	path.Move(glm::vec2(-56.1f, 71.8f));
+
+	CurveSettings settings;
+
+	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+
+	ASSERT_EQ(2, shapes.size());
+	ASSERT_EQ(1, shapes[0].positions.size());
+	EXPECT_FLOAT_EQ(66.78f, shapes[0].positions[0].x);
+	EXPECT_FLOAT_EQ(91.91f, shapes[0].positions[0].y);
+	ASSERT_EQ(1, shapes[1].positions.size());
+	EXPECT_FLOAT_EQ(-56.1f, shapes[1].positions[0].x);
+	EXPECT_FLOAT_EQ(71.8f, shapes[1].positions[0].y);
+}
+
 TEST(CurvePath, PathLine)
 {
 	CurvePath path;

@@ -57,7 +57,7 @@ namespace ExLibris
 
 		for (std::vector<CommandType>::const_iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
 		{
-			Shape& shape_current = shapes.back();
+			Shape* shape_current = &shapes.back();
 
 			switch (*command_it)
 			{
@@ -70,15 +70,17 @@ namespace ExLibris
 					{
 						Shape shape;
 						shapes.push_back(shape);
+
+						shape_current = &shapes.back();
 					}
 
-					shape_current.positions.push_back(*position_it);
+					shape_current->positions.push_back(*position_it);
 
 				} break;
 
 			case eCommandType_Line:
 				{
-					shape_current.positions.push_back(*position_it);
+					shape_current->positions.push_back(*position_it);
 
 				} break;
 
@@ -99,13 +101,13 @@ namespace ExLibris
 							glm::vec2 cb = glm::mix(control, to, time);
 							glm::vec2 mixed = glm::mix(ac, cb, time);
 
-							shape_current.positions.push_back(mixed);
+							shape_current->positions.push_back(mixed);
 
 							time += delta;
 						}
 					}
 
-					shape_current.positions.push_back(to);
+					shape_current->positions.push_back(to);
 
 				} break;
 
@@ -132,13 +134,13 @@ namespace ExLibris
 
 							glm::vec2 mixed = glm::mix(mixed_a, mixed_b, time);
 
-							shape_current.positions.push_back(mixed);
+							shape_current->positions.push_back(mixed);
 
 							time += delta;
 						}
 					}
 
-					shape_current.positions.push_back(to);
+					shape_current->positions.push_back(to);
 
 				} break;
 
