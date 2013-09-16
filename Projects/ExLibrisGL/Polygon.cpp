@@ -2,6 +2,8 @@
 
 #include "Polygon.h"
 
+#include "Triangle.h"
+
 namespace ExLibris
 {
 
@@ -33,11 +35,12 @@ namespace ExLibris
 				continue;
 			}
 
-			std::vector<int> avl;
+			int* avl_data = new int[n];
 			for (int index = 0; index < n; ++index)
 			{
-				avl.push_back(index);
+				avl_data[index] = index;
 			}
+			int* avl = avl_data;
 
 			int i = 0;
 			int al = n;
@@ -47,13 +50,11 @@ namespace ExLibris
 				int i1 = avl[(i + 1) % al];
 				int i2 = avl[(i + 2) % al];
 
-				const glm::vec2& a = shape.positions[i0];
-				const glm::vec2& b = shape.positions[i1];
-				const glm::vec2& c = shape.positions[i2];
+				Triangle triangulate(shape.positions[i0], shape.positions[i1], shape.positions[i2]);
 
 				bool earFound = false;
 
-				if (_IsConvex(a, b, c))
+				if (triangulate.IsConvex())
 				{
 					earFound = true;
 					for (int j = 0; j < al; ++j)
@@ -64,7 +65,7 @@ namespace ExLibris
 							continue;
 						}
 
-						if (_IsPointInTriangle(shape.positions[vi], a, b, c))
+						if (triangulate.IsPositionInside(shape.positions[vi]))
 						{
 							earFound = false;
 
@@ -75,17 +76,35 @@ namespace ExLibris
 
 				if (earFound)
 				{
-					triangles.positions.push_back(a);
-					triangles.positions.push_back(b);
-					triangles.positions.push_back(c);
+					triangles.positions.push_back(triangulate.a);
+					triangles.positions.push_back(triangulate.b);
+					triangles.positions.push_back(triangulate.c);
 
-					i++;
+					avl += (i + 1) % al;
+					al--;
+					i = 0;
 				}
 				else
 				{
+					if ((i + 1) > (3 * al))
+					{
+						break;
+					}
+
 					i++;
 				}
 			}
+
+			int i0 = avl[(i + 0) % al];
+			triangles.positions.push_back(shape.positions[i0]);
+
+			int i1 = avl[(i + 1) % al];
+			triangles.positions.push_back(shape.positions[i1]);
+
+			int i2 = avl[(i + 2) % al];
+			triangles.positions.push_back(shape.positions[i2]);
+
+			delete avl_data;
 		}
 
 		return triangles;
