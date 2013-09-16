@@ -79,6 +79,8 @@
     </ClCompile>
     <ClCompile Include="IFont.cpp" />
     <ClCompile Include="CurvePath.cpp" />
+    <ClCompile Include="Polygon.cpp" />
+    <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CurveSettings.h" />
@@ -94,7 +96,10 @@
     <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
+    <ClInclude Include="Polygon.h" />
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="Triangle.h" />
+    <ClInclude Include="TriangleList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
