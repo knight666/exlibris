@@ -40,16 +40,16 @@ namespace ExLibris
 		m_Positions.push_back(a_To);
 	}
 
-	std::vector<Shape> CurvePath::ConvertToShapes(const CurveSettings& a_Settings) const
+	std::vector<Polygon> CurvePath::ConvertToShapes(const CurveSettings& a_Settings) const
 	{
-		std::vector<Shape> shapes;
+		std::vector<Polygon> shapes;
 
 		if (m_Commands.size() == 0)
 		{
 			return shapes;
 		}
 
-		Shape shape;
+		Polygon shape;
 		shapes.push_back(shape);
 
 		std::vector<glm::vec2>::const_iterator position_it = m_Positions.begin();
@@ -57,7 +57,7 @@ namespace ExLibris
 
 		for (std::vector<CommandType>::const_iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
 		{
-			Shape* shape_current = &shapes.back();
+			Polygon* shape_current = &shapes.back();
 
 			switch (*command_it)
 			{
@@ -68,7 +68,7 @@ namespace ExLibris
 
 					if (command_it != m_Commands.begin())
 					{
-						Shape shape;
+						Polygon shape;
 						shapes.push_back(shape);
 
 						shape_current = &shapes.back();

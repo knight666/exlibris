@@ -1,7 +1,7 @@
 #ifndef _POLYGONSHAPE_H_
 #define _POLYGONSHAPE_H_
 
-#include "Shape.h"
+#include "Polygon.h"
 #include "TriangleList.h"
 
 namespace ExLibris
@@ -15,7 +15,7 @@ namespace ExLibris
 		PolygonShape();
 		~PolygonShape();
 	
-		void AddShape(const Shape& a_Shape);
+		void AddShape(const Polygon& a_Shape);
 
 		TriangleList* Triangulate() const;
 
@@ -26,7 +26,7 @@ namespace ExLibris
 
 	private:
 
-		std::vector<Shape> m_Shapes;
+		std::vector<Polygon> m_Shapes;
 	
 	}; // class PolygonShape
 

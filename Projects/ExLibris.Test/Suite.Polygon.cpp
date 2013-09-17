@@ -18,7 +18,7 @@ TEST(PolygonShape, TriangulateOne)
 {
 	PolygonShape polygon;
 
-	Shape shape;
+	Polygon shape;
 	shape.positions.push_back(glm::vec2(56.9f, -91.9f));
 	shape.positions.push_back(glm::vec2(6.43f, 12.8f));
 	shape.positions.push_back(glm::vec2(-11.9f, 14.5f));
@@ -41,7 +41,7 @@ TEST(PolygonShape, TriangulateTwo)
 {
 	PolygonShape polygon;
 
-	Shape shape;
+	Polygon shape;
 	shape.positions.push_back(glm::vec2(16.4f, 78.8f));
 	shape.positions.push_back(glm::vec2(12.9f, 105.9f));
 	shape.positions.push_back(glm::vec2(-25.9f, 56.0f));
