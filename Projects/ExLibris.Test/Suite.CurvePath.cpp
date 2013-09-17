@@ -11,7 +11,7 @@ TEST(CurvePath, PathMove)
 
 	CurveSettings settings;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(1, shapes[0].positions.size());
@@ -27,7 +27,7 @@ TEST(CurvePath, PathMoveTwice)
 
 	CurveSettings settings;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(2, shapes.size());
 	ASSERT_EQ(1, shapes[0].positions.size());
@@ -46,7 +46,7 @@ TEST(CurvePath, PathLine)
 
 	CurveSettings settings;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
@@ -65,7 +65,7 @@ TEST(CurvePath, PathTwoLines)
 
 	CurveSettings settings;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(3, shapes[0].positions.size());
@@ -86,7 +86,7 @@ TEST(CurvePath, PathConic)
 	CurveSettings settings;
 	settings.precision = 2;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(3, shapes[0].positions.size());
@@ -106,7 +106,7 @@ TEST(CurvePath, PathConicNoStartPoint)
 	CurveSettings settings;
 	settings.precision = 2;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
@@ -125,7 +125,7 @@ TEST(CurvePath, PathConicPrecisionHigh)
 	CurveSettings settings;
 	settings.precision = 10;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(11, shapes[0].positions.size());
@@ -146,7 +146,7 @@ TEST(CurvePath, PathConicPrecisionOne)
 	CurveSettings settings;
 	settings.precision = 1;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
@@ -165,7 +165,7 @@ TEST(CurvePath, PathConicPrecisionNone)
 	CurveSettings settings;
 	settings.precision = 1;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
@@ -185,7 +185,7 @@ TEST(CurvePath, PathConicTwoCurves)
 	CurveSettings settings;
 	settings.precision = 3;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(7, shapes[0].positions.size());
@@ -210,7 +210,7 @@ TEST(CurvePath, PathQuadratic)
 	CurveSettings settings;
 	settings.precision = 4;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(5, shapes[0].positions.size());
@@ -238,7 +238,7 @@ TEST(CurvePath, PathQuadraticNoStartPoint)
 	CurveSettings settings;
 	settings.precision = 3;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(3, shapes[0].positions.size());
@@ -259,7 +259,7 @@ TEST(CurvePath, PathQuadraticPrecisionHigh)
 	CurveSettings settings;
 	settings.precision = 16;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(17, shapes[0].positions.size());
@@ -284,7 +284,7 @@ TEST(CurvePath, PathQuadraticPrecisionOne)
 	CurveSettings settings;
 	settings.precision = 1;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
@@ -312,7 +312,7 @@ TEST(CurvePath, PathQuadraticPrecisionTwoCurves)
 	CurveSettings settings;
 	settings.precision = 14;
 
-	std::vector<Shape> shapes = path.ConvertToShapes(settings);
+	std::vector<Polygon> shapes = path.ConvertToShapes(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(29, shapes[0].positions.size());

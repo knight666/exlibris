@@ -2,7 +2,7 @@
 #define _CURVEPATH_H_
 
 #include "CurveSettings.h"
-#include "Shape.h"
+#include "Polygon.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -23,7 +23,7 @@ namespace ExLibris
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
 		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To);
 
-		std::vector<Shape> ConvertToShapes(const CurveSettings& a_Settings) const;
+		std::vector<Polygon> ConvertToShapes(const CurveSettings& a_Settings) const;
 
 	private:
 

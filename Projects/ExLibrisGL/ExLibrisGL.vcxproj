@@ -99,7 +99,7 @@
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="PolygonShape.h" />
-    <ClInclude Include="Shape.h" />
+    <ClInclude Include="Polygon.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
   </ItemGroup>

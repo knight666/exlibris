@@ -18,12 +18,12 @@ namespace ExLibris
 		m_Shapes.clear();
 	}
 
-	void PolygonShape::AddShape(const Shape& a_Shape)
+	void PolygonShape::AddShape(const Polygon& a_Shape)
 	{
 		m_Shapes.push_back(a_Shape);
 	}
 
-	std::vector<p2t::Point*> ConvertShapeToPolyline(const Shape& a_Shape)
+	std::vector<p2t::Point*> ConvertShapeToPolyline(const Polygon& a_Shape)
 	{
 		std::vector<p2t::Point*> polyline;
 
@@ -66,9 +66,9 @@ namespace ExLibris
 
 		if (m_Shapes.size() > 1)
 		{
-			for (std::vector<Shape>::const_iterator shape_it = m_Shapes.begin() + 1; shape_it != m_Shapes.end(); ++shape_it)
+			for (std::vector<Polygon>::const_iterator shape_it = m_Shapes.begin() + 1; shape_it != m_Shapes.end(); ++shape_it)
 			{
-				const Shape& shape = *shape_it;
+				const Polygon& shape = *shape_it;
 
 				std::vector<p2t::Point*> hole = ConvertShapeToPolyline(shape);
 				cdt->AddHole(hole);

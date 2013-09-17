@@ -1,5 +1,5 @@
-#ifndef _SHAPE_H_
-#define _SHAPE_H_
+#ifndef _POLYGON_H_
+#define _POLYGON_H_
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -7,12 +7,12 @@
 namespace ExLibris
 {
 
-	struct Shape
+	struct Polygon
 	{
 	
 		std::vector<glm::vec2> positions;
 	
-	}; // struct Shape
+	}; // struct Polygon
 
 }; // namespace ExLibris
 
