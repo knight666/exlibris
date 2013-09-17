@@ -1,6 +1,6 @@
 #include "ExLibrisGL.PCH.h"
 
-#include "Polygon.h"
+#include "PolygonShape.h"
 
 #include <poly2tri/poly2tri.h>
 
@@ -9,16 +9,16 @@
 namespace ExLibris
 {
 
-	Polygon::Polygon()
+	PolygonShape::PolygonShape()
 	{
 	}
 	
-	Polygon::~Polygon()
+	PolygonShape::~PolygonShape()
 	{
 		m_Shapes.clear();
 	}
 
-	void Polygon::AddShape(const Shape& a_Shape)
+	void PolygonShape::AddShape(const Shape& a_Shape)
 	{
 		m_Shapes.push_back(a_Shape);
 	}
@@ -52,7 +52,7 @@ namespace ExLibris
 	// if an object is returned instead of a pointer, the destructor is called on return
 	// compiler bug?
 
-	TriangleList* Polygon::Triangulate() const
+	TriangleList* PolygonShape::Triangulate() const
 	{
 		TriangleList* triangles = new TriangleList;
 
@@ -108,12 +108,12 @@ namespace ExLibris
 		return triangles;
 	}
 
-	bool Polygon::_IsConvex(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C) const
+	bool PolygonShape::_IsConvex(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C) const
 	{
 		return (((a_A.y - a_B.y) * (a_C.x - a_B.x)) + ((a_B.x - a_A.x) * (a_C.y - a_B.y))) >= 0;
 	}
 
-	bool Polygon::_IsPointInTriangle(const glm::vec2& a_TriangleA, const glm::vec2& a_TriangleB, const glm::vec2& a_TriangleC, const glm::vec2& a_Position) const
+	bool PolygonShape::_IsPointInTriangle(const glm::vec2& a_TriangleA, const glm::vec2& a_TriangleB, const glm::vec2& a_TriangleC, const glm::vec2& a_Position) const
 	{
 		glm::vec2 v0 = a_TriangleC - a_TriangleA;
 		glm::vec2 v1 = a_TriangleB - a_TriangleA;
