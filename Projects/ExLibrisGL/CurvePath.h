@@ -23,7 +23,7 @@ namespace ExLibris
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
 		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To);
 
-		std::vector<Polygon> ConvertToShapes(const CurveSettings& a_Settings) const;
+		std::vector<Polygon> ConvertToPolygons(const CurveSettings& a_Settings) const;
 
 	private:
 

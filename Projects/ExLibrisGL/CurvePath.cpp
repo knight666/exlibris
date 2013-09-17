@@ -40,7 +40,7 @@ namespace ExLibris
 		m_Positions.push_back(a_To);
 	}
 
-	std::vector<Polygon> CurvePath::ConvertToShapes(const CurveSettings& a_Settings) const
+	std::vector<Polygon> CurvePath::ConvertToPolygons(const CurveSettings& a_Settings) const
 	{
 		std::vector<Polygon> shapes;
 
