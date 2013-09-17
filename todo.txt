@@ -25,3 +25,19 @@ ShapePathVisitor
 TriangleConverter
 
 - Paint(path)
+
+CurvePath
+- ConvertToShapes
+
+Shape
+- list of points
+
+Polygon
+- AddShape
+- Triangulate
+
+TriangleList
+
+GlyphMesh
+- outline
+- triangles
