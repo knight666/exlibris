@@ -35,6 +35,7 @@
     <Import Project="..\..\Properties\OutDebug.props" />
     <Import Project="..\..\Properties\LibFreeType.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\OptPrecompiled.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -43,6 +44,7 @@
     <Import Project="..\..\Properties\OutRelease.props" />
     <Import Project="..\..\Properties\LibFreeType.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\OptPrecompiled.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />

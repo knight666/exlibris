@@ -7,7 +7,23 @@ namespace ExLibris
 	struct TriangleList
 	{
 	
-		std::vector<glm::vec2> positions;
+		TriangleList()
+			: vertex_count(0)
+			, positions(nullptr)
+		{
+		}
+
+		~TriangleList()
+		{
+			if (positions != nullptr)
+			{
+				delete [] positions;
+				positions = nullptr;
+			}
+		}
+
+		size_t vertex_count;
+		glm::vec2* positions;
 	
 	}; // struct TriangleList
 

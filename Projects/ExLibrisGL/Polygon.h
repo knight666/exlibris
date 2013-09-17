@@ -17,7 +17,7 @@ namespace ExLibris
 	
 		void AddShape(const Shape& a_Shape);
 
-		TriangleList Triangulate() const;
+		TriangleList* Triangulate() const;
 
 	private:
 

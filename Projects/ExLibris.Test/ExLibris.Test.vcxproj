@@ -37,6 +37,7 @@
     <Import Project="..\..\Properties\LibFreeType.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
     <Import Project="..\..\Properties\LibGoogleTest.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -47,6 +48,7 @@
     <Import Project="..\..\Properties\LibFreeType.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
     <Import Project="..\..\Properties\LibGoogleTest.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />

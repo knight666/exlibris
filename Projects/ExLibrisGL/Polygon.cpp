@@ -2,6 +2,8 @@
 
 #include "Polygon.h"
 
+#include <poly2tri/poly2tri.h>
+
 #include "Triangle.h"
 
 namespace ExLibris
@@ -21,92 +23,88 @@ namespace ExLibris
 		m_Shapes.push_back(a_Shape);
 	}
 
-	TriangleList Polygon::Triangulate() const
+	std::vector<p2t::Point*> ConvertShapeToPolyline(const Shape& a_Shape)
 	{
-		TriangleList triangles;
+		std::vector<p2t::Point*> polyline;
 
-		for (std::vector<Shape>::const_iterator shape_it = m_Shapes.begin(); shape_it != m_Shapes.end(); ++shape_it)
+		for (std::vector<glm::vec2>::const_iterator position_it = a_Shape.positions.begin(); position_it != a_Shape.positions.end(); ++position_it)
 		{
-			const Shape& shape = *shape_it;
+			const glm::vec2& position = *position_it;
 
-			int n = (int)shape.positions.size();
-			if (n < 3)
-			{
-				continue;
-			}
-
-			int* avl_data = new int[n];
-			for (int index = 0; index < n; ++index)
-			{
-				avl_data[index] = index;
-			}
-			int* avl = avl_data;
-
-			int i = 0;
-			int al = n;
-			while (al > 3)
-			{
-				int i0 = avl[(i + 0) % al];
-				int i1 = avl[(i + 1) % al];
-				int i2 = avl[(i + 2) % al];
-
-				Triangle triangulate(shape.positions[i0], shape.positions[i1], shape.positions[i2]);
-
-				bool earFound = false;
-
-				if (triangulate.IsConvex())
-				{
-					earFound = true;
-					for (int j = 0; j < al; ++j)
-					{
-						int vi = avl[j];
-						if (vi == i0 || vi == i1 || vi == i2)
-						{
-							continue;
-						}
-
-						if (triangulate.IsPositionInside(shape.positions[vi]))
-						{
-							earFound = false;
-
-							break;
-						}
-					}
-				}
-
-				if (earFound)
-				{
-					triangles.positions.push_back(triangulate.a);
-					triangles.positions.push_back(triangulate.b);
-					triangles.positions.push_back(triangulate.c);
-
-					avl += (i + 1) % al;
-					al--;
-					i = 0;
-				}
-				else
-				{
-					if ((i + 1) > (3 * al))
-					{
-						break;
-					}
-
-					i++;
-				}
-			}
-
-			int i0 = avl[(i + 0) % al];
-			triangles.positions.push_back(shape.positions[i0]);
-
-			int i1 = avl[(i + 1) % al];
-			triangles.positions.push_back(shape.positions[i1]);
-
-			int i2 = avl[(i + 2) % al];
-			triangles.positions.push_back(shape.positions[i2]);
-
-			delete avl_data;
+			polyline.push_back(new p2t::Point((double)position.x, (double)position.y));
 		}
 
+		// check if last and first position overlap
+
+		p2t::Point* position_first = polyline.front();
+		p2t::Point* position_last = polyline.back();
+
+		double delta = 1e-6;
+		if (abs(position_first->x - position_last->x) < delta && abs(position_first->y - position_last->y) < delta)
+		{
+			delete position_last;
+			polyline.pop_back();
+		}
+
+		return polyline;
+	}
+
+	// if an object is returned instead of a pointer, the destructor is called on return
+	// compiler bug?
+
+	TriangleList* Polygon::Triangulate() const
+	{
+		TriangleList* triangles = new TriangleList;
+
+		if (m_Shapes.size() == 0)
+		{
+			return triangles;
+		}
+
+		std::vector<p2t::Point*> base_polyline = ConvertShapeToPolyline(*m_Shapes.begin());
+		p2t::CDT* cdt = new p2t::CDT(base_polyline);
+
+		if (m_Shapes.size() > 1)
+		{
+			for (std::vector<Shape>::const_iterator shape_it = m_Shapes.begin() + 1; shape_it != m_Shapes.end(); ++shape_it)
+			{
+				const Shape& shape = *shape_it;
+
+				std::vector<p2t::Point*> hole = ConvertShapeToPolyline(shape);
+				cdt->AddHole(hole);
+			}
+		}
+
+		cdt->Triangulate();
+
+		std::vector<p2t::Triangle*> cdt_triangles = cdt->GetTriangles();
+
+		triangles->vertex_count = cdt_triangles.size() * 3;
+
+		triangles->positions = new glm::vec2[triangles->vertex_count];
+		glm::vec2* dst_position_data = triangles->positions;
+
+		for (std::vector<p2t::Triangle*>::iterator triangle_it = cdt_triangles.begin(); triangle_it != cdt_triangles.end(); ++triangle_it)
+		{
+			p2t::Triangle* triangle = *triangle_it;
+
+			p2t::Point* point_a = triangle->GetPoint(0);
+			dst_position_data[0].x = (float)point_a->x;
+			dst_position_data[0].y = (float)point_a->y;
+
+			p2t::Point* point_b = triangle->GetPoint(1);
+			dst_position_data[1].x = (float)point_b->x;
+			dst_position_data[1].y = (float)point_b->y;
+
+			p2t::Point* point_c = triangle->GetPoint(2);
+			dst_position_data[2].x = (float)point_c->x;
+			dst_position_data[2].y = (float)point_c->y;
+
+			dst_position_data += 3;
+		}
+
+		delete cdt;
+		
 		return triangles;
 	}
 
