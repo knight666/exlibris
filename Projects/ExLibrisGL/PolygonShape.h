@@ -1,5 +1,5 @@
-#ifndef _POLYGON_H_
-#define _POLYGON_H_
+#ifndef _POLYGONSHAPE_H_
+#define _POLYGONSHAPE_H_
 
 #include "Shape.h"
 #include "TriangleList.h"
@@ -7,13 +7,13 @@
 namespace ExLibris
 {
 
-	class Polygon
+	class PolygonShape
 	{
 	
 	public:
 	
-		Polygon();
-		~Polygon();
+		PolygonShape();
+		~PolygonShape();
 	
 		void AddShape(const Shape& a_Shape);
 
@@ -28,7 +28,7 @@ namespace ExLibris
 
 		std::vector<Shape> m_Shapes;
 	
-	}; // class Polygon
+	}; // class PolygonShape
 
 }; // namespace ExLibris
 

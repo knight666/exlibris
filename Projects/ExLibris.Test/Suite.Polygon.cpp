@@ -1,12 +1,12 @@
 #include "ExLibris.Test.PCH.h"
 
-#include "Polygon.h"
+#include "PolygonShape.h"
 
 using namespace ExLibris;
 
-TEST(Polygon, TriangulateEmpty)
+TEST(PolygonShape, TriangulateEmpty)
 {
-	Polygon polygon;
+	PolygonShape polygon;
 
 	TriangleList* list = polygon.Triangulate();
 
@@ -14,9 +14,9 @@ TEST(Polygon, TriangulateEmpty)
 	EXPECT_EQ(0, list->vertex_count);
 }
 
-TEST(Polygon, TriangulateOne)
+TEST(PolygonShape, TriangulateOne)
 {
-	Polygon polygon;
+	PolygonShape polygon;
 
 	Shape shape;
 	shape.positions.push_back(glm::vec2(56.9f, -91.9f));
@@ -37,9 +37,9 @@ TEST(Polygon, TriangulateOne)
 	EXPECT_FLOAT_EQ(-91.9f, list->positions[2].y);
 }
 
-TEST(Polygon, TriangulateTwo)
+TEST(PolygonShape, TriangulateTwo)
 {
-	Polygon polygon;
+	PolygonShape polygon;
 
 	Shape shape;
 	shape.positions.push_back(glm::vec2(16.4f, 78.8f));
