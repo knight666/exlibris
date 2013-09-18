@@ -5,23 +5,6 @@
 namespace ExLibris
 {
 
-	/*int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
-	{
-		int i, j, c = 0;
-		for (i = 0, j = nvert-1; i < nvert; j = i++) {
-			if ( ((verty[i]>testy) != (verty[j]>testy)) &&
-				(
-					testx < 
-						(vertx[j] - vertx[i]) * 
-						(testy - verty[i]) / 
-						(verty[j] - verty[i]) + 
-						vertx[i]
-				) )
-				c = !c;
-		}
-		return c;
-	}*/
-
 	bool Polygon::IsPositionInside(const glm::vec2& a_Position) const
 	{
 		if (positions.size() < 3)
@@ -39,18 +22,37 @@ namespace ExLibris
 			const glm::vec2& start = *start_it;
 			const glm::vec2& end = *end_it;
 
-			bool vertical = ((start.y > a_Position.y) != (end.y > a_Position.y));
-			bool horizontal = (a_Position.x < ((end.x - start.x) * (a_Position.y - start.y) / (end.y - start.y) + start.x));
-
-			if (vertical && horizontal)
+			if ((start.y > a_Position.y) != (end.y > a_Position.y))
 			{
-				inside = !inside;
+				bool raycast = (a_Position.x < ((end.x - start.x) * (a_Position.y - start.y) / (end.y - start.y) + start.x));
+				if (raycast)
+				{
+					inside = !inside;
+				}
 			}
 
 			end_it = start_it++;
 		}
 
 		return inside;
+	}
+
+	bool Polygon::Intersects(const Polygon& a_Other) const
+	{
+		if (positions.size() < 3 || a_Other.positions.size() < 3)
+		{
+			return false;
+		}
+
+		for (std::vector<glm::vec2>::const_iterator position_it = a_Other.positions.begin(); position_it != a_Other.positions.end(); ++position_it)
+		{
+			if (IsPositionInside(*position_it))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }; // namespace ExLibris

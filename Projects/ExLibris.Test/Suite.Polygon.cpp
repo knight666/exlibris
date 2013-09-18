@@ -57,3 +57,37 @@ TEST(Polygon, IsPositionInsideNotEnoughVertices)
 
 	EXPECT_FALSE(p.IsPositionInside(glm::vec2(14.0f, 12.0f)));
 }
+
+TEST(Polygon, Intersects)
+{
+	Polygon p_left;
+	p_left.positions.push_back(glm::vec2(-10.0f, -10.0f));
+	p_left.positions.push_back(glm::vec2(10.0f, -10.0f));
+	p_left.positions.push_back(glm::vec2(10.0f, 10.0f));
+	p_left.positions.push_back(glm::vec2(-10.0f, 10.0f));
+
+	Polygon p_right;
+	p_right.positions.push_back(glm::vec2(5.0f, 5.0f));
+	p_right.positions.push_back(glm::vec2(15.0f, 5.0f));
+	p_right.positions.push_back(glm::vec2(15.0f, 15.0f));
+
+	EXPECT_TRUE(p_left.Intersects(p_right));
+	EXPECT_TRUE(p_right.Intersects(p_left));
+}
+
+TEST(Polygon, IntersectsNoHit)
+{
+	Polygon p_left;
+	p_left.positions.push_back(glm::vec2(-10.0f, -10.0f));
+	p_left.positions.push_back(glm::vec2(10.0f, -10.0f));
+	p_left.positions.push_back(glm::vec2(10.0f, 10.0f));
+	p_left.positions.push_back(glm::vec2(-10.0f, 10.0f));
+
+	Polygon p_right;
+	p_right.positions.push_back(glm::vec2(0.0f, 25.0f));
+	p_right.positions.push_back(glm::vec2(-15.0f, 50.0f));
+	p_right.positions.push_back(glm::vec2(15.0f, 50.0f));
+
+	EXPECT_FALSE(p_left.Intersects(p_right));
+	EXPECT_FALSE(p_right.Intersects(p_left));
+}

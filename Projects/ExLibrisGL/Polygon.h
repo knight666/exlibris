@@ -13,6 +13,8 @@ namespace ExLibris
 	public:
 
 		bool IsPositionInside(const glm::vec2& a_Position) const;
+
+		bool Intersects(const Polygon& a_Other) const;
 	
 	public:
 
