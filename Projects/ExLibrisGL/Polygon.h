@@ -7,12 +7,18 @@
 namespace ExLibris
 {
 
-	struct Polygon
+	class Polygon
 	{
+
+	public:
+
+		bool IsPositionInside(const glm::vec2& a_Position) const;
 	
+	public:
+
 		std::vector<glm::vec2> positions;
 	
-	}; // struct Polygon
+	}; // class Polygon
 
 }; // namespace ExLibris
 

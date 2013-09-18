@@ -81,6 +81,7 @@
     </ClCompile>
     <ClCompile Include="IFont.cpp" />
     <ClCompile Include="CurvePath.cpp" />
+    <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="PolygonShape.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
