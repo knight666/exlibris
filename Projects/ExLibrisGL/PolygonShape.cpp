@@ -38,22 +38,6 @@ namespace ExLibris
 		}
 	}
 
-	std::vector<p2t::Point*> ConvertPolygonToPolyline(const Polygon& a_Shape)
-	{
-		std::vector<p2t::Point*> polyline;
-
-		for (std::vector<glm::vec2>::const_iterator position_it = a_Shape.positions.begin(); position_it != a_Shape.positions.end(); ++position_it)
-		{
-			const glm::vec2& position = *position_it;
-
-			polyline.push_back(new p2t::Point((double)position.x, (double)position.y));
-		}
-
-		CheckPolylineOverlap(polyline);
-
-		return polyline;
-	}
-
 	// if an object is returned instead of a pointer, the destructor is called on return
 	// compiler bug?
 
@@ -66,17 +50,80 @@ namespace ExLibris
 			return triangles;
 		}
 
-		std::vector<p2t::Point*> base_polyline = ConvertPolygonToPolyline(*m_Polygons.begin());
-		p2t::CDT* cdt = new p2t::CDT(base_polyline);
+		const Polygon& base_polygon = *m_Polygons.begin();
+
+		std::vector<p2t::Point*> base_polyline;
+		for (std::vector<glm::vec2>::const_iterator position_it = base_polygon.positions.begin(); position_it != base_polygon.positions.end(); ++position_it)
+		{
+			const glm::vec2& position = *position_it;
+
+			base_polyline.push_back(
+				new p2t::Point(
+					(double)position.x,
+					(double)position.y
+				)
+			);
+		}
+
+		std::vector<const Polygon*> holes;
 
 		if (m_Polygons.size() > 1)
 		{
-			for (std::vector<Polygon>::const_iterator shape_it = m_Polygons.begin() + 1; shape_it != m_Polygons.end(); ++shape_it)
+			for (std::vector<Polygon>::const_iterator polygon_it = m_Polygons.begin() + 1; polygon_it != m_Polygons.end(); ++polygon_it)
 			{
-				const Polygon& shape = *shape_it;
+				const Polygon& polygon = *polygon_it;
 
-				std::vector<p2t::Point*> hole = ConvertPolygonToPolyline(shape);
-				cdt->AddHole(hole);
+				if (base_polygon.Intersects(polygon))
+				{
+					holes.push_back(&polygon);
+				}
+				else
+				{
+					for (std::vector<glm::vec2>::const_iterator position_it = polygon.positions.begin(); position_it != polygon.positions.end(); ++position_it)
+					{
+						const glm::vec2& position = *position_it;
+
+						base_polyline.push_back(
+							new p2t::Point(
+								(double)position.x,
+								(double)position.y
+							)
+						);
+					}
+				}
+			}
+		}
+
+		CheckPolylineOverlap(base_polyline);
+
+		p2t::CDT* cdt = new p2t::CDT(base_polyline);
+		if (holes.size() > 0)
+		{
+			for (std::vector<const Polygon*>::iterator hole_it = holes.begin(); hole_it != holes.end(); ++hole_it)
+			{
+				const Polygon* polygon = *hole_it;
+
+				if (polygon->positions.size() == 0)
+				{
+					continue;
+				}
+
+				std::vector<p2t::Point*> hole_polyline;
+				for (std::vector<glm::vec2>::const_iterator position_it = polygon->positions.begin(); position_it != polygon->positions.end(); ++position_it)
+				{
+					const glm::vec2& position = *position_it;
+
+					hole_polyline.push_back(
+						new p2t::Point(
+							(double)position.x,
+							(double)position.y
+						)
+					);
+				}
+
+				CheckPolylineOverlap(hole_polyline);
+
+				cdt->AddHole(hole_polyline);
 			}
 		}
 
