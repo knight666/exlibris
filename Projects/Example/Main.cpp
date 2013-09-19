@@ -380,10 +380,6 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 
 int main(int argc, const char** argv)
 {
-	ExLibris::FontLoaderFreetype loader;
-	ExLibris::IFont* font = loader.LoadFont(g_FontPath);
-	ExLibris::FontFace* face_size24 = font->CreateFace(g_FontSize);
-
 	GLFWwindow* window;
 
 	glfwSetErrorCallback(OnGlfwError);
@@ -392,6 +388,22 @@ int main(int argc, const char** argv)
 	{
 		exit(EXIT_FAILURE);
 	}
+
+	ExLibris::FontLoaderFreetype loader;
+
+	float load_time_start = (float)glfwGetTime();
+
+	ExLibris::IFont* font = loader.LoadFont(g_FontPath);
+
+	float load_time_font = (float)glfwGetTime();
+	std::cout << "Loading font: " << (load_time_font - load_time_start) * 1000.0f << " ms." << std::endl;
+	load_time_start = load_time_font;
+
+	ExLibris::FontFace* face_size24 = font->CreateFace(g_FontSize);
+
+	float load_time_face = (float)glfwGetTime();
+	std::cout << "Creating face: " << (load_time_face - load_time_start) * 1000.0f << " ms." << std::endl;
+	load_time_start = load_time_face;
 
 	window = glfwCreateWindow(640, 480, "ExLibris", nullptr, nullptr);
 	if (window == nullptr)
