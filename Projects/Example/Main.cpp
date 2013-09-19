@@ -184,7 +184,8 @@ struct TextGlyphMesh
 {
 	GLuint vertex_buffer;
 	unsigned int vertex_count;
-	glm::vec2 offset;
+	glm::vec2 line_offset;
+	glm::vec2 glyph_offset;
 };
 
 struct TextMesh
@@ -341,23 +342,14 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 		if (glyph->mesh != nullptr)
 		{
 			TextGlyphMesh* glyph_mesh = new TextGlyphMesh;
-			glyph_mesh->offset = glm::vec2(0.0f, glyph->metrics->offset.y);
-
-			glm::vec2 position_local = cursor_offset;
+			glyph_mesh->line_offset = glm::vec2(0.0f, glyph->metrics->offset.y);
+			glyph_mesh->glyph_offset = cursor_offset;
 
 			glyph_mesh->vertex_count = glyph->mesh->vertex_count;
-			glm::vec2* positions = new glm::vec2[glyph_mesh->vertex_count];
-
-			for (size_t vertex_index = 0; vertex_index < glyph_mesh->vertex_count; ++vertex_index)
-			{
-				positions[vertex_index] = position_local + glyph->mesh->positions[vertex_index];
-			}
 
 			glGenBuffers(1, &glyph_mesh->vertex_buffer);
 			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
-			glBufferData(GL_ARRAY_BUFFER, glyph_mesh->vertex_count * sizeof(glm::vec2), positions, GL_STATIC_DRAW);
-
-			delete [] positions;
+			glBufferData(GL_ARRAY_BUFFER, glyph_mesh->vertex_count * sizeof(glm::vec2), glyph->mesh->positions, GL_STATIC_DRAW);
 
 			text_mesh.glyphs.push_back(glyph_mesh);
 		}
@@ -537,7 +529,8 @@ int main(int argc, const char** argv)
 		{
 			TextGlyphMesh* glyph_mesh = *mesh_it;
 
-			glUniform2fv(g_ShaderProgram->GetUniform("uniOffset"), 1, glm::value_ptr(glyph_mesh->offset));
+			glUniform2fv(g_ShaderProgram->GetUniform("uniTextOffset"), 1, glm::value_ptr(glyph_mesh->line_offset));
+			glUniform2fv(g_ShaderProgram->GetUniform("uniGlyphOffset"), 1, glm::value_ptr(glyph_mesh->glyph_offset));
 			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
 
 			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
