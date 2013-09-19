@@ -2,151 +2,54 @@
 
 #include "FontFreetype.h"
 
+#include "CurvePath.h"
 #include "FontFace.h"
 #include "FreetypeConversion.h"
 #include "Glyph.h"
+#include "PolygonShape.h"
 
 namespace ExLibris
 {
 
-	glm::vec2 ConvertOutlinePosition(Glyph* a_Glyph, const FT_Vector* a_Position)
+	int CurvePathMoveTo(const FT_Vector* a_To, void* a_User)
 	{
-		return Fixed26Dot6::ToFloatVec2(a_Position);
-	}
+		CurvePath* path = (CurvePath*)a_User;
 
-	int CallbackMoveTo(const FT_Vector* a_To, void* a_User)
-	{
-		Glyph* glyph = (Glyph*)a_User;
-
-		GlyphOutline* outline = glyph->outline;
-
-		if (outline->contours.size() > 0)
-		{
-			GlyphContour* contour_previous = outline->contours.back();
-			contour_previous->points.pop_back();
-		}
-
-		GlyphContour* contour = new GlyphContour;
-		outline->contours.push_back(contour);
-
-		glm::vec2 position = ConvertOutlinePosition(glyph, a_To);
-
-		contour->points.push_back(position);
+		path->Move(Fixed26Dot6::ToFloatVec2(a_To));
 
 		return 0;
 	}
 
-	int CallbackLineTo(const FT_Vector* a_To, void* a_User)
+	int CurvePathLineTo(const FT_Vector* a_To, void* a_User)
 	{
-		Glyph* glyph = (Glyph*)a_User;
+		CurvePath* path = (CurvePath*)a_User;
 
-		GlyphOutline* outline = glyph->outline;
-		if (outline == nullptr || outline->contours.size() == 0)
-		{
-			return -1;
-		}
-
-		GlyphContour* contour = outline->contours.back();
-
-		glm::vec2 position = ConvertOutlinePosition(glyph, a_To);
-
-		contour->points.push_back(position);
+		path->LineTo(Fixed26Dot6::ToFloatVec2(a_To));
 
 		return 0;
 	}
 
-	int CallbackConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
+	int CurvePathConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
 	{
-		Glyph* glyph = (Glyph*)a_User;
+		CurvePath* path = (CurvePath*)a_User;
 
-		GlyphOutline* outline = glyph->outline;
-		if (outline == nullptr || outline->contours.size() == 0)
-		{
-			return -1;
-		}
-
-		GlyphContour* contour = outline->contours.back();
-		if (contour->points.size() == 0)
-		{
-			return -1;
-		}
-
-		glm::vec2 a = contour->points.back();
-		glm::vec2 b = ConvertOutlinePosition(glyph, a_To);
-		glm::vec2 c = ConvertOutlinePosition(glyph, a_Control);
-
-		int precision = 5;
-		glm::vec2 delta_precision((float)precision, (float)precision);
-
-		glm::vec2 delta_ac = (c - a) / delta_precision;
-		glm::vec2 delta_cb = (b - c) / delta_precision;
-
-		glm::vec2 start = a;
-
-		for (int j = 1; j < precision; ++j)
-		{
-			a += delta_ac;
-			c += delta_cb;
-
-			glm::vec2 end = a + ((c - a) / delta_precision) * (float)j;
-
-			contour->points.push_back(end);
-
-			start = end;
-		}
-
-		contour->points.push_back(b);
+		path->ConicCurveTo(
+			Fixed26Dot6::ToFloatVec2(a_Control),
+			Fixed26Dot6::ToFloatVec2(a_To)
+		);
 
 		return 0;
 	}
 
-	int CallbackCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
+	int CurvePathCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
 	{
-		Glyph* glyph = (Glyph*)a_User;
+		CurvePath* path = (CurvePath*)a_User;
 
-		GlyphOutline* outline = glyph->outline;
-		if (outline == nullptr || outline->contours.size() == 0)
-		{
-			return -1;
-		}
-
-		GlyphContour* contour = outline->contours.back();
-		if (contour->points.size() == 0)
-		{
-			return -1;
-		}
-
-		glm::vec2 a = contour->points.back();
-		glm::vec2 b = ConvertOutlinePosition(glyph, a_To);
-		glm::vec2 c = ConvertOutlinePosition(glyph, a_ControlA);
-		glm::vec2 d = ConvertOutlinePosition(glyph, a_ControlB);
-
-		int precision = 5;
-		glm::vec2 delta_precision((float)precision, (float)precision);
-
-		glm::vec2 delta_ac = (c - a) / delta_precision;
-		glm::vec2 delta_cd = (d - c) / delta_precision;
-		glm::vec2 delta_db = (b - d) / delta_precision;
-
-		glm::vec2 start = a;
-
-		for (int j = 1; j < precision; ++j)
-		{
-			a += delta_ac;
-			c += delta_cd;
-			d += delta_db;
-
-			glm::vec2 ac = a + ((c - a) / delta_precision) * (float)j;
-			glm::vec2 cd = c + ((d - c) / delta_precision) * (float)j;
-
-			glm::vec2 end = ac + ((cd - ac) / delta_precision) * (float)j;
-
-			contour->points.push_back(end);
-
-			start = end;
-		}
-
-		contour->points.push_back(b);
+		path->QuadraticCurveTo(
+			Fixed26Dot6::ToFloatVec2(a_ControlA),
+			Fixed26Dot6::ToFloatVec2(a_ControlB),
+			Fixed26Dot6::ToFloatVec2(a_To)
+		);
 
 		return 0;
 	}
@@ -155,10 +58,10 @@ namespace ExLibris
 		: IFont(a_Family)
 		, m_Font(nullptr)
 	{
-		m_OutlineCallbacks.move_to = &CallbackMoveTo;
-		m_OutlineCallbacks.line_to = &CallbackLineTo;
-		m_OutlineCallbacks.conic_to = &CallbackConicTo;
-		m_OutlineCallbacks.cubic_to = &CallbackCubicTo;
+		m_OutlineCallbacks.move_to = &CurvePathMoveTo;
+		m_OutlineCallbacks.line_to = &CurvePathLineTo;
+		m_OutlineCallbacks.conic_to = &CurvePathConicTo;
+		m_OutlineCallbacks.cubic_to = &CurvePathCubicTo;
 		m_OutlineCallbacks.shift = 0;
 		m_OutlineCallbacks.delta = 0;
 	}
@@ -380,19 +283,33 @@ namespace ExLibris
 
 		FT_Outline_Transform(&a_Slot->outline, &transform_flipped);
 
-		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph);
+		CurvePath path;
+
+		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, &path);
 		if (errors != 0)
 		{
-			delete a_Glyph->outline;
-			a_Glyph->outline = nullptr;
-
 			return false;
 		}
 
-		if (a_Glyph->outline->contours.size() > 0)
+		CurveSettings settings;
+		settings.precision = 10;
+
+		std::vector<Polygon> polygons = path.ConvertToPolygons(settings);
+		if (polygons.size() > 0)
 		{
-			GlyphContour* contour_last = a_Glyph->outline->contours.back();
-			contour_last->points.pop_back();
+			a_Glyph->outline = new GlyphOutline;
+			a_Glyph->outline->contours = polygons;
+
+			PolygonShape glyph_polygon;
+			
+			for (std::vector<Polygon>::iterator polygon_it = polygons.begin(); polygon_it != polygons.end(); ++polygon_it)
+			{
+				Polygon& polygon = *polygon_it;
+
+				glyph_polygon.AddShape(polygon);
+			}
+
+			a_Glyph->mesh = glyph_polygon.Triangulate();
 		}
 
 		return true;

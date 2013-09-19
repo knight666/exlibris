@@ -213,12 +213,12 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 
 		if (glyph->outline != nullptr)
 		{
-			for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
+			/*for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
 			{
 				ExLibris::GlyphContour* contour = *contour_it;
 
 				outline.vertex_count += contour->points.size();
-			}
+			}*/
 		}
 
 		glyphs.push_back(glyph);
@@ -256,7 +256,7 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 				}
 			}
 
-			for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
+			/*for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin(); contour_it != glyph->outline->contours.end(); ++contour_it)
 			{
 				ExLibris::GlyphContour* contour = *contour_it;
 
@@ -275,7 +275,7 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 				glyph_contour.count = position_index - glyph_contour.start;
 
 				outline.contours.push_back(glyph_contour);
-			}
+			}*/
 		}
 		
 		cursor_offset.x += glyph->metrics->advance;
@@ -297,7 +297,7 @@ TextOutline CreateTextOutline(ExLibris::FontFace* a_Face, const std::wstring& a_
 	return outline;
 }
 
-std::vector<p2t::Point*> ConvertContourToPolyline(const glm::vec2& a_Cursor, ExLibris::GlyphContour* a_Contour)
+/*std::vector<p2t::Point*> ConvertContourToPolyline(const glm::vec2& a_Cursor, ExLibris::GlyphContour* a_Contour)
 {
 	std::vector<p2t::Point*> polyline;
 
@@ -309,7 +309,7 @@ std::vector<p2t::Point*> ConvertContourToPolyline(const glm::vec2& a_Cursor, ExL
 	}
 
 	return polyline;
-}
+}*/
 
 TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 {
@@ -338,61 +338,26 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 	{
 		ExLibris::Glyph* glyph = *glyph_it;
 
-		if (glyph->outline != nullptr)
+		if (glyph->mesh != nullptr)
 		{
 			TextGlyphMesh* glyph_mesh = new TextGlyphMesh;
 			glyph_mesh->offset = glm::vec2(0.0f, glyph->metrics->offset.y);
 
 			glm::vec2 position_local = cursor_offset;
 
-			std::vector<p2t::Point*> outline = ConvertContourToPolyline(position_local, glyph->outline->contours[0]);
-			p2t::CDT* cdt = new p2t::CDT(outline);
+			glyph_mesh->vertex_count = glyph->mesh->vertex_count;
+			glm::vec2* positions = new glm::vec2[glyph_mesh->vertex_count];
 
-			if (glyph->outline->contours.size() > 1)
+			for (size_t vertex_index = 0; vertex_index < glyph_mesh->vertex_count; ++vertex_index)
 			{
-				for (std::vector<ExLibris::GlyphContour*>::iterator contour_it = glyph->outline->contours.begin() + 1; contour_it != glyph->outline->contours.end(); ++contour_it)
-				{
-					ExLibris::GlyphContour* contour = *contour_it;
-
-					std::vector<p2t::Point*> hole = ConvertContourToPolyline(position_local, contour);
-					cdt->AddHole(hole);
-				}
-			}
-
-			cdt->Triangulate();
-
-			std::vector<p2t::Triangle*> cdt_triangles = cdt->GetTriangles();
-
-			glyph_mesh->vertex_count = cdt_triangles.size() * 3;
-
-			glm::vec2* position_data = new glm::vec2[glyph_mesh->vertex_count];
-			glm::vec2* dst_position_data = position_data;
-
-			for (std::vector<p2t::Triangle*>::const_iterator triangle_it = cdt_triangles.begin(); triangle_it != cdt_triangles.end(); ++triangle_it)
-			{
-				p2t::Triangle* triangle = *triangle_it;
-
-				p2t::Point* point_a = triangle->GetPoint(0);
-				dst_position_data->x = (float)point_a->x;
-				dst_position_data->y = (float)point_a->y;
-				++dst_position_data;
-
-				p2t::Point* point_b = triangle->GetPoint(1);
-				dst_position_data->x = (float)point_b->x;
-				dst_position_data->y = (float)point_b->y;
-				++dst_position_data;
-
-				p2t::Point* point_c = triangle->GetPoint(2);
-				dst_position_data->x = (float)point_c->x;
-				dst_position_data->y = (float)point_c->y;
-				++dst_position_data;
+				positions[vertex_index] = position_local + glyph->mesh->positions[vertex_index];
 			}
 
 			glGenBuffers(1, &glyph_mesh->vertex_buffer);
 			glBindBuffer(GL_ARRAY_BUFFER, glyph_mesh->vertex_buffer);
-			glBufferData(GL_ARRAY_BUFFER, glyph_mesh->vertex_count * sizeof(glm::vec2), position_data, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, glyph_mesh->vertex_count * sizeof(glm::vec2), positions, GL_STATIC_DRAW);
 
-			delete [] position_data;
+			delete [] positions;
 
 			text_mesh.glyphs.push_back(glyph_mesh);
 		}
