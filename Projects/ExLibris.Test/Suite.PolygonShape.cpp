@@ -87,19 +87,19 @@ TEST(PolygonShape, TriangulateTwoPolygons)
 	TriangleList* list = shape.Triangulate();
 
 	ASSERT_NE(nullptr, list->positions);
-	ASSERT_EQ(18, list->vertex_count);
+	ASSERT_EQ(6, list->vertex_count);
 	EXPECT_FLOAT_EQ(-20.0f, list->positions[0].x);
 	EXPECT_FLOAT_EQ(-10.0f, list->positions[0].y);
 	EXPECT_FLOAT_EQ(30.0f, list->positions[1].x);
 	EXPECT_FLOAT_EQ(10.0f, list->positions[1].y);
 	EXPECT_FLOAT_EQ(30.0f, list->positions[2].x);
 	EXPECT_FLOAT_EQ(55.0f, list->positions[2].y);
-	EXPECT_FLOAT_EQ(50.0f, list->positions[3].x);
-	EXPECT_FLOAT_EQ(-20.0f, list->positions[3].y);
+	EXPECT_FLOAT_EQ(120.0f, list->positions[3].x);
+	EXPECT_FLOAT_EQ(20.0f, list->positions[3].y);
 	EXPECT_FLOAT_EQ(80.0f, list->positions[4].x);
 	EXPECT_FLOAT_EQ(10.0f, list->positions[4].y);
-	EXPECT_FLOAT_EQ(120.0f, list->positions[5].x);
-	EXPECT_FLOAT_EQ(20.0f, list->positions[5].y);
+	EXPECT_FLOAT_EQ(50.0f, list->positions[5].x);
+	EXPECT_FLOAT_EQ(-20.0f, list->positions[5].y);
 }
 
 TEST(PolygonShape, TriangulateTwoPolygonsHole)
