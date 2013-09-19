@@ -160,10 +160,10 @@ TEST_F(FaceContext, FindGlyphOutline)
 	ASSERT_NE(nullptr, glyph->outline);
 	EXPECT_EQ(1, glyph->outline->contours.size());
 
-	GlyphContour* contour = glyph->outline->contours[0];
-	EXPECT_EQ(4, contour->points.size());
-	EXPECT_FLOAT_EQ(8.2031250f, contour->points[0].x);
-	EXPECT_FLOAT_EQ(-8.5937500f, contour->points[0].y);
+	Polygon contour = glyph->outline->contours[0];
+	EXPECT_EQ(5, contour.positions.size());
+	EXPECT_FLOAT_EQ(8.2031250f, contour.positions[0].x);
+	EXPECT_FLOAT_EQ(-8.5937500f, contour.positions[0].y);
 }
 
 TEST_F(FaceContext, FindGlyphNotFound)
