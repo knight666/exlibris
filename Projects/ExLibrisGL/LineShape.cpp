@@ -62,8 +62,8 @@ namespace ExLibris
 			// 2 ---------- 3
 
 			glm::vec2 normal = glm::normalize(next - current);
-			glm::vec2 offset_left(normal.y * a_Thickness, -normal.x * thickness_half);
-			glm::vec2 offset_right(-normal.y * a_Thickness, normal.x * thickness_half);
+			glm::vec2 offset_left(normal.y * thickness_half, -normal.x * thickness_half);
+			glm::vec2 offset_right(-normal.y * thickness_half, normal.x * thickness_half);
 			
 			dst_position[0] = next + offset_left;
 			dst_position[1] = current + offset_left;

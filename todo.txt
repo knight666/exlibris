@@ -17,27 +17,29 @@ ShapePath
 - CubicTo(position, controlA, controlB);
 - Visit(visitor, precisionType, precisionHint)
 
-ShapePathVisitor
-- VisitShapeStart
-- VisitShapePosition
-- VisitShapeEnd
+GraphicsSettings
+- winding
+- precision
 
-TriangleConverter
+FilledSettings
+- winding
+- precision
+- type
+	eFast
+	eSmooth
+- thickness
 
-- Paint(path)
+IMeshBuilder
+- SetVertexCount(count)
+- AddVertexPosition(position)
+- AddTriangle(indexA, indexB, indexC)
 
-CurvePath
-- ConvertToShapes
-
-Shape
-- list of points
-
-Polygon
-- AddShape
-- Triangulate
-
-TriangleList
-
-GlyphMesh
-- outline
-- triangles
+GraphicsContext
+- Clear()
+- Move(position)
+- LineTo(position)
+- ConicTo(position, control);
+- CubicTo(position, controlA, controlB);
+- Finish()
+- BuildMeshFilled(IMeshBuilder, settings)
+- BuildMeshOutline(IMeshBuilder, settings)
