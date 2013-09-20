@@ -39,6 +39,7 @@
 #include <FontFace.h>
 #include <FontLoaderFreetype.h>
 #include <Glyph.h>
+#include <LineShape.h>
 
 // Options
 
@@ -370,6 +371,9 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 	return text_mesh;
 }
 
+
+#define SKIP_FONT
+
 int main(int argc, const char** argv)
 {
 	GLFWwindow* window;
@@ -380,6 +384,8 @@ int main(int argc, const char** argv)
 	{
 		exit(EXIT_FAILURE);
 	}
+
+#ifndef SKIP_FONT
 
 	ExLibris::FontLoaderFreetype loader;
 
@@ -396,6 +402,8 @@ int main(int argc, const char** argv)
 	float load_time_face = (float)glfwGetTime();
 	std::cout << "Creating face: " << (load_time_face - load_time_start) * 1000.0f << " ms." << std::endl;
 	load_time_start = load_time_face;
+
+#endif
 
 	window = glfwCreateWindow(640, 480, "ExLibris", nullptr, nullptr);
 	if (window == nullptr)
@@ -421,57 +429,34 @@ int main(int argc, const char** argv)
 	g_ShaderLoader = new Framework::ShaderLoader();
 	LoadShaders();
 
+#ifndef SKIP_FONT
+
 	TextOutline outline = CreateTextOutline(face_size24, g_Text);
 
 	TextMesh mesh = CreateMesh(face_size24, g_Text);
+
+#endif
 
 	float time = 0.0f;
 
 	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
 
+	ExLibris::LineShape shape;
+
+	ExLibris::Polygon p;
+	p += glm::vec2(50.0f + 0.0f, 100.0f);
+	p += glm::vec2(50.0f + 50.0f, 50.0f);
+	p += glm::vec2(50.0f + 100.0f, 100.0f);
+	p += glm::vec2(50.0f + 150.0f, 50.0f);
+
+	shape.AddPolygon(p);
+
+	ExLibris::TriangleList* triangles = shape.Triangulate(20.0f);
+
 	GLuint vertex_buffer;
 	glGenBuffers(1, &vertex_buffer);
-	unsigned int vertex_total = 4;
-	GlyphVertex* vertex_data = new GlyphVertex[vertex_total];
-
-	GLuint element_buffer;
-	glGenBuffers(1, &element_buffer);
-	unsigned int element_total = 6;
-	GLuint* element_data = new GLuint[element_total];
-
-	vertex_data[0].position.x = 0.0f;
-	vertex_data[0].position.y = 0.0f;
-	vertex_data[0].texture_coordinate.x = 0.0f;
-	vertex_data[0].texture_coordinate.y = 1.0f;
-
-	vertex_data[1].position.x = 2.0f;
-	vertex_data[1].position.y = 0.0f;
-	vertex_data[1].texture_coordinate.x = 1.0f;
-	vertex_data[1].texture_coordinate.y = 1.0f;
-
-	vertex_data[2].position.x = 0.0f;
-	vertex_data[2].position.y = 1.0f;
-	vertex_data[2].texture_coordinate.x = 0.0f;
-	vertex_data[2].texture_coordinate.y = 0.0f;
-
-	vertex_data[3].position.x = 2.0f;
-	vertex_data[3].position.y = 1.0f;
-	vertex_data[3].texture_coordinate.x = 1.0f;
-	vertex_data[3].texture_coordinate.y = 0.0f;
-
-	element_data[0] = 1;
-	element_data[1] = 0;
-	element_data[2] = 2;
-
-	element_data[3] = 1;
-	element_data[4] = 2;
-	element_data[5] = 3;
-
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, vertex_total * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_total * sizeof(GLuint), element_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, triangles->vertex_count * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
 
 	float timer = 0.0f;
 
@@ -514,6 +499,8 @@ int main(int argc, const char** argv)
 
 		glm::mat4x4 mvp = projection * modelview;
 
+#ifndef SKIP_FONT
+
 		glm::vec4 color(1.0f, 0.0f, 0.0f, 1.0f);
 
 		glUseProgram(g_ShaderProgram->GetHandle());
@@ -541,16 +528,42 @@ int main(int argc, const char** argv)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glUseProgram(0);
 
-		/*glBindBuffer(GL_ARRAY_BUFFER, outline.vertex_buffer);
+#endif
 
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(glm::value_ptr(projection));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)));
+
+		glLineWidth(10.0f);
+
+		glBegin(GL_LINE_STRIP);
+		{
+			glVertex2fv(glm::value_ptr(glm::vec2(10.0f, 100.0f + 100.0f)));
+			glVertex2fv(glm::value_ptr(glm::vec2(50.0f, 100.0f + 50.0f)));
+			glVertex2fv(glm::value_ptr(glm::vec2(100.0f, 100.0f + 100.0f)));
+		}
+		glEnd();
+
+		glLineWidth(1.0f);
+
+		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
+
+		//glBegin(GL_LINE_STRIP);
+		glBegin(GL_TRIANGLES);
+		for (size_t i = 0; i < triangles->vertex_count; ++i)
+		{
+			glVertex2fv(glm::value_ptr(triangles->positions[i]));
+		}
+		glEnd();
+
+		/*glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
 
-		for (std::vector<TextGlyphOutline>::iterator contour_it = outline.contours.begin(); contour_it != outline.contours.end(); ++contour_it)
-		{
-			TextGlyphOutline& contour = *contour_it;
-
-			glDrawArrays(GL_LINE_LOOP, contour.start, contour.count);
-		}
+		glDrawArrays(GL_TRIANGLES, 0, 12);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
