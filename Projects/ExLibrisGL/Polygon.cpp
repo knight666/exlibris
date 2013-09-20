@@ -5,6 +5,13 @@
 namespace ExLibris
 {
 
+	Polygon& Polygon::operator += (glm::vec2& a_Position)
+	{
+		positions.push_back(a_Position);
+
+		return *this;
+	}
+
 	bool Polygon::IsPositionInside(const glm::vec2& a_Position) const
 	{
 		if (positions.size() < 3)
