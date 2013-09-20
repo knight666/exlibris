@@ -20,7 +20,7 @@ namespace ExLibris
 		void Clear();
 		void AddPolygon(const Polygon& a_Polygon);
 
-		TriangleList* Triangulate() const;
+		TriangleList* Triangulate(float a_Thickness) const;
 
 	private:
 
