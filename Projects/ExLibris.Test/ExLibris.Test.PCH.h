@@ -16,4 +16,9 @@
 
 #include <gtest/gtest.h>
 
+#define EXPECT_VEC2_EQ(_expected_x, _expected_y, _actual) { \
+	EXPECT_FLOAT_EQ(_expected_x, _actual.x); \
+	EXPECT_FLOAT_EQ(_expected_y, _actual.y); \
+}
+
 #endif
