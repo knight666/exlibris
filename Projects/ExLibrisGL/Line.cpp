@@ -51,4 +51,28 @@ namespace ExLibris
 		return quad;
 	}
 
+	Line::CollisionResult Line::Collides(const Line& a_Other) const
+	{
+		CollisionResult result;
+		result.collides = false;
+		result.time = 0.0f;
+
+		glm::vec2 delta_a = end - start;
+		glm::vec2 delta_b = a_Other.end - a_Other.start;
+
+		float b_dot_d_perp = (delta_a.x * delta_b.y) - (delta_a.y * delta_b.x);
+		if (b_dot_d_perp == 0.0f)
+		{
+			return result;
+		}
+
+		result.collides = true;
+
+		glm::vec2 local = a_Other.start - start;
+		result.time = ((local.x * delta_b.y) - (local.y * delta_b.x)) / b_dot_d_perp;
+		result.position = start + (delta_a * result.time);
+
+		return result;
+	}
+
 }; // namespace ExLibris
