@@ -2,6 +2,8 @@
 
 #include "LineShape.h"
 
+#include "Line.h"
+
 namespace ExLibris
 {
 
@@ -89,60 +91,26 @@ namespace ExLibris
 		std::vector<ShapeType> shape_types;
 		std::vector<glm::vec2> shape_positions;
 
-		const glm::vec2& previous = *previous_it;
-		const glm::vec2& current = *current_it;
-
 		glm::vec2 world_up(0.0f, -1.0f);
 
-		glm::vec2 start_normal = glm::normalize(current - previous);
-		glm::vec2 start_position_upper;
-		glm::vec2 start_position_lower;
-
-		if (glm::dot(start_normal, world_up) > 0.0f)
-		{
-			start_position_upper = previous + glm::vec2(start_normal.y * thickness_half, -start_normal.x * thickness_half);
-			start_position_lower = previous + glm::vec2(-start_normal.y * thickness_half, start_normal.x * thickness_half);
-		}
-		else
-		{
-			start_position_upper = previous + glm::vec2(-start_normal.y * thickness_half, start_normal.x * thickness_half);
-			start_position_lower = previous + glm::vec2(start_normal.y * thickness_half, -start_normal.x * thickness_half);
-		}
-
-		if (start_position_upper.y > start_position_lower.y)
-		{
-			glm::vec2 swap = start_position_upper;
-			start_position_upper = start_position_lower;
-			start_position_lower = swap;
-		}
-
-		shape_positions.push_back(start_position_upper);
-		shape_positions.push_back(start_position_lower);
+		Line line_start(*previous_it, *current_it);
+		Quad quad_start = line_start.ConstructQuad(a_Thickness);
+		
+		shape_positions.push_back(quad_start.ul);
+		shape_positions.push_back(quad_start.ll);
 
 		while (current_it != polygon.positions.end())
 		{
 			const glm::vec2& previous = *previous_it;
 			const glm::vec2& current = *current_it;
 
+			Line line_previous(previous, current);
+			Quad quad_previous = line_previous.ConstructQuad(a_Thickness);
+
 			if (next_it == polygon.positions.end())
 			{
-				glm::vec2 end_position_upper;
-				glm::vec2 end_position_lower;
-
-				glm::vec2 end_normal = glm::normalize(current - previous);
-				if (glm::dot(end_normal, world_up) > 0.0f)
-				{
-					end_position_upper = current + glm::vec2(end_normal.y * thickness_half, -end_normal.x * thickness_half);
-					end_position_lower = current + glm::vec2(-end_normal.y * thickness_half, end_normal.x * thickness_half);
-				}
-				else
-				{
-					end_position_upper = current + glm::vec2(-end_normal.y * thickness_half, end_normal.x * thickness_half);
-					end_position_lower = current + glm::vec2(end_normal.y * thickness_half, -end_normal.x * thickness_half);
-				}
-
-				shape_positions.push_back(end_position_upper);
-				shape_positions.push_back(end_position_lower);
+				shape_positions.push_back(quad_previous.ur);
+				shape_positions.push_back(quad_previous.lr);
 
 				shape_types.push_back(eShapeType_Quad);
 
@@ -205,36 +173,47 @@ namespace ExLibris
 			glm::vec2 previous_ur = current + previous_offset_left;
 			glm::vec2 previous_lr = current + previous_offset_right;
 
-			CollisionResult collision_upper = LineCollision(
-				previous_ul, previous_ur,
-				next_ul, next_ur
+			Line line_current(current, next);
+			Quad quad_current = line_current.ConstructQuad(a_Thickness);
+
+			shape_positions.push_back(quad_previous.ur);
+			shape_positions.push_back(quad_previous.lr);
+
+			shape_types.push_back(eShapeType_Quad);
+
+			shape_positions.push_back(quad_current.ul);
+			shape_positions.push_back(quad_current.ll);
+
+			/*CollisionResult collision_upper = LineCollision(
+				quad_previous.ul, quad_previous.ur,
+				quad_current.ul, quad_current.ur
 			);
 
 			CollisionResult collision_lower = LineCollision(
-				previous_ll, previous_lr,
-				next_ll, next_lr
+				quad_previous.ll, quad_previous.lr,
+				quad_current.ll, quad_current.lr
 			);
 
 			if (collision_upper.time < collision_lower.time)
 			{
 				shape_positions.push_back(collision_upper.position);
-				shape_positions.push_back(previous_lr);
+				shape_positions.push_back(quad_previous.lr);
 
 				shape_types.push_back(eShapeType_Quad);
 
-				shape_positions.push_back(next_ll);
+				shape_positions.push_back(quad_current.ll);
 				shape_positions.push_back(collision_upper.position);
 			}
 			else
 			{
 				shape_positions.push_back(collision_lower.position);
-				shape_positions.push_back(previous_ur);
+				shape_positions.push_back(quad_previous.ur);
 
 				shape_types.push_back(eShapeType_Quad);
 
-				shape_positions.push_back(next_ul);
+				shape_positions.push_back(quad_current.ul);
 				shape_positions.push_back(collision_lower.position);
-			}
+			}*/
 
 			if (current_it != polygon.positions.begin())
 			{
