@@ -24,13 +24,13 @@ TEST(Line, QuadHorizontal)
 
 	Quad quad = line.ConstructQuad(20.0f);
 
+	EXPECT_VEC2_EQ(100.0f, -10.0f, quad.ur);
 	EXPECT_VEC2_EQ(0.0f, -10.0f, quad.ul);
 	EXPECT_VEC2_EQ(0.0f, 10.0f, quad.ll);
-	EXPECT_VEC2_EQ(100.0f, -10.0f, quad.ur);
 	EXPECT_VEC2_EQ(100.0f, 10.0f, quad.lr);
 }
 
-TEST(Line, QuadHorizontalBackwards)
+TEST(Line, QuadHorizontalReversed)
 {
 	Line line(
 		glm::vec2(250.0f, 50.0f),
@@ -39,8 +39,38 @@ TEST(Line, QuadHorizontalBackwards)
 
 	Quad quad = line.ConstructQuad(10.0f);
 
+	EXPECT_VEC2_EQ(250.0f, 45.0f, quad.ur);
 	EXPECT_VEC2_EQ(150.0f, 45.0f, quad.ul);
 	EXPECT_VEC2_EQ(150.0f, 55.0f, quad.ll);
-	EXPECT_VEC2_EQ(250.0f, 45.0f, quad.ur);
 	EXPECT_VEC2_EQ(250.0f, 55.0f, quad.lr);
+}
+
+TEST(Line, QuadVertical)
+{
+	Line line(
+		glm::vec2(150.0f, 40.0f),
+		glm::vec2(150.0f, 140.0f)
+	);
+
+	Quad quad = line.ConstructQuad(16.0f);
+
+	EXPECT_VEC2_EQ(158.0f, 140.0f, quad.ur);
+	EXPECT_VEC2_EQ(158.0f, 40.0f, quad.ul);
+	EXPECT_VEC2_EQ(142.0f, 40.0f, quad.ll);
+	EXPECT_VEC2_EQ(142.0f, 140.0f, quad.lr);
+}
+
+TEST(Line, QuadVerticalReversed)
+{
+	Line line(
+		glm::vec2(25.0f, 320.0f),
+		glm::vec2(25.0f, 160.0f)
+	);
+
+	Quad quad = line.ConstructQuad(10.0f);
+
+	EXPECT_VEC2_EQ(30.0f, 320.0f, quad.ur);
+	EXPECT_VEC2_EQ(30.0f, 160.0f, quad.ul);
+	EXPECT_VEC2_EQ(20.0f, 160.0f, quad.ll);
+	EXPECT_VEC2_EQ(20.0f, 320.0f, quad.lr);
 }
