@@ -81,6 +81,7 @@
     </ClCompile>
     <ClCompile Include="IFont.cpp" />
     <ClCompile Include="CurvePath.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineShape.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="PolygonShape.cpp" />
@@ -100,6 +101,7 @@
     <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="LineShape.h" />
     <ClInclude Include="PolygonShape.h" />
     <ClInclude Include="Polygon.h" />

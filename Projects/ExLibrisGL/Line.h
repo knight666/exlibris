@@ -1,0 +1,26 @@
+#ifndef _LINE_H_
+#define _LINE_H_
+
+#include <glm/glm.hpp>
+
+namespace ExLibris
+{
+
+	class Line
+	{
+
+	public:
+
+		Line();
+		Line(const glm::vec2& a_Start, const glm::vec2& a_End);
+
+	public:
+	
+		glm::vec2 start;
+		glm::vec2 end;
+	
+	}; // class Line
+
+}; // namespace ExLibris
+
+#endif

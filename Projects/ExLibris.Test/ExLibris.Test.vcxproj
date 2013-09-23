@@ -70,6 +70,7 @@
     <ClCompile Include="Suite.CurvePath.cpp" />
     <ClCompile Include="Suite.FontFace.cpp" />
     <ClCompile Include="Suite.FontLoading.cpp" />
+    <ClCompile Include="Suite.Line.cpp" />
     <ClCompile Include="Suite.LineShape.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.PolygonShape.cpp" />
