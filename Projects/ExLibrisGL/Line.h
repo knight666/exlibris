@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Quad.h"
+
 namespace ExLibris
 {
 
@@ -13,6 +15,8 @@ namespace ExLibris
 
 		Line();
 		Line(const glm::vec2& a_Start, const glm::vec2& a_End);
+
+		Quad ConstructQuad(float a_Thickness) const;
 
 	public:
 	
