@@ -52,6 +52,8 @@ static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 static Framework::ShaderLoader* g_ShaderLoader;
 static Framework::ShaderProgram* g_ShaderProgram = nullptr;
 
+static bool g_DrawLines = false;
+
 static void OnGlfwError(int error, const char* description)
 {
 	std::cerr << description << std::endl;
@@ -78,6 +80,10 @@ static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mod
 	else if (key == GLFW_KEY_F5 && action == GLFW_RELEASE)
 	{
 		LoadShaders();
+	}
+	else if (key == GLFW_KEY_1 && action == GLFW_RELEASE)
+	{
+		g_DrawLines = !g_DrawLines;
 	}
 }
 
@@ -444,10 +450,10 @@ int main(int argc, const char** argv)
 	ExLibris::LineShape shape;
 
 	ExLibris::Polygon p;
-	p += glm::vec2(50.0f + 0.0f, 100.0f);
-	p += glm::vec2(50.0f + 50.0f, 50.0f);
-	p += glm::vec2(50.0f + 100.0f, 100.0f);
-	p += glm::vec2(50.0f + 150.0f, 50.0f);
+	p += glm::vec2(50.0f, 100.0f);
+	p += glm::vec2(100.0f, 50.0f);
+	p += glm::vec2(150.0f, 100.0f);
+	//p += glm::vec2(100.0f, 110.0f);
 
 	shape.AddPolygon(p);
 
@@ -552,8 +558,15 @@ int main(int argc, const char** argv)
 
 		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
 
-		//glBegin(GL_LINE_STRIP);
-		glBegin(GL_TRIANGLES);
+		if (g_DrawLines)
+		{
+			glBegin(GL_LINE_STRIP);
+		}
+		else
+		{
+			glBegin(GL_TRIANGLES);
+		}
+
 		for (size_t i = 0; i < triangles->vertex_count; ++i)
 		{
 			glVertex2fv(glm::value_ptr(triangles->positions[i]));

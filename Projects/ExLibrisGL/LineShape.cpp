@@ -86,14 +86,38 @@ namespace ExLibris
 		std::vector<glm::vec2>::const_iterator current_it = previous_it + 1;
 		std::vector<glm::vec2>::const_iterator next_it = current_it + 1;
 		
-		std::vector<glm::vec2> quad_positions;
+		std::vector<ShapeType> shape_types;
+		std::vector<glm::vec2> shape_positions;
 
-		glm::vec2 start_normal = glm::normalize(*current_it - *previous_it);
-		glm::vec2 start_position_upper = *previous_it + glm::vec2(-start_normal.y * thickness_half, start_normal.x * thickness_half);
-		glm::vec2 start_position_lower = *previous_it + glm::vec2(start_normal.y * thickness_half, -start_normal.x * thickness_half);
+		const glm::vec2& previous = *previous_it;
+		const glm::vec2& current = *current_it;
 
-		quad_positions.push_back(start_position_upper);
-		quad_positions.push_back(start_position_lower);
+		glm::vec2 world_up(0.0f, -1.0f);
+
+		glm::vec2 start_normal = glm::normalize(current - previous);
+		glm::vec2 start_position_upper;
+		glm::vec2 start_position_lower;
+
+		if (glm::dot(start_normal, world_up) > 0.0f)
+		{
+			start_position_upper = previous + glm::vec2(start_normal.y * thickness_half, -start_normal.x * thickness_half);
+			start_position_lower = previous + glm::vec2(-start_normal.y * thickness_half, start_normal.x * thickness_half);
+		}
+		else
+		{
+			start_position_upper = previous + glm::vec2(-start_normal.y * thickness_half, start_normal.x * thickness_half);
+			start_position_lower = previous + glm::vec2(start_normal.y * thickness_half, -start_normal.x * thickness_half);
+		}
+
+		if (start_position_upper.y > start_position_lower.y)
+		{
+			glm::vec2 swap = start_position_upper;
+			start_position_upper = start_position_lower;
+			start_position_lower = swap;
+		}
+
+		shape_positions.push_back(start_position_upper);
+		shape_positions.push_back(start_position_lower);
 
 		while (current_it != polygon.positions.end())
 		{
@@ -102,32 +126,79 @@ namespace ExLibris
 
 			if (next_it == polygon.positions.end())
 			{
-				glm::vec2 end_normal = glm::normalize(current - previous);
-				glm::vec2 end_position_upper = current + glm::vec2(-end_normal.y * thickness_half, end_normal.x * thickness_half);
-				glm::vec2 end_position_lower = current + glm::vec2(end_normal.y * thickness_half, -end_normal.x * thickness_half);
+				glm::vec2 end_position_upper;
+				glm::vec2 end_position_lower;
 
-				quad_positions.push_back(end_position_upper);
-				quad_positions.push_back(end_position_lower);
+				glm::vec2 end_normal = glm::normalize(current - previous);
+				if (glm::dot(end_normal, world_up) > 0.0f)
+				{
+					end_position_upper = current + glm::vec2(end_normal.y * thickness_half, -end_normal.x * thickness_half);
+					end_position_lower = current + glm::vec2(-end_normal.y * thickness_half, end_normal.x * thickness_half);
+				}
+				else
+				{
+					end_position_upper = current + glm::vec2(-end_normal.y * thickness_half, end_normal.x * thickness_half);
+					end_position_lower = current + glm::vec2(end_normal.y * thickness_half, -end_normal.x * thickness_half);
+				}
+
+				shape_positions.push_back(end_position_upper);
+				shape_positions.push_back(end_position_lower);
+
+				shape_types.push_back(eShapeType_Quad);
 
 				break;
 			}
 			
 			const glm::vec2& next = *next_it;
 
-			glm::vec2 normal_next = glm::normalize(next - current);
+			glm::vec2 next_offset_left;
+			glm::vec2 next_offset_right;
 
-			glm::vec2 next_offset_left(-normal_next.y * thickness_half, normal_next.x * thickness_half);
-			glm::vec2 next_offset_right(normal_next.y * thickness_half, -normal_next.x * thickness_half);
+			glm::vec2 normal_next = glm::normalize(next - current);
+			if (glm::dot(normal_next, world_up) > 0.0f)
+			{
+				next_offset_left = glm::vec2(normal_next.y * thickness_half, -normal_next.x * thickness_half);
+				next_offset_right = glm::vec2(-normal_next.y * thickness_half, normal_next.x * thickness_half);
+			}
+			else
+			{
+				next_offset_left = glm::vec2(-normal_next.y * thickness_half, normal_next.x * thickness_half);
+				next_offset_right = glm::vec2(normal_next.y * thickness_half, -normal_next.x * thickness_half);
+			}
+
+			if (next_offset_left.y > next_offset_right.y)
+			{
+				glm::vec2 swap = next_offset_left;
+				next_offset_left = next_offset_right;
+				next_offset_right = swap;
+			}
 
 			glm::vec2 next_ul = current + next_offset_left;
 			glm::vec2 next_ll = current + next_offset_right;
 			glm::vec2 next_ur = next + next_offset_left;
 			glm::vec2 next_lr = next + next_offset_right;
 
-			glm::vec2 normal_previous = glm::normalize(current - previous);
+			glm::vec2 previous_offset_left;
+			glm::vec2 previous_offset_right;
 
-			glm::vec2 previous_offset_left(-normal_previous.y * thickness_half, normal_previous.x * thickness_half);
-			glm::vec2 previous_offset_right(normal_previous.y * thickness_half, -normal_previous.x * thickness_half);
+			glm::vec2 normal_previous = glm::normalize(current - previous);
+			if (glm::dot(normal_previous, world_up) > 0.0f)
+			{
+				previous_offset_left = glm::vec2(normal_previous.y * thickness_half, -normal_previous.x * thickness_half);
+				previous_offset_right = glm::vec2(-normal_previous.y * thickness_half, normal_previous.x * thickness_half);
+			}
+			else
+			{
+				previous_offset_left = glm::vec2(-normal_previous.y * thickness_half, normal_previous.x * thickness_half);
+				previous_offset_right = glm::vec2(normal_previous.y * thickness_half, -normal_previous.x * thickness_half);
+			}
+
+			if (previous_offset_left.y > previous_offset_right.y)
+			{
+				glm::vec2 swap = previous_offset_left;
+				previous_offset_left = previous_offset_right;
+				previous_offset_right = swap;
+			}
 
 			glm::vec2 previous_ul = previous + previous_offset_left;
 			glm::vec2 previous_ll = previous + previous_offset_right;
@@ -146,19 +217,23 @@ namespace ExLibris
 
 			if (collision_upper.time < collision_lower.time)
 			{
-				quad_positions.push_back(collision_upper.position);
-				quad_positions.push_back(previous_lr);
+				shape_positions.push_back(collision_upper.position);
+				shape_positions.push_back(previous_lr);
 
-				quad_positions.push_back(next_ll);
-				quad_positions.push_back(collision_upper.position);
+				shape_types.push_back(eShapeType_Quad);
+
+				shape_positions.push_back(next_ll);
+				shape_positions.push_back(collision_upper.position);
 			}
 			else
 			{
-				quad_positions.push_back(collision_lower.position);
-				quad_positions.push_back(previous_ur);
-					
-				quad_positions.push_back(next_ul);
-				quad_positions.push_back(collision_lower.position);
+				shape_positions.push_back(collision_lower.position);
+				shape_positions.push_back(previous_ur);
+
+				shape_types.push_back(eShapeType_Quad);
+
+				shape_positions.push_back(next_ul);
+				shape_positions.push_back(collision_lower.position);
 			}
 
 			if (current_it != polygon.positions.begin())
@@ -172,22 +247,34 @@ namespace ExLibris
 			}
 		}
 
-		for (std::vector<glm::vec2>::iterator quad_it = quad_positions.begin(); quad_it != quad_positions.end();)
+		std::vector<glm::vec2>::iterator position_it = shape_positions.begin();
+		for (std::vector<ShapeType>::iterator type_it = shape_types.begin(); type_it != shape_types.end(); ++type_it)
 		{
-			glm::vec2 quad_ul = *quad_it++;
-			glm::vec2 quad_ll = *quad_it++;
-			glm::vec2 quad_ur = *quad_it++;
-			glm::vec2 quad_lr = *quad_it++;
+			if (*type_it == eShapeType_Triangle)
+			{
+				dst_position[0] = *position_it++;
+				dst_position[1] = *position_it++;
+				dst_position[2] = *position_it++;
 
-			dst_position[0] = quad_ur;
-			dst_position[1] = quad_ul;
-			dst_position[2] = quad_ll;
+				dst_position += 3;
+			}
+			else if (*type_it == eShapeType_Quad)
+			{
+				glm::vec2 quad_ul = *position_it++;
+				glm::vec2 quad_ll = *position_it++;
+				glm::vec2 quad_ur = *position_it++;
+				glm::vec2 quad_lr = *position_it++;
 
-			dst_position[3] = quad_ur;
-			dst_position[4] = quad_ll;
-			dst_position[5] = quad_lr;
+				dst_position[0] = quad_ur;
+				dst_position[1] = quad_ul;
+				dst_position[2] = quad_ll;
 
-			dst_position += 6;
+				dst_position[3] = quad_ur;
+				dst_position[4] = quad_ll;
+				dst_position[5] = quad_lr;
+
+				dst_position += 6;
+			}
 		}
 
 		return triangles;
