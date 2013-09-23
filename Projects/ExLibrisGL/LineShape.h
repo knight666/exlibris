@@ -24,6 +24,12 @@ namespace ExLibris
 
 	private:
 
+		enum ShapeType
+		{
+			eShapeType_Triangle,
+			eShapeType_Quad
+		};
+
 		std::vector<Polygon> m_Polygons;
 
 	}; // class LineShape
