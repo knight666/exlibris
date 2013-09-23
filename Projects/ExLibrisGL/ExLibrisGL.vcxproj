@@ -85,6 +85,7 @@
     <ClCompile Include="LineShape.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="PolygonShape.cpp" />
+    <ClCompile Include="Quad.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +106,7 @@
     <ClInclude Include="LineShape.h" />
     <ClInclude Include="PolygonShape.h" />
     <ClInclude Include="Polygon.h" />
+    <ClInclude Include="Quad.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
   </ItemGroup>
