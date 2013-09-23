@@ -13,10 +13,21 @@ namespace ExLibris
 
 	public:
 
+		struct CollisionResult
+		{
+			bool collides;
+			float time;
+			glm::vec2 position;
+		};
+
+	public:
+
 		Line();
 		Line(const glm::vec2& a_Start, const glm::vec2& a_End);
 
 		Quad ConstructQuad(float a_Thickness) const;
+
+		CollisionResult Collides(const Line& a_Other) const;
 
 	public:
 	
