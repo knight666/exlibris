@@ -453,7 +453,7 @@ int main(int argc, const char** argv)
 	p += glm::vec2(50.0f, 100.0f);
 	p += glm::vec2(100.0f, 50.0f);
 	p += glm::vec2(150.0f, 100.0f);
-	//p += glm::vec2(100.0f, 110.0f);
+	p += glm::vec2(100.0f, 110.0f);
 
 	shape.AddPolygon(p);
 
