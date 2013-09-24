@@ -45,7 +45,7 @@
 
 //static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
 static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
-static float g_FontSize = 36.0f;
+static float g_FontSize = 100.0f;
 static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 //static std::wstring g_Text = L"agjklipqsdf";
 
@@ -71,11 +71,43 @@ void LoadShaders()
 	g_ShaderProgram->Link();
 }
 
+static glm::vec3 g_CameraPosition;
+static float g_CameraZoom = 1.0f;
+
 static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	if (action == GLFW_PRESS || action == GLFW_REPEAT)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		float speed = 5.0f;
+
+		if (key == GLFW_KEY_LEFT)
+		{
+			g_CameraPosition.x -= speed;
+		}
+		else if (key == GLFW_KEY_RIGHT)
+		{
+			g_CameraPosition.x += speed;
+		}
+		else if (key == GLFW_KEY_UP)
+		{
+			g_CameraPosition.y -= speed;
+		}
+		else if (key == GLFW_KEY_DOWN)
+		{
+			g_CameraPosition.y += speed;
+		}
+		else if (key == GLFW_KEY_KP_ADD)
+		{
+			g_CameraZoom += 0.25f;
+		}
+		else if (key == GLFW_KEY_KP_SUBTRACT)
+		{
+			g_CameraZoom -= 0.25f;
+		}
+		else if (key == GLFW_KEY_ESCAPE)
+		{
+			glfwSetWindowShouldClose(window, GL_TRUE);
+		}
 	}
 	else if (key == GLFW_KEY_F5 && action == GLFW_RELEASE)
 	{
@@ -391,7 +423,7 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 }
 
 
-#define SKIP_FONT
+//#define SKIP_FONT
 
 int main(int argc, const char** argv)
 {
@@ -450,6 +482,21 @@ int main(int argc, const char** argv)
 	LoadShaders();
 
 #ifndef SKIP_FONT
+
+	ExLibris::Glyph* glyph_a = face_size24->FindGlyph((unsigned int)'$');
+
+	ExLibris::LineShape shape_a;
+	for (std::vector<ExLibris::Polygon>::iterator contour_it = glyph_a->outline->contours.begin(); contour_it != glyph_a->outline->contours.end(); ++contour_it)
+	{
+		shape_a.AddPolygon(*contour_it);
+	}
+
+	ExLibris::TriangleList* list_a = shape_a.Triangulate(5.0f);
+
+	GLuint buffer_a;
+	glGenBuffers(1, &buffer_a);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer_a);
+	glBufferData(GL_ARRAY_BUFFER, list_a->vertex_filled * sizeof(glm::vec2), list_a->positions, GL_STATIC_DRAW);
 
 	TextOutline outline = CreateTextOutline(face_size24, g_Text);
 
@@ -517,11 +564,30 @@ int main(int argc, const char** argv)
 		glm::mat4x4 projection = glm::ortho<float>(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 		
 		glm::mat4x4 modelview;
-		modelview = glm::translate(modelview, glm::vec3(0.0f, 100.0f, 0.0f));
+		modelview = glm::translate(modelview, g_CameraPosition);
+		modelview = glm::scale(modelview, glm::vec3(g_CameraZoom, g_CameraZoom, 1.0f));
 
 		glm::mat4x4 mvp = projection * modelview;
 
-#ifndef SKIP_FONT
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(glm::value_ptr(projection));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(glm::value_ptr(modelview));
+
+		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffer_a);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+
+		glDrawArrays(GL_TRIANGLES, 0, list_a->vertex_filled);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+/*#ifndef SKIP_FONT
 
 		glm::vec4 color(1.0f, 0.0f, 0.0f, 1.0f);
 
@@ -550,7 +616,7 @@ int main(int argc, const char** argv)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glUseProgram(0);
 
-#endif
+#endif*/
 
 		g_MousePath += glm::vec2((float)mouse_position.x, (float)mouse_position.y);
 
