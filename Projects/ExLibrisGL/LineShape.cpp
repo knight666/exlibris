@@ -83,10 +83,6 @@ namespace ExLibris
 
 		triangles->vertex_count = (section_count * 6) + (corner_count * 3);
 
-		triangles->positions = new glm::vec2[triangles->vertex_count];
-
-		glm::vec2* dst_position = triangles->positions;
-
 		std::vector<glm::vec2>::const_iterator previous_it = polygon.positions.begin();
 		std::vector<glm::vec2>::const_iterator current_it = previous_it + 1;
 		std::vector<glm::vec2>::const_iterator next_it = current_it + 1;
@@ -215,6 +211,10 @@ namespace ExLibris
 			}
 		}
 
+		triangles->positions = new glm::vec2[triangles->vertex_count];
+
+		glm::vec2* dst_position = triangles->positions;
+
 		std::vector<glm::vec2>::iterator position_it = shape_positions.begin();
 		for (std::vector<ShapeType>::iterator type_it = shape_types.begin(); type_it != shape_types.end(); ++type_it)
 		{
@@ -224,6 +224,7 @@ namespace ExLibris
 				dst_position[1] = *position_it++;
 				dst_position[2] = *position_it++;
 
+				triangles->vertex_filled += 3;
 				dst_position += 3;
 			}
 			else if (*type_it == eShapeType_Quad)
@@ -241,6 +242,7 @@ namespace ExLibris
 				dst_position[4] = quad_ll;
 				dst_position[5] = quad_lr;
 
+				triangles->vertex_filled += 6;
 				dst_position += 6;
 			}
 		}

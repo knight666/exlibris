@@ -9,6 +9,7 @@ namespace ExLibris
 	
 		TriangleList()
 			: vertex_count(0)
+			, vertex_filled(0)
 			, positions(nullptr)
 		{
 		}
@@ -23,6 +24,7 @@ namespace ExLibris
 		}
 
 		size_t vertex_count;
+		size_t vertex_filled;
 		glm::vec2* positions;
 	
 	}; // struct TriangleList
