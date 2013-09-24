@@ -463,25 +463,12 @@ int main(int argc, const char** argv)
 
 	ExLibris::Polygon p;
 	p += glm::vec2(0.0f, 100.0f);
-	p += glm::vec2(50.0f, 100.0f);
-	p += glm::vec2(100.0f, 100.0f);
-	p += glm::vec2(100.0f, 150.0f);
-	p += glm::vec2(50.0f, 150.0f);
-	p += glm::vec2(50.0f, 200.0f);
-	p += glm::vec2(200.0f, 200.0f);
-	p += glm::vec2(200.0f, 150.0f);
-	p += glm::vec2(150.0f, 150.0f);
-	p += glm::vec2(150.0f, 100.0f);
-	p += glm::vec2(200.0f, 100.0f);
+	p += glm::vec2(10.0f, 0.0f);
+	p += glm::vec2(20.0f, 100.0f);
 
 	shape.AddPolygon(p);
 
-	ExLibris::TriangleList* triangles = shape.Triangulate(20.0f);
-
-	GLuint vertex_buffer;
-	glGenBuffers(1, &vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, triangles->vertex_count * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);*/
+	ExLibris::TriangleList* triangles_test = shape.Triangulate(20.0f);*/
 
 	GLuint vertex_buffer;
 	glGenBuffers(1, &vertex_buffer);

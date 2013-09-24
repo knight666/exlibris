@@ -136,8 +136,9 @@ namespace ExLibris
 				Line collision_line_next(quad_current.ll, quad_current.lr);
 
 				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
-				
-				if (collision.time >= 0.0f && collision.time <= 1.0f)
+
+				float outside_previous = collision_line_previous.GetCrossProduct(quad_current.lr);
+				if (collision.time >= 0.0f && collision.time <= 1.0f && outside_previous > 0.0f)
 				{
 					shape_positions.push_back(quad_previous.ur);
 					shape_positions.push_back(collision.position);
@@ -165,7 +166,8 @@ namespace ExLibris
 
 				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
 
-				if (collision.time >= 0.0f && collision.time <= 1.0f)
+				float outside_previous = collision_line_previous.GetCrossProduct(quad_current.ur);
+				if (collision.time >= 0.0f && collision.time <= 1.0f && outside_previous < 0.0f)
 				{
 					shape_positions.push_back(collision.position);
 					shape_positions.push_back(quad_previous.lr);
