@@ -87,6 +87,19 @@ static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
+static ExLibris::Polygon g_MousePath;
+
+static void OnMouseButton(GLFWwindow* a_Window, int a_Button, int a_Action, int a_Modifiers)
+{
+	if (a_Button == GLFW_MOUSE_BUTTON_1 && a_Action == GLFW_RELEASE)
+	{
+		double cursor_position[2];
+		glfwGetCursorPos(a_Window, &cursor_position[0], &cursor_position[1]);
+
+		g_MousePath += glm::vec2((float)cursor_position[0], (float)cursor_position[1]);
+	}
+}
+
 struct GlyphBitmap
 {
 	unsigned char* pixels;
@@ -419,6 +432,7 @@ int main(int argc, const char** argv)
 	}
 
 	glfwSetKeyCallback(window, OnKey);
+	glfwSetMouseButtonCallback(window, OnMouseButton);
 	glfwMakeContextCurrent(window);
 
 	if (glewInit() != GLEW_OK)
@@ -445,11 +459,10 @@ int main(int argc, const char** argv)
 
 	float time = 0.0f;
 
-	//GLuint text_texture = CreateTexture(font_glyphs, (unsigned int)font_face_height, text);
-
-	ExLibris::LineShape shape;
+	/*ExLibris::LineShape shape;
 
 	ExLibris::Polygon p;
+	p += glm::vec2(0.0f, 100.0f);
 	p += glm::vec2(50.0f, 100.0f);
 	p += glm::vec2(100.0f, 100.0f);
 	p += glm::vec2(100.0f, 150.0f);
@@ -468,7 +481,10 @@ int main(int argc, const char** argv)
 	GLuint vertex_buffer;
 	glGenBuffers(1, &vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, triangles->vertex_count * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, triangles->vertex_count * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);*/
+
+	GLuint vertex_buffer;
+	glGenBuffers(1, &vertex_buffer);
 
 	float timer = 0.0f;
 
@@ -478,6 +494,9 @@ int main(int argc, const char** argv)
 
 	do 
 	{
+		glm::dvec2 mouse_position;
+		glfwGetCursorPos(window, &mouse_position.x, &mouse_position.y);
+
 		unsigned long time_current = GetTickCount();
 		float time_delta = (float)(time_current - time_start);
 		time_start = time_current;
@@ -500,9 +519,6 @@ int main(int argc, const char** argv)
 
 		glfwGetFramebufferSize(window, &width, &height);
 		ratio = width / (float) height;
-
-		glm::dvec2 mouse_position;
-		glfwGetCursorPos(window, &mouse_position.x, &mouse_position.y);
 
 		char window_title[256] = { 0 };
 		sprintf(window_title, "ExLibris - (%i, %i)", (int)mouse_position.x, (int)mouse_position.y);
@@ -549,30 +565,47 @@ int main(int argc, const char** argv)
 
 #endif
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixf(glm::value_ptr(projection));
+		g_MousePath += glm::vec2((float)mouse_position.x, (float)mouse_position.y);
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		ExLibris::LineShape shape;
+		shape.AddPolygon(g_MousePath);
 
-		glLineWidth(1.0f);
+		ExLibris::TriangleList* triangles = shape.Triangulate(20.0f);
 
-		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
+		g_MousePath.positions.pop_back();
 
-		if (g_DrawLines)
+		if (triangles != nullptr && triangles->vertex_count > 0)
 		{
-			glBegin(GL_LINE_STRIP);
-		}
-		else
-		{
-			glBegin(GL_TRIANGLES);
-		}
+			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+			glBufferData(GL_ARRAY_BUFFER, triangles->vertex_count * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
 
-		for (size_t i = 0; i < triangles->vertex_count; ++i)
-		{
-			glVertex2fv(glm::value_ptr(triangles->positions[i]));
+			glMatrixMode(GL_PROJECTION);
+			glLoadMatrixf(glm::value_ptr(projection));
+
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+
+			glLineWidth(1.0f);
+
+			glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
+
+			if (g_DrawLines)
+			{
+				glBegin(GL_LINE_STRIP);
+			}
+			else
+			{
+				glBegin(GL_TRIANGLES);
+			}
+
+			for (size_t i = 0; i < triangles->vertex_count; ++i)
+			{
+				glVertex2fv(glm::value_ptr(triangles->positions[i]));
+			}
+			glEnd();
+
+			delete triangles;
 		}
-		glEnd();
 
 		/*glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
