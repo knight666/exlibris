@@ -15,6 +15,50 @@ TEST(Line, Construct)
 	EXPECT_VEC2_EQ(-7.92f, 90.12f, line.end);
 }
 
+TEST(Line, PerpendicularDistanceHorizontal)
+{
+	Line line(
+		glm::vec2(125.0f, 15.0f),
+		glm::vec2(250.0f, 15.0f)
+	);
+
+	EXPECT_FLOAT_EQ(30.0f, line.GetPerpendicularDistanceToPosition(glm::vec2(200.0f, -15.0f)));
+	EXPECT_FLOAT_EQ(30.0f, line.GetPerpendicularDistanceToPosition(glm::vec2(200.0f, 45.0f)));
+}
+
+TEST(Line, PerpendicularDistanceVertical)
+{
+	Line line(
+		glm::vec2(50.0f, 60.0f),
+		glm::vec2(50.0f, 120.0f)
+	);
+
+	EXPECT_FLOAT_EQ(25.0f, line.GetPerpendicularDistanceToPosition(glm::vec2(75.0f, 80.0f)));
+	EXPECT_FLOAT_EQ(25.0f, line.GetPerpendicularDistanceToPosition(glm::vec2(25.0f, 80.0f)));
+}
+
+TEST(Line, PerpendicularDistanceDiagonal)
+{
+	Line line(
+		glm::vec2(0.0f, 0.0f),
+		glm::vec2(256.0f, 256.0f)
+	);
+
+	EXPECT_FLOAT_EQ(90.509666f, line.GetPerpendicularDistanceToPosition(glm::vec2(128.0f, 0.0f)));
+	EXPECT_FLOAT_EQ(90.509666f, line.GetPerpendicularDistanceToPosition(glm::vec2(0.0f, 128.0f)));
+}
+
+TEST(Line, PerpendicularDistanceNone)
+{
+	Line line(
+		glm::vec2(55.0f, 12.0f),
+		glm::vec2(120.0f, -78.0f)
+	);
+
+	EXPECT_FLOAT_EQ(0.0f, line.GetPerpendicularDistanceToPosition(line.start));
+	EXPECT_FLOAT_EQ(0.0f, line.GetPerpendicularDistanceToPosition(line.end));
+}
+
 TEST(Line, QuadHorizontal)
 {
 	Line line(
