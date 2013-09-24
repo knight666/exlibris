@@ -442,7 +442,7 @@ int main(int argc, const char** argv)
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_TEXTURE_2D);
 
