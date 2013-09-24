@@ -122,63 +122,37 @@ namespace ExLibris
 			Line line_current(current, next);
 			Quad quad_current = line_current.ConstructQuad(a_Thickness);
 
-			// determine nearest collision point
-
-			Line quad_previous_upper(quad_previous.ul, quad_previous.ur);
-			Line quad_previous_lower(quad_previous.ll, quad_previous.lr);
-			Line quad_current_upper(quad_current.ul, quad_current.ur);
-			Line quad_current_lower(quad_current.ll, quad_current.lr);
-
-			Line::CollisionResult previous_upper_current_upper = quad_previous_upper.Collides(quad_current_upper);
-			Line::CollisionResult previous_upper_current_lower = quad_previous_upper.Collides(quad_current_lower);
-			Line::CollisionResult previous_lower_current_upper = quad_previous_lower.Collides(quad_current_upper);
-			Line::CollisionResult previous_lower_current_lower = quad_previous_lower.Collides(quad_current_lower);
-
 			Line line_joint(previous, next);
 
-			float distance_upper_upper = line_joint.GetPerpendicularDistanceToPosition(previous_upper_current_upper.position);
-			float distance_upper_lower = line_joint.GetPerpendicularDistanceToPosition(previous_upper_current_lower.position);
-			float distance_lower_upper = line_joint.GetPerpendicularDistanceToPosition(previous_lower_current_upper.position);
-			float distance_lower_lower = line_joint.GetPerpendicularDistanceToPosition(previous_lower_current_lower.position);
+			float side_joint = line_joint.GetCrossProduct(current);
+			if (side_joint < 0.0f)
+			{
+				Line collision_line_previous(quad_previous.ll, quad_previous.lr);
+				Line collision_line_next(quad_current.ll, quad_current.lr);
 
-			Line::CollisionResult* collision_nearest = &previous_upper_current_upper;
-			float distance_nearest = distance_upper_lower;
+				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
 
-			if (distance_upper_lower < distance_nearest)
-			{
-				collision_nearest = &previous_upper_current_lower;
-				distance_nearest = distance_upper_lower;
-			}
-			if (distance_lower_upper < distance_nearest)
-			{
-				collision_nearest = &previous_lower_current_upper;
-				distance_nearest = distance_lower_upper;
-			}
-			if (distance_lower_lower < distance_nearest)
-			{
-				collision_nearest = &previous_lower_current_lower;
-				distance_nearest = distance_lower_lower;
-			}
-
-			float side = line_joint.GetCrossProduct(collision_nearest->position);
-			if (side < 0.0f)
-			{
 				shape_positions.push_back(quad_previous.ur);
-				shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(collision.position);
 
 				shape_types.push_back(eShapeType_Quad);
 
 				shape_positions.push_back(quad_current.ul);
-				shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(collision.position);
 			}
 			else
 			{
-				shape_positions.push_back(collision_nearest->position);
+				Line collision_line_previous(quad_previous.ul, quad_previous.ur);
+				Line collision_line_next(quad_current.ul, quad_current.ur);
+
+				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
+
+				shape_positions.push_back(collision.position);
 				shape_positions.push_back(quad_previous.lr);
 
 				shape_types.push_back(eShapeType_Quad);
 
-				shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(collision.position);
 				shape_positions.push_back(quad_current.ll);
 			}
 
