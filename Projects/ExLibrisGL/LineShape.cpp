@@ -127,6 +127,8 @@ namespace ExLibris
 
 			Line line_joint(previous, next);
 
+			bool segment_default = false;
+
 			float side_joint = line_joint.GetCrossProduct(current);
 			if (side_joint < 0.0f)
 			{
@@ -134,20 +136,27 @@ namespace ExLibris
 				Line collision_line_next(quad_current.ll, quad_current.lr);
 
 				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
+				
+				if (collision.time >= 0.0f && collision.time <= 1.0f)
+				{
+					shape_positions.push_back(quad_previous.ur);
+					shape_positions.push_back(collision.position);
 
-				shape_positions.push_back(quad_previous.ur);
-				shape_positions.push_back(collision.position);
+					shape_types.push_back(eShapeType_Quad);
 
-				shape_types.push_back(eShapeType_Quad);
+					shape_positions.push_back(quad_previous.ur);
+					shape_positions.push_back(quad_current.ul);
+					shape_positions.push_back(collision.position);
 
-				shape_positions.push_back(quad_previous.ur);
-				shape_positions.push_back(quad_current.ul);
-				shape_positions.push_back(collision.position);
+					shape_types.push_back(eShapeType_Triangle);
 
-				shape_types.push_back(eShapeType_Triangle);
-
-				shape_positions.push_back(quad_current.ul);
-				shape_positions.push_back(collision.position);
+					shape_positions.push_back(quad_current.ul);
+					shape_positions.push_back(collision.position);
+				}
+				else
+				{
+					segment_default = true;
+				}
 			}
 			else if (side_joint > 0.0f)
 			{
@@ -156,21 +165,33 @@ namespace ExLibris
 
 				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
 
-				shape_positions.push_back(collision.position);
-				shape_positions.push_back(quad_previous.lr);
+				if (collision.time >= 0.0f && collision.time <= 1.0f)
+				{
+					shape_positions.push_back(collision.position);
+					shape_positions.push_back(quad_previous.lr);
 
-				shape_types.push_back(eShapeType_Quad);
+					shape_types.push_back(eShapeType_Quad);
 
-				shape_positions.push_back(quad_previous.lr);
-				shape_positions.push_back(quad_current.ll);
-				shape_positions.push_back(collision.position);
+					shape_positions.push_back(quad_previous.lr);
+					shape_positions.push_back(quad_current.ll);
+					shape_positions.push_back(collision.position);
 
-				shape_types.push_back(eShapeType_Triangle);
+					shape_types.push_back(eShapeType_Triangle);
 
-				shape_positions.push_back(collision.position);
-				shape_positions.push_back(quad_current.ll);
+					shape_positions.push_back(collision.position);
+					shape_positions.push_back(quad_current.ll);
+				}
+				else
+				{
+					segment_default = true;
+				}
 			}
 			else
+			{
+				segment_default = true;
+			}
+
+			if (segment_default)
 			{
 				shape_positions.push_back(quad_previous.ur);
 				shape_positions.push_back(quad_previous.lr);
