@@ -60,4 +60,32 @@ namespace ExLibris
 		return result;
 	}
 
+	float Line::GetPerpendicularDistanceToPosition(const glm::vec2& a_Position) const
+	{
+		glm::vec2 line_difference = end - start;
+		glm::vec2 start_to_point = a_Position - start;
+
+		float line_length_squared = (line_difference.x * line_difference.x) + (line_difference.y * line_difference.y);
+		if (line_length_squared == 0.0f)
+		{
+			return glm::length(start_to_point);
+		}
+
+		float time = glm::dot(start_to_point, line_difference) / line_length_squared;
+
+		if (time < 0.0f)
+		{
+			return glm::length(start_to_point);
+		}
+		else if (time > 1.0f)
+		{
+			return glm::distance(a_Position, end);
+		}
+		else
+		{
+			glm::vec2 projection = start + (line_difference * time);
+			return glm::distance(a_Position, projection);
+		}
+	}
+
 }; // namespace ExLibris
