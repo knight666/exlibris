@@ -555,18 +555,6 @@ int main(int argc, const char** argv)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)));
-
-		glLineWidth(10.0f);
-
-		glBegin(GL_LINE_STRIP);
-		{
-			glVertex2fv(glm::value_ptr(glm::vec2(10.0f, 100.0f + 100.0f)));
-			glVertex2fv(glm::value_ptr(glm::vec2(50.0f, 100.0f + 50.0f)));
-			glVertex2fv(glm::value_ptr(glm::vec2(100.0f, 100.0f + 100.0f)));
-		}
-		glEnd();
-
 		glLineWidth(1.0f);
 
 		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));

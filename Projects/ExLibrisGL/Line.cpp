@@ -88,4 +88,12 @@ namespace ExLibris
 		}
 	}
 
+	float Line::GetCrossProduct(const glm::vec2& a_Position) const
+	{
+		glm::vec2 projected_line = end - start;
+		glm::vec2 projected_position = a_Position - start;
+
+		return ((projected_line.x * projected_position.y) - (projected_line.y * projected_position.x));
+	}
+
 }; // namespace ExLibris
