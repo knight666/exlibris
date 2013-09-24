@@ -149,7 +149,7 @@ namespace ExLibris
 				shape_positions.push_back(quad_current.ul);
 				shape_positions.push_back(collision.position);
 			}
-			else
+			else if (side_joint > 0.0f)
 			{
 				Line collision_line_previous(quad_previous.ul, quad_previous.ur);
 				Line collision_line_next(quad_current.ul, quad_current.ur);
@@ -168,6 +168,16 @@ namespace ExLibris
 				shape_types.push_back(eShapeType_Triangle);
 
 				shape_positions.push_back(collision.position);
+				shape_positions.push_back(quad_current.ll);
+			}
+			else
+			{
+				shape_positions.push_back(quad_previous.ur);
+				shape_positions.push_back(quad_previous.lr);
+
+				shape_types.push_back(eShapeType_Quad);
+
+				shape_positions.push_back(quad_current.ul);
 				shape_positions.push_back(quad_current.ll);
 			}
 
