@@ -78,7 +78,10 @@ namespace ExLibris
 
 		TriangleList* triangles = new TriangleList;
 		
-		triangles->vertex_count = (polygon.positions.size() - 1) * 8;
+		size_t section_count = polygon.positions.size() - 1;
+		size_t corner_count = section_count - 1;
+
+		triangles->vertex_count = (section_count * 6) + (corner_count * 3);
 
 		triangles->positions = new glm::vec2[triangles->vertex_count];
 
@@ -137,6 +140,12 @@ namespace ExLibris
 
 				shape_types.push_back(eShapeType_Quad);
 
+				shape_positions.push_back(quad_previous.ur);
+				shape_positions.push_back(quad_current.ul);
+				shape_positions.push_back(collision.position);
+
+				shape_types.push_back(eShapeType_Triangle);
+
 				shape_positions.push_back(quad_current.ul);
 				shape_positions.push_back(collision.position);
 			}
@@ -151,6 +160,12 @@ namespace ExLibris
 				shape_positions.push_back(quad_previous.lr);
 
 				shape_types.push_back(eShapeType_Quad);
+
+				shape_positions.push_back(quad_previous.lr);
+				shape_positions.push_back(quad_current.ll);
+				shape_positions.push_back(collision.position);
+
+				shape_types.push_back(eShapeType_Triangle);
 
 				shape_positions.push_back(collision.position);
 				shape_positions.push_back(quad_current.ll);
