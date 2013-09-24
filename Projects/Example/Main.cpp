@@ -564,7 +564,7 @@ int main(int argc, const char** argv)
 		if (triangles != nullptr && triangles->vertex_count > 0)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-			glBufferData(GL_ARRAY_BUFFER, triangles->vertex_count * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, triangles->vertex_filled * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(glm::value_ptr(projection));
@@ -574,22 +574,44 @@ int main(int argc, const char** argv)
 
 			glLineWidth(1.0f);
 
-			glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
+			glColor4fv(glm::value_ptr(glm::vec4(0.0f, 0.0f, 0.75f, 1.0f)));
+
+			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+
+			glDrawArrays(GL_TRIANGLES, 0, triangles->vertex_filled);
+
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			if (g_DrawLines)
 			{
-				glBegin(GL_LINE_STRIP);
-			}
-			else
-			{
-				glBegin(GL_TRIANGLES);
-			}
+				glDisable(GL_DEPTH_TEST);
 
-			for (size_t i = 0; i < triangles->vertex_count; ++i)
-			{
-				glVertex2fv(glm::value_ptr(triangles->positions[i]));
+				glLineWidth(1.0f);
+
+				glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
+
+				glBegin(GL_LINES);
+
+				for (size_t i = 0; i < triangles->vertex_filled; i += 3)
+				{
+					glVertex2fv(glm::value_ptr(triangles->positions[i    ]));
+					glVertex2fv(glm::value_ptr(triangles->positions[i + 1]));
+
+					glVertex2fv(glm::value_ptr(triangles->positions[i + 1]));
+					glVertex2fv(glm::value_ptr(triangles->positions[i + 2]));
+
+					glVertex2fv(glm::value_ptr(triangles->positions[i + 2]));
+					glVertex2fv(glm::value_ptr(triangles->positions[i    ]));
+				}
+
+				glEnd();
+
+				glEnable(GL_DEPTH_TEST);
 			}
-			glEnd();
 
 			delete triangles;
 		}
