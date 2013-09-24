@@ -26,10 +26,11 @@ namespace ExLibris
 		Line(const glm::vec2& a_Start, const glm::vec2& a_End);
 
 		float GetPerpendicularDistanceToPosition(const glm::vec2& a_Position) const;
-
-		Quad ConstructQuad(float a_Thickness) const;
+		float GetCrossProduct(const glm::vec2& a_Position) const;
 
 		CollisionResult Collides(const Line& a_Other) const;
+
+		Quad ConstructQuad(float a_Thickness) const;
 
 	public:
 	

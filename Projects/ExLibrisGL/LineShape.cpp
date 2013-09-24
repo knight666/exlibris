@@ -119,60 +119,6 @@ namespace ExLibris
 			
 			const glm::vec2& next = *next_it;
 
-			glm::vec2 next_offset_left;
-			glm::vec2 next_offset_right;
-
-			glm::vec2 normal_next = glm::normalize(next - current);
-			if (glm::dot(normal_next, world_up) > 0.0f)
-			{
-				next_offset_left = glm::vec2(normal_next.y * thickness_half, -normal_next.x * thickness_half);
-				next_offset_right = glm::vec2(-normal_next.y * thickness_half, normal_next.x * thickness_half);
-			}
-			else
-			{
-				next_offset_left = glm::vec2(-normal_next.y * thickness_half, normal_next.x * thickness_half);
-				next_offset_right = glm::vec2(normal_next.y * thickness_half, -normal_next.x * thickness_half);
-			}
-
-			if (next_offset_left.y > next_offset_right.y)
-			{
-				glm::vec2 swap = next_offset_left;
-				next_offset_left = next_offset_right;
-				next_offset_right = swap;
-			}
-
-			glm::vec2 next_ul = current + next_offset_left;
-			glm::vec2 next_ll = current + next_offset_right;
-			glm::vec2 next_ur = next + next_offset_left;
-			glm::vec2 next_lr = next + next_offset_right;
-
-			glm::vec2 previous_offset_left;
-			glm::vec2 previous_offset_right;
-
-			glm::vec2 normal_previous = glm::normalize(current - previous);
-			if (glm::dot(normal_previous, world_up) > 0.0f)
-			{
-				previous_offset_left = glm::vec2(normal_previous.y * thickness_half, -normal_previous.x * thickness_half);
-				previous_offset_right = glm::vec2(-normal_previous.y * thickness_half, normal_previous.x * thickness_half);
-			}
-			else
-			{
-				previous_offset_left = glm::vec2(-normal_previous.y * thickness_half, normal_previous.x * thickness_half);
-				previous_offset_right = glm::vec2(normal_previous.y * thickness_half, -normal_previous.x * thickness_half);
-			}
-
-			if (previous_offset_left.y > previous_offset_right.y)
-			{
-				glm::vec2 swap = previous_offset_left;
-				previous_offset_left = previous_offset_right;
-				previous_offset_right = swap;
-			}
-
-			glm::vec2 previous_ul = previous + previous_offset_left;
-			glm::vec2 previous_ll = previous + previous_offset_right;
-			glm::vec2 previous_ur = current + previous_offset_left;
-			glm::vec2 previous_lr = current + previous_offset_right;
-
 			Line line_current(current, next);
 			Quad quad_current = line_current.ConstructQuad(a_Thickness);
 
@@ -188,35 +134,53 @@ namespace ExLibris
 			Line::CollisionResult previous_lower_current_upper = quad_previous_lower.Collides(quad_current_upper);
 			Line::CollisionResult previous_lower_current_lower = quad_previous_lower.Collides(quad_current_lower);
 
+			Line line_joint(previous, next);
+
+			float distance_upper_upper = line_joint.GetPerpendicularDistanceToPosition(previous_upper_current_upper.position);
+			float distance_upper_lower = line_joint.GetPerpendicularDistanceToPosition(previous_upper_current_lower.position);
+			float distance_lower_upper = line_joint.GetPerpendicularDistanceToPosition(previous_lower_current_upper.position);
+			float distance_lower_lower = line_joint.GetPerpendicularDistanceToPosition(previous_lower_current_lower.position);
+
 			Line::CollisionResult* collision_nearest = &previous_upper_current_upper;
-			if (previous_upper_current_lower.time <= collision_nearest->time)
+			float distance_nearest = distance_upper_lower;
+
+			if (distance_upper_lower < distance_nearest)
 			{
 				collision_nearest = &previous_upper_current_lower;
+				distance_nearest = distance_upper_lower;
 			}
-			if (previous_lower_current_upper.time <= collision_nearest->time)
+			if (distance_lower_upper < distance_nearest)
 			{
 				collision_nearest = &previous_lower_current_upper;
+				distance_nearest = distance_lower_upper;
 			}
-			if (previous_lower_current_lower.time <= collision_nearest->time)
+			if (distance_lower_lower < distance_nearest)
 			{
 				collision_nearest = &previous_lower_current_lower;
+				distance_nearest = distance_lower_lower;
 			}
 
-			shape_positions.push_back(quad_previous.ur);
-			shape_positions.push_back(quad_previous.lr);
-			//shape_positions.push_back(collision_nearest->position);
+			float side = line_joint.GetCrossProduct(collision_nearest->position);
+			if (side < 0.0f)
+			{
+				shape_positions.push_back(quad_previous.ur);
+				shape_positions.push_back(collision_nearest->position);
 
-			shape_types.push_back(eShapeType_Quad);
+				shape_types.push_back(eShapeType_Quad);
 
-			/*shape_positions.push_back(quad_previous.ur);
-			shape_positions.push_back(quad_current.ul);
-			shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(quad_current.ul);
+				shape_positions.push_back(collision_nearest->position);
+			}
+			else
+			{
+				shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(quad_previous.lr);
 
-			shape_types.push_back(eShapeType_Triangle);*/
+				shape_types.push_back(eShapeType_Quad);
 
-			shape_positions.push_back(quad_current.ul);
-			shape_positions.push_back(quad_current.ll);
-			//shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(collision_nearest->position);
+				shape_positions.push_back(quad_current.ll);
+			}
 
 			if (current_it != polygon.positions.begin())
 			{
