@@ -78,7 +78,7 @@ namespace ExLibris
 
 		TriangleList* triangles = new TriangleList;
 		
-		triangles->vertex_count = (polygon.positions.size() - 1) * 6;
+		triangles->vertex_count = (polygon.positions.size() - 1) * 8;
 
 		triangles->positions = new glm::vec2[triangles->vertex_count];
 
@@ -176,44 +176,47 @@ namespace ExLibris
 			Line line_current(current, next);
 			Quad quad_current = line_current.ConstructQuad(a_Thickness);
 
+			// determine nearest collision point
+
+			Line quad_previous_upper(quad_previous.ul, quad_previous.ur);
+			Line quad_previous_lower(quad_previous.ll, quad_previous.lr);
+			Line quad_current_upper(quad_current.ul, quad_current.ur);
+			Line quad_current_lower(quad_current.ll, quad_current.lr);
+
+			Line::CollisionResult previous_upper_current_upper = quad_previous_upper.Collides(quad_current_upper);
+			Line::CollisionResult previous_upper_current_lower = quad_previous_upper.Collides(quad_current_lower);
+			Line::CollisionResult previous_lower_current_upper = quad_previous_lower.Collides(quad_current_upper);
+			Line::CollisionResult previous_lower_current_lower = quad_previous_lower.Collides(quad_current_lower);
+
+			Line::CollisionResult* collision_nearest = &previous_upper_current_upper;
+			if (previous_upper_current_lower.time <= collision_nearest->time)
+			{
+				collision_nearest = &previous_upper_current_lower;
+			}
+			if (previous_lower_current_upper.time <= collision_nearest->time)
+			{
+				collision_nearest = &previous_lower_current_upper;
+			}
+			if (previous_lower_current_lower.time <= collision_nearest->time)
+			{
+				collision_nearest = &previous_lower_current_lower;
+			}
+
 			shape_positions.push_back(quad_previous.ur);
 			shape_positions.push_back(quad_previous.lr);
+			//shape_positions.push_back(collision_nearest->position);
 
 			shape_types.push_back(eShapeType_Quad);
 
+			/*shape_positions.push_back(quad_previous.ur);
+			shape_positions.push_back(quad_current.ul);
+			shape_positions.push_back(collision_nearest->position);
+
+			shape_types.push_back(eShapeType_Triangle);*/
+
 			shape_positions.push_back(quad_current.ul);
 			shape_positions.push_back(quad_current.ll);
-
-			/*CollisionResult collision_upper = LineCollision(
-				quad_previous.ul, quad_previous.ur,
-				quad_current.ul, quad_current.ur
-			);
-
-			CollisionResult collision_lower = LineCollision(
-				quad_previous.ll, quad_previous.lr,
-				quad_current.ll, quad_current.lr
-			);
-
-			if (collision_upper.time < collision_lower.time)
-			{
-				shape_positions.push_back(collision_upper.position);
-				shape_positions.push_back(quad_previous.lr);
-
-				shape_types.push_back(eShapeType_Quad);
-
-				shape_positions.push_back(quad_current.ll);
-				shape_positions.push_back(collision_upper.position);
-			}
-			else
-			{
-				shape_positions.push_back(collision_lower.position);
-				shape_positions.push_back(quad_previous.ur);
-
-				shape_types.push_back(eShapeType_Quad);
-
-				shape_positions.push_back(quad_current.ul);
-				shape_positions.push_back(collision_lower.position);
-			}*/
+			//shape_positions.push_back(collision_nearest->position);
 
 			if (current_it != polygon.positions.begin())
 			{
