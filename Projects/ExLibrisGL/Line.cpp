@@ -17,21 +17,34 @@ namespace ExLibris
 
 	Quad Line::ConstructQuad(float a_Thickness) const
 	{
-		glm::vec2 direction = glm::normalize(end - start);
-
-		float thickness_half = a_Thickness / 2.0f;
-		glm::vec2 offset_upper(direction.y * thickness_half, -direction.x * thickness_half);
-		glm::vec2 offset_lower(-direction.y * thickness_half, direction.x * thickness_half);
-
 		Quad quad;
 
-		// counter-clockwise rotation
+		if (glm::distance(end, start) < 1e-6f)
+		{
+			// counter-clockwise rotation
 
-		quad.ur = end + offset_upper;
-		quad.ul = start + offset_upper;
+			quad.ur = end;
+			quad.ul = start;
 
-		quad.ll = start + offset_lower;
-		quad.lr = end + offset_lower;
+			quad.ll = start;
+			quad.lr = end;
+		}
+		else
+		{
+			glm::vec2 direction = glm::normalize(end - start);
+
+			float thickness_half = a_Thickness / 2.0f;
+			glm::vec2 offset_upper(direction.y * thickness_half, -direction.x * thickness_half);
+			glm::vec2 offset_lower(-direction.y * thickness_half, direction.x * thickness_half);
+
+			// counter-clockwise rotation
+
+			quad.ur = end + offset_upper;
+			quad.ul = start + offset_upper;
+
+			quad.ll = start + offset_lower;
+			quad.lr = end + offset_lower;
+		}
 
 		return quad;
 	}
