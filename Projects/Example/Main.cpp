@@ -451,9 +451,15 @@ int main(int argc, const char** argv)
 
 	ExLibris::Polygon p;
 	p += glm::vec2(50.0f, 100.0f);
-	p += glm::vec2(100.0f, 50.0f);
+	p += glm::vec2(100.0f, 100.0f);
+	p += glm::vec2(100.0f, 150.0f);
+	p += glm::vec2(50.0f, 150.0f);
+	p += glm::vec2(50.0f, 200.0f);
+	p += glm::vec2(200.0f, 200.0f);
+	p += glm::vec2(200.0f, 150.0f);
+	p += glm::vec2(150.0f, 150.0f);
 	p += glm::vec2(150.0f, 100.0f);
-	p += glm::vec2(100.0f, 110.0f);
+	p += glm::vec2(200.0f, 100.0f);
 
 	shape.AddPolygon(p);
 
@@ -494,6 +500,13 @@ int main(int argc, const char** argv)
 
 		glfwGetFramebufferSize(window, &width, &height);
 		ratio = width / (float) height;
+
+		glm::dvec2 mouse_position;
+		glfwGetCursorPos(window, &mouse_position.x, &mouse_position.y);
+
+		char window_title[256] = { 0 };
+		sprintf(window_title, "ExLibris - (%i, %i)", (int)mouse_position.x, (int)mouse_position.y);
+		glfwSetWindowTitle(window, window_title);
 
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
