@@ -146,8 +146,8 @@ namespace ExLibris
 					shape_types.push_back(eShapeType_Quad);
 
 					shape_positions.push_back(quad_previous.ur);
-					shape_positions.push_back(quad_current.ul);
 					shape_positions.push_back(collision.position);
+					shape_positions.push_back(quad_current.ul);
 
 					shape_types.push_back(eShapeType_Triangle);
 
