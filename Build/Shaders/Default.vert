@@ -22,7 +22,7 @@ vec2 GetOffsetBezier(float a_Time)
 }
 
 void main()
-{	
+{
 	float time = (cos(uniTime) * 0.5 + 0.5);
 	//vec2 scale_both = vec2(time * 0.25 + 1.0, time * 0.55 + 1.0);
 	
@@ -38,4 +38,4 @@ void main()
 	//vec2 line_offset = uniLineOffset;
 	
 	gl_Position = matModelViewProjection * vec4(glyph_position * scale_both + line_offset, 0.0, 1.0);
-}	
+}
