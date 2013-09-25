@@ -37,6 +37,8 @@ namespace ExLibris
 			return;
 		}
 
+		a_Visitor.VisitBuilderMesh(3);
+
 		std::vector<glm::vec2>::const_iterator position_it = m_DataPositions.begin();
 
 		for (std::vector<DataType>::const_iterator type_it = m_DataTypes.begin(); type_it != m_DataTypes.end(); ++type_it)
