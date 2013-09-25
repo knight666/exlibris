@@ -3,6 +3,8 @@
 
 #include "TriangleOrientation.h"
 
+#include <glm/glm.hpp>
+
 namespace ExLibris
 {
 
