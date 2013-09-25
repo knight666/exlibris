@@ -43,6 +43,7 @@
 
 // Options
 
+static bool g_LoadFont = false;
 //static std::string g_FontPath = "Fonts/Mathilde/mathilde.otf";
 static std::string g_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
 static float g_FontSize = 100.0f;
@@ -51,6 +52,8 @@ static std::wstring g_Text = L"Pa's wijze lynx bezag vroom het fikse aquaduct";
 
 static Framework::ShaderLoader* g_ShaderLoader;
 static Framework::ShaderProgram* g_ShaderProgram = nullptr;
+static Framework::ShaderProgram* g_ProgramOutlineTriangles = nullptr;
+static Framework::ShaderProgram* g_ProgramOutlineLines = nullptr;
 
 static bool g_DrawLines = false;
 
@@ -69,6 +72,24 @@ void LoadShaders()
 	g_ShaderProgram = g_ShaderLoader->LoadProgram("Default", "Shaders/Default");
 	g_ShaderProgram->Compile();
 	g_ShaderProgram->Link();
+
+	if (g_ProgramOutlineTriangles != nullptr)
+	{
+		delete g_ProgramOutlineTriangles;
+	}
+
+	g_ProgramOutlineTriangles = g_ShaderLoader->LoadProgram("Triangles2D", "Shaders/Triangles2D");
+	g_ProgramOutlineTriangles->Compile();
+	g_ProgramOutlineTriangles->Link();
+
+	if (g_ProgramOutlineLines != nullptr)
+	{
+		delete g_ProgramOutlineLines;
+	}
+
+	g_ProgramOutlineLines = g_ShaderLoader->LoadProgram("Lines2D", "Shaders/Lines2D");
+	g_ProgramOutlineLines->Compile();
+	g_ProgramOutlineLines->Link();
 }
 
 static glm::vec3 g_CameraPosition;
@@ -436,23 +457,28 @@ int main(int argc, const char** argv)
 		exit(EXIT_FAILURE);
 	}
 
+	ExLibris::FontFace* face_size24 = nullptr;
+
 #ifndef SKIP_FONT
 
-	ExLibris::FontLoaderFreetype loader;
+	if (g_LoadFont)
+	{
+		ExLibris::FontLoaderFreetype loader;
 
-	float load_time_start = (float)glfwGetTime();
+		float load_time_start = (float)glfwGetTime();
 
-	ExLibris::IFont* font = loader.LoadFont(g_FontPath);
+		ExLibris::IFont* font = loader.LoadFont(g_FontPath);
 
-	float load_time_font = (float)glfwGetTime();
-	std::cout << "Loading font: " << (load_time_font - load_time_start) * 1000.0f << " ms." << std::endl;
-	load_time_start = load_time_font;
+		float load_time_font = (float)glfwGetTime();
+		std::cout << "Loading font: " << (load_time_font - load_time_start) * 1000.0f << " ms." << std::endl;
+		load_time_start = load_time_font;
 
-	ExLibris::FontFace* face_size24 = font->CreateFace(g_FontSize);
+		ExLibris::FontFace* face_size24 = font->CreateFace(g_FontSize);
 
-	float load_time_face = (float)glfwGetTime();
-	std::cout << "Creating face: " << (load_time_face - load_time_start) * 1000.0f << " ms." << std::endl;
-	load_time_start = load_time_face;
+		float load_time_face = (float)glfwGetTime();
+		std::cout << "Creating face: " << (load_time_face - load_time_start) * 1000.0f << " ms." << std::endl;
+		load_time_start = load_time_face;
+	}
 
 #endif
 
@@ -483,24 +509,33 @@ int main(int argc, const char** argv)
 
 #ifndef SKIP_FONT
 
-	ExLibris::Glyph* glyph_a = face_size24->FindGlyph((unsigned int)'$');
+	TextOutline outline;
+	TextMesh mesh;
 
+	ExLibris::Glyph* glyph_a = nullptr;
 	ExLibris::LineShape shape_a;
-	for (std::vector<ExLibris::Polygon>::iterator contour_it = glyph_a->outline->contours.begin(); contour_it != glyph_a->outline->contours.end(); ++contour_it)
+	ExLibris::TriangleList* list_a = nullptr;
+	GLuint buffer_a = 0;
+
+	if (g_LoadFont)
 	{
-		shape_a.AddPolygon(*contour_it);
+		glyph_a = face_size24->FindGlyph((unsigned int)'$');
+
+		for (std::vector<ExLibris::Polygon>::iterator contour_it = glyph_a->outline->contours.begin(); contour_it != glyph_a->outline->contours.end(); ++contour_it)
+		{
+			shape_a.AddPolygon(*contour_it);
+		}
+
+		list_a = shape_a.Triangulate(5.0f);
+
+		glGenBuffers(1, &buffer_a);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer_a);
+		glBufferData(GL_ARRAY_BUFFER, list_a->vertex_filled * sizeof(glm::vec2), list_a->positions, GL_STATIC_DRAW);
+
+		outline = CreateTextOutline(face_size24, g_Text);
+
+		mesh = CreateMesh(face_size24, g_Text);
 	}
-
-	ExLibris::TriangleList* list_a = shape_a.Triangulate(5.0f);
-
-	GLuint buffer_a;
-	glGenBuffers(1, &buffer_a);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_a);
-	glBufferData(GL_ARRAY_BUFFER, list_a->vertex_filled * sizeof(glm::vec2), list_a->positions, GL_STATIC_DRAW);
-
-	TextOutline outline = CreateTextOutline(face_size24, g_Text);
-
-	TextMesh mesh = CreateMesh(face_size24, g_Text);
 
 #endif
 
@@ -569,23 +604,26 @@ int main(int argc, const char** argv)
 
 		glm::mat4x4 mvp = projection * modelview;
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixf(glm::value_ptr(projection));
+		if (g_LoadFont)
+		{
+			glMatrixMode(GL_PROJECTION);
+			glLoadMatrixf(glm::value_ptr(projection));
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(glm::value_ptr(modelview));
+			glMatrixMode(GL_MODELVIEW);
+			glLoadMatrixf(glm::value_ptr(modelview));
 
-		glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+			glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 
-		glBindBuffer(GL_ARRAY_BUFFER, buffer_a);
+			glBindBuffer(GL_ARRAY_BUFFER, buffer_a);
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
 
-		glDrawArrays(GL_TRIANGLES, 0, list_a->vertex_filled);
+			glDrawArrays(GL_TRIANGLES, 0, list_a->vertex_filled);
 
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
 
 /*#ifndef SKIP_FONT
 
@@ -632,52 +670,33 @@ int main(int argc, const char** argv)
 			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 			glBufferData(GL_ARRAY_BUFFER, triangles->vertex_filled * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
 
-			glMatrixMode(GL_PROJECTION);
-			glLoadMatrixf(glm::value_ptr(projection));
+			Framework::ShaderProgram* outline_program = nullptr;
+			glm::vec4 outline_color;
+			
+			if (g_DrawLines)
+			{
+				outline_program = g_ProgramOutlineLines;
+				outline_color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+			}
+			else
+			{
+				outline_program = g_ProgramOutlineTriangles;
+				outline_color = glm::vec4(0.0f, 0.0f, 0.75f, 1.0f);
+			}
 
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
+			glUseProgram(outline_program->GetHandle());
+			glUniformMatrix4fv(outline_program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+			glUniform4fv(outline_program->GetUniform("uniColor"), 1, glm::value_ptr(outline_color));
 
-			glLineWidth(1.0f);
+			GLint attribute_position = outline_program->GetAttribute("attrPosition");
+			glEnableVertexAttribArray(attribute_position);
 
-			glColor4fv(glm::value_ptr(glm::vec4(0.0f, 0.0f, 0.75f, 1.0f)));
-
-			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), 0);
+			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 			glDrawArrays(GL_TRIANGLES, 0, triangles->vertex_filled);
 
-			glDisableClientState(GL_VERTEX_ARRAY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			if (g_DrawLines)
-			{
-				glDisable(GL_DEPTH_TEST);
-
-				glLineWidth(1.0f);
-
-				glColor4fv(glm::value_ptr(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)));
-
-				glBegin(GL_LINES);
-
-				for (size_t i = 0; i < triangles->vertex_filled; i += 3)
-				{
-					glVertex2fv(glm::value_ptr(triangles->positions[i    ]));
-					glVertex2fv(glm::value_ptr(triangles->positions[i + 1]));
-
-					glVertex2fv(glm::value_ptr(triangles->positions[i + 1]));
-					glVertex2fv(glm::value_ptr(triangles->positions[i + 2]));
-
-					glVertex2fv(glm::value_ptr(triangles->positions[i + 2]));
-					glVertex2fv(glm::value_ptr(triangles->positions[i    ]));
-				}
-
-				glEnd();
-
-				glEnable(GL_DEPTH_TEST);
-			}
+			glUseProgram(0);
 
 			delete triangles;
 		}
