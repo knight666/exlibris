@@ -34,7 +34,7 @@ IMeshBuilder
 - AddVertexPosition(position)
 - AddTriangle(indexA, indexB, indexC)
 
-GraphicsContext
+Canvas
 - Clear()
 - Move(position)
 - LineTo(position)
@@ -43,3 +43,13 @@ GraphicsContext
 - Finish()
 - BuildMeshFilled(IMeshBuilder, settings)
 - BuildMeshOutline(IMeshBuilder, settings)
+
+IMeshVisitor
+- GetOrientation()
+- VisitBuilderVertexCount(count)
+- VisitBuilderAddTriangle(a, b, c)
+
+MeshBuilder
+- AddTriangle(a, b, c)
+- AddQuad(ul, ur, ll, lr)
+- Accept(visitor)

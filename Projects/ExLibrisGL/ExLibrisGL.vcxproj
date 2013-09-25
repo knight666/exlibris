@@ -83,6 +83,7 @@
     <ClCompile Include="CurvePath.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineShape.cpp" />
+    <ClCompile Include="MeshBuilder.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="PolygonShape.cpp" />
     <ClCompile Include="Quad.cpp" />
@@ -102,13 +103,16 @@
     <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
+    <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineShape.h" />
+    <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="PolygonShape.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
+    <ClInclude Include="TriangleOrientation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
