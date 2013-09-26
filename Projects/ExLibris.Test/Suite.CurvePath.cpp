@@ -22,6 +22,25 @@ TEST(CurvePath, BuildPolygon)
 	EXPECT_VEC2_EQ(26.5f, 99.8f, shape->positions[2]);
 }
 
+TEST(CurvePath, BuildPolygonCurve)
+{
+	CurvePath path;
+	path.Move(glm::vec2(10.0f, 20.0f));
+	path.ConicCurveTo(glm::vec2(15.0f, 15.0f), glm::vec2(20.0f, 20.0f));
+
+	CurveSettings settings;
+	settings.precision = 3;
+
+	Polygon* shape = path.BuildPolygon(settings);
+
+	ASSERT_NE(nullptr, shape);
+	ASSERT_EQ(4, shape->positions.size());
+	EXPECT_VEC2_EQ(10.0f, 20.0f, shape->positions[0]);
+	EXPECT_VEC2_EQ(13.333333f, 17.777777f, shape->positions[1]);
+	EXPECT_VEC2_EQ(16.666666f, 17.777777f, shape->positions[2]);
+	EXPECT_VEC2_EQ(20.0f, 20.0f, shape->positions[3]);
+}
+
 TEST(CurvePath, PathMove)
 {
 	CurvePath path;

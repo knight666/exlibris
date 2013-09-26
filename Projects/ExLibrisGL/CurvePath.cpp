@@ -6,6 +6,9 @@ namespace ExLibris
 {
 
 	CurvePath::CurvePath()
+		: m_CurveStarted(false)
+		, m_CurveStep(0)
+		, m_CurveTimeDelta(0.0f)
 	{
 	}
 	
@@ -171,7 +174,44 @@ namespace ExLibris
 
 			} break;
 
+		case eCommandType_CurveConic:
+			{
+				if (a_Settings.precision == 0 || m_CurveStep == a_Settings.precision)
+				{
+					a_Target = m_CurveTo;
+					m_CurveStarted = false;
+					m_CurveStep = 0;
+
+					m_CommandCurrent++;
+
+					break;
+				}
+
+				if (!m_CurveStarted)
+				{
+					m_CurveFrom = m_CurvePositionPrevious;
+					m_CurveControlA = *m_CommandPositionCurrent++;
+					m_CurveTo = *m_CommandPositionCurrent++;
+
+					m_CurveStep = 1;
+					m_CurveTimeDelta = 1.0f / (float)a_Settings.precision;
+
+					m_CurveStarted = true;
+				}
+				
+				float time = m_CurveStep * m_CurveTimeDelta;
+
+				glm::vec2 ac = glm::mix(m_CurveFrom, m_CurveControlA, time);
+				glm::vec2 cb = glm::mix(m_CurveControlA, m_CurveTo, time);
+				a_Target = glm::mix(ac, cb, time);
+
+				m_CurveStep++;
+
+			} break;
+
 		}
+
+		m_CurvePositionPrevious = a_Target;
 
 		return true;
 	}
