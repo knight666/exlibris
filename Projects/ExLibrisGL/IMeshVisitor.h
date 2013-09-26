@@ -19,8 +19,9 @@ namespace ExLibris
 	
 		virtual TriangleOrientation GetOrientation() const = 0;
 
-		virtual void VisitBuilderMesh(unsigned int a_VertexCount) = 0;
-		virtual void VisitBuilderAddTriangle(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C) = 0;
+		virtual void VisitBuilderMeshBegin(unsigned int a_VertexCount) = 0;
+		virtual void VisitBuilderTriangle(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C) = 0;
+		virtual void VisitBuilderMeshEnd() = 0;
 	
 	}; // class IMeshVisitor
 
