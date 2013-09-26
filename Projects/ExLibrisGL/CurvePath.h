@@ -47,8 +47,13 @@ namespace ExLibris
 		std::vector<CommandType>::iterator m_CommandCurrent;
 
 		glm::vec2 m_CurvePositionPrevious;
-		glm::vec2 m_CurvePositionCurrent;
-		glm::vec2 m_CurvePositionNext;
+		glm::vec2 m_CurveFrom;
+		glm::vec2 m_CurveControlA;
+		glm::vec2 m_CurveControlB;
+		glm::vec2 m_CurveTo;
+		bool m_CurveStarted;
+		int m_CurveStep;
+		float m_CurveTimeDelta;
 
 	}; // class CurvePath
 
