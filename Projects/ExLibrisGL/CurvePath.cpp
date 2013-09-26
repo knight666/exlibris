@@ -152,4 +152,45 @@ namespace ExLibris
 		return shapes;
 	}
 
+	bool CurvePath::_NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings)
+	{
+		switch (*m_CommandCurrent)
+		{
+
+		case eCommandType_Move:
+			{
+				a_Target = *m_CommandPositionCurrent++;
+				m_CommandCurrent++;
+
+			} break;
+
+		case eCommandType_Line:
+			{
+				a_Target = *m_CommandPositionCurrent++;
+				m_CommandCurrent++;
+
+			} break;
+
+		}
+
+		return true;
+	}
+
+	Polygon* CurvePath::BuildPolygon(const CurveSettings& a_Settings)
+	{
+		Polygon* result = new Polygon;
+
+		m_CommandPositionCurrent = m_Positions.begin();
+		m_CommandCurrent = m_Commands.begin();
+
+		glm::vec2 position;
+
+		while (m_CommandCurrent != m_Commands.end() && _NextCurvePosition(position, a_Settings))
+		{
+			*result += position;
+		}
+
+		return result;
+	}
+
 }; // namespace ExLibris
