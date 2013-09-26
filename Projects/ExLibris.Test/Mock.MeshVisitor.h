@@ -15,6 +15,7 @@ namespace ExLibris
 
 		MockMeshVisitor()
 			: vertex_count(0)
+			, mesh_count(0)
 		{
 		}
 	
@@ -23,20 +24,26 @@ namespace ExLibris
 			return eTriangleOrientation_CounterClockWise;
 		}
 
-		void VisitBuilderMesh(unsigned int a_VertexCount)
+		void VisitBuilderMeshBegin(unsigned int a_VertexCount)
 		{
-			vertex_count = a_VertexCount;
+			vertex_count += a_VertexCount;
 		}
 
-		void VisitBuilderAddTriangle(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C)
+		void VisitBuilderTriangle(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C)
 		{
 			triangles.push_back(Triangle(a_A, a_B, a_C));
+		}
+
+		void VisitBuilderMeshEnd()
+		{
+			mesh_count++;
 		}
 
 	public:
 
 		unsigned int vertex_count;
 		std::vector<Triangle> triangles;
+		unsigned int mesh_count;
 	
 	}; // class MockMeshVisitor
 

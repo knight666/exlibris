@@ -5,8 +5,14 @@
 namespace ExLibris
 {
 
+	MeshBuilder::MeshBuilder()
+		: m_VertexCount(0)
+	{
+	}
+
 	void MeshBuilder::Clear()
 	{
+		m_VertexCount = 0;
 		m_DataTypes.clear();
 		m_DataPositions.clear();
 	}
@@ -18,6 +24,8 @@ namespace ExLibris
 		m_DataPositions.push_back(a_A);
 		m_DataPositions.push_back(a_B);
 		m_DataPositions.push_back(a_C);
+
+		m_VertexCount += 3;
 	}
 
 	void MeshBuilder::AddQuad(const glm::vec2& a_UpperLeft, const glm::vec2& a_UpperRight, const glm::vec2& a_LowerLeft, const glm::vec2& a_LowerRight)
@@ -28,6 +36,8 @@ namespace ExLibris
 		m_DataPositions.push_back(a_UpperRight);
 		m_DataPositions.push_back(a_LowerLeft);
 		m_DataPositions.push_back(a_LowerRight);
+
+		m_VertexCount += 6;
 	}
 
 	void MeshBuilder::Accept(IMeshVisitor& a_Visitor) const
@@ -37,7 +47,7 @@ namespace ExLibris
 			return;
 		}
 
-		a_Visitor.VisitBuilderMesh(3);
+		a_Visitor.VisitBuilderMeshBegin(m_VertexCount);
 
 		std::vector<glm::vec2>::const_iterator position_it = m_DataPositions.begin();
 
@@ -54,7 +64,7 @@ namespace ExLibris
 					const glm::vec2& b = *position_it++;
 					const glm::vec2& c = *position_it++;
 
-					a_Visitor.VisitBuilderAddTriangle(a, b, c);
+					a_Visitor.VisitBuilderTriangle(a, b, c);
 
 				} break;
 
@@ -65,13 +75,15 @@ namespace ExLibris
 					const glm::vec2& ll = *position_it++;
 					const glm::vec2& lr = *position_it++;
 
-					a_Visitor.VisitBuilderAddTriangle(ur, ul, ll);
-					a_Visitor.VisitBuilderAddTriangle(ur, ll, lr);
+					a_Visitor.VisitBuilderTriangle(ur, ul, ll);
+					a_Visitor.VisitBuilderTriangle(ur, ll, lr);
 
 				} break;
 
 			}
 		}
+
+		a_Visitor.VisitBuilderMeshEnd();
 	}
 
 }; // namespace ExLibris
