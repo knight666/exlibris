@@ -4,6 +4,24 @@
 
 using namespace ExLibris;
 
+TEST(CurvePath, BuildPolygon)
+{
+	CurvePath path;
+	path.Move(glm::vec2(-56.9f, 12.0f));
+	path.LineTo(glm::vec2(123.9f, 76.3f));
+	path.LineTo(glm::vec2(26.5f, 99.8f));
+
+	CurveSettings settings;
+
+	Polygon* shape = path.BuildPolygon(settings);
+
+	ASSERT_NE(nullptr, shape);
+	ASSERT_EQ(3, shape->positions.size());
+	EXPECT_VEC2_EQ(-56.9f, 12.0f, shape->positions[0]);
+	EXPECT_VEC2_EQ(123.9f, 76.3f, shape->positions[1]);
+	EXPECT_VEC2_EQ(26.5f, 99.8f, shape->positions[2]);
+}
+
 TEST(CurvePath, PathMove)
 {
 	CurvePath path;

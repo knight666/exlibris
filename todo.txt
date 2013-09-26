@@ -34,6 +34,15 @@ IMeshBuilder
 - AddVertexPosition(position)
 - AddTriangle(indexA, indexB, indexC)
 
+Cursor
+- command_index
+- position_index
+- step
+- delta
+
+CurvePath
+- GetPosition(Cursor&)
+
 Canvas
 - Clear()
 - Move(position)
@@ -41,8 +50,8 @@ Canvas
 - ConicTo(position, control);
 - CubicTo(position, controlA, controlB);
 - Finish()
-- BuildMeshFilled(IMeshBuilder, settings)
-- BuildMeshOutline(IMeshBuilder, settings)
+- MeshBuilder* BuildOutline(settings)
+- MeshBuilder* BuildFilled(settings)
 
 IMeshVisitor
 - GetOrientation()
