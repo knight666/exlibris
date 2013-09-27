@@ -23,13 +23,20 @@ namespace ExLibris
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
 		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To);
 
-		Polygon* BuildPolygon(const CurveSettings& a_Settings);
+		std::vector<Polygon> BuildPolygons(const CurveSettings& a_Settings);
 
 		std::vector<Polygon> ConvertToPolygons(const CurveSettings& a_Settings) const;
 
 	private:
 
-		bool _NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings);
+		enum ShapeResult
+		{
+			eShapeResult_Valid,
+			eShapeResult_Next,
+			eShapeResult_End
+		};
+
+		ShapeResult _NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings);
 
 		enum CommandType
 		{
@@ -51,6 +58,7 @@ namespace ExLibris
 		glm::vec2 m_CurveControlA;
 		glm::vec2 m_CurveControlB;
 		glm::vec2 m_CurveTo;
+		bool m_CurveShapeNext;
 		bool m_CurveStarted;
 		int m_CurveStep;
 		float m_CurveTimeDelta;

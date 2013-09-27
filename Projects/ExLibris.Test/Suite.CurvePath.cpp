@@ -4,43 +4,6 @@
 
 using namespace ExLibris;
 
-TEST(CurvePath, BuildPolygon)
-{
-	CurvePath path;
-	path.Move(glm::vec2(-56.9f, 12.0f));
-	path.LineTo(glm::vec2(123.9f, 76.3f));
-	path.LineTo(glm::vec2(26.5f, 99.8f));
-
-	CurveSettings settings;
-
-	Polygon* shape = path.BuildPolygon(settings);
-
-	ASSERT_NE(nullptr, shape);
-	ASSERT_EQ(3, shape->positions.size());
-	EXPECT_VEC2_EQ(-56.9f, 12.0f, shape->positions[0]);
-	EXPECT_VEC2_EQ(123.9f, 76.3f, shape->positions[1]);
-	EXPECT_VEC2_EQ(26.5f, 99.8f, shape->positions[2]);
-}
-
-TEST(CurvePath, BuildPolygonCurve)
-{
-	CurvePath path;
-	path.Move(glm::vec2(10.0f, 20.0f));
-	path.ConicCurveTo(glm::vec2(15.0f, 15.0f), glm::vec2(20.0f, 20.0f));
-
-	CurveSettings settings;
-	settings.precision = 3;
-
-	Polygon* shape = path.BuildPolygon(settings);
-
-	ASSERT_NE(nullptr, shape);
-	ASSERT_EQ(4, shape->positions.size());
-	EXPECT_VEC2_EQ(10.0f, 20.0f, shape->positions[0]);
-	EXPECT_VEC2_EQ(13.333333f, 17.777777f, shape->positions[1]);
-	EXPECT_VEC2_EQ(16.666666f, 17.777777f, shape->positions[2]);
-	EXPECT_VEC2_EQ(20.0f, 20.0f, shape->positions[3]);
-}
-
 TEST(CurvePath, PathMove)
 {
 	CurvePath path;
@@ -48,12 +11,10 @@ TEST(CurvePath, PathMove)
 
 	CurveSettings settings;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
-	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(1, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(33.3f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(15.5f, shapes[0].positions[0].y);
+	EXPECT_VEC2_EQ(33.3f, 15.5f, shapes[0].positions[0]);
 }
 
 TEST(CurvePath, PathMoveTwice)
@@ -64,15 +25,13 @@ TEST(CurvePath, PathMoveTwice)
 
 	CurveSettings settings;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(2, shapes.size());
 	ASSERT_EQ(1, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(66.78f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(91.91f, shapes[0].positions[0].y);
+	EXPECT_VEC2_EQ(66.78f, 91.91f, shapes[0].positions[0]);
 	ASSERT_EQ(1, shapes[1].positions.size());
-	EXPECT_FLOAT_EQ(-56.1f, shapes[1].positions[0].x);
-	EXPECT_FLOAT_EQ(71.8f, shapes[1].positions[0].y);
+	EXPECT_VEC2_EQ(-56.1f, 71.8f, shapes[1].positions[0]);
 }
 
 TEST(CurvePath, PathLine)
@@ -83,14 +42,12 @@ TEST(CurvePath, PathLine)
 
 	CurveSettings settings;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(10.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(10.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(25.0f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(10.0f, shapes[0].positions[1].y);
+	EXPECT_VEC2_EQ(10.0f, 10.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(25.0f, 10.0f, shapes[0].positions[1]);
 }
 
 TEST(CurvePath, PathTwoLines)
@@ -102,16 +59,13 @@ TEST(CurvePath, PathTwoLines)
 
 	CurveSettings settings;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(3, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(6.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(16.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(2.0f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(3.0f, shapes[0].positions[1].y);
-	EXPECT_FLOAT_EQ(17.0f, shapes[0].positions[2].x);
-	EXPECT_FLOAT_EQ(17.0f, shapes[0].positions[2].y);
+	EXPECT_VEC2_EQ(6.0f, 16.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(2.0f, 3.0f, shapes[0].positions[1]);
+	EXPECT_VEC2_EQ(17.0f, 17.0f, shapes[0].positions[2]);
 }
 
 TEST(CurvePath, PathConic)
@@ -123,16 +77,13 @@ TEST(CurvePath, PathConic)
 	CurveSettings settings;
 	settings.precision = 2;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(3, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(10.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(20.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(15.0f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(17.5f, shapes[0].positions[1].y);
-	EXPECT_FLOAT_EQ(20.0f, shapes[0].positions[2].x);
-	EXPECT_FLOAT_EQ(20.0f, shapes[0].positions[2].y);
+	EXPECT_VEC2_EQ(10.0f, 20.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(15.0f, 17.5f, shapes[0].positions[1]);
+	EXPECT_VEC2_EQ(20.0f, 20.0f, shapes[0].positions[2]);
 }
 
 TEST(CurvePath, PathConicNoStartPoint)
@@ -143,14 +94,12 @@ TEST(CurvePath, PathConicNoStartPoint)
 	CurveSettings settings;
 	settings.precision = 2;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(-25.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(30.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(-50.0f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(50.0f, shapes[0].positions[1].y);
+	EXPECT_VEC2_EQ(-25.0f, 30.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(-50.0f, 50.0f, shapes[0].positions[1]);
 }
 
 TEST(CurvePath, PathConicPrecisionHigh)
@@ -162,16 +111,13 @@ TEST(CurvePath, PathConicPrecisionHigh)
 	CurveSettings settings;
 	settings.precision = 10;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(11, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(100.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(100.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(75.0f, shapes[0].positions[5].x);
-	EXPECT_FLOAT_EQ(56.25f, shapes[0].positions[5].y);
-	EXPECT_FLOAT_EQ(100.0f, shapes[0].positions[10].x);
-	EXPECT_FLOAT_EQ(25.0f, shapes[0].positions[10].y);
+	EXPECT_VEC2_EQ(100.0f, 100.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(75.0f, 56.25f, shapes[0].positions[5]);
+	EXPECT_VEC2_EQ(100.0f, 25.0f, shapes[0].positions[10]);
 }
 
 TEST(CurvePath, PathConicPrecisionOne)
@@ -183,14 +129,12 @@ TEST(CurvePath, PathConicPrecisionOne)
 	CurveSettings settings;
 	settings.precision = 1;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(36.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(21.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(-30.0f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(-88.8f, shapes[0].positions[1].y);
+	EXPECT_VEC2_EQ(36.0f, 21.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(-30.0f, -88.8f, shapes[0].positions[1]);
 }
 
 TEST(CurvePath, PathConicPrecisionNone)
@@ -200,16 +144,14 @@ TEST(CurvePath, PathConicPrecisionNone)
 	path.ConicCurveTo(glm::vec2(15.3f, 56.2f), glm::vec2(-30.0f, -88.8f));
 
 	CurveSettings settings;
-	settings.precision = 1;
+	settings.precision = 0;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(22.4f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(87.3f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(-30.0f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(-88.8f, shapes[0].positions[1].y);
+	EXPECT_VEC2_EQ(22.4f, 87.3f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(-30.0f, -88.8f, shapes[0].positions[1]);
 }
 
 TEST(CurvePath, PathConicTwoCurves)
@@ -222,16 +164,13 @@ TEST(CurvePath, PathConicTwoCurves)
 	CurveSettings settings;
 	settings.precision = 3;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(7, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(25.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(25.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(100.0f, shapes[0].positions[3].x);
-	EXPECT_FLOAT_EQ(25.0f, shapes[0].positions[3].y);
-	EXPECT_FLOAT_EQ(200.0f, shapes[0].positions[6].x);
-	EXPECT_FLOAT_EQ(100.0f, shapes[0].positions[6].y);
+	EXPECT_VEC2_EQ(25.0f, 25.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(100.0f, 25.0f, shapes[0].positions[3]);
+	EXPECT_VEC2_EQ(200.0f, 100.0f, shapes[0].positions[6]);
 }
 
 TEST(CurvePath, PathQuadratic)
@@ -247,20 +186,15 @@ TEST(CurvePath, PathQuadratic)
 	CurveSettings settings;
 	settings.precision = 4;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(5, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(5.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(5.0f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(8.125f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(-11.875f, shapes[0].positions[1].y);
-	EXPECT_FLOAT_EQ(15.0f, shapes[0].positions[2].x);
-	EXPECT_FLOAT_EQ(-17.5f, shapes[0].positions[2].y);
-	EXPECT_FLOAT_EQ(21.875f, shapes[0].positions[3].x);
-	EXPECT_FLOAT_EQ(-11.875f, shapes[0].positions[3].y);
-	EXPECT_FLOAT_EQ(25.0f, shapes[0].positions[4].x);
-	EXPECT_FLOAT_EQ(5.0f, shapes[0].positions[4].y);
+	EXPECT_VEC2_EQ(5.0f, 5.0f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(8.125f, -11.875f, shapes[0].positions[1]);
+	EXPECT_VEC2_EQ(15.0f, -17.5f, shapes[0].positions[2]);
+	EXPECT_VEC2_EQ(21.875f, -11.875f, shapes[0].positions[3]);
+	EXPECT_VEC2_EQ(25.0f, 5.0f, shapes[0].positions[4]);
 }
 
 TEST(CurvePath, PathQuadraticNoStartPoint)
@@ -275,12 +209,11 @@ TEST(CurvePath, PathQuadraticNoStartPoint)
 	CurveSettings settings;
 	settings.precision = 3;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(3, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(-12.0f, shapes[0].positions[2].x);
-	EXPECT_FLOAT_EQ(29.9f, shapes[0].positions[2].y);
+	EXPECT_VEC2_EQ(-12.0f, 29.9f, shapes[0].positions[2]);
 }
 
 TEST(CurvePath, PathQuadraticPrecisionHigh)
@@ -296,16 +229,13 @@ TEST(CurvePath, PathQuadraticPrecisionHigh)
 	CurveSettings settings;
 	settings.precision = 16;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(17, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(24.0f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(87.2f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(19.618299f, shapes[0].positions[6].x);
-	EXPECT_FLOAT_EQ(71.68959f, shapes[0].positions[6].y);
-	EXPECT_FLOAT_EQ(33.91f, shapes[0].positions[16].x);
-	EXPECT_FLOAT_EQ(88.91f, shapes[0].positions[16].y);
+	EXPECT_VEC2_EQ(24.0f, 87.2f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(19.618299f, 71.68959f, shapes[0].positions[6]);
+	EXPECT_VEC2_EQ(33.91f, 88.91f, shapes[0].positions[16]);
 }
 
 TEST(CurvePath, PathQuadraticPrecisionOne)
@@ -321,14 +251,12 @@ TEST(CurvePath, PathQuadraticPrecisionOne)
 	CurveSettings settings;
 	settings.precision = 1;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(2, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(57.36f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(14.25f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(63.57f, shapes[0].positions[1].x);
-	EXPECT_FLOAT_EQ(49.886f, shapes[0].positions[1].y);
+	EXPECT_VEC2_EQ(57.36f, 14.25f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(63.57f, 49.886f, shapes[0].positions[1]);
 }
 
 TEST(CurvePath, PathQuadraticPrecisionTwoCurves)
@@ -349,14 +277,11 @@ TEST(CurvePath, PathQuadraticPrecisionTwoCurves)
 	CurveSettings settings;
 	settings.precision = 14;
 
-	std::vector<Polygon> shapes = path.ConvertToPolygons(settings);
+	std::vector<Polygon> shapes = path.BuildPolygons(settings);
 
 	ASSERT_EQ(1, shapes.size());
 	ASSERT_EQ(29, shapes[0].positions.size());
-	EXPECT_FLOAT_EQ(222.8f, shapes[0].positions[0].x);
-	EXPECT_FLOAT_EQ(34.9f, shapes[0].positions[0].y);
-	EXPECT_FLOAT_EQ(88.8812f, shapes[0].positions[14].x);
-	EXPECT_FLOAT_EQ(-12.9f, shapes[0].positions[14].y);
-	EXPECT_FLOAT_EQ(16.87f, shapes[0].positions[28].x);
-	EXPECT_FLOAT_EQ(912.08f, shapes[0].positions[28].y);
+	EXPECT_VEC2_EQ(222.8f, 34.9f, shapes[0].positions[0]);
+	EXPECT_VEC2_EQ(88.8812f, -12.9f, shapes[0].positions[14]);
+	EXPECT_VEC2_EQ(16.87f, 912.08f, shapes[0].positions[28]);
 }
