@@ -41,7 +41,9 @@ Cursor
 - delta
 
 CurvePath
-- GetPosition(Cursor&)
+- ReadPosition()
+- GetCurrentShapeIndex()
+- IsEndOfPath()
 
 Canvas
 - Clear()

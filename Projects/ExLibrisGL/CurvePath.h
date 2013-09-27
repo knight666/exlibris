@@ -29,14 +29,7 @@ namespace ExLibris
 
 	private:
 
-		enum ShapeResult
-		{
-			eShapeResult_Valid,
-			eShapeResult_Next,
-			eShapeResult_End
-		};
-
-		ShapeResult _NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings);
+		glm::vec2 _NextCurvePosition(const CurveSettings& a_Settings);
 
 		enum CommandType
 		{

@@ -155,34 +155,27 @@ namespace ExLibris
 		return shapes;
 	}
 
-	bool CurvePath::_NextShape()
+	glm::vec2 CurvePath::_NextCurvePosition(const CurveSettings& a_Settings)
 	{
-		bool is_move = (*m_CommandCurrent == eCommandType_Move);
-		bool is_first_command = (m_CommandCurrent == m_Commands.begin());
-
-		return is_move && !is_first_command;
-	}
-
-	CurvePath::ShapeResult CurvePath::_NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings)
-	{
-		m_CurveShapeNext = false;
-		bool next_command = false;
+		glm::vec2 position;
 
 		switch (*m_CommandCurrent)
 		{
 
 		case eCommandType_Move:
 			{
-				a_Target = *m_CommandPositionCurrent++;
+				position = *m_CommandPositionCurrent++;
 				m_CurveShapeNext = true;
-				next_command = true;
+
+				++m_CommandCurrent;
 
 			} break;
 
 		case eCommandType_Line:
 			{
-				a_Target = *m_CommandPositionCurrent++;
-				next_command = true;
+				position = *m_CommandPositionCurrent++;
+
+				++m_CommandCurrent;
 
 			} break;
 
@@ -190,12 +183,12 @@ namespace ExLibris
 			{
 				if (m_CurveStarted && m_CurveStep >= a_Settings.precision)
 				{
-					a_Target = m_CurveTo;
+					position = m_CurveTo;
 
 					m_CurveStarted = false;
 					m_CurveStep = 0;
 
-					next_command = true;
+					++m_CommandCurrent;
 
 					break;
 				}
@@ -208,9 +201,9 @@ namespace ExLibris
 
 					if (a_Settings.precision <= 1)
 					{
-						a_Target = m_CurveTo;
+						position = m_CurveTo;
 
-						next_command = true;
+						++m_CommandCurrent;
 
 						break;
 					}
@@ -225,7 +218,7 @@ namespace ExLibris
 
 				glm::vec2 ac = glm::mix(m_CurveFrom, m_CurveControlA, time);
 				glm::vec2 cb = glm::mix(m_CurveControlA, m_CurveTo, time);
-				a_Target = glm::mix(ac, cb, time);
+				position = glm::mix(ac, cb, time);
 
 				m_CurveStep++;
 
@@ -235,12 +228,12 @@ namespace ExLibris
 			{
 				if (m_CurveStarted && m_CurveStep >= a_Settings.precision)
 				{
-					a_Target = m_CurveTo;
+					position = m_CurveTo;
 
 					m_CurveStarted = false;
 					m_CurveStep = 0;
 
-					next_command = true;
+					++m_CommandCurrent;
 
 					break;
 				}
@@ -254,9 +247,9 @@ namespace ExLibris
 
 					if (a_Settings.precision <= 1)
 					{
-						a_Target = m_CurveTo;
+						position = m_CurveTo;
 
-						next_command = true;
+						++m_CommandCurrent;
 
 						break;
 					}
@@ -276,7 +269,7 @@ namespace ExLibris
 				glm::vec2 mixed_a = glm::mix(ab, bc, time);
 				glm::vec2 mixed_b = glm::mix(bc, cd, time);
 
-				a_Target = glm::mix(mixed_a, mixed_b, time);
+				position = glm::mix(mixed_a, mixed_b, time);
 
 				m_CurveStep++;
 
@@ -284,16 +277,9 @@ namespace ExLibris
 
 		}
 
-		m_CurvePositionPrevious = a_Target;
-
-		if (next_command && ++m_CommandCurrent == m_Commands.end())
-		{
-			return eShapeResult_End;
-		}
-		else
-		{
-			return eShapeResult_Valid;
-		}
+		m_CurvePositionPrevious = position;
+		
+		return position;
 	}
 
 	std::vector<Polygon> CurvePath::BuildPolygons(const CurveSettings& a_Settings)
@@ -314,9 +300,8 @@ namespace ExLibris
 		m_CommandCurrent = m_Commands.begin();
 
 		glm::vec2 position;
-		ShapeResult result = eShapeResult_Next;
 
-		while (result != eShapeResult_End)
+		while (m_CommandCurrent != m_Commands.end())
 		{
 			// check if it's actually a new shape and not the first move command
 
@@ -328,9 +313,7 @@ namespace ExLibris
 				shape_current = &shapes.back();
 			}
 
-			result = _NextCurvePosition(position, a_Settings);
-
-			*shape_current += position;
+			*shape_current += _NextCurvePosition(a_Settings);
 		}
 
 		return shapes;
