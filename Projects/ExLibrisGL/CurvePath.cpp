@@ -155,34 +155,47 @@ namespace ExLibris
 		return shapes;
 	}
 
-	bool CurvePath::_NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings)
+	bool CurvePath::_NextShape()
 	{
+		bool is_move = (*m_CommandCurrent == eCommandType_Move);
+		bool is_first_command = (m_CommandCurrent == m_Commands.begin());
+
+		return is_move && !is_first_command;
+	}
+
+	CurvePath::ShapeResult CurvePath::_NextCurvePosition(glm::vec2& a_Target, const CurveSettings& a_Settings)
+	{
+		m_CurveShapeNext = false;
+		bool next_command = false;
+
 		switch (*m_CommandCurrent)
 		{
 
 		case eCommandType_Move:
 			{
 				a_Target = *m_CommandPositionCurrent++;
-				m_CommandCurrent++;
+				m_CurveShapeNext = true;
+				next_command = true;
 
 			} break;
 
 		case eCommandType_Line:
 			{
 				a_Target = *m_CommandPositionCurrent++;
-				m_CommandCurrent++;
+				next_command = true;
 
 			} break;
 
 		case eCommandType_CurveConic:
 			{
-				if (a_Settings.precision == 0 || m_CurveStep == a_Settings.precision)
+				if (m_CurveStarted && m_CurveStep >= a_Settings.precision)
 				{
 					a_Target = m_CurveTo;
+
 					m_CurveStarted = false;
 					m_CurveStep = 0;
 
-					m_CommandCurrent++;
+					next_command = true;
 
 					break;
 				}
@@ -192,6 +205,15 @@ namespace ExLibris
 					m_CurveFrom = m_CurvePositionPrevious;
 					m_CurveControlA = *m_CommandPositionCurrent++;
 					m_CurveTo = *m_CommandPositionCurrent++;
+
+					if (a_Settings.precision <= 1)
+					{
+						a_Target = m_CurveTo;
+
+						next_command = true;
+
+						break;
+					}
 
 					m_CurveStep = 1;
 					m_CurveTimeDelta = 1.0f / (float)a_Settings.precision;
@@ -209,28 +231,109 @@ namespace ExLibris
 
 			} break;
 
+		case eCommandType_CurveQuadratic:
+			{
+				if (m_CurveStarted && m_CurveStep >= a_Settings.precision)
+				{
+					a_Target = m_CurveTo;
+
+					m_CurveStarted = false;
+					m_CurveStep = 0;
+
+					next_command = true;
+
+					break;
+				}
+
+				if (!m_CurveStarted)
+				{
+					m_CurveFrom = m_CurvePositionPrevious;
+					m_CurveControlA = *m_CommandPositionCurrent++;
+					m_CurveControlB = *m_CommandPositionCurrent++;
+					m_CurveTo = *m_CommandPositionCurrent++;
+
+					if (a_Settings.precision <= 1)
+					{
+						a_Target = m_CurveTo;
+
+						next_command = true;
+
+						break;
+					}
+
+					m_CurveStep = 1;
+					m_CurveTimeDelta = 1.0f / (float)a_Settings.precision;
+
+					m_CurveStarted = true;
+				}
+
+				float time = m_CurveStep * m_CurveTimeDelta;
+
+				glm::vec2 ab = glm::mix(m_CurveFrom, m_CurveControlA, time);
+				glm::vec2 bc = glm::mix(m_CurveControlA, m_CurveControlB, time);
+				glm::vec2 cd = glm::mix(m_CurveControlB, m_CurveTo, time);
+
+				glm::vec2 mixed_a = glm::mix(ab, bc, time);
+				glm::vec2 mixed_b = glm::mix(bc, cd, time);
+
+				a_Target = glm::mix(mixed_a, mixed_b, time);
+
+				m_CurveStep++;
+
+			} break;
+
 		}
 
 		m_CurvePositionPrevious = a_Target;
 
-		return true;
+		if (next_command && ++m_CommandCurrent == m_Commands.end())
+		{
+			return eShapeResult_End;
+		}
+		else
+		{
+			return eShapeResult_Valid;
+		}
 	}
 
-	Polygon* CurvePath::BuildPolygon(const CurveSettings& a_Settings)
+	std::vector<Polygon> CurvePath::BuildPolygons(const CurveSettings& a_Settings)
 	{
-		Polygon* result = new Polygon;
+		std::vector<Polygon> shapes;
+
+		if (m_Commands.size() == 0)
+		{
+			return shapes;
+		}
+
+		Polygon shape;
+		shapes.push_back(shape);
+
+		Polygon* shape_current = &shapes.back();
 
 		m_CommandPositionCurrent = m_Positions.begin();
 		m_CommandCurrent = m_Commands.begin();
 
 		glm::vec2 position;
+		ShapeResult result = eShapeResult_Next;
 
-		while (m_CommandCurrent != m_Commands.end() && _NextCurvePosition(position, a_Settings))
+		while (result != eShapeResult_End)
 		{
-			*result += position;
+			// check if it's actually a new shape and not the first move command
+
+			if (m_CommandCurrent != m_Commands.begin() && *m_CommandCurrent == eCommandType_Move)
+			{
+				Polygon shape;
+				shapes.push_back(shape);
+
+				shape_current = &shapes.back();
+			}
+
+			result = _NextCurvePosition(position, a_Settings);
+
+			*shape_current += position;
 		}
 
-		return result;
+		return shapes;
 	}
 
 }; // namespace ExLibris

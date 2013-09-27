@@ -661,7 +661,7 @@ int main(int argc, const char** argv)
 		ExLibris::LineShape shape;
 		shape.AddPolygon(g_MousePath);
 
-		ExLibris::TriangleList* triangles = shape.Triangulate(20.0f);
+		ExLibris::TriangleList* triangles = shape.Triangulate(50.0f);
 
 		g_MousePath.positions.pop_back();
 
