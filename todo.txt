@@ -40,6 +40,10 @@ Cursor
 - step
 - delta
 
+CurvePathCursor
+- ReadPosition()
+- IsNextShape()
+
 CurvePath
 - ReadPosition()
 - GetCurrentShapeIndex()
@@ -64,3 +68,11 @@ MeshBuilder
 - AddTriangle(a, b, c)
 - AddQuad(ul, ur, ll, lr)
 - Accept(visitor)
+
+
+IPositionReader
+- CursorStart()
+- CursorReadPosition()
+- CursorIsNextShape()
+- CursorIsValid()
+
