@@ -16,6 +16,8 @@ namespace ExLibris
 
 		MeshBuilder();
 
+		size_t GetVertexCount() const;
+
 		void Clear();
 
 		void AddTriangle(
@@ -39,7 +41,7 @@ namespace ExLibris
 			eDataType_Quad
 		};
 
-		unsigned int m_VertexCount;
+		size_t m_VertexCount;
 		std::vector<DataType> m_DataTypes;
 		std::vector<glm::vec2> m_DataPositions;
 	

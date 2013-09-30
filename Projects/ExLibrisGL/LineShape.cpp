@@ -250,4 +250,148 @@ namespace ExLibris
 		return triangles;
 	}
 
+	MeshBuilder* LineShape::BuildMesh(float a_Thickness)
+	{
+		MeshBuilder* builder = new MeshBuilder;
+
+		for (std::vector<Polygon>::iterator polygon_it = m_Polygons.begin(); polygon_it != m_Polygons.end(); ++polygon_it)
+		{
+			_TriangulatePolygon(builder, *polygon_it, a_Thickness);
+		}
+
+		return builder;
+	}
+
+	void LineShape::_TriangulatePolygon(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness)
+	{
+		if (a_Polygon.positions.size() < 2)
+		{
+			return;
+		}
+
+		std::vector<glm::vec2>::const_iterator previous_it = a_Polygon.positions.begin();
+		std::vector<glm::vec2>::const_iterator current_it = previous_it + 1;
+		std::vector<glm::vec2>::const_iterator next_it = current_it + 1;
+
+		Line line_start(*previous_it, *current_it);
+		Quad quad_start = line_start.ConstructQuad(a_Thickness);
+
+		Quad quad_section;
+		quad_section.ul = quad_start.ul;
+		quad_section.ll = quad_start.ll;
+
+		while (current_it != a_Polygon.positions.end())
+		{
+			const glm::vec2& previous = *previous_it;
+			const glm::vec2& current = *current_it;
+
+			Line line_previous(previous, current);
+			Quad quad_previous = line_previous.ConstructQuad(a_Thickness);
+
+			if (next_it == a_Polygon.positions.end())
+			{
+				a_Target->AddQuad(
+					quad_section.ul, quad_previous.ur,
+					quad_section.ll, quad_previous.lr
+				);
+
+				break;
+			}
+
+			const glm::vec2& next = *next_it;
+
+			Line line_current(current, next);
+			Quad quad_current = line_current.ConstructQuad(a_Thickness);
+
+			Line line_joint(previous, next);
+
+			bool segment_default = false;
+
+			float side_joint = line_joint.GetCrossProduct(current);
+			if (side_joint < 0.0f)
+			{
+				Line collision_line_previous(quad_previous.ll, quad_previous.lr);
+				Line collision_line_next(quad_current.ll, quad_current.lr);
+
+				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
+
+				float outside_previous = collision_line_previous.GetCrossProduct(quad_current.lr);
+				if (collision.time >= 0.0f && collision.time <= 1.0f && outside_previous > 0.0f)
+				{
+					a_Target->AddQuad(
+						quad_section.ul, quad_previous.ur,
+						quad_section.ll, collision.position
+					);
+
+					a_Target->AddTriangle(
+						quad_previous.ur,
+						collision.position,
+						quad_current.ul
+					);
+
+					quad_section.ul = quad_current.ul;
+					quad_section.ll = collision.position;
+				}
+				else
+				{
+					segment_default = true;
+				}
+			}
+			else if (side_joint > 0.0f)
+			{
+				Line collision_line_previous(quad_previous.ul, quad_previous.ur);
+				Line collision_line_next(quad_current.ul, quad_current.ur);
+
+				Line::CollisionResult collision = collision_line_previous.Collides(collision_line_next);
+
+				float outside_previous = collision_line_previous.GetCrossProduct(quad_current.ur);
+				if (collision.time >= 0.0f && collision.time <= 1.0f && outside_previous < 0.0f)
+				{
+					a_Target->AddQuad(
+						quad_section.ul, collision.position,
+						quad_section.ll, quad_previous.lr
+					);
+
+					a_Target->AddTriangle(
+						quad_previous.lr,
+						quad_current.ll,
+						collision.position
+					);
+
+					quad_section.ul = collision.position;
+					quad_section.ll = quad_current.ll;
+				}
+				else
+				{
+					segment_default = true;
+				}
+			}
+			else
+			{
+				segment_default = true;
+			}
+
+			if (segment_default)
+			{
+				a_Target->AddQuad(
+					quad_section.ul, quad_previous.ur,
+					quad_section.ll, quad_previous.lr
+				);
+
+				quad_section.ul = quad_current.ul;
+				quad_section.ll = quad_current.ll;
+			}
+
+			if (current_it != a_Polygon.positions.begin())
+			{
+				previous_it++;
+			}
+			current_it++;
+			if (next_it != a_Polygon.positions.end())
+			{
+				next_it++;
+			}
+		}
+	}
+
 }; // namespace ExLibris
