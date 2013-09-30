@@ -39,6 +39,7 @@
 #include <FontFace.h>
 #include <FontLoaderFreetype.h>
 #include <Glyph.h>
+#include <IMeshVisitor.h>
 #include <LineShape.h>
 
 // Options
@@ -443,6 +444,81 @@ TextMesh CreateMesh(ExLibris::FontFace* a_Face, const std::wstring& a_Text)
 	return text_mesh;
 }
 
+class MeshOpenGL
+	: public ExLibris::IMeshVisitor
+{
+
+public:
+
+	MeshOpenGL()
+		: m_Buffer(0)
+		, m_VertexData(nullptr)
+		, m_VertexCount(0)
+		, m_VertexFilled(0)
+	{
+		glGenBuffers(1, &m_Buffer);
+	}
+
+	~MeshOpenGL()
+	{
+		if (m_VertexData != nullptr)
+		{
+			delete [] m_VertexData;
+			m_VertexData = nullptr;
+		}
+
+		glDeleteBuffers(1, &m_Buffer);
+	}
+
+	ExLibris::TriangleOrientation GetOrientation() const
+	{
+		return ExLibris::eTriangleOrientation_CounterClockWise;
+	}
+
+	void VisitBuilderMeshBegin(unsigned int a_VertexCount)
+	{
+		m_VertexFilled = 0;
+
+		if (a_VertexCount > m_VertexCount)
+		{
+			m_VertexCount = a_VertexCount;
+
+			if (m_VertexData != nullptr)
+			{
+				delete [] m_VertexData;
+			}
+			m_VertexData = new glm::vec2[m_VertexCount];
+		}
+	}
+
+	void VisitBuilderTriangle(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C)
+	{
+		m_VertexData[m_VertexFilled++] = a_A;
+		m_VertexData[m_VertexFilled++] = a_B;
+		m_VertexData[m_VertexFilled++] = a_C;
+	}
+
+	void VisitBuilderMeshEnd()
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
+		glBufferData(GL_ARRAY_BUFFER, m_VertexFilled * sizeof(glm::vec2), m_VertexData, GL_STATIC_DRAW);
+	}
+
+	void Render()
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
+		glDrawArrays(GL_TRIANGLES, 0, m_VertexFilled);
+	}
+
+private:
+
+	GLuint m_Buffer;
+	glm::vec2* m_VertexData;
+	size_t m_VertexCount;
+	size_t m_VertexFilled;
+
+};
+
 
 //#define SKIP_FONT
 
@@ -555,6 +631,8 @@ int main(int argc, const char** argv)
 	GLuint vertex_buffer;
 	glGenBuffers(1, &vertex_buffer);
 
+	MeshOpenGL* mesh_outline = new MeshOpenGL();
+
 	float timer = 0.0f;
 
 	unsigned long time_start = GetTickCount();
@@ -661,14 +739,13 @@ int main(int argc, const char** argv)
 		ExLibris::LineShape shape;
 		shape.AddPolygon(g_MousePath);
 
-		ExLibris::TriangleList* triangles = shape.Triangulate(20.0f);
+		ExLibris::MeshBuilder* builder = shape.BuildMesh(20.0f);
 
 		g_MousePath.positions.pop_back();
 
-		if (triangles != nullptr && triangles->vertex_count > 0)
+		if (builder != nullptr && builder->GetVertexCount() > 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-			glBufferData(GL_ARRAY_BUFFER, triangles->vertex_filled * sizeof(glm::vec2), triangles->positions, GL_STATIC_DRAW);
+			builder->Accept(*mesh_outline);
 
 			Framework::ShaderProgram* outline_program = nullptr;
 			glm::vec4 outline_color;
@@ -693,12 +770,12 @@ int main(int argc, const char** argv)
 
 			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-			glDrawArrays(GL_TRIANGLES, 0, triangles->vertex_filled);
+			mesh_outline->Render();
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glUseProgram(0);
 
-			delete triangles;
+			delete builder;
 		}
 
 		/*glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);

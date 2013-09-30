@@ -10,6 +10,11 @@ namespace ExLibris
 	{
 	}
 
+	size_t MeshBuilder::GetVertexCount() const
+	{
+		return m_VertexCount;
+	}
+
 	void MeshBuilder::Clear()
 	{
 		m_VertexCount = 0;
