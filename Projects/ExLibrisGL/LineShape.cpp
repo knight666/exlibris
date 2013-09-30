@@ -250,19 +250,54 @@ namespace ExLibris
 		return triangles;
 	}
 
-	MeshBuilder* LineShape::BuildMesh(float a_Thickness)
+	MeshBuilder* LineShape::BuildMesh(const LineMeshOptions& a_Options)
 	{
 		MeshBuilder* builder = new MeshBuilder;
 
-		for (std::vector<Polygon>::iterator polygon_it = m_Polygons.begin(); polygon_it != m_Polygons.end(); ++polygon_it)
+		if (a_Options.quality == LineMeshOptions::eQuality_Fast)
 		{
-			_TriangulatePolygon(builder, *polygon_it, a_Thickness);
+			for (std::vector<Polygon>::iterator polygon_it = m_Polygons.begin(); polygon_it != m_Polygons.end(); ++polygon_it)
+			{
+				_TriangulatePolygonFast(builder, *polygon_it, a_Options.thickness);
+			}
 		}
-
+		else if (a_Options.quality == LineMeshOptions::eQuality_Gapless)
+		{
+			for (std::vector<Polygon>::iterator polygon_it = m_Polygons.begin(); polygon_it != m_Polygons.end(); ++polygon_it)
+			{
+				_TriangulatePolygonGapless(builder, *polygon_it, a_Options.thickness);
+			}
+		}
+		
 		return builder;
 	}
 
-	void LineShape::_TriangulatePolygon(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness)
+	void LineShape::_TriangulatePolygonFast(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness)
+	{
+		if (a_Polygon.positions.size() < 2)
+		{
+			return;
+		}
+
+		std::vector<glm::vec2>::const_iterator current_it = a_Polygon.positions.begin();
+		std::vector<glm::vec2>::const_iterator next_it = current_it + 1;
+
+		while (next_it != a_Polygon.positions.end())
+		{
+			Line segment_line(*current_it, *next_it);
+			Quad segment_quad = segment_line.ConstructQuad(a_Thickness);
+
+			a_Target->AddQuad(
+				segment_quad.ul, segment_quad.ur,
+				segment_quad.ll, segment_quad.lr
+			);
+
+			++current_it;
+			++next_it;
+		}
+	}
+
+	void LineShape::_TriangulatePolygonGapless(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness)
 	{
 		if (a_Polygon.positions.size() < 2)
 		{

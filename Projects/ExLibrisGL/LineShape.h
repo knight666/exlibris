@@ -1,6 +1,7 @@
 #ifndef _LINESHAPE_H_
 #define _LINESHAPE_H_
 
+#include "LineMeshOptions.h"
 #include "MeshBuilder.h"
 #include "Polygon.h"
 #include "TriangleList.h"
@@ -23,11 +24,12 @@ namespace ExLibris
 
 		TriangleList* Triangulate(float a_Thickness) const;
 
-		MeshBuilder* BuildMesh(float a_Thickness);
+		MeshBuilder* BuildMesh(const LineMeshOptions& a_Options);
 
 	private:
 
-		void _TriangulatePolygon(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness);
+		void _TriangulatePolygonFast(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness);
+		void _TriangulatePolygonGapless(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness);
 
 	private:
 

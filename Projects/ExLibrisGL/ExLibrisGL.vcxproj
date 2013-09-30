@@ -105,6 +105,7 @@
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="Line.h" />
+    <ClInclude Include="LineMeshOptions.h" />
     <ClInclude Include="LineShape.h" />
     <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="PolygonShape.h" />

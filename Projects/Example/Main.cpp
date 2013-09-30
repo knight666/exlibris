@@ -739,7 +739,11 @@ int main(int argc, const char** argv)
 		ExLibris::LineShape shape;
 		shape.AddPolygon(g_MousePath);
 
-		ExLibris::MeshBuilder* builder = shape.BuildMesh(20.0f);
+		ExLibris::LineMeshOptions options;
+		options.thickness = 20.0f;
+		options.quality = ExLibris::LineMeshOptions::eQuality_Fast;
+
+		ExLibris::MeshBuilder* builder = shape.BuildMesh(options);
 
 		g_MousePath.positions.pop_back();
 
