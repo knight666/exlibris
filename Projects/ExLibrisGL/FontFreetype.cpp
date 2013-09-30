@@ -294,7 +294,7 @@ namespace ExLibris
 		CurveSettings settings;
 		settings.precision = 10;
 
-		std::vector<Polygon> polygons = path.ConvertToPolygons(settings);
+		std::vector<Polygon> polygons = path.BuildPolygons(settings);
 		if (polygons.size() > 0)
 		{
 			a_Glyph->outline = new GlyphOutline;

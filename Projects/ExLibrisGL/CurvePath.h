@@ -23,14 +23,7 @@ namespace ExLibris
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
 		void QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To);
 
-		bool StartCursor(const CurveSettings& a_Settings);
-		glm::vec2 ReadCursorPosition();
-		bool IsCursorNextShape() const;
-		bool IsCursorValid() const;
-
-		std::vector<Polygon> BuildPolygons(const CurveSettings& a_Settings);
-
-		std::vector<Polygon> ConvertToPolygons(const CurveSettings& a_Settings) const;
+		std::vector<Polygon> BuildPolygons(const CurveSettings& a_Settings) const;
 
 	private:
 
