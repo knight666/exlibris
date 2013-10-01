@@ -5,7 +5,7 @@
 namespace ExLibris
 {
 
-	Polygon& Polygon::operator += (glm::vec2& a_Position)
+	Polygon& Polygon::operator += (const glm::vec2& a_Position)
 	{
 		positions.push_back(a_Position);
 
