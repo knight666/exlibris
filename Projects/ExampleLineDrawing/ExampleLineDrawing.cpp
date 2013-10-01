@@ -133,6 +133,9 @@ public:
 
 		m_MeshLines = new MeshOpenGL();
 
+		m_OptionLineQuality.quality = ExLibris::LineMeshOptions::eQuality_Fast;
+		m_OptionLineQuality.thickness = 20.0f;
+
 		return true;
 	}
 
@@ -172,11 +175,7 @@ public:
 		ExLibris::LineShape shape;
 		shape.AddPolygon(m_MousePath);
 
-		ExLibris::LineMeshOptions options;
-		options.thickness = 20.0f;
-		options.quality = ExLibris::LineMeshOptions::eQuality_Fast;
-
-		ExLibris::MeshBuilder* builder = shape.BuildMesh(options);
+		ExLibris::MeshBuilder* builder = shape.BuildMesh(m_OptionLineQuality);
 
 		m_MousePath.positions.pop_back();
 
@@ -238,17 +237,52 @@ private:
 
 	void OnKeyReleased(int a_Key, int a_ScanCode, int a_Modifiers)
 	{
-		if (a_Key == GLFW_KEY_ESCAPE)
+		switch (a_Key)
 		{
-			Quit();
-		}
-		else if (a_Key == GLFW_KEY_F5)
-		{
-			_LoadShaders();
-		}
-		else if (a_Key == GLFW_KEY_1)
-		{
-			m_OptionDrawLines = !m_OptionDrawLines;
+
+		case GLFW_KEY_ESCAPE:
+			{
+				Quit();
+
+			} break;
+
+		case GLFW_KEY_F5:
+			{
+				_LoadShaders();
+
+			} break;
+
+		case GLFW_KEY_UP:
+			{
+				m_OptionLineQuality.thickness += 1.0f;
+
+			} break;
+
+		case GLFW_KEY_DOWN:
+			{
+				m_OptionLineQuality.thickness -= 1.0f;
+
+			} break;
+
+		case GLFW_KEY_1:
+			{
+				m_OptionDrawLines = !m_OptionDrawLines;
+
+			} break;
+
+		case GLFW_KEY_2:
+			{
+				if (m_OptionLineQuality.quality == ExLibris::LineMeshOptions::eQuality_Fast)
+				{
+					m_OptionLineQuality.quality = ExLibris::LineMeshOptions::eQuality_Gapless;
+				}
+				else if (m_OptionLineQuality.quality == ExLibris::LineMeshOptions::eQuality_Gapless)
+				{
+					m_OptionLineQuality.quality = ExLibris::LineMeshOptions::eQuality_Fast;
+				}
+
+			} break;
+
 		}
 	}
 
@@ -294,6 +328,7 @@ private:
 	ExLibris::Polygon m_MousePath;
 
 	bool m_OptionDrawLines;
+	ExLibris::LineMeshOptions m_OptionLineQuality;
 
 	fw::ShaderLoader* m_ShaderLoader;
 	fw::ShaderProgram* m_ProgramTriangles;
