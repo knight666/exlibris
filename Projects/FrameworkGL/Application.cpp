@@ -22,7 +22,7 @@ namespace Framework
 		{
 			application->OnKeyPressed(a_Key, a_ScanCode, a_Modifiers);
 		}
-		else if (a_Action == GLFW_PRESS)
+		else if (a_Action == GLFW_RELEASE)
 		{
 			application->OnKeyReleased(a_Key, a_ScanCode, a_Modifiers);
 		}
@@ -32,13 +32,18 @@ namespace Framework
 	{
 		Application* application = (Application*)glfwGetWindowUserPointer(a_Window);
 
+		double cursor_position[2];
+		glfwGetCursorPos(a_Window, &cursor_position[0], &cursor_position[1]);
+
+		glm::vec2 position((float)cursor_position[0], (float)cursor_position[1]);
+
 		if (a_Action == GLFW_PRESS)
 		{
-			application->OnButtonPressed(a_Button, a_Modifiers);
+			application->OnButtonPressed(a_Button, position, a_Modifiers);
 		}
 		else if (a_Action == GLFW_RELEASE)
 		{
-			application->OnButtonReleased(a_Button, a_Modifiers);
+			application->OnButtonReleased(a_Button, position, a_Modifiers);
 		}
 	}
 
@@ -52,13 +57,19 @@ namespace Framework
 	}
 
 	Application::Application(int a_ArgumentCount, const char** a_Arguments)
-		: m_Running(false)
+		: m_ArgumentCount(a_ArgumentCount)
+		, m_Arguments(a_Arguments)
+		, m_Running(false)
 	{
-		ParseCommandLine(a_ArgumentCount, a_Arguments);
 	}
 	
 	Application::~Application()
 	{
+	}
+
+	GLFWwindow* Application::GetWindow() const
+	{
+		return m_Window;
 	}
 
 	bool Application::IsRunning() const
@@ -90,6 +101,8 @@ namespace Framework
 			return false;
 		}
 
+		glfwMakeContextCurrent(m_Window);
+
 		glfwSetKeyCallback(m_Window, ProcessKey);
 		glfwSetMouseButtonCallback(m_Window, ProcessButton);
 		glfwSetCursorPosCallback(m_Window, ProcessCursor);
@@ -111,11 +124,18 @@ namespace Framework
 		return true;
 	}
 
+	void Application::_DestroyOpenGL()
+	{
+		glfwTerminate();
+	}
+
 	int Application::Run()
 	{
+		ParseCommandLine(m_ArgumentCount, m_Arguments);
+
 		if (!_InitializeOpenGL())
 		{
-			glfwTerminate();
+			_DestroyOpenGL();
 
 			return -1;
 		}
@@ -125,19 +145,25 @@ namespace Framework
 			return -1;
 		}
 
+		m_Running = true;
+
 		unsigned long time_start = GetTickCount();
 		float physics_time = 0.0f;
 		float physics_frame = 1000.0f / 60.0f;
 
-		while (IsRunning())
+		while (IsRunning() && glfwWindowShouldClose(m_Window) == 0)
 		{
+			// poll
+
+			glfwPollEvents();
+
+			// update
+
 			unsigned long time_current = GetTickCount();
 			float time_delta = (float)(time_current - time_start);
 			time_start = time_current;
 
 			physics_time += time_delta;
-
-			// update
 
 			while (physics_time > physics_frame)
 			{
@@ -149,7 +175,14 @@ namespace Framework
 			// render
 
 			Render();
+
+			// swap
+
+			glfwSwapBuffers(m_Window);
 		}
+
+		Destroy();
+		_DestroyOpenGL();
 
 		return 0;
 	}
@@ -162,15 +195,15 @@ namespace Framework
 	{
 	}
 
-	void Application::OnButtonPressed(int a_Button, int a_Modifiers)
-	{
-	}
-
-	void Application::OnButtonReleased(int a_Button, int a_Modifiers)
-	{
-	}
-
 	void Application::OnMouseMoved(const glm::vec2& a_Position)
+	{
+	}
+
+	void Application::OnButtonPressed(int a_Button, const glm::vec2& a_Position, int a_Modifiers)
+	{
+	}
+
+	void Application::OnButtonReleased(int a_Button, const glm::vec2& a_Position, int a_Modifiers)
 	{
 	}
 

@@ -12,7 +12,7 @@ namespace ExLibris
 
 	public:
 
-		Polygon& operator += (glm::vec2& a_Position);
+		Polygon& operator += (const glm::vec2& a_Position);
 
 		bool IsPositionInside(const glm::vec2& a_Position) const;
 
