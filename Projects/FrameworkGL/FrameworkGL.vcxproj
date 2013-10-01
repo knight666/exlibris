@@ -37,6 +37,7 @@
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -46,6 +47,7 @@
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -66,6 +68,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="FrameworkGL.PCH.h" />
+    <ClInclude Include="MeshOpenGL.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="ShaderSource.h" />
@@ -76,6 +79,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MeshOpenGL.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="ShaderSource.cpp" />
