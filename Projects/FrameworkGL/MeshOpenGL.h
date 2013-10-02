@@ -23,7 +23,8 @@ namespace Framework
 		void VisitBuilderTriangle(const glm::vec2& a_A, const glm::vec2& a_B, const glm::vec2& a_C);
 		void VisitBuilderMeshEnd();
 
-		void Render();
+		GLuint GetBuffer() const;
+		GLuint GetVertexCount() const;
 
 	private:
 

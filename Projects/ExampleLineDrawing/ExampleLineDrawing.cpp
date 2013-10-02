@@ -7,6 +7,7 @@
 // Framework
 
 #include <Application.h>
+#include <MeshOpenGL.h>
 #include <ShaderLoader.h>
 #include <ShaderProgram.h>
 
@@ -25,7 +26,6 @@ namespace fw = Framework;
 // ExLibris
 
 #include <LineShape.h>
-#include <MeshOpenGL.h>
 #include <Polygon.h>
 
 // Main
@@ -129,9 +129,10 @@ public:
 			GLint attribute_position = outline_program->GetAttribute("attrPosition");
 			glEnableVertexAttribArray(attribute_position);
 
+			glBindBuffer(GL_ARRAY_BUFFER, m_MeshLines->GetBuffer());
 			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-			m_MeshLines->Render();
+			glDrawArrays(GL_TRIANGLES, 0, m_MeshLines->GetVertexCount());
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glUseProgram(0);
