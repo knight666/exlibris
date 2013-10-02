@@ -23,6 +23,7 @@ namespace Framework
 		}
 
 		glDeleteBuffers(1, &m_Buffer);
+		m_Buffer = 0;
 	}
 
 	ExLibris::TriangleOrientation MeshOpenGL::GetOrientation() const
@@ -59,10 +60,14 @@ namespace Framework
 		glBufferData(GL_ARRAY_BUFFER, m_VertexFilled * sizeof(glm::vec2), m_VertexData, GL_STATIC_DRAW);
 	}
 
-	void MeshOpenGL::Render()
+	GLuint MeshOpenGL::GetBuffer() const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
-		glDrawArrays(GL_TRIANGLES, 0, m_VertexFilled);
+		return m_Buffer;
+	}
+
+	GLuint MeshOpenGL::GetVertexCount() const
+	{
+		return m_VertexFilled;
 	}
 
 }; // namespace Framework
