@@ -1,10 +1,9 @@
 #ifndef _GLYPH_H_
 #define _GLYPH_H_
 
+#include "CurvePath.h"
 #include "GlyphBitmap.h"
 #include "GlyphMetrics.h"
-#include "GlyphOutline.h"
-#include "TriangleList.h"
 
 namespace ExLibris
 {
@@ -17,7 +16,6 @@ namespace ExLibris
 			, metrics(nullptr)
 			, bitmap(nullptr)
 			, outline(nullptr)
-			, mesh(nullptr)
 		{
 		}
 
@@ -34,17 +32,11 @@ namespace ExLibris
 				delete bitmap;
 				bitmap = nullptr;
 			}
-			
+
 			if (outline != nullptr)
 			{
 				delete outline;
 				outline = nullptr;
-			}
-
-			if (mesh != nullptr)
-			{
-				delete mesh;
-				mesh = nullptr;
 			}
 		}
 
@@ -53,8 +45,7 @@ namespace ExLibris
 		unsigned int index;
 		GlyphMetrics* metrics;
 		GlyphBitmap* bitmap;
-		GlyphOutline* outline;
-		TriangleList* mesh;
+		CurvePath* outline;
 		std::map<unsigned int, glm::vec2> kernings;
 	
 	}; // struct Glyph

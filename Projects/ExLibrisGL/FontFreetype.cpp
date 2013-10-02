@@ -273,8 +273,6 @@ namespace ExLibris
 
 		FT_Error errors = 0;
 
-		a_Glyph->outline = new GlyphOutline;
-
 		FT_Matrix transform_flipped;
 		transform_flipped.xx = Fixed16Dot16::ToFixed(1.0f);
 		transform_flipped.xy = 0;
@@ -283,33 +281,12 @@ namespace ExLibris
 
 		FT_Outline_Transform(&a_Slot->outline, &transform_flipped);
 
-		CurvePath path;
+		a_Glyph->outline = new CurvePath;
 
-		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, &path);
+		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph->outline);
 		if (errors != 0)
 		{
 			return false;
-		}
-
-		CurveSettings settings;
-		settings.precision = 10;
-
-		std::vector<Polygon> polygons = path.BuildPolygons(settings);
-		if (polygons.size() > 0)
-		{
-			a_Glyph->outline = new GlyphOutline;
-			a_Glyph->outline->contours = polygons;
-
-			PolygonShape glyph_polygon;
-			
-			for (std::vector<Polygon>::iterator polygon_it = polygons.begin(); polygon_it != polygons.end(); ++polygon_it)
-			{
-				Polygon& polygon = *polygon_it;
-
-				glyph_polygon.AddShape(polygon);
-			}
-
-			a_Glyph->mesh = glyph_polygon.Triangulate();
 		}
 
 		return true;

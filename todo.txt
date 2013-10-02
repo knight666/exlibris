@@ -1,3 +1,5 @@
+--gtest_filter=-Font*:Face*
+
 Makefile
 
 - Python build script
@@ -39,12 +41,7 @@ Canvas
 - MeshBuilder* BuildOutline(settings)
 - MeshBuilder* BuildFilled(settings)
 
-cli::Parser
-cli::Command
-- GetName
-- HasFlag
-- FindFlag
-
-cli::Flag
-- begin
-- end
+FontMeshRender(FontFace*)
+- FindMesh(int)
+- LoadGlyphs(vector<int>)
+- DrawText(string, position, color)

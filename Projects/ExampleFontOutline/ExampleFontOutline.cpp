@@ -26,6 +26,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <CurveSettings.h>
 #include <FontFace.h>
 #include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
@@ -119,18 +120,25 @@ public:
 
 		timer.Start();
 		{
-			m_Glyph = m_FontFace->FindGlyph((unsigned int)'$');
+			m_Glyph = m_FontFace->FindGlyph((unsigned int)'A');
 
-			for (std::vector<exl::Polygon>::iterator contour_it = m_Glyph->outline->contours.begin(); contour_it != m_Glyph->outline->contours.end(); ++contour_it)
-			{
-				m_Shape.AddPolygon(*contour_it);
-			}
+			exl::CurveSettings settings;
+			settings.precision = 10;
 
-			exl::MeshBuilder* builder = m_Shape.BuildMesh(m_MeshOptions);
-			if (builder != nullptr && builder->GetVertexCount() > 0)
+			std::vector<exl::Polygon> polygons = m_Glyph->outline->BuildPolygons(settings);
+			if (polygons.size() > 0)
 			{
-				builder->Accept(*m_Mesh);
-				delete builder;
+				for (std::vector<exl::Polygon>::iterator poly_it = polygons.begin(); poly_it != polygons.end(); ++poly_it)
+				{
+					m_Shape.AddPolygon(*poly_it);
+				}
+
+				exl::MeshBuilder* builder = m_Shape.BuildMesh(m_MeshOptions);
+				if (builder != nullptr && builder->GetVertexCount() > 0)
+				{
+					builder->Accept(*m_Mesh);
+					delete builder;
+				}
 			}
 		}
 		timer.End();
