@@ -97,10 +97,8 @@
     <ClInclude Include="FreetypeConversion.h" />
     <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphBitmap.h" />
-    <ClInclude Include="GlyphContour.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
-    <ClInclude Include="GlyphOutline.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IMeshVisitor.h" />
