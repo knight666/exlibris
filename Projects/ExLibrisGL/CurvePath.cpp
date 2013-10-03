@@ -13,6 +13,21 @@ namespace ExLibris
 	{
 	}
 
+	size_t CurvePath::GetCommandCount() const
+	{
+		return m_Commands.size();
+	}
+
+	size_t CurvePath::GetPositionCount() const
+	{
+		return m_Positions.size();
+	}
+
+	const glm::vec2& CurvePath::GetPosition(size_t a_Index) const
+	{
+		return m_Positions[a_Index];
+	}
+
 	void CurvePath::Move(const glm::vec2& a_Position)
 	{
 		m_Commands.push_back(eCommandType_Move);

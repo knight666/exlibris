@@ -81,8 +81,7 @@ TEST(FontFace, TryGetKerning)
 	glm::vec2 kerning_actual;
 	EXPECT_TRUE(face->TryGetKerning(glyph, glyph_other, kerning_actual));
 
-	EXPECT_FLOAT_EQ(-4.5f, kerning_actual.x);
-	EXPECT_FLOAT_EQ(22.0f, kerning_actual.y);
+	EXPECT_VEC2_EQ(-4.5f, 22.0f, kerning_actual);
 }
 
 TEST(FontFace, TryGetKerningNotFound)
@@ -144,12 +143,9 @@ TEST_F(FaceContext, FindGlyph)
 	EXPECT_EQ(25, glyph->index);
 	ASSERT_NE(nullptr, glyph->metrics);
 	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
-	EXPECT_FLOAT_EQ(2.0f, glyph->metrics->offset.x);
-	EXPECT_FLOAT_EQ(34.0f, glyph->metrics->offset.y);
-	EXPECT_FLOAT_EQ(2.0625000f, glyph->metrics->bounding_box.minimum.x);
-	EXPECT_FLOAT_EQ(0.0000000f, glyph->metrics->bounding_box.minimum.y);
-	EXPECT_FLOAT_EQ(16.859375f, glyph->metrics->bounding_box.maximum.x);
-	EXPECT_FLOAT_EQ(23.000000f, glyph->metrics->bounding_box.maximum.y);
+	EXPECT_VEC2_EQ(2.0f, 34.0f, glyph->metrics->offset);
+	EXPECT_VEC2_EQ(2.0625000f, 0.0000000f, glyph->metrics->bounding_box.minimum);
+	EXPECT_VEC2_EQ(16.859375f, 23.000000f, glyph->metrics->bounding_box.maximum);
 }
 
 TEST_F(FaceContext, FindGlyphOutline)
@@ -158,12 +154,10 @@ TEST_F(FaceContext, FindGlyphOutline)
 	ASSERT_NE(nullptr, glyph);
 
 	ASSERT_NE(nullptr, glyph->outline);
-	EXPECT_EQ(1, glyph->outline->contours.size());
+	EXPECT_EQ(5, glyph->outline->GetCommandCount());
 
-	Polygon contour = glyph->outline->contours[0];
-	EXPECT_EQ(5, contour.positions.size());
-	EXPECT_FLOAT_EQ(8.2031250f, contour.positions[0].x);
-	EXPECT_FLOAT_EQ(-8.5937500f, contour.positions[0].y);
+	EXPECT_EQ(5, glyph->outline->GetPositionCount());
+	EXPECT_VEC2_EQ(8.2031250f, -8.5937500f, glyph->outline->GetPosition(0));
 }
 
 TEST_F(FaceContext, FindGlyphNotFound)

@@ -18,6 +18,11 @@ namespace ExLibris
 		CurvePath();
 		~CurvePath();
 
+		size_t GetCommandCount() const;
+
+		size_t GetPositionCount() const;
+		const glm::vec2& GetPosition(size_t a_Index) const;
+
 		void Move(const glm::vec2& a_Position);
 		void LineTo(const glm::vec2& a_To);
 		void ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To);
@@ -38,22 +43,6 @@ namespace ExLibris
 
 		std::vector<CommandType> m_Commands;
 		std::vector<glm::vec2> m_Positions;
-
-		struct CursorState
-		{
-			CurveSettings settings;
-			std::vector<CommandType>::iterator command_it;
-			std::vector<glm::vec2>::iterator position_it;
-			glm::vec2 curve_previous;
-			glm::vec2 curve_from;
-			glm::vec2 curve_control_a;
-			glm::vec2 curve_control_b;
-			glm::vec2 curve_to;
-			bool curve_started;
-			int curve_step;
-			float curve_time_delta;
-		};
-		CursorState m_Cursor;
 
 	}; // class CurvePath
 
