@@ -1,4 +1,4 @@
-// STL
+﻿// STL
 
 #include <iostream>
 #include <map>
@@ -93,7 +93,9 @@ public:
 		m_ShaderLoader = new fw::ShaderLoader();
 		_LoadShaders();
 
-		m_MeshOptions.quality = exl::LineMeshOptions::eQuality_Fast;
+		m_CurveSettings.precision = 10;
+
+		m_MeshOptions.quality = exl::LineMeshOptions::eQuality_Gapless;
 		m_MeshOptions.thickness = 5.0f;
 
 		m_Mesh = new fw::MeshOpenGL();
@@ -120,26 +122,8 @@ public:
 
 		timer.Start();
 		{
-			m_Glyph = m_FontFace->FindGlyph((unsigned int)'A');
+			_BuildGlyphMesh();
 
-			exl::CurveSettings settings;
-			settings.precision = 10;
-
-			std::vector<exl::Polygon> polygons = m_Glyph->outline->BuildPolygons(settings);
-			if (polygons.size() > 0)
-			{
-				for (std::vector<exl::Polygon>::iterator poly_it = polygons.begin(); poly_it != polygons.end(); ++poly_it)
-				{
-					m_Shape.AddPolygon(*poly_it);
-				}
-
-				exl::MeshBuilder* builder = m_Shape.BuildMesh(m_MeshOptions);
-				if (builder != nullptr && builder->GetVertexCount() > 0)
-				{
-					builder->Accept(*m_Mesh);
-					delete builder;
-				}
-			}
 		}
 		timer.End();
 
@@ -227,25 +211,25 @@ private:
 
 		case GLFW_KEY_LEFT:
 			{
-				m_CameraVelocity.x = -speed;
+				m_CameraVelocity.x = speed;
 
 			} break;
 
 		case GLFW_KEY_RIGHT:
 			{
-				m_CameraVelocity.x = speed;
+				m_CameraVelocity.x = -speed;
 
 			} break;
 
 		case GLFW_KEY_UP:
 			{
-				m_CameraVelocity.y = -speed;
+				m_CameraVelocity.y = speed;
 
 			} break;
 
 		case GLFW_KEY_DOWN:
 			{
-				m_CameraVelocity.y = speed;
+				m_CameraVelocity.y = -speed;
 
 			} break;
 
@@ -284,6 +268,37 @@ private:
 		case GLFW_KEY_1:
 			{
 				m_OptionDrawLines = !m_OptionDrawLines;
+
+			} break;
+
+		case GLFW_KEY_2:
+			{
+				if (m_MeshOptions.quality == ExLibris::LineMeshOptions::eQuality_Fast)
+				{
+					m_MeshOptions.quality = ExLibris::LineMeshOptions::eQuality_Gapless;
+				}
+				else if (m_MeshOptions.quality == ExLibris::LineMeshOptions::eQuality_Gapless)
+				{
+					m_MeshOptions.quality = ExLibris::LineMeshOptions::eQuality_Fast;
+				}
+
+				_BuildGlyphMesh();
+
+			} break;
+
+		case GLFW_KEY_O:
+			{
+				m_CurveSettings.precision -= 5;
+
+				_BuildGlyphMesh();
+
+			} break;
+
+		case GLFW_KEY_P:
+			{
+				m_CurveSettings.precision += 5;
+
+				_BuildGlyphMesh();
 
 			} break;
 
@@ -335,6 +350,29 @@ private:
 		m_ProgramLines->Link();
 	}
 
+	void _BuildGlyphMesh() 
+	{
+		m_Glyph = m_FontFace->FindGlyph((unsigned int)L'₫');
+
+		std::vector<exl::Polygon> polygons = m_Glyph->outline->BuildPolygons(m_CurveSettings);
+		if (polygons.size() > 0)
+		{
+			m_Shape.Clear();
+
+			for (std::vector<exl::Polygon>::iterator poly_it = polygons.begin(); poly_it != polygons.end(); ++poly_it)
+			{
+				m_Shape.AddPolygon(*poly_it);
+			}
+
+			exl::MeshBuilder* builder = m_Shape.BuildMesh(m_MeshOptions);
+			if (builder != nullptr && builder->GetVertexCount() > 0)
+			{
+				builder->Accept(*m_Mesh);
+				delete builder;
+			}
+		}
+	}
+
 private:
 
 	bool m_OptionDrawLines;
@@ -348,6 +386,7 @@ private:
 
 	exl::Glyph* m_Glyph;
 	exl::LineShape m_Shape;
+	exl::CurveSettings m_CurveSettings;
 	exl::LineMeshOptions m_MeshOptions;
 
 	fw::ShaderLoader* m_ShaderLoader;

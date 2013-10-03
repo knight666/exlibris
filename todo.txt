@@ -41,7 +41,11 @@ Canvas
 - MeshBuilder* BuildOutline(settings)
 - MeshBuilder* BuildFilled(settings)
 
-FontMeshRender(FontFace*)
+MeshCache
+- FindMesh(unsigned int)
+- AddMesh(unsigned int, Mesh*)
+
+FontRenderOutline(FontFace*)
 - FindMesh(int)
 - LoadGlyphs(vector<int>)
 - DrawText(string, position, color)
