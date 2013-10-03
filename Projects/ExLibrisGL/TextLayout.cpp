@@ -161,7 +161,14 @@ namespace ExLibris
 			{
 				TextGlyph* glyph = *glyph_it;
 
-				a_Visitor.VisitTextGlyph(glyph->glyph, glyph->x, glyph->advance);
+				if (glyph->type == eGlyphType_Character)
+				{
+					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance);
+				}
+				else if (glyph->type == eGlyphType_Whitespace)
+				{
+					a_Visitor.VisitTextWhitespace(glyph->x, glyph->advance);
+				}
 			}
 
 			a_Visitor.VisitTextLineEnd();
