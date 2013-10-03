@@ -94,7 +94,8 @@ public:
 					shape.AddPolygon(*poly_it);
 				}
 
-				exl::MeshBuilder* builder = shape.BuildMesh(line_mesh_options);
+				//exl::MeshBuilder* builder = shape.BuildMesh(line_mesh_options);
+				exl::MeshBuilder* builder = shape.BuildFilledMesh();
 
 				if (builder != nullptr && builder->GetVertexCount() > 0)
 				{
@@ -373,13 +374,13 @@ private:
 
 		case GLFW_KEY_MINUS:
 			{
-				m_CameraZoomSpeed = -0.25f;
+				m_CameraZoomSpeed = -0.05f;
 
 			} break;
 
 		case GLFW_KEY_EQUAL:
 			{
-				m_CameraZoomSpeed = 0.25f;
+				m_CameraZoomSpeed = 0.05f;
 
 			} break;
 
@@ -502,7 +503,7 @@ private:
 				m_Shape.AddPolygon(*poly_it);
 			}
 
-			exl::MeshBuilder* builder = m_Shape.BuildMesh(m_MeshOptions);
+			exl::MeshBuilder* builder = m_Shape.BuildOutlineMesh(m_MeshOptions);
 			if (builder != nullptr && builder->GetVertexCount() > 0)
 			{
 				builder->Accept(*m_Mesh);

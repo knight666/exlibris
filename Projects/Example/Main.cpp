@@ -743,7 +743,7 @@ int main(int argc, const char** argv)
 		options.thickness = 20.0f;
 		options.quality = ExLibris::LineMeshOptions::eQuality_Fast;
 
-		ExLibris::MeshBuilder* builder = shape.BuildMesh(options);
+		ExLibris::MeshBuilder* builder = shape.BuildOutlineMesh(options);
 
 		g_MousePath.positions.pop_back();
 

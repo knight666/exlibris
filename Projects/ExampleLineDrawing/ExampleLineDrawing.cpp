@@ -100,7 +100,7 @@ public:
 		ExLibris::LineShape shape;
 		shape.AddPolygon(m_MousePath);
 
-		ExLibris::MeshBuilder* builder = shape.BuildMesh(m_OptionLineQuality);
+		ExLibris::MeshBuilder* builder = shape.BuildOutlineMesh(m_OptionLineQuality);
 
 		m_MousePath.positions.pop_back();
 
