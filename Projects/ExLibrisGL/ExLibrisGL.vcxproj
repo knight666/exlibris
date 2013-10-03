@@ -87,9 +87,11 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="PolygonShape.cpp" />
     <ClCompile Include="Quad.cpp" />
+    <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Alignment.h" />
     <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
@@ -102,6 +104,7 @@
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IMeshVisitor.h" />
+    <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineMeshOptions.h" />
     <ClInclude Include="LineShape.h" />
@@ -109,6 +112,8 @@
     <ClInclude Include="PolygonShape.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
+    <ClInclude Include="SizePolicy.h" />
+    <ClInclude Include="TextLayout.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
     <ClInclude Include="TriangleOrientation.h" />
