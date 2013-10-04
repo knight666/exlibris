@@ -46,16 +46,36 @@ public:
 		: m_DrawFilled(true)
 		, m_DrawOutline(true)
 	{
+		m_CurveSettings.precision = 10;
 	}
 
 	~OutlineVisitor()
 	{
+		for (std::map<unsigned int, MeshEntry*>::iterator entry_it = m_MeshCache.begin(); entry_it != m_MeshCache.end(); ++entry_it)
+		{
+			MeshEntry* entry = entry_it->second;
+
+			delete entry->mesh_filled;
+			delete entry->mesh_outline;
+		}
+		m_MeshCache.clear();
 	}
 
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
 	{
 		m_Face = a_Face;
 		m_Dimensions = a_Dimensions;
+
+		for (std::map<unsigned int, MeshEntry*>::iterator entry_it = m_MeshCache.begin(); entry_it != m_MeshCache.end(); ++entry_it)
+		{
+			MeshEntry* entry = entry_it->second;
+
+			delete entry->mesh_filled;
+			delete entry->mesh_outline;
+		}
+		m_MeshCache.clear();
+
+		m_GlyphMeshes.clear();
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
@@ -81,14 +101,11 @@ public:
 			instance->meshes->mesh_filled = new fw::MeshOpenGL();
 			instance->meshes->mesh_outline = new fw::MeshOpenGL();
 
-			exl::CurveSettings curve_settings;
-			curve_settings.precision = 10;
-
 			exl::LineMeshOptions line_mesh_options;
 			line_mesh_options.quality = exl::LineMeshOptions::eQuality_Gapless;
 			line_mesh_options.thickness = 5.0f;
 
-			std::vector<exl::Polygon> polygons = a_Glyph->outline->BuildPolygons(curve_settings);
+			std::vector<exl::Polygon> polygons = a_Glyph->outline->BuildPolygons(m_CurveSettings);
 			if (polygons.size() > 0)
 			{
 				exl::LineShape shape;
@@ -129,6 +146,11 @@ public:
 
 	void VisitTextEnd()
 	{
+	}
+
+	void SetCurveSettings(const exl::CurveSettings& a_Settings)
+	{
+		m_CurveSettings = a_Settings;
 	}
 
 	void SetColorFilled(const glm::vec4& a_Color)
@@ -211,6 +233,8 @@ private:
 		fw::MeshOpenGL* mesh_filled;
 		fw::MeshOpenGL* mesh_outline;
 	};
+
+	exl::CurveSettings m_CurveSettings;
 
 	std::map<unsigned int, MeshEntry*> m_MeshCache;
 
@@ -498,7 +522,8 @@ private:
 			{
 				m_CurveSettings.precision -= 5;
 
-				_BuildGlyphMesh();
+				m_OutlineVisitor->SetCurveSettings(m_CurveSettings);
+				m_TextLayout->Accept(*m_OutlineVisitor);
 
 			} break;
 
@@ -506,7 +531,8 @@ private:
 			{
 				m_CurveSettings.precision += 5;
 
-				_BuildGlyphMesh();
+				m_OutlineVisitor->SetCurveSettings(m_CurveSettings);
+				m_TextLayout->Accept(*m_OutlineVisitor);
 
 			} break;
 
@@ -535,7 +561,6 @@ private:
 
 		}
 	}
-
 
 private:
 
