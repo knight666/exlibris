@@ -43,6 +43,8 @@ class OutlineVisitor
 public:
 
 	OutlineVisitor()
+		: m_DrawFilled(true)
+		, m_DrawOutline(true)
 	{
 	}
 
@@ -68,14 +70,16 @@ public:
 		instance->position = m_LineOffset;
 		instance->position.x += a_X;
 
-		std::map<unsigned int, fw::MeshOpenGL*>::iterator mesh_found = m_MeshCache.find(a_Glyph->index);
+		std::map<unsigned int, MeshEntry*>::iterator mesh_found = m_MeshCache.find(a_Glyph->index);
 		if (mesh_found != m_MeshCache.end())
 		{
-			instance->mesh = mesh_found->second;
+			instance->meshes = mesh_found->second;
 		}
 		else
 		{
-			instance->mesh = new fw::MeshOpenGL();
+			instance->meshes = new MeshEntry;
+			instance->meshes->mesh_filled = new fw::MeshOpenGL();
+			instance->meshes->mesh_outline = new fw::MeshOpenGL();
 
 			exl::CurveSettings curve_settings;
 			curve_settings.precision = 10;
@@ -94,17 +98,22 @@ public:
 					shape.AddPolygon(*poly_it);
 				}
 
-				//exl::MeshBuilder* builder = shape.BuildMesh(line_mesh_options);
-				exl::MeshBuilder* builder = shape.BuildFilledMesh();
-
-				if (builder != nullptr && builder->GetVertexCount() > 0)
+				exl::MeshBuilder* builder_filled = shape.BuildFilledMesh();
+				if (builder_filled != nullptr && builder_filled->GetVertexCount() > 0)
 				{
-					builder->Accept(*instance->mesh);
-					delete builder;
+					builder_filled->Accept(*instance->meshes->mesh_filled);
+					delete builder_filled;
+				}
+
+				exl::MeshBuilder* builder_outline = shape.BuildOutlineMesh(line_mesh_options);
+				if (builder_outline != nullptr && builder_outline->GetVertexCount() > 0)
+				{
+					builder_outline->Accept(*instance->meshes->mesh_outline);
+					delete builder_outline;
 				}
 			}
 
-			m_MeshCache.insert(std::make_pair(a_Glyph->index, instance->mesh));
+			m_MeshCache.insert(std::make_pair(a_Glyph->index, instance->meshes));
 		}
 
 		m_GlyphMeshes.push_back(instance);
@@ -122,6 +131,36 @@ public:
 	{
 	}
 
+	void SetColorFilled(const glm::vec4& a_Color)
+	{
+		m_ColorFilled = a_Color;
+	}
+
+	void SetColorOutline(const glm::vec4& a_Color)
+	{
+		m_ColorOutline = a_Color;
+	}
+
+	bool GetDrawFilled() const
+	{
+		return m_DrawFilled;
+	}
+
+	void SetDrawFilled(bool a_Value)
+	{
+		m_DrawFilled = a_Value;
+	}
+
+	bool GetDrawOutline() const
+	{
+		return m_DrawOutline;
+	}
+
+	void SetDrawOutline(bool a_Value)
+	{
+		m_DrawOutline = a_Value;
+	}
+
 	void Render(fw::ShaderProgram* a_ShaderProgram, const glm::mat4x4& a_MatrixProjection, const glm::mat4x4& a_MatrixModelView, GLint a_AttributePosition)
 	{
 		for (std::vector<GlyphInstance*>::iterator instance_it = m_GlyphMeshes.begin(); instance_it != m_GlyphMeshes.end(); ++instance_it)
@@ -134,11 +173,26 @@ public:
 			glm::mat4x4 mvp = a_MatrixProjection * a_MatrixModelView * offset;
 
 			glUniformMatrix4fv(a_ShaderProgram->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+			
+			if (m_DrawOutline)
+			{
+				glUniform4fv(a_ShaderProgram->GetUniform("uniColor"), 1, glm::value_ptr(m_ColorOutline));
 
-			glBindBuffer(GL_ARRAY_BUFFER, instance->mesh->GetBuffer());
-			glVertexAttribPointer(a_AttributePosition, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+				glBindBuffer(GL_ARRAY_BUFFER, instance->meshes->mesh_outline->GetBuffer());
+				glVertexAttribPointer(a_AttributePosition, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-			glDrawArrays(GL_TRIANGLES, 0, instance->mesh->GetVertexCount());
+				glDrawArrays(GL_TRIANGLES, 0, instance->meshes->mesh_outline->GetVertexCount());
+			}
+			
+			if (m_DrawFilled)
+			{
+				glUniform4fv(a_ShaderProgram->GetUniform("uniColor"), 1, glm::value_ptr(m_ColorFilled));
+
+				glBindBuffer(GL_ARRAY_BUFFER, instance->meshes->mesh_filled->GetBuffer());
+				glVertexAttribPointer(a_AttributePosition, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+				glDrawArrays(GL_TRIANGLES, 0, instance->meshes->mesh_filled->GetVertexCount());
+			}
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -152,14 +206,26 @@ private:
 
 	glm::vec2 m_LineOffset;
 
-	std::map<unsigned int, fw::MeshOpenGL*> m_MeshCache;
+	struct MeshEntry
+	{
+		fw::MeshOpenGL* mesh_filled;
+		fw::MeshOpenGL* mesh_outline;
+	};
+
+	std::map<unsigned int, MeshEntry*> m_MeshCache;
 
 	struct GlyphInstance
 	{
-		fw::MeshOpenGL* mesh;
+		MeshEntry* meshes;
 		glm::vec2 position;
 	};
 	std::vector<GlyphInstance*> m_GlyphMeshes;
+
+	bool m_DrawFilled;
+	glm::vec4 m_ColorFilled;
+
+	bool m_DrawOutline;
+	glm::vec4 m_ColorOutline;
 
 }; // class OutlineVisitor
 
@@ -212,7 +278,7 @@ public:
 
 	bool ParseCommandLine(int a_ArgumentCount, const char** a_Arguments)
 	{
-		m_FontPath = "Fonts/Roboto/Roboto-Regular.ttf";
+		m_FontPath = "Fonts/Roboto/Roboto-BoldItalic.ttf";
 		//m_FontPath = "Fonts/Mathilde/mathilde.otf";
 		m_FontSize = 100.0f;
 
@@ -262,9 +328,12 @@ public:
 
 		m_TextLayout = new exl::TextLayout;
 		m_TextLayout->SetFontFace(m_FontFace);
-		m_TextLayout->SetText("Printing some text...");
+		m_TextLayout->SetText("Vegetables on sale");
 
 		m_OutlineVisitor = new OutlineVisitor;
+		m_OutlineVisitor->SetColorFilled(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
+		m_OutlineVisitor->SetColorOutline(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
+
 		m_TextLayout->Accept(*m_OutlineVisitor);
 
 		return true;
@@ -297,35 +366,21 @@ public:
 		modelview = glm::translate(modelview, m_CameraPosition);
 		modelview = glm::scale(modelview, glm::vec3(m_CameraZoom, m_CameraZoom, 1.0f));
 
-		//glm::mat4x4 mvp = projection * modelview;
-
 		fw::ShaderProgram* outline_program = nullptr;
-		glm::vec4 outline_color;
 
 		if (m_OptionDrawLines)
 		{
 			outline_program = m_ProgramLines;
-			outline_color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 		}
 		else
 		{
 			outline_program = m_ProgramTriangles;
-			outline_color = glm::vec4(0.0f, 0.0f, 0.75f, 1.0f);
 		}
 
 		glUseProgram(outline_program->GetHandle());
-		glUniform4fv(outline_program->GetUniform("uniColor"), 1, glm::value_ptr(outline_color));
 
 		GLint attribute_position = outline_program->GetAttribute("attrPosition");
 		glEnableVertexAttribArray(attribute_position);
-
-		/*glBindBuffer(GL_ARRAY_BUFFER, m_Mesh->GetBuffer());
-		glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-		glDrawArrays(GL_TRIANGLES, 0, m_Mesh->GetVertexCount());
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glUseProgram(0);*/
 
 		m_OutlineVisitor->Render(outline_program, projection, modelview, attribute_position);
 	}
@@ -372,12 +427,14 @@ private:
 
 			} break;
 
+		case GLFW_KEY_KP_SUBTRACT:
 		case GLFW_KEY_MINUS:
 			{
 				m_CameraZoomSpeed = -0.05f;
 
 			} break;
 
+		case GLFW_KEY_KP_ADD:
 		case GLFW_KEY_EQUAL:
 			{
 				m_CameraZoomSpeed = 0.05f;
@@ -411,6 +468,18 @@ private:
 			} break;
 
 		case GLFW_KEY_2:
+			{
+				m_OutlineVisitor->SetDrawFilled(!m_OutlineVisitor->GetDrawFilled());
+
+			} break;
+
+		case GLFW_KEY_3:
+			{
+				m_OutlineVisitor->SetDrawOutline(!m_OutlineVisitor->GetDrawOutline());
+
+			} break;
+
+		case GLFW_KEY_4:
 			{
 				if (m_MeshOptions.quality == ExLibris::LineMeshOptions::eQuality_Fast)
 				{
@@ -455,7 +524,9 @@ private:
 
 			} break;
 
+		case GLFW_KEY_KP_SUBTRACT:
 		case GLFW_KEY_MINUS:
+		case GLFW_KEY_KP_ADD:
 		case GLFW_KEY_EQUAL:
 			{
 				m_CameraZoomSpeed = 0.0f;
