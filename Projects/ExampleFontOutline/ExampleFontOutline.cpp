@@ -47,6 +47,9 @@ public:
 		, m_DrawOutline(true)
 	{
 		m_CurveSettings.precision = 10;
+
+		m_LineOptions.quality = exl::LineMeshOptions::eQuality_Gapless;
+		m_LineOptions.thickness = 5.0f;
 	}
 
 	~OutlineVisitor()
@@ -101,10 +104,6 @@ public:
 			instance->meshes->mesh_filled = new fw::MeshOpenGL();
 			instance->meshes->mesh_outline = new fw::MeshOpenGL();
 
-			exl::LineMeshOptions line_mesh_options;
-			line_mesh_options.quality = exl::LineMeshOptions::eQuality_Gapless;
-			line_mesh_options.thickness = 5.0f;
-
 			std::vector<exl::Polygon> polygons = a_Glyph->outline->BuildPolygons(m_CurveSettings);
 			if (polygons.size() > 0)
 			{
@@ -122,7 +121,7 @@ public:
 					delete builder_filled;
 				}
 
-				exl::MeshBuilder* builder_outline = shape.BuildOutlineMesh(line_mesh_options);
+				exl::MeshBuilder* builder_outline = shape.BuildOutlineMesh(m_LineOptions);
 				if (builder_outline != nullptr && builder_outline->GetVertexCount() > 0)
 				{
 					builder_outline->Accept(*instance->meshes->mesh_outline);
@@ -146,6 +145,11 @@ public:
 
 	void VisitTextEnd()
 	{
+	}
+
+	void SetLineOptions(const exl::LineMeshOptions& a_Options)
+	{
+		m_LineOptions = a_Options;
 	}
 
 	void SetCurveSettings(const exl::CurveSettings& a_Settings)
@@ -235,6 +239,7 @@ private:
 	};
 
 	exl::CurveSettings m_CurveSettings;
+	exl::LineMeshOptions m_LineOptions;
 
 	std::map<unsigned int, MeshEntry*> m_MeshCache;
 
@@ -503,7 +508,7 @@ private:
 
 			} break;
 
-		case GLFW_KEY_4:
+		case GLFW_KEY_L:
 			{
 				if (m_MeshOptions.quality == ExLibris::LineMeshOptions::eQuality_Fast)
 				{
@@ -514,7 +519,8 @@ private:
 					m_MeshOptions.quality = ExLibris::LineMeshOptions::eQuality_Fast;
 				}
 
-				_BuildGlyphMesh();
+				m_OutlineVisitor->SetLineOptions(m_MeshOptions);
+				m_TextLayout->Accept(*m_OutlineVisitor);
 
 			} break;
 
