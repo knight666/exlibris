@@ -135,7 +135,7 @@ public:
 		m_GlyphMeshes.push_back(instance);
 	}
 
-	void VisitTextWhitespace(float a_X, float a_Advance)
+	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
 	{
 	}
 

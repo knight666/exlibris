@@ -2,6 +2,8 @@
 
 #include <FontFace.h>
 #include <TextLayout.h>
+
+#include "Mock.Font.h"
 #include "Mock.TextLayoutVisitor.h"
 
 using namespace ExLibris;
@@ -18,7 +20,9 @@ using namespace ExLibris;
 
 FontFace* CreateFixedWidthFontFace()
 {
-	FontFace* face = new FontFace(nullptr);
+	MockFont* font = new MockFont("Dummy");
+
+	FontFace* face = new FontFace(font);
 	face->SetLineHeight(20.0f);
 
 	TEST_GLYPH_ADD('?');
@@ -28,7 +32,9 @@ FontFace* CreateFixedWidthFontFace()
 
 FontFace* CreateDynamicWidthFontFace()
 {
-	FontFace* face = new FontFace(nullptr);
+	MockFont* font = new MockFont("Dummy");
+
+	FontFace* face = new FontFace(font);
 	face->SetLineHeight(20.0f);
 
 	TEST_GLYPH_ADD('A');
@@ -64,7 +70,9 @@ FontFace* CreateDynamicWidthFontFace()
 
 FontFace* CreateKerningFontFace()
 {
-	FontFace* face = new FontFace(nullptr);
+	MockFont* font = new MockFont("Dummy");
+
+	FontFace* face = new FontFace(font);
 	face->SetLineHeight(20.0f);
 
 	Glyph* glyph_x = new Glyph();
@@ -330,6 +338,8 @@ TEST(TextLayout, DimensionsKerning)
 
 	layout.SetText("zxy");
 
+	layout.Layout();
+
 	EXPECT_FLOAT_EQ(10.0f + 0.0f + 10.0f + -4.0f + 10.0f, layout.GetDimensions().x);
 	EXPECT_FLOAT_EQ(20.0f, layout.GetDimensions().y);
 }
@@ -342,6 +352,8 @@ TEST(TextLayout, DimensionsNoKerning)
 	layout.SetFontFace(face);
 
 	layout.SetText("zzzzz");
+
+	layout.Layout();
 
 	EXPECT_FLOAT_EQ(10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f, layout.GetDimensions().x);
 	EXPECT_FLOAT_EQ(20.0f, layout.GetDimensions().y);
@@ -543,6 +555,8 @@ TEST(TextLayout, DimensionsKerningNewLine)
 
 	layout.SetText("yzyx\nxxyyz");
 
+	layout.Layout();
+
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, 10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 5.0f + 10.0f + 0.0f);
 	layout_width = std::max<float>(layout_width, 10.0f + 2.0f + 10.0f + -4.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f);
@@ -573,11 +587,7 @@ TEST(TextLayout, AcceptVisitorFont)
 
 	layout.Accept(visitor);
 
-	ASSERT_EQ(1, visitor.lines.size());
-	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
-	EXPECT_FLOAT_EQ(0.0f, visitor.lines[0]->width);
-
-	ASSERT_EQ(0, visitor.glyphs.size());
+	ASSERT_EQ(0, visitor.lines.size());
 }
 
 TEST(TextLayout, AcceptVisitorTextNoFont)
@@ -678,23 +688,22 @@ TEST(TextLayout, AcceptVisitorKerningFontText)
 	layout.Accept(visitor);
 
 	ASSERT_EQ(1, visitor.lines.size());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_EQ(10 + 0 + 10 + 0 + 10 + -4 + 10, visitor.lines[0]->width);
 
 	ASSERT_EQ(4, visitor.glyphs.size());
 	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
-	EXPECT_EQ(0, visitor.glyphs[0]->x);
-	EXPECT_EQ(10, visitor.glyphs[0]->advance);
+	EXPECT_FLOAT_EQ(0.0f, visitor.glyphs[0]->x);
+	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[0]->advance);
 	EXPECT_TRUE(visitor.glyphs[1]->glyph != nullptr);
-	EXPECT_EQ(10, visitor.glyphs[1]->x);
-	EXPECT_EQ(10, visitor.glyphs[1]->advance);
+	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[1]->x);
+	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[1]->advance);
 	EXPECT_TRUE(visitor.glyphs[2]->glyph != nullptr);
-	EXPECT_EQ(20, visitor.glyphs[2]->x);
-	EXPECT_EQ(6, visitor.glyphs[2]->advance);
+	EXPECT_FLOAT_EQ(20.0f, visitor.glyphs[2]->x);
+	EXPECT_FLOAT_EQ(6.0f, visitor.glyphs[2]->advance);
 	EXPECT_TRUE(visitor.glyphs[3]->glyph != nullptr);
-	EXPECT_EQ(26, visitor.glyphs[3]->x);
-	EXPECT_EQ(10, visitor.glyphs[3]->advance);
+	EXPECT_FLOAT_EQ(26.0f, visitor.glyphs[3]->x);
+	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[3]->advance);
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalIgnore)
@@ -718,11 +727,10 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalIgnore)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"THIS IS YOUR CAPTAIN SPEAKING", visitor.lines[0]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(20, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixed)
@@ -746,11 +754,10 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixed)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"CRASH LANDINGS ARE NOT PART OF THIS EXERCISE", visitor.lines[0]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(335, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 335.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooSmall)
@@ -773,10 +780,9 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooSmall)
 
 	ASSERT_EQ(0, visitor.lines.size());
 
-	int layout_width = 0;
-
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(16, layout.GetDimensions().y);
+	float layout_width = 0.0f;
+	
+	EXPECT_VEC2_EQ(layout_width, 16.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooLarge)
@@ -801,12 +807,11 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooLarge)
 	EXPECT_STREQ(L"WHY BUILD ONE", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"WHEN YOU CAN BUILD", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(44, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 44.0f, layout.GetDimensions());
 }
 
 
@@ -830,10 +835,9 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedNegative)
 
 	ASSERT_EQ(0, visitor.lines.size());
 
-	int layout_width = 0;
+	float layout_width = 0.0f;
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(0, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 0.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpanding)
@@ -857,11 +861,10 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpanding)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"ENTERPRISE", visitor.lines[0]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(24, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 24.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingTwoLines)
@@ -886,12 +889,11 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingTwoLines)
 	EXPECT_STREQ(L"BEAM ME UP", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"TECHNICIAN GUY", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(40, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingNegative)
@@ -916,12 +918,11 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingNegative)
 	EXPECT_STREQ(L"TAKE ME TO VENICE", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"I WANT TO SEE THE BOATS", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(40, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximum)
@@ -946,12 +947,11 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximum)
 	EXPECT_STREQ(L"TO SPACE AND BEYOND", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"MY MOTHERS BASEMENT", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(40, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumThreeLines)
@@ -976,12 +976,11 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumThreeLines)
 	EXPECT_STREQ(L"YOUR PLANS CAN BE FOILED", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"SIMPLY BY APPLYING SOME", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(40, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumNegative)
@@ -1004,8 +1003,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumNegative)
 
 	ASSERT_EQ(0, visitor.lines.size());
 
-	EXPECT_EQ(0, layout.GetDimensions().x);
-	EXPECT_EQ(0, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalFixed)
@@ -1029,8 +1027,7 @@ TEST(TextLayout, LimitsHorizontalFixed)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"BRING ME A BANANA", visitor.lines[0]->text.c_str());
 
-	EXPECT_EQ(1120, layout.GetDimensions().x);
-	EXPECT_EQ(20, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(1120.0f, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalFixedTooSmall)
@@ -1054,8 +1051,7 @@ TEST(TextLayout, LimitsHorizontalFixedTooSmall)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"MY GOD IT ", visitor.lines[0]->text.c_str());
 
-	EXPECT_EQ(620, layout.GetDimensions().x);
-	EXPECT_EQ(20, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(620.0f, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalFixedTooLarge)
@@ -1079,8 +1075,7 @@ TEST(TextLayout, LimitsHorizontalFixedTooLarge)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"BRING ON THE NEWSPAPERS", visitor.lines[0]->text.c_str());
 
-	EXPECT_EQ(3300, layout.GetDimensions().x);
-	EXPECT_EQ(20, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(3300.0, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalFixedNegative)
@@ -1093,7 +1088,7 @@ TEST(TextLayout, LimitsHorizontalFixedNegative)
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(-150, -15));
+	layout.SetSizeHint(glm::vec2(-150.0f, -15.0f));
 
 	layout.Layout();
 
@@ -1103,8 +1098,7 @@ TEST(TextLayout, LimitsHorizontalFixedNegative)
 
 	ASSERT_EQ(0, visitor.lines.size());
 
-	EXPECT_EQ(0, layout.GetDimensions().x);
-	EXPECT_EQ(0, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnore)
@@ -1117,7 +1111,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnore)
 	layout.SetHorizontalSizePolicy(eSizePolicy_MinimumExpanding);
 	layout.SetVerticalSizePolicy(eSizePolicy_Ignore);
 
-	layout.SetSizeHint(glm::vec2(12, 35));
+	layout.SetSizeHint(glm::vec2(12.0f, 35.0f));
 
 	layout.Layout();
 
@@ -1128,11 +1122,10 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnore)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"FINE I WILL GET MY OWN STARSHIP", visitor.lines[0]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(20, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnoreExpandToMinimum)
@@ -1145,7 +1138,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnoreExpandToMinimum)
 	layout.SetHorizontalSizePolicy(eSizePolicy_MinimumExpanding);
 	layout.SetVerticalSizePolicy(eSizePolicy_Ignore);
 
-	layout.SetSizeHint(glm::vec2(1800, 35));
+	layout.SetSizeHint(glm::vec2(1800.0f, 35.0f));
 
 	layout.Layout();
 
@@ -1156,11 +1149,10 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnoreExpandToMinimum)
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"SET PHASERS TO AWESOME", visitor.lines[0]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_EQ(1800, layout.GetDimensions().x);
-	EXPECT_EQ(20, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(1800.0f, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMinimumExpanding)
@@ -1173,7 +1165,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMinimumExpanding)
 	layout.SetHorizontalSizePolicy(eSizePolicy_MinimumExpanding);
 	layout.SetVerticalSizePolicy(eSizePolicy_MinimumExpanding);
 
-	layout.SetSizeHint(glm::vec2(16, 50));
+	layout.SetSizeHint(glm::vec2(16.0f, 50.0f));
 
 	layout.Layout();
 
@@ -1185,12 +1177,11 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMinimumExpanding)
 	EXPECT_STREQ(L"BRING YOUR OWN", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"PARTY HAT", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(50, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 50.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMaximum)
@@ -1203,7 +1194,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMaximum)
 	layout.SetHorizontalSizePolicy(eSizePolicy_MinimumExpanding);
 	layout.SetVerticalSizePolicy(eSizePolicy_MinimumExpanding);
 
-	layout.SetSizeHint(glm::vec2(16, 50));
+	layout.SetSizeHint(glm::vec2(16.0f, 50.0f));
 
 	layout.Layout();
 
@@ -1215,12 +1206,11 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMaximum)
 	EXPECT_STREQ(L"BRING YOUR OWN", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"PARTY HAT", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(50, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 50.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMaximumVerticalIgnore)
@@ -1233,7 +1223,7 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalIgnore)
 	layout.SetHorizontalSizePolicy(eSizePolicy_Maximum);
 	layout.SetVerticalSizePolicy(eSizePolicy_Ignore);
 
-	layout.SetSizeHint(glm::vec2(610, 116));
+	layout.SetSizeHint(glm::vec2(610.0f, 116.0f));
 
 	layout.Layout();
 
@@ -1246,13 +1236,12 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalIgnore)
 	EXPECT_STREQ(L"FRUITY ", visitor.lines[1]->text.c_str());
 	EXPECT_STREQ(L"PIE", visitor.lines[2]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[2]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[2]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(60, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 60.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMaximumVerticalMinimumExpanding)
@@ -1265,7 +1254,7 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalMinimumExpanding)
 	layout.SetHorizontalSizePolicy(eSizePolicy_Maximum);
 	layout.SetVerticalSizePolicy(eSizePolicy_MinimumExpanding);
 
-	layout.SetSizeHint(glm::vec2(700, 40));
+	layout.SetSizeHint(glm::vec2(700.0f, 40.0f));
 
 	layout.Layout();
 
@@ -1278,13 +1267,12 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalMinimumExpanding)
 	EXPECT_STREQ(L"AUNT OFF A ", visitor.lines[1]->text.c_str());
 	EXPECT_STREQ(L"CLIFF", visitor.lines[2]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[2]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[2]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(60, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 60.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LimitsHorizontalMaximumVerticalMaximum)
@@ -1297,7 +1285,7 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalMaximum)
 	layout.SetHorizontalSizePolicy(eSizePolicy_Maximum);
 	layout.SetVerticalSizePolicy(eSizePolicy_Maximum);
 
-	layout.SetSizeHint(glm::vec2(821, 41));
+	layout.SetSizeHint(glm::vec2(821.0f, 41.0f));
 
 	layout.Layout();
 
@@ -1309,12 +1297,11 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalMaximum)
 	EXPECT_STREQ(L"SINK INTO ", visitor.lines[0]->text.c_str());
 	EXPECT_STREQ(L"THE DEEPEST ", visitor.lines[1]->text.c_str());
 
-	int layout_width = 0;
-	layout_width = std::max<int>(layout_width, visitor.lines[0]->width);
-	layout_width = std::max<int>(layout_width, visitor.lines[1]->width);
+	float layout_width = 0.0f;
+	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
+	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_EQ(40, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, LayoutVerticalTop)
@@ -1334,8 +1321,7 @@ TEST(TextLayout, LayoutVerticalTop)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"JEWEL OF MY CROWN", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalTopTallBox)
@@ -1349,7 +1335,7 @@ TEST(TextLayout, LayoutVerticalTopTallBox)
 
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(0, 150));
+	layout.SetSizeHint(glm::vec2(0.0f, 150.0f));
 
 	layout.Layout();
 
@@ -1359,8 +1345,7 @@ TEST(TextLayout, LayoutVerticalTopTallBox)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"BRING YOUR OWN LASERS", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalTopTallBoxTwoLines)
@@ -1374,7 +1359,7 @@ TEST(TextLayout, LayoutVerticalTopTallBoxTwoLines)
 
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(0, 240));
+	layout.SetSizeHint(glm::vec2(0.0f, 240.0f));
 
 	layout.Layout();
 
@@ -1384,11 +1369,9 @@ TEST(TextLayout, LayoutVerticalTopTallBoxTwoLines)
 
 	ASSERT_EQ(2, visitor.lines.size());
 	EXPECT_STREQ(L"THE SASS IS ALMOST", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_STREQ(L"PALPATABLE", visitor.lines[1]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[1]->offset.x);
-	EXPECT_EQ(20, visitor.lines[1]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 20.0f, visitor.lines[1]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalMiddle)
@@ -1408,8 +1391,7 @@ TEST(TextLayout, LayoutVerticalMiddle)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"BRING HER UP TO LUDRICOUS SPEED", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalMiddleTallBox)
@@ -1423,7 +1405,7 @@ TEST(TextLayout, LayoutVerticalMiddleTallBox)
 
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(0, 153));
+	layout.SetSizeHint(glm::vec2(0.0f, 153.0f));
 
 	layout.Layout();
 
@@ -1433,8 +1415,7 @@ TEST(TextLayout, LayoutVerticalMiddleTallBox)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"DO ANDROIDS DREAM OF ELECTRIC KEBAB", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(66, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 66.5f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalMiddleTallBoxThreeLines)
@@ -1448,7 +1429,7 @@ TEST(TextLayout, LayoutVerticalMiddleTallBoxThreeLines)
 
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(0, 144));
+	layout.SetSizeHint(glm::vec2(0.0f, 144.0f));
 
 	layout.Layout();
 
@@ -1458,14 +1439,11 @@ TEST(TextLayout, LayoutVerticalMiddleTallBoxThreeLines)
 
 	ASSERT_EQ(3, visitor.lines.size());
 	EXPECT_STREQ(L"THERE ARE", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(42, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 42.0f, visitor.lines[0]->offset);
 	EXPECT_STREQ(L"FIVE LIGHTS", visitor.lines[1]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[1]->offset.x);
-	EXPECT_EQ(62, visitor.lines[1]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 62.0f, visitor.lines[1]->offset);
 	EXPECT_STREQ(L"NO WAIT", visitor.lines[2]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[2]->offset.x);
-	EXPECT_EQ(82, visitor.lines[2]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 82.0f, visitor.lines[2]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalBottom)
@@ -1485,8 +1463,7 @@ TEST(TextLayout, LayoutVerticalBottom)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"DODGE THAT ASTEROID PLEASE", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalBottomTallBox)
@@ -1500,7 +1477,7 @@ TEST(TextLayout, LayoutVerticalBottomTallBox)
 
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(0, 64));
+	layout.SetSizeHint(glm::vec2(0.0f, 64.0f));
 
 	layout.Layout();
 
@@ -1510,8 +1487,7 @@ TEST(TextLayout, LayoutVerticalBottomTallBox)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"WHAT IS IT WITH YOU AND ROMULAN ALE", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(44, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 44.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutVerticalBottomTallBoxTwoLines)
@@ -1525,7 +1501,7 @@ TEST(TextLayout, LayoutVerticalBottomTallBoxTwoLines)
 
 	layout.SetVerticalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(0, 500));
+	layout.SetSizeHint(glm::vec2(0.0f, 500.0f));
 
 	layout.Layout();
 
@@ -1535,11 +1511,9 @@ TEST(TextLayout, LayoutVerticalBottomTallBoxTwoLines)
 
 	ASSERT_EQ(2, visitor.lines.size());
 	EXPECT_STREQ(L"YOU ARE GOING TO BE FINE", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(460, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 460.0f, visitor.lines[0]->offset);
 	EXPECT_STREQ(L"YOU STILL HAVE MOST OF YOUR VITAL ORGANS", visitor.lines[1]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[1]->offset.x);
-	EXPECT_EQ(480, visitor.lines[1]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 480.0f, visitor.lines[1]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalLeft)
@@ -1559,8 +1533,7 @@ TEST(TextLayout, LayoutHorizontalLeft)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"LUNCH HOUR I REPEAT LUNCH HOUR", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalLeftWideBox)
@@ -1574,7 +1547,7 @@ TEST(TextLayout, LayoutHorizontalLeftWideBox)
 
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(2800, 113));
+	layout.SetSizeHint(glm::vec2(2800.0f, 113.0f));
 
 	layout.Layout();
 
@@ -1584,8 +1557,7 @@ TEST(TextLayout, LayoutHorizontalLeftWideBox)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"ANOTHER DAY ANOTHER RAVIOLI SANDWICH", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalLeftWideBoxTwoLines)
@@ -1599,7 +1571,7 @@ TEST(TextLayout, LayoutHorizontalLeftWideBoxTwoLines)
 
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(2734, 124));
+	layout.SetSizeHint(glm::vec2(2734.0f, 124.0f));
 
 	layout.Layout();
 
@@ -1609,11 +1581,9 @@ TEST(TextLayout, LayoutHorizontalLeftWideBoxTwoLines)
 
 	ASSERT_EQ(2, visitor.lines.size());
 	EXPECT_STREQ(L"WE ARE OUT OF MAYONAISSE", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_STREQ(L"FIGURES", visitor.lines[1]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[1]->offset.x);
-	EXPECT_EQ(20, visitor.lines[1]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 20.0f, visitor.lines[1]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalMiddle)
@@ -1633,8 +1603,7 @@ TEST(TextLayout, LayoutHorizontalMiddle)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"BRING YOUR KID TO WORK THEY SAID", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalMiddleWideBox)
@@ -1648,7 +1617,7 @@ TEST(TextLayout, LayoutHorizontalMiddleWideBox)
 
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(15000, 113));
+	layout.SetSizeHint(glm::vec2(15000.0f, 113.0f));
 
 	layout.Layout();
 
@@ -1658,8 +1627,7 @@ TEST(TextLayout, LayoutHorizontalMiddleWideBox)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"SHE WONT GET SNAPPED IN HALF BY A SEA MONSTER THEY SAID", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(5661, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(5661.5f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalMiddleWideBoxTwoLines)
@@ -1673,7 +1641,7 @@ TEST(TextLayout, LayoutHorizontalMiddleWideBoxTwoLines)
 
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(3455, 55));
+	layout.SetSizeHint(glm::vec2(3455.0f, 55.0f));
 
 	layout.Layout();
 
@@ -1683,11 +1651,9 @@ TEST(TextLayout, LayoutHorizontalMiddleWideBoxTwoLines)
 
 	ASSERT_EQ(2, visitor.lines.size());
 	EXPECT_STREQ(L"OH IM SURE WE CAN PUT THE PIECES BACK TOGETHER", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(191, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(191.5f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_STREQ(L"IF WE CAN FIND ENOUGH PIECES THAT IS", visitor.lines[1]->text.c_str());
-	EXPECT_EQ(538, visitor.lines[1]->offset.x);
-	EXPECT_EQ(20, visitor.lines[1]->offset.y);
+	EXPECT_VEC2_EQ(538.5f, 20.0f, visitor.lines[1]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalRight)
@@ -1707,8 +1673,7 @@ TEST(TextLayout, LayoutHorizontalRight)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"THIS MONSTER IS NOT GOING BACK IN ITS BOX", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalRightWideBox)
@@ -1722,7 +1687,7 @@ TEST(TextLayout, LayoutHorizontalRightWideBox)
 
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(10477, 234));
+	layout.SetSizeHint(glm::vec2(10477.0f, 234.0f));
 
 	layout.Layout();
 
@@ -1732,8 +1697,7 @@ TEST(TextLayout, LayoutHorizontalRightWideBox)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_STREQ(L"OUR NEW NEIGHBOUR HAS TOO MANY TENTACLES", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(7684, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(7684.0f, 0.0f, visitor.lines[0]->offset);
 }
 
 TEST(TextLayout, LayoutHorizontalRightWideBoxTwoLines)
@@ -1747,7 +1711,7 @@ TEST(TextLayout, LayoutHorizontalRightWideBoxTwoLines)
 
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
 
-	layout.SetSizeHint(glm::vec2(6023, 182));
+	layout.SetSizeHint(glm::vec2(6023.0f, 182.0f));
 
 	layout.Layout();
 
@@ -1757,11 +1721,9 @@ TEST(TextLayout, LayoutHorizontalRightWideBoxTwoLines)
 
 	ASSERT_EQ(2, visitor.lines.size());
 	EXPECT_STREQ(L"BRING THE SPAGHETTI", visitor.lines[0]->text.c_str());
-	EXPECT_EQ(4683, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(4683.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_STREQ(L"AND FIGHT IT OUT LIKE MEN", visitor.lines[1]->text.c_str());
-	EXPECT_EQ(4360, visitor.lines[1]->offset.x);
-	EXPECT_EQ(20, visitor.lines[1]->offset.y);
+	EXPECT_VEC2_EQ(4360.0f, 20.0f, visitor.lines[1]->offset);
 }
 
 TEST(TextLayout, WordWrappingSpaces)
@@ -1773,7 +1735,7 @@ TEST(TextLayout, WordWrappingSpaces)
 
 	layout.SetWordWrapping(TextLayout::eWordWrapping_Greedy);
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
-	layout.SetSizeHint(glm::vec2(1080, 33));
+	layout.SetSizeHint(glm::vec2(1080.0f, 33.0f));
 
 	layout.Layout();
 
@@ -1796,7 +1758,7 @@ TEST(TextLayout, WordWrappingSentence)
 
 	layout.SetWordWrapping(TextLayout::eWordWrapping_Greedy);
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
-	layout.SetSizeHint(glm::vec2(920, 33));
+	layout.SetSizeHint(glm::vec2(920.0f, 33.0f));
 
 	layout.Layout();
 
@@ -1819,7 +1781,7 @@ TEST(TextLayout, WordWrappingLongWord)
 
 	layout.SetWordWrapping(TextLayout::eWordWrapping_Greedy);
 	layout.SetHorizontalSizePolicy(eSizePolicy_Fixed);
-	layout.SetSizeHint(glm::vec2(1168, 33));
+	layout.SetSizeHint(glm::vec2(1168.0f, 33.0f));
 
 	layout.Layout();
 

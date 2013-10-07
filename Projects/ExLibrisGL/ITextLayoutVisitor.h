@@ -22,7 +22,7 @@ namespace ExLibris
 		virtual void VisitTextBegin(const FontFace* a_Face, const glm::vec2& a_Dimensions) = 0;
 		virtual void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width) = 0;
 		virtual void VisitTextCharacter(const Glyph* a_Glyph, float a_X, float a_Advance) = 0;
-		virtual void VisitTextWhitespace(float a_X, float a_Advance) = 0;
+		virtual void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance) = 0;
 		virtual void VisitTextLineEnd() = 0;
 		virtual void VisitTextEnd() = 0;
 

@@ -7,6 +7,7 @@ namespace ExLibris
 
 	TextLayout::TextLayout()
 		: m_Face(nullptr)
+		, m_GlyphSpace(nullptr)
 		, m_HorizontalPolicy(eSizePolicy_Ignore)
 		, m_VerticalPolicy(eSizePolicy_Ignore)
 		, m_HorizontalAlignment(eHorizontalAlignment_Left)
@@ -16,6 +17,7 @@ namespace ExLibris
 		, m_LinesDirty(false)
 		, m_LayoutDirty(false)
 	{
+		m_GlyphSpace = new TextGlyph;
 	}
 	
 	TextLayout::~TextLayout()
@@ -41,6 +43,16 @@ namespace ExLibris
 	void TextLayout::SetFontFace(FontFace* a_Face)
 	{
 		m_Face = a_Face;
+
+		m_GlyphSpace->glyph = m_Face->FindGlyph((unsigned int)' ');
+		if (m_GlyphSpace->glyph != nullptr)
+		{
+			m_GlyphSpace->advance = m_GlyphSpace->glyph->metrics->advance;
+		}
+		else
+		{
+			m_GlyphSpace->advance = 0.0f;
+		}
 
 		m_GlyphsDirty = true;
 	}
@@ -177,7 +189,7 @@ namespace ExLibris
 				}
 				else if (glyph->type == eGlyphType_Whitespace)
 				{
-					a_Visitor.VisitTextWhitespace(glyph->x, glyph->advance);
+					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance);
 				}
 			}
 
@@ -202,9 +214,6 @@ namespace ExLibris
 
 	void TextLayout::_ConvertTextToGlyphs()
 	{
-		Glyph* glyph_space = m_Face->FindGlyph((unsigned int)' ');
-		glyph_space->metrics->advance;
-
 		std::vector<unsigned int> text_utf32 = _AsciiToUtf32(m_Text);
 
 		std::vector<unsigned int>::const_iterator char_next_it = text_utf32.end();
@@ -225,6 +234,7 @@ namespace ExLibris
 			bool next_char_valid = (char_next_it != text_utf32.end());
 			int whitespace_count = 0;
 
+			unsigned int glyph_identifier = 0;
 			GlyphType glyph_type = eGlyphType_Character;
 
 			if (character == char_carriage_return)
@@ -238,20 +248,28 @@ namespace ExLibris
 				}
 
 				glyph_type = eGlyphType_NewLine;
+
+				glyph_identifier = char_new_line;
 			}
 			else if (character == char_new_line)
 			{
 				glyph_type = eGlyphType_NewLine;
+
+				glyph_identifier = char_new_line;
 			}
 			else if (character == char_space)
 			{
 				glyph_type = eGlyphType_Whitespace;
 				whitespace_count = 1;
+
+				glyph_identifier = character;
 			}
 			else if (character == char_tab)
 			{
 				glyph_type = eGlyphType_Whitespace;
 				whitespace_count = 4;
+
+				glyph_identifier = character;
 			}
 
 			bool glyph_valid = false;
@@ -268,6 +286,7 @@ namespace ExLibris
 					{
 						glyph_valid = true;
 
+						glyph_identifier = glyph_current->index;
 						glyph_advance = glyph_current->metrics->advance;
 
 						if (next_char_valid)
@@ -286,13 +305,10 @@ namespace ExLibris
 
 			case eGlyphType_Whitespace:
 				{
-					if (glyph_space != nullptr)
-					{
-						glyph_valid = true;
+					glyph_valid = true;
 
-						glyph_current = glyph_space;
-						glyph_advance = glyph_space->metrics->advance * whitespace_count;
-					}
+					glyph_current = m_GlyphSpace->glyph;
+					glyph_advance = m_GlyphSpace->advance * whitespace_count;
 
 				} break;
 
@@ -306,6 +322,7 @@ namespace ExLibris
 			if (glyph_valid)
 			{
 				TextGlyph* instance = new TextGlyph;
+				instance->identifier = glyph_identifier;
 				instance->glyph = glyph_current;
 				instance->type = glyph_type;
 				instance->x = 0.0f;
