@@ -265,10 +265,7 @@ namespace ExLibris
 			{
 				const Polygon& polygon = *polygon_it;
 
-				if (polygon.positions.size() > 2)
-				{
-					_TriangulateOutlineFast(builder, polygon, a_Options.thickness);
-				}
+				_TriangulateOutlineFast(builder, polygon, a_Options.thickness);
 			}
 		}
 		else if (a_Options.quality == LineMeshOptions::eQuality_Gapless)
@@ -277,10 +274,7 @@ namespace ExLibris
 			{
 				const Polygon& polygon = *polygon_it;
 
-				if (polygon.positions.size() > 2)
-				{
-					_TriangulateOutlineGapless(builder, polygon, a_Options.thickness);
-				}
+				_TriangulateOutlineGapless(builder, polygon, a_Options.thickness);
 			}
 		}
 		
@@ -447,7 +441,7 @@ namespace ExLibris
 
 	void LineShape::_TriangulateOutlineFast(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness) const
 	{
-		if (a_Polygon.positions.size() < 2)
+		if (a_Polygon.positions.size() <= 1)
 		{
 			return;
 		}
@@ -472,9 +466,9 @@ namespace ExLibris
 
 	void LineShape::_TriangulateOutlineGapless(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness) const
 	{
-		if (a_Polygon.positions.size() < 2)
+		if (a_Polygon.positions.size() <= 2)
 		{
-			return;
+			return _TriangulateOutlineFast(a_Target, a_Polygon, a_Thickness);
 		}
 
 		std::vector<glm::vec2>::const_iterator previous_it = a_Polygon.positions.begin();

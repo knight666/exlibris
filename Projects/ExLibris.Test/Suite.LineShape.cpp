@@ -1,6 +1,8 @@
 #include "ExLibris.Test.PCH.h"
 
-#include "LineShape.h"
+#include <LineShape.h>
+
+#include "Mock.MeshVisitor.h"
 
 using namespace ExLibris;
 
@@ -33,7 +35,7 @@ TEST(LineShape, ClearPolygons)
 	EXPECT_EQ(0, shape.GetPolygonCount());
 }
 
-TEST(LineShape, TriangulateStraightLine)
+TEST(LineShape, OutlineStraightLine)
 {
 	LineShape shape;
 
@@ -43,25 +45,28 @@ TEST(LineShape, TriangulateStraightLine)
 
 	shape.AddPolygon(p);
 
-	TriangleList* triangles = shape.Triangulate(2.0f);
-	ASSERT_EQ(6, triangles->vertex_count);
+	LineMeshOptions options;
+	options.quality = LineMeshOptions::eQuality_Fast;
+	options.thickness = 2.0f;
 
-	EXPECT_FLOAT_EQ(150.0f, triangles->positions[0].x);
-	EXPECT_FLOAT_EQ(24.0f, triangles->positions[0].y);
-	EXPECT_FLOAT_EQ(-50.0f, triangles->positions[1].x);
-	EXPECT_FLOAT_EQ(24.0f, triangles->positions[1].y);
-	EXPECT_FLOAT_EQ(-50.0f, triangles->positions[2].x);
-	EXPECT_FLOAT_EQ(26.0f, triangles->positions[2].y);
+	MeshBuilder* builder = shape.BuildOutlineMesh(options);
+	ASSERT_EQ(6, builder->GetVertexCount());
 
-	EXPECT_FLOAT_EQ(150.0f, triangles->positions[3].x);
-	EXPECT_FLOAT_EQ(24.0f, triangles->positions[3].y);
-	EXPECT_FLOAT_EQ(-50.0f, triangles->positions[4].x);
-	EXPECT_FLOAT_EQ(26.0f, triangles->positions[4].y);
-	EXPECT_FLOAT_EQ(150.0f, triangles->positions[5].x);
-	EXPECT_FLOAT_EQ(26.0f, triangles->positions[5].y);
+	MockMeshVisitor visitor;
+	builder->Accept(visitor);
+
+	ASSERT_EQ(2, visitor.triangles.size());
+
+	EXPECT_VEC2_EQ(150.0f, 24.0f, visitor.triangles[0].a);
+	EXPECT_VEC2_EQ(-50.0f, 24.0f, visitor.triangles[0].b);
+	EXPECT_VEC2_EQ(-50.0f, 26.0f, visitor.triangles[0].c);
+
+	EXPECT_VEC2_EQ(150.0f, 24.0f, visitor.triangles[1].a);
+	EXPECT_VEC2_EQ(-50.0f, 26.0f, visitor.triangles[1].b);
+	EXPECT_VEC2_EQ(150.0f, 26.0f, visitor.triangles[1].c);
 }
 
-TEST(LineShape, TriangulateCornerUp)
+TEST(LineShape, OutlineCornerUp)
 {
 	LineShape shape;
 
@@ -72,24 +77,31 @@ TEST(LineShape, TriangulateCornerUp)
 
 	shape.AddPolygon(p);
 
-	TriangleList* triangles = shape.Triangulate(10.0f);
-	ASSERT_EQ(12, triangles->vertex_count);
+	LineMeshOptions options;
+	options.quality = LineMeshOptions::eQuality_Fast;
+	options.thickness = 2.0f;
 
-	EXPECT_FLOAT_EQ(0.0f, triangles->positions[1].x);
-	EXPECT_FLOAT_EQ(95.0f, triangles->positions[1].y);
-	EXPECT_FLOAT_EQ(50.0f, triangles->positions[0].x);
-	EXPECT_FLOAT_EQ(95.0f, triangles->positions[0].y);
-	EXPECT_FLOAT_EQ(0.0f, triangles->positions[2].x);
-	EXPECT_FLOAT_EQ(105.0f, triangles->positions[2].y);
-	EXPECT_FLOAT_EQ(50.0f, triangles->positions[5].x);
-	EXPECT_FLOAT_EQ(105.0f, triangles->positions[5].y);
+	MeshBuilder* builder = shape.BuildOutlineMesh(options);
+	ASSERT_EQ(12, builder->GetVertexCount());
 
-	EXPECT_FLOAT_EQ(45.0f, triangles->positions[7].x);
-	EXPECT_FLOAT_EQ(100.0f, triangles->positions[7].y);
-	EXPECT_FLOAT_EQ(55.0f, triangles->positions[8].x);
-	EXPECT_FLOAT_EQ(100.0f, triangles->positions[8].y);
-	EXPECT_FLOAT_EQ(45.0f, triangles->positions[6].x);
-	EXPECT_FLOAT_EQ(50.0f, triangles->positions[6].y);
-	EXPECT_FLOAT_EQ(55.0f, triangles->positions[11].x);
-	EXPECT_FLOAT_EQ(50.0, triangles->positions[11].y);
+	MockMeshVisitor visitor;
+	builder->Accept(visitor);
+
+	ASSERT_EQ(4, visitor.triangles.size());
+
+	EXPECT_VEC2_EQ(50.0f, 99.0f, visitor.triangles[0].a);
+	EXPECT_VEC2_EQ(0.0f, 99.0f, visitor.triangles[0].b);
+	EXPECT_VEC2_EQ(0.0f, 101.0f, visitor.triangles[0].c);
+
+	EXPECT_VEC2_EQ(50.0f, 99.0f, visitor.triangles[1].a);
+	EXPECT_VEC2_EQ(0.0f, 101.0f, visitor.triangles[1].b);
+	EXPECT_VEC2_EQ(50.0f, 101.0f, visitor.triangles[1].c);
+
+	EXPECT_VEC2_EQ(49.0f, 50.0f, visitor.triangles[2].a);
+	EXPECT_VEC2_EQ(49.0f, 100.0f, visitor.triangles[2].b);
+	EXPECT_VEC2_EQ(51.0f, 100.0f, visitor.triangles[2].c);
+
+	EXPECT_VEC2_EQ(49.0f, 50.0f, visitor.triangles[3].a);
+	EXPECT_VEC2_EQ(51.0f, 100.0f, visitor.triangles[3].b);
+	EXPECT_VEC2_EQ(51.0f, 50.0f, visitor.triangles[3].c);
 }
