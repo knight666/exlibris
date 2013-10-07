@@ -57,6 +57,11 @@ namespace ExLibris
 		m_GlyphsDirty = true;
 	}
 
+	const glm::vec2& TextLayout::GetSizeHint() const
+	{
+		return m_SizeHint;
+	}
+
 	void TextLayout::SetSizeHint(const glm::vec2& a_SizeHint)
 	{
 		m_SizeHint = a_SizeHint;
@@ -97,6 +102,11 @@ namespace ExLibris
 		m_WordWrapping = a_Wrapping;
 
 		m_LinesDirty = true;
+	}
+
+	const glm::vec2& TextLayout::GetDimensions() const
+	{
+		return m_Dimensions;
 	}
 
 	void TextLayout::Layout()
@@ -246,7 +256,7 @@ namespace ExLibris
 
 			bool glyph_valid = false;
 			Glyph* glyph_current = nullptr;
-			float glyph_advance;
+			float glyph_advance = 0.0f;
 
 			switch (glyph_type)
 			{

@@ -31,6 +31,7 @@ namespace ExLibris
 		const std::string& GetText() const;
 		void SetText(const std::string& a_Text);
 
+		const glm::vec2& GetSizeHint() const;
 		void SetSizeHint(const glm::vec2& a_SizeHint);
 
 		void SetHorizontalSizePolicy(SizePolicy a_Policy);
@@ -40,6 +41,8 @@ namespace ExLibris
 		void SetVerticalAlignment(VerticalAlignment a_Alignment);
 
 		void SetWordWrapping(WordWrapping a_Wrapping);
+
+		const glm::vec2& GetDimensions() const;
 
 		void Layout();
 
