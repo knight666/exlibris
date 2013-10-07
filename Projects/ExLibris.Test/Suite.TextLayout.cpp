@@ -206,8 +206,7 @@ TEST(TextLayout, DimensionsFixed)
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsFixedTextBeforeFont)
@@ -230,8 +229,7 @@ TEST(TextLayout, DimensionsFixedTextBeforeFont)
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsFixedResize)
@@ -254,8 +252,7 @@ TEST(TextLayout, DimensionsFixedResize)
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsDynamic)
@@ -277,8 +274,7 @@ TEST(TextLayout, DimensionsDynamic)
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsDynamicTextBeforeFont)
@@ -301,8 +297,7 @@ TEST(TextLayout, DimensionsDynamicTextBeforeFont)
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsDynamicResize)
@@ -325,8 +320,7 @@ TEST(TextLayout, DimensionsDynamicResize)
 	float layout_width = 0.0f;
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsKerning)
@@ -340,8 +334,7 @@ TEST(TextLayout, DimensionsKerning)
 
 	layout.Layout();
 
-	EXPECT_FLOAT_EQ(10.0f + 0.0f + 10.0f + -4.0f + 10.0f, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(10.0f + 0.0f + 10.0f + -4.0f + 10.0f, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsNoKerning)
@@ -355,8 +348,7 @@ TEST(TextLayout, DimensionsNoKerning)
 
 	layout.Layout();
 
-	EXPECT_FLOAT_EQ(10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f, 20.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsNewLine)
@@ -380,8 +372,7 @@ TEST(TextLayout, DimensionsNewLine)
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsDoubleNewLine)
@@ -407,8 +398,7 @@ TEST(TextLayout, DimensionsDoubleNewLine)
 	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[2]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 60.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsCarriageReturn)
@@ -432,8 +422,7 @@ TEST(TextLayout, DimensionsCarriageReturn)
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsDoubleCarriageReturn)
@@ -459,8 +448,7 @@ TEST(TextLayout, DimensionsDoubleCarriageReturn)
 	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[2]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 60.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsUnixNewLine)
@@ -484,8 +472,7 @@ TEST(TextLayout, DimensionsUnixNewLine)
 	layout_width = std::max<float>(layout_width, visitor.lines[0]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsTripleUnixNewLine)
@@ -515,8 +502,7 @@ TEST(TextLayout, DimensionsTripleUnixNewLine)
 	layout_width = std::max<float>(layout_width, visitor.lines[3]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[4]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 100.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsMixedNewLineTypes)
@@ -542,8 +528,7 @@ TEST(TextLayout, DimensionsMixedNewLineTypes)
 	layout_width = std::max<float>(layout_width, visitor.lines[1]->width);
 	layout_width = std::max<float>(layout_width, visitor.lines[2]->width);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(visitor.lines.size() * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 60.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, DimensionsKerningNewLine)
@@ -561,8 +546,7 @@ TEST(TextLayout, DimensionsKerningNewLine)
 	layout_width = std::max<float>(layout_width, 10.0f + 0.0f + 10.0f + 0.0f + 10.0f + 5.0f + 10.0f + 0.0f);
 	layout_width = std::max<float>(layout_width, 10.0f + 2.0f + 10.0f + -4.0f + 10.0f + 0.0f + 10.0f + 0.0f + 10.0f);
 
-	EXPECT_FLOAT_EQ(layout_width, layout.GetDimensions().x);
-	EXPECT_FLOAT_EQ(2 * 20.0f, layout.GetDimensions().y);
+	EXPECT_VEC2_EQ(layout_width, 40.0f, layout.GetDimensions());
 }
 
 TEST(TextLayout, AcceptVisitorEmpty)
@@ -615,7 +599,7 @@ TEST(TextLayout, AcceptVisitorOneGlyph)
 	layout.Accept(visitor);
 
 	ASSERT_EQ(1, visitor.lines.size());
-	EXPECT_VEC2_EQ(0.0f, 0.0F, visitor.lines[0]->offset);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_EQ(63, visitor.lines[0]->width);
 
 	ASSERT_EQ(1, visitor.glyphs.size());
@@ -635,7 +619,7 @@ TEST(TextLayout, AcceptVisitorFixedFontText)
 	layout.Accept(visitor);
 
 	ASSERT_EQ(1, visitor.lines.size());
-	EXPECT_VEC2_EQ(0.0f, 0.0F, visitor.lines[0]->offset);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_EQ(189, visitor.lines[0]->width);
 
 	ASSERT_EQ(3, visitor.glyphs.size());
@@ -661,20 +645,19 @@ TEST(TextLayout, AcceptVisitorDynamicFontText)
 	layout.Accept(visitor);
 
 	ASSERT_EQ(1, visitor.lines.size());
-	EXPECT_EQ(0, visitor.lines[0]->offset.x);
-	EXPECT_EQ(0, visitor.lines[0]->offset.y);
+	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
 	EXPECT_EQ(GetTextGlyphWidth("ACK"), visitor.lines[0]->width);
 
 	ASSERT_EQ(3, visitor.glyphs.size());
 	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
-	EXPECT_EQ(0, visitor.glyphs[0]->x);
-	EXPECT_EQ(65, visitor.glyphs[0]->advance);
+	EXPECT_FLOAT_EQ(0.0f, visitor.glyphs[0]->x);
+	EXPECT_FLOAT_EQ(65.0f, visitor.glyphs[0]->advance);
 	EXPECT_TRUE(visitor.glyphs[1]->glyph != nullptr);
-	EXPECT_EQ(65, visitor.glyphs[1]->x);
-	EXPECT_EQ(67, visitor.glyphs[1]->advance);
+	EXPECT_FLOAT_EQ(65.0f, visitor.glyphs[1]->x);
+	EXPECT_FLOAT_EQ(67.0f, visitor.glyphs[1]->advance);
 	EXPECT_TRUE(visitor.glyphs[2]->glyph != nullptr);
-	EXPECT_EQ(132, visitor.glyphs[2]->x);
-	EXPECT_EQ(75, visitor.glyphs[2]->advance);
+	EXPECT_FLOAT_EQ(132.0f, visitor.glyphs[2]->x);
+	EXPECT_FLOAT_EQ(75.0f, visitor.glyphs[2]->advance);
 }
 
 TEST(TextLayout, AcceptVisitorKerningFontText)
@@ -689,7 +672,7 @@ TEST(TextLayout, AcceptVisitorKerningFontText)
 
 	ASSERT_EQ(1, visitor.lines.size());
 	EXPECT_VEC2_EQ(0.0f, 0.0f, visitor.lines[0]->offset);
-	EXPECT_EQ(10 + 0 + 10 + 0 + 10 + -4 + 10, visitor.lines[0]->width);
+	EXPECT_FLOAT_EQ(10.0f + 0.0f + 10.0f + 0.0f + 10.0f + -4.0f + 10.0f, visitor.lines[0]->width);
 
 	ASSERT_EQ(4, visitor.glyphs.size());
 	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
