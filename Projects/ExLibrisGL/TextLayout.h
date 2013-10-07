@@ -60,6 +60,7 @@ namespace ExLibris
 
 		struct TextGlyph
 		{
+			unsigned int identifier;
 			Glyph* glyph;
 			GlyphType type;
 			float x;
@@ -91,6 +92,8 @@ namespace ExLibris
 
 		std::vector<TextGlyph*> m_Glyphs;
 		bool m_GlyphsDirty;
+
+		TextGlyph* m_GlyphSpace;
 
 		std::vector<TextLine*> m_Lines;
 		TextLine* m_LineCurrent;

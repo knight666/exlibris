@@ -59,12 +59,14 @@ namespace ExLibris
 			glyphs.push_back(glyph);
 		}
 
-		void VisitTextWhitespace(float a_X, float a_Advance)
+		void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
 		{
 			VisitGlyph* glyph = new VisitGlyph;
 			glyph->glyph = nullptr;
 			glyph->x = a_X;
 			glyph->advance = a_Advance;
+
+			line_current->text.push_back((wchar_t)a_Identifier);
 
 			glyphs.push_back(glyph);
 		}
