@@ -3,6 +3,12 @@
 
 namespace ExLibris
 {
+	class FontFace;
+	struct Glyph;
+};
+
+namespace ExLibris
+{
 
 	class ITextLayoutVisitor
 	{

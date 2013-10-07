@@ -75,12 +75,14 @@
     <ClCompile Include="Suite.MeshBuilder.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.PolygonShape.cpp" />
+    <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExLibris.Test.PCH.h" />
     <ClInclude Include="Mock.Font.h" />
     <ClInclude Include="Mock.MeshVisitor.h" />
+    <ClInclude Include="Mock.TextLayoutVisitor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
