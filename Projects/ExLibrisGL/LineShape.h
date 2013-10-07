@@ -24,8 +24,6 @@ namespace ExLibris
 		void Clear();
 		void AddPolygon(const Polygon& a_Polygon);
 
-		TriangleList* Triangulate(float a_Thickness) const;
-
 		MeshBuilder* BuildFilledMesh() const;
 		MeshBuilder* BuildOutlineMesh(const LineMeshOptions& a_Options) const;
 
@@ -36,12 +34,6 @@ namespace ExLibris
 		void _TriangulateOutlineGapless(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness) const;
 
 	private:
-
-		enum ShapeType
-		{
-			eShapeType_Triangle,
-			eShapeType_Quad
-		};
 
 		std::vector<Polygon> m_Polygons;
 
