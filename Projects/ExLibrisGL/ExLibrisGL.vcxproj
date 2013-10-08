@@ -72,6 +72,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Family.cpp" />
     <ClCompile Include="FontFace.cpp" />
     <ClCompile Include="FontFreetype.cpp" />
     <ClCompile Include="FontLoaderFreetype.cpp" />
@@ -81,6 +82,7 @@
     </ClCompile>
     <ClCompile Include="IFont.cpp" />
     <ClCompile Include="CurvePath.cpp" />
+    <ClCompile Include="Library.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineShape.cpp" />
     <ClCompile Include="MeshBuilder.cpp" />
@@ -93,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="Alignment.h" />
     <ClInclude Include="CurveSettings.h" />
+    <ClInclude Include="Family.h" />
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
@@ -105,6 +108,7 @@
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
+    <ClInclude Include="Library.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineMeshOptions.h" />
     <ClInclude Include="LineShape.h" />
