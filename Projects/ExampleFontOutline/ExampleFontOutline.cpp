@@ -334,11 +334,17 @@ public:
 
 		timer.Start();
 		{
-			m_Font = m_FontLoader->LoadFont(m_FontPath);
+			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
+			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
+			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
+
+			exl::Family* family = m_Library->FindFamily("Roboto");
+			m_Font = family->FindFont(exl::eWeight_Normal, exl::eStyle_Italicized);
 		}
 		timer.End();
 
-		std::cout << "Loading font:     " << timer.GetMilliSeconds() << " ms." << std::endl;
+		std::cout << "Loading fonts:    " << timer.GetMilliSeconds() << " ms." << std::endl;
 
 		timer.Start();
 		{
