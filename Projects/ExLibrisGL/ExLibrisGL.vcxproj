@@ -117,10 +117,12 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="SizePolicy.h" />
+    <ClInclude Include="Style.h" />
     <ClInclude Include="TextLayout.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
     <ClInclude Include="TriangleOrientation.h" />
+    <ClInclude Include="Weight.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

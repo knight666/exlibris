@@ -101,6 +101,9 @@ namespace ExLibris
 
 		m_Font = a_Font;
 
+		m_Weight = ((m_Font->style_flags & FT_STYLE_FLAG_BOLD) != 0) ? eWeight_Bold : eWeight_Normal;
+		m_Style = ((m_Font->style_flags & FT_STYLE_FLAG_ITALIC) != 0) ? eStyle_Italicized : eStyle_None;
+
 		return true;
 	}
 
