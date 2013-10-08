@@ -48,12 +48,16 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		FontFreetype* font = new FontFreetype(m_Library->CreateFamily(font_loaded->family_name));
+		Family* family = m_Library->CreateFamily(font_loaded->family_name);
+
+		FontFreetype* font = new FontFreetype(family);
 		if (!font->LoadFontData(font_loaded))
 		{
 			delete font;
 			return nullptr;
 		}
+
+		family->AddFont(font);
 
 		return font;
 	}
