@@ -4,6 +4,7 @@
 #include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
 #include <Glyph.h>
+#include <Library.h>
 
 #include "Mock.Font.h"
 
@@ -20,7 +21,7 @@ TEST(FontFace, Construct)
 
 TEST(FontFace, ConstructFromFont)
 {
-	MockFont* font = new MockFont("Broom 2.0");
+	MockFont* font = new MockFont(nullptr);
 
 	FontFace* face = font->CreateFace(12.0f);
 	ASSERT_NE(nullptr, face);
@@ -32,7 +33,7 @@ TEST(FontFace, ConstructFromFont)
 
 TEST(FontFace, FindGlyph)
 {
-	MockFont* font = new MockFont("Best Greetings");
+	MockFont* font = new MockFont(nullptr);
 
 	FontFace* face = new FontFace(font);
 
@@ -54,7 +55,8 @@ TEST(FontFace, FindGlyphNoFont)
 
 TEST(FontFace, FindGlyphEmpty)
 {
-	MockFont* font = new MockFont("Smexy");
+	MockFont* font = new MockFont(nullptr);
+
 	FontFace* face = new FontFace(font);
 
 	Glyph* glyph = face->FindGlyph(32);
@@ -63,7 +65,8 @@ TEST(FontFace, FindGlyphEmpty)
 
 TEST(FontFace, TryGetKerning)
 {
-	MockFont* font = new MockFont("Elderberries 2.0");
+	MockFont* font = new MockFont(nullptr);
+
 	FontFace* face = new FontFace(font);
 
 	Glyph* glyph = new Glyph;
@@ -86,7 +89,8 @@ TEST(FontFace, TryGetKerning)
 
 TEST(FontFace, TryGetKerningNotFound)
 {
-	MockFont* font = new MockFont("Roller");
+	MockFont* font = new MockFont(nullptr);
+
 	FontFace* face = new FontFace(font);
 
 	Glyph* glyph = new Glyph;
@@ -109,7 +113,8 @@ public:
 
 	void SetUp()
 	{
-		loader = new FontLoaderFreetype;
+		library = new Library;
+		loader = new FontLoaderFreetype(library);
 		font = loader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
 		face = font->CreateFace(24.0f);
 	}
@@ -119,10 +124,12 @@ public:
 		delete face;
 		delete font;
 		delete loader;
+		delete library;
 	}
 
 protected:
 
+	Library* library;
 	FontLoaderFreetype* loader;
 	FontFreetype* font;
 	FontFace* face;

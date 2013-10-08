@@ -20,7 +20,7 @@ namespace ExLibris
 	
 	public:
 	
-		FontFreetype(const std::string& a_FamilyName);
+		FontFreetype(Family* a_Family);
 		~FontFreetype();
 
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;

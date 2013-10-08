@@ -20,7 +20,7 @@ using namespace ExLibris;
 
 FontFace* CreateFixedWidthFontFace()
 {
-	MockFont* font = new MockFont("Dummy");
+	MockFont* font = new MockFont(nullptr);
 
 	FontFace* face = new FontFace(font);
 	face->SetLineHeight(20.0f);
@@ -32,7 +32,7 @@ FontFace* CreateFixedWidthFontFace()
 
 FontFace* CreateDynamicWidthFontFace()
 {
-	MockFont* font = new MockFont("Dummy");
+	MockFont* font = new MockFont(nullptr);
 
 	FontFace* face = new FontFace(font);
 	face->SetLineHeight(20.0f);
@@ -70,7 +70,7 @@ FontFace* CreateDynamicWidthFontFace()
 
 FontFace* CreateKerningFontFace()
 {
-	MockFont* font = new MockFont("Dummy");
+	MockFont* font = new MockFont(nullptr);
 
 	FontFace* face = new FontFace(font);
 	face->SetLineHeight(20.0f);

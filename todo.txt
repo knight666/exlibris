@@ -1,4 +1,5 @@
 --gtest_filter=-Font*:Face*
+--gtest_filter=Library*:Family*
 
 Makefile
 

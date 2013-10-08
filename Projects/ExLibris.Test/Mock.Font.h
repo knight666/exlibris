@@ -13,8 +13,8 @@ namespace ExLibris
 	
 	public:
 	
-		MockFont(const std::string& a_FamilyName)
-			: IFont(a_FamilyName)
+		MockFont(Family* a_Family)
+			: IFont(a_Family)
 		{
 		}
 

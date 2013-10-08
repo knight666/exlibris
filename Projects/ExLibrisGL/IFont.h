@@ -6,6 +6,7 @@
 
 namespace ExLibris
 {
+	class Family;
 	class FontFace;
 }
 
@@ -17,10 +18,10 @@ namespace ExLibris
 	
 	public:
 	
-		IFont(const std::string& a_FamilyName);
+		IFont(Family* a_Family);
 		virtual ~IFont();
 	
-		const std::string& GetFamilyName() const;
+		Family* GetFamily() const;
 
 		Weight GetWeight() const;
 		Style GetStyle() const;
@@ -31,7 +32,7 @@ namespace ExLibris
 
 	protected:
 
-		std::string m_FamilyName;
+		Family* m_Family;
 		Weight m_Weight;
 		Style m_Style;
 	

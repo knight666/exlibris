@@ -10,7 +10,7 @@ TEST(Family, AddFont)
 {
 	Family* fam = new Family(nullptr, "Kittykat");
 
-	MockFont* font = new MockFont("Kittykat");
+	MockFont* font = new MockFont(fam);
 	fam->AddFont(font);
 
 	EXPECT_EQ(1, fam->GetFontCount());
@@ -20,7 +20,7 @@ TEST(Family, AddFontTwice)
 {
 	Family* fam = new Family(nullptr, "Bangers 'N Mash");
 
-	MockFont* font = new MockFont("Bangers 'N Mash");
+	MockFont* font = new MockFont(fam);
 	fam->AddFont(font);
 	fam->AddFont(font);
 
@@ -31,7 +31,7 @@ TEST(Family, FindFont)
 {
 	Family* fam = new Family(nullptr, "Veranda");
 
-	MockFont* font = new MockFont("Veranda");
+	MockFont* font = new MockFont(fam);
 	font->SetWeight(eWeight_Bold);
 	font->SetStyle(eStyle_None);
 
@@ -45,7 +45,7 @@ TEST(Family, FindFontMatchWeight)
 {
 	Family* fam = new Family(nullptr, "Droned");
 
-	MockFont* font = new MockFont("Droned");
+	MockFont* font = new MockFont(fam);
 	font->SetWeight(eWeight_Bold);
 	font->SetStyle(eStyle_Italicized);
 
@@ -59,7 +59,7 @@ TEST(Family, FindFontMatchStyle)
 {
 	Family* fam = new Family(nullptr, "BigBoned");
 
-	MockFont* font = new MockFont("BigBoned");
+	MockFont* font = new MockFont(fam);
 	font->SetWeight(eWeight_Bold);
 	font->SetStyle(eStyle_Italicized);
 

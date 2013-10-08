@@ -32,6 +32,7 @@ namespace fw = Framework;
 #include <FontLoaderFreetype.h>
 #include <LineShape.h>
 #include <Polygon.h>
+#include <Library.h>
 #include <TextLayout.h>
 
 namespace exl = ExLibris;
@@ -326,7 +327,8 @@ public:
 
 		m_Mesh = new fw::MeshOpenGL();
 
-		m_FontLoader = new exl::FontLoaderFreetype();
+		m_Library = new exl::Library;
+		m_FontLoader = new exl::FontLoaderFreetype(m_Library);
 
 		Timer timer;
 
@@ -421,6 +423,7 @@ public:
 		delete m_FontFace;
 		delete m_Font;
 		delete m_FontLoader;
+		delete m_Library;
 	}
 
 private:
@@ -621,6 +624,7 @@ private:
 	std::string m_FontPath;
 	float m_FontSize;
 
+	exl::Library* m_Library;
 	exl::FontLoaderFreetype* m_FontLoader;
 	exl::IFont* m_Font;
 	exl::FontFace* m_FontFace;
