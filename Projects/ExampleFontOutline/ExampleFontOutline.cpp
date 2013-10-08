@@ -303,6 +303,10 @@ public:
 		, m_OutlineVisitor(nullptr)
 		, m_CameraZoom(1.0f)
 		, m_CameraZoomSpeed(0.0f)
+		, m_Library(nullptr)
+		, m_FontLoader(nullptr)
+		, m_Font(nullptr)
+		, m_FontFace(nullptr)
 	{
 	}
 
@@ -310,7 +314,6 @@ public:
 	{
 		m_FontPath = "Fonts/Roboto/Roboto-BoldItalic.ttf";
 		//m_FontPath = "Fonts/Mathilde/mathilde.otf";
-		m_FontSize = 100.0f;
 
 		return true;
 	}
@@ -319,6 +322,10 @@ public:
 	{
 		m_ShaderLoader = new fw::ShaderLoader();
 		_LoadShaders();
+
+		m_FontSize = 100.0f;
+		m_FontWeight = exl::eWeight_Normal;
+		m_FontStyle = exl::eStyle_None;
 
 		m_CurveSettings.precision = 10;
 
@@ -338,9 +345,6 @@ public:
 			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
 			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
 			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
-
-			exl::Family* family = m_Library->FindFamily("Roboto");
-			m_Font = family->FindFont(exl::eWeight_Normal, exl::eStyle_Italicized);
 		}
 		timer.End();
 
@@ -348,7 +352,7 @@ public:
 
 		timer.Start();
 		{
-			m_FontFace = m_Font->CreateFace(m_FontSize);
+			_LoadFontFace();
 		}
 		timer.End();
 
@@ -479,6 +483,48 @@ private:
 
 			} break;
 
+		case GLFW_KEY_B:
+			{
+				if (a_Modifiers & GLFW_MOD_CONTROL)
+				{
+					if (m_FontWeight == exl::eWeight_Normal)
+					{
+						m_FontWeight = exl::eWeight_Bold;
+					}
+					else
+					{
+						m_FontWeight = exl::eWeight_Normal;
+					}
+
+					_LoadFontFace();
+					
+					m_TextLayout->SetFontFace(m_FontFace);
+					m_TextLayout->Accept(*m_OutlineVisitor);
+				}
+
+			} break;
+
+		case GLFW_KEY_I:
+			{
+				if (a_Modifiers & GLFW_MOD_CONTROL)
+				{
+					if (m_FontStyle == exl::eStyle_None)
+					{
+						m_FontStyle = exl::eStyle_Italicized;
+					}
+					else
+					{
+						m_FontStyle = exl::eStyle_None;
+					}
+
+					_LoadFontFace();
+					
+					m_TextLayout->SetFontFace(m_FontFace);
+					m_TextLayout->Accept(*m_OutlineVisitor);
+				}
+
+			} break;
+
 		}
 	}
 
@@ -600,6 +646,22 @@ private:
 		m_ProgramLines->Link();
 	}
 
+	void _LoadFontFace()
+	{
+		exl::Family* family = m_Library->FindFamily("Roboto");
+		if (family != nullptr)
+		{
+			m_Font = family->FindFont(m_FontWeight, m_FontStyle);
+
+			if (m_FontFace != nullptr)
+			{
+				delete m_FontFace;
+			}
+
+			m_FontFace = m_Font->CreateFace(m_FontSize);
+		}
+	}
+
 	void _BuildGlyphMesh() 
 	{
 		m_Glyph = m_FontFace->FindGlyph((unsigned int)L'A');
@@ -629,6 +691,8 @@ private:
 
 	std::string m_FontPath;
 	float m_FontSize;
+	exl::Weight m_FontWeight;
+	exl::Style m_FontStyle;
 
 	exl::Library* m_Library;
 	exl::FontLoaderFreetype* m_FontLoader;
