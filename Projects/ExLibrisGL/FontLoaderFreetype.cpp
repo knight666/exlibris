@@ -45,6 +45,9 @@ namespace ExLibris
 			return nullptr;
 		}
 
+		bool is_bold = font_loaded->style_flags & FT_STYLE_FLAG_BOLD;
+		bool is_italic = font_loaded->style_flags & FT_STYLE_FLAG_ITALIC;
+
 		FontFreetype* font = new FontFreetype(font_loaded->family_name);
 		if (!font->LoadFontData(font_loaded))
 		{

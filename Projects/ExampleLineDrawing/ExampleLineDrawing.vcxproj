@@ -36,6 +36,7 @@
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\ProjExLibris.props" />
     <Import Project="..\..\Properties\ProjFrameworkGL.props" />
   </ImportGroup>
@@ -46,6 +47,7 @@
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\ProjExLibris.props" />
     <Import Project="..\..\Properties\ProjFrameworkGL.props" />
   </ImportGroup>
