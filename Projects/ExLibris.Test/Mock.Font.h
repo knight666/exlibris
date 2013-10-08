@@ -22,6 +22,16 @@ namespace ExLibris
 		{
 		}
 
+		void SetWeight(Weight a_Weight)
+		{
+			m_Weight = a_Weight;
+		}
+
+		void SetStyle(Style a_Style)
+		{
+			m_Style = a_Style;
+		}
+
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const
 		{
 			return a_CodepointUtf32;
