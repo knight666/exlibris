@@ -54,7 +54,7 @@ namespace ExLibris
 		return 0;
 	}
 
-	FontFreetype::FontFreetype(const std::string& a_Family)
+	FontFreetype::FontFreetype(Family* a_Family)
 		: IFont(a_Family)
 		, m_Font(nullptr)
 	{

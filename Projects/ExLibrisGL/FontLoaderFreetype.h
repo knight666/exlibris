@@ -5,13 +5,18 @@
 
 namespace ExLibris
 {
+	class Library;
+};
+
+namespace ExLibris
+{
 
 	class FontLoaderFreetype
 	{
 	
 	public:
 	
-		FontLoaderFreetype();
+		FontLoaderFreetype(Library* a_Library);
 		~FontLoaderFreetype();
 
 		FT_Library GetLibrary() const;
@@ -20,8 +25,9 @@ namespace ExLibris
 	
 	private:
 
+		Library* m_Library;
 		FT_Error m_Error;
-		FT_Library m_Library;
+		FT_Library m_FTLibrary;
 	
 	}; // class FontLoaderFreetype
 
