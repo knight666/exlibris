@@ -125,6 +125,7 @@ namespace ExLibris
 		FontFace* face = new FontFace(this);
 		face->SetSize(a_Size);
 		face->SetLineHeight(Fixed26Dot6::ToFloat(m_Font->size->metrics.height));
+		face->SetAscender(Fixed26Dot6::ToFloat(m_Font->ascender));
 
 		std::vector<Glyph*> glyphs;
 
@@ -138,7 +139,7 @@ namespace ExLibris
 				Glyph* glyph = new Glyph;
 				glyph->index = (unsigned int)codepoint;
 
-				_LoadMetrics(m_Font->glyph, glyph, m_Font->size->metrics.ascender);
+				_LoadMetrics(m_Font->glyph, glyph, m_Font->size->metrics.descender);
 				_LoadBitmap(m_Font->glyph, glyph);
 				_LoadOutline(m_Font->glyph, glyph);
 
@@ -189,7 +190,7 @@ namespace ExLibris
 		return face;
 	}
 
-	bool FontFreetype::_LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Pos a_Ascender) const
+	bool FontFreetype::_LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Pos a_Descender) const
 	{
 		FT_Error errors = 0;
 
@@ -197,8 +198,7 @@ namespace ExLibris
 
 		a_Glyph->metrics = new GlyphMetrics;
 		a_Glyph->metrics->offset.x = Fixed26Dot6::ToFloat(glyph_metrics.horiBearingX);
-		//a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(glyph_metrics.vertAdvance - glyph_metrics.horiBearingY);
-		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(a_Ascender);
+		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(glyph_metrics.horiBearingY - a_Descender);
 		a_Glyph->metrics->advance = Fixed26Dot6::ToFloat(glyph_metrics.horiAdvance);
 
 		// bounding box

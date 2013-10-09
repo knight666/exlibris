@@ -29,6 +29,9 @@ namespace ExLibris
 		float GetLineHeight() const;
 		void SetLineHeight(float a_LineHeight);
 
+		float GetAscender() const;
+		void SetAscender(float a_Ascender);
+
 		void AddGlyph(Glyph* a_Glyph);
 		Glyph* FindGlyph(unsigned int a_CodepointUtf32) const;
 
@@ -39,6 +42,7 @@ namespace ExLibris
 		const IFont* m_Font;
 		float m_Size;
 		float m_LineHeight;
+		float m_Ascender;
 		std::map<unsigned int, Glyph*> m_Glyphs;
 	
 	}; // class FontFace

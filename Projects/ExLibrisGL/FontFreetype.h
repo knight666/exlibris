@@ -33,7 +33,7 @@ namespace ExLibris
 
 	private:
 
-		bool _LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Pos a_Ascender) const;
+		bool _LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Pos a_Descender) const;
 		bool _LoadBitmap(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
 		bool _LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
 

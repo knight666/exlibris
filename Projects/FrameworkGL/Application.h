@@ -32,6 +32,8 @@ namespace Framework
 
 	protected:
 
+		virtual void OnCharacter(unsigned int a_Character);
+
 		virtual void OnKeyPressed(int a_Key, int a_ScanCode, int a_Modifiers);
 		virtual void OnKeyReleased(int a_Key, int a_ScanCode, int a_Modifiers);
 
@@ -44,6 +46,7 @@ namespace Framework
 		bool _InitializeOpenGL();
 		void _DestroyOpenGL();
 
+		friend void ProcessCharacter(GLFWwindow* a_Window, unsigned int a_Character);
 		friend void ProcessKey(GLFWwindow* a_Window, int a_Key, int a_ScanCode, int a_Action, int a_Modifiers);
 		friend void ProcessButton(GLFWwindow* a_Window, int a_Button, int a_Action, int a_Modifiers);
 		friend void ProcessCursor(GLFWwindow* a_Window, double a_X, double a_Y);
