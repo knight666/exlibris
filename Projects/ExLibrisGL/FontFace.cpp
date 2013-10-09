@@ -13,6 +13,7 @@ namespace ExLibris
 		, m_Size(0.0f)
 		, m_LineHeight(0.0f)
 		, m_Ascender(0.0f)
+		, m_Descender(0.0f)
 	{
 	}
 	
@@ -58,6 +59,16 @@ namespace ExLibris
 	void FontFace::SetAscender(float a_Ascender)
 	{
 		m_Ascender = a_Ascender;
+	}
+
+	float FontFace::GetDescender() const
+	{
+		return m_Descender;
+	}
+
+	void FontFace::SetDescender(float a_Descender)
+	{
+		m_Descender = a_Descender;
 	}
 
 	void FontFace::AddGlyph(Glyph* a_Glyph)

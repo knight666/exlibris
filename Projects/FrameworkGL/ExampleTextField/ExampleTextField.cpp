@@ -70,19 +70,19 @@ public:
 		GlyphVertex vertex_data[4] = {
 			{
 				glm::vec2(0.0f, 0.0f),
-				glm::vec2(0.0f, 1.0f)
-			},
-			{
-				glm::vec2(1.0f, 0.0f),
-				glm::vec2(1.0f, 1.0f)
-			},
-			{
-				glm::vec2(0.0f, 1.0f),
 				glm::vec2(0.0f, 0.0f)
 			},
 			{
-				glm::vec2(1.0f, 1.0f),
+				glm::vec2(1.0f, 0.0f),
 				glm::vec2(1.0f, 0.0f)
+			},
+			{
+				glm::vec2(0.0f, 1.0f),
+				glm::vec2(0.0f, 1.0f)
+			},
+			{
+				glm::vec2(1.0f, 1.0f),
+				glm::vec2(1.0f, 1.0f)
 			},
 		};
 
@@ -111,7 +111,10 @@ public:
 
 	void SetFont(exl::FontFace* a_Font)
 	{
-		m_Layout->SetFontFace(a_Font);
+		m_Font = a_Font;
+		m_Layout->SetFontFace(m_Font);
+
+		m_RenderCorrection.y = -m_Font->GetAscender();
 	}
 
 	void AddCharacter(unsigned int a_Character)
@@ -135,16 +138,7 @@ public:
 
 	void Render(const glm::vec2& a_Position)
 	{
-		glm::vec2 screen_position = a_Position + m_RenderOffset;
-
-		glm::mat4x4 modelview;
-		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
-		modelview = glm::scale(modelview, glm::vec3((float)m_TextureWidth, (float)m_TextureHeight, 1.0f));
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(glm::value_ptr(modelview));
-
-		glBindTexture(GL_TEXTURE_2D, m_Texture);
+		glm::vec2 screen_position = a_Position + m_RenderCorrection;
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -158,15 +152,39 @@ public:
 		glVertexPointer(2, GL_FLOAT, sizeof(GlyphVertex), (void*)GlyphVertex::eOffset_Position);
 		glTexCoordPointer(2, GL_FLOAT, sizeof(GlyphVertex), (void*)GlyphVertex::eOffset_TextureCoordinate);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);;
+		// render text
+
+		glm::mat4x4 modelview;
+		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
+		modelview = glm::scale(modelview, glm::vec3((float)m_TextureWidth, (float)m_TextureHeight, 1.0f));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(glm::value_ptr(modelview));
+
+		glBindTexture(GL_TEXTURE_2D, m_Texture);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		// render cursor
+
+		glm::vec2 cursor_position = screen_position + m_CursorPosition;
+
+		glm::mat4x4 modelview_cursor;
+		modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
+		modelview_cursor = glm::scale(modelview_cursor, glm::vec3(1.0f, m_Layout->GetFontFace()->GetLineHeight(), 1.0f));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(glm::value_ptr(modelview_cursor));
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glDisable(GL_BLEND);
 	}
@@ -182,13 +200,16 @@ private:
 		m_TextureData = new unsigned char[m_TexturePitch * m_TextureHeight];
 		memset(m_TextureData, 0, m_TexturePitch * m_TextureHeight);
 
-		m_RenderOffset.x = 0.0f;
-		m_RenderOffset.y = 0.0f;
+		m_RenderCorrection.x = 0.0f;
+		m_RenderCorrection.y = -a_Face->GetAscender();
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
 	{
 		m_LineOffset = a_Offset;
+		m_LineOffset.y += m_Font->GetDescender();
+
+		m_CursorPosition = a_Offset;
 	}
 
 	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance)
@@ -196,10 +217,12 @@ private:
 		exl::GlyphMetrics* metrics = a_Glyph->metrics;
 		exl::GlyphBitmap* bitmap = a_Glyph->bitmap;
 
+		m_CursorPosition.x = a_X + a_Advance;
+
 		glm::vec2 offset = m_LineOffset + metrics->offset;
 		offset.x += a_X;
 
-		m_RenderOffset = glm::min(m_RenderOffset, offset);
+		m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
 		offset.x = std::max(offset.x, 0.0f);
 
 		unsigned char* dst = m_TextureData + ((unsigned int)offset.y * m_TexturePitch) + (unsigned int)offset.x * 4;
@@ -214,7 +237,7 @@ private:
 			{
 				memcpy(dst, src, src_pitch);
 			
-				dst -= m_TexturePitch;
+				dst += m_TexturePitch;
 				src += src_pitch;
 			}
 		}
@@ -222,6 +245,7 @@ private:
 
 	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
 	{
+		m_CursorPosition.x = a_X + a_Advance;
 	}
 
 	void VisitTextLineEnd()
@@ -230,8 +254,6 @@ private:
 
 	void VisitTextEnd()
 	{
-		m_RenderOffset.y -= m_Layout->GetFontFace()->GetAscender();
-
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
 		glTexImage2D(
 			GL_TEXTURE_2D, 0, GL_RGBA,
@@ -248,11 +270,13 @@ private:
 
 private:
 
+	exl::FontFace* m_Font;
 	exl::TextLayout* m_Layout;
 	std::string m_Text;
 
 	glm::vec2 m_LineOffset;
-	glm::vec2 m_RenderOffset;
+	glm::vec2 m_RenderCorrection;
+	glm::vec2 m_CursorPosition;
 
 	GLuint m_Texture;
 	unsigned int m_TextureWidth;
