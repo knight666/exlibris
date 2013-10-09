@@ -14,6 +14,13 @@ namespace Framework
 		std::cerr << a_Description << std::endl;
 	}
 
+	static void ProcessCharacter(GLFWwindow* a_Window, unsigned int a_Character)
+	{
+		Application* application = (Application*)glfwGetWindowUserPointer(a_Window);
+
+		application->OnCharacter(a_Character);
+	}
+
 	static void ProcessKey(GLFWwindow* a_Window, int a_Key, int a_ScanCode, int a_Action, int a_Modifiers)
 	{
 		Application* application = (Application*)glfwGetWindowUserPointer(a_Window);
@@ -103,6 +110,7 @@ namespace Framework
 
 		glfwMakeContextCurrent(m_Window);
 
+		glfwSetCharCallback(m_Window, ProcessCharacter);
 		glfwSetKeyCallback(m_Window, ProcessKey);
 		glfwSetMouseButtonCallback(m_Window, ProcessButton);
 		glfwSetCursorPosCallback(m_Window, ProcessCursor);
@@ -185,6 +193,10 @@ namespace Framework
 		_DestroyOpenGL();
 
 		return 0;
+	}
+
+	void Application::OnCharacter(unsigned int a_Character)
+	{
 	}
 
 	void Application::OnKeyPressed(int a_Key, int a_ScanCode, int a_Modifiers)
