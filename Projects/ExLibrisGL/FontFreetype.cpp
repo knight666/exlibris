@@ -107,7 +107,7 @@ namespace ExLibris
 		return true;
 	}
 
-	FontFace* FontFreetype::CreateFace(float a_Size) const
+	FontFace* FontFreetype::_CreateFace(float a_Size)
 	{
 		if (m_Font == nullptr)
 		{
@@ -183,6 +183,8 @@ namespace ExLibris
 
 			face->AddGlyph(glyph_left);
 		}
+
+		m_Faces.insert(std::make_pair(a_Size, face));
 
 		return face;
 	}

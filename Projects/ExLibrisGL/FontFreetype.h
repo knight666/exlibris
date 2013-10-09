@@ -25,9 +25,11 @@ namespace ExLibris
 
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
 
-		FontFace* CreateFace(float a_Size) const;
-
 		bool LoadFontData(FT_Face a_Font);
+
+	private:
+
+		FontFace* _CreateFace(float a_Size);
 
 	private:
 

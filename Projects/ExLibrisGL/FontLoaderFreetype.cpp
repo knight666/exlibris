@@ -57,8 +57,6 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		family->AddFont(font);
-
 		return font;
 	}
 

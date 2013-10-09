@@ -37,7 +37,7 @@ namespace ExLibris
 			return a_CodepointUtf32;
 		}
 
-		FontFace* CreateFace(float a_Size) const
+		FontFace* _CreateFace(float a_Size)
 		{
 			FontFace* face = new FontFace(this);
 			face->SetSize(a_Size);
