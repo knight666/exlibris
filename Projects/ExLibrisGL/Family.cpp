@@ -17,6 +17,7 @@ namespace ExLibris
 		{
 			delete *font_it;
 		}
+		m_Fonts.clear();
 	}
 
 	Library* Family::GetLibrary() const

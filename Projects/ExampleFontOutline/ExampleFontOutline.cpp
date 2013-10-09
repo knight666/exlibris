@@ -339,12 +339,17 @@ public:
 
 		Timer timer;
 
+		exl::IFont* font_regular = nullptr;
+		exl::IFont* font_bold = nullptr;
+		exl::IFont* font_italic = nullptr;
+		exl::IFont* font_bolditalic = nullptr;
+
 		timer.Start();
 		{
-			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
-			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
-			m_FontLoader->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
+			font_regular = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+			font_bold = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
+			font_italic = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
+			font_bolditalic = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
 		}
 		timer.End();
 
@@ -352,6 +357,11 @@ public:
 
 		timer.Start();
 		{
+			font_regular->CreateFace(m_FontSize);
+			font_bold->CreateFace(m_FontSize);
+			font_italic->CreateFace(m_FontSize);
+			font_bolditalic->CreateFace(m_FontSize);
+
 			_LoadFontFace();
 		}
 		timer.End();
@@ -652,12 +662,6 @@ private:
 		if (family != nullptr)
 		{
 			m_Font = family->FindFont(m_FontWeight, m_FontStyle);
-
-			if (m_FontFace != nullptr)
-			{
-				delete m_FontFace;
-			}
-
 			m_FontFace = m_Font->CreateFace(m_FontSize);
 		}
 	}
