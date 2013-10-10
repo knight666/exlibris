@@ -125,8 +125,8 @@ namespace ExLibris
 		FontFace* face = new FontFace(this);
 		face->SetSize(a_Size);
 		face->SetLineHeight(Fixed26Dot6::ToFloat(m_Font->size->metrics.height));
-		face->SetAscender(Fixed26Dot6::ToFloat(m_Font->ascender));
-		face->SetDescender(Fixed26Dot6::ToFloat(m_Font->descender));
+		face->SetAscender(Fixed26Dot6::ToFloat(m_Font->size->metrics.ascender));
+		face->SetDescender(Fixed26Dot6::ToFloat(m_Font->size->metrics.descender));
 
 		std::vector<Glyph*> glyphs;
 
