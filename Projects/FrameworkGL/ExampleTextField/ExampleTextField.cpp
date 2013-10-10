@@ -115,6 +115,8 @@ public:
 		m_Layout->SetFontFace(m_Font);
 
 		m_RenderCorrection.y = -m_Font->GetAscender();
+
+		m_Layout->Accept(*this);
 	}
 
 	void AddCharacter(unsigned int a_Character)
@@ -138,7 +140,7 @@ public:
 
 	void Render(const glm::vec2& a_Position)
 	{
-		glm::vec2 screen_position = a_Position + m_RenderCorrection;
+		glm::vec2 screen_position = a_Position + m_RenderCorrection + m_LineCorrection;
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -167,13 +169,15 @@ public:
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+		glDisable(GL_BLEND);
+
 		// render cursor
 
 		glm::vec2 cursor_position = screen_position + m_CursorPosition;
 
 		glm::mat4x4 modelview_cursor;
 		modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
-		modelview_cursor = glm::scale(modelview_cursor, glm::vec3(1.0f, m_Layout->GetFontFace()->GetLineHeight(), 1.0f));
+		modelview_cursor = glm::scale(modelview_cursor, glm::vec3(1.0f, m_Font->GetLineHeight(), 1.0f));
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadMatrixf(glm::value_ptr(modelview_cursor));
@@ -185,8 +189,6 @@ public:
 
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-
-		glDisable(GL_BLEND);
 	}
 
 private:
@@ -198,7 +200,19 @@ private:
 		m_TextureHeight = (unsigned int)a_Dimensions.y;
 
 		m_TextureData = new unsigned char[m_TexturePitch * m_TextureHeight];
-		memset(m_TextureData, 0, m_TexturePitch * m_TextureHeight);
+		//memset(m_TextureData, 0, m_TexturePitch * m_TextureHeight);
+
+		unsigned int clear_color = 0x00000000;
+
+		for (unsigned int y = 0; y < m_TextureHeight; ++y)
+		{
+			unsigned int* dst = (unsigned int*)(m_TextureData + y * m_TexturePitch);
+
+			for (unsigned int x = 0; x < m_TextureWidth; ++x)
+			{
+				*dst++ = clear_color;
+			}
+		}
 
 		m_RenderCorrection.x = 0.0f;
 		m_RenderCorrection.y = -a_Face->GetAscender();
@@ -210,6 +224,9 @@ private:
 		m_LineOffset.y += m_Font->GetDescender();
 
 		m_CursorPosition = a_Offset;
+
+		m_LineCorrection.x = 0.0f;
+		m_LineCorrection.y = 0.0f;
 	}
 
 	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance)
@@ -223,7 +240,12 @@ private:
 		offset.x += a_X;
 
 		m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
-		offset.x = std::max(offset.x, 0.0f);
+
+		if (offset.x < 0.0f)
+		{
+			m_LineCorrection.x = fabs(offset.x);
+			offset.x = 0.0f;
+		}
 
 		unsigned char* dst = m_TextureData + ((unsigned int)offset.y * m_TexturePitch) + (unsigned int)offset.x * 4;
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
@@ -233,9 +255,34 @@ private:
 
 		for (unsigned int y = 0; y < bitmap->height; ++y)
 		{
-			if (dst >= m_TextureData && dst < dst_end)
+			if (dst >= m_TextureData && dst + src_pitch < dst_end)
 			{
-				memcpy(dst, src, src_pitch);
+				unsigned int* dst_line = (unsigned int*)dst;
+				unsigned int* src_line = (unsigned int*)src;
+
+				for (unsigned int x = 0; x < bitmap->width; ++x)
+				{
+					unsigned int src_a = (*src_line & 0x000000FF);
+					unsigned int src_r = (*src_line & 0x0000FF00) >> 8;
+					unsigned int src_g = (*src_line & 0x00FF0000) >> 16;
+					unsigned int src_b = (*src_line & 0xFF000000) >> 24;
+
+					unsigned int dst_a = (*dst_line & 0x000000FF);
+					unsigned int dst_r = (*dst_line & 0x0000FF00) >> 8;
+					unsigned int dst_g = (*dst_line & 0x00FF0000) >> 16;
+					unsigned int dst_b = (*dst_line & 0xFF000000) >> 24;
+
+					unsigned int rgba =
+						((((src_a * src_a) + (dst_a * (255 - src_a))) >> 8) & 0x000000FF) |
+						((((src_r * src_a) + (dst_r * (255 - src_a))) >> 8) & 0x000000FF) << 8 |
+						((((src_g * src_a) + (dst_g * (255 - src_a))) >> 8) & 0x000000FF) << 16 |
+						((((src_b * src_a) + (dst_b * (255 - src_a))) >> 8) & 0x000000FF) << 24;
+
+					*dst_line = rgba;
+
+					++dst_line;
+					++src_line;
+				}
 			
 				dst += m_TexturePitch;
 				src += src_pitch;
@@ -275,6 +322,7 @@ private:
 	std::string m_Text;
 
 	glm::vec2 m_LineOffset;
+	glm::vec2 m_LineCorrection;
 	glm::vec2 m_RenderCorrection;
 	glm::vec2 m_CursorPosition;
 
@@ -314,8 +362,11 @@ public:
 		m_Library = new exl::Library;
 		m_FontLoader = new exl::FontLoaderFreetype(m_Library);
 
+		m_FontSize = 24.0f;
+
 		m_Font = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		m_FontFace = m_Font->CreateFace(24.0f);
+		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
+		m_FontFace = m_Font->CreateFace(m_FontSize);
 
 		m_TextField = new TextField;
 		m_TextField->SetFont(m_FontFace);
@@ -378,6 +429,24 @@ private:
 
 			} break;
 
+		case GLFW_KEY_UP:
+			{
+				m_FontSize -= 1.0f;
+
+				m_FontFace = m_Font->CreateFace(m_FontSize);
+				m_TextField->SetFont(m_FontFace);
+
+			} break;
+
+		case GLFW_KEY_DOWN:
+			{
+				m_FontSize += 1.0f;
+
+				m_FontFace = m_Font->CreateFace(m_FontSize);
+				m_TextField->SetFont(m_FontFace);
+
+			} break;
+
 		}
 	}
 
@@ -386,6 +455,7 @@ private:
 	exl::Library* m_Library;
 	exl::FontLoaderFreetype* m_FontLoader;
 	exl::IFont* m_Font;
+	float m_FontSize;
 	exl::FontFace* m_FontFace;
 
 	TextField* m_TextField;
