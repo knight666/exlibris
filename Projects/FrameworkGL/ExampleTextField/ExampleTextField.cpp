@@ -56,6 +56,8 @@ public:
 		, m_TexturePitch(0)
 		, m_TextureHeight(0)
 		, m_TextureData(nullptr)
+		, m_CursorVisible(true)
+		, m_CursorTime(0.0f)
 	{
 		m_Layout = new exl::TextLayout;
 
@@ -138,6 +140,18 @@ public:
 		}
 	}
 
+	void Update(float a_DeltaTime)
+	{
+		m_CursorTime += a_DeltaTime;
+
+		while (m_CursorTime > 50.0f)
+		{
+			m_CursorVisible = !m_CursorVisible;
+
+			m_CursorTime -= 50.0f;
+		}
+	}
+
 	void Render(const glm::vec2& a_Position)
 	{
 		glm::vec2 screen_position = a_Position + m_RenderCorrection + m_LineCorrection;
@@ -173,16 +187,19 @@ public:
 
 		// render cursor
 
-		glm::vec2 cursor_position = screen_position + m_CursorPosition;
+		if (m_CursorVisible)
+		{
+			glm::vec2 cursor_position = screen_position + m_CursorPosition;
 
-		glm::mat4x4 modelview_cursor;
-		modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
-		modelview_cursor = glm::scale(modelview_cursor, glm::vec3(1.0f, m_Font->GetLineHeight(), 1.0f));
+			glm::mat4x4 modelview_cursor;
+			modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
+			modelview_cursor = glm::scale(modelview_cursor, glm::vec3(1.0f, m_Font->GetLineHeight(), 1.0f));
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(glm::value_ptr(modelview_cursor));
+			glMatrixMode(GL_MODELVIEW);
+			glLoadMatrixf(glm::value_ptr(modelview_cursor));
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -324,7 +341,10 @@ private:
 	glm::vec2 m_LineOffset;
 	glm::vec2 m_LineCorrection;
 	glm::vec2 m_RenderCorrection;
+
 	glm::vec2 m_CursorPosition;
+	bool m_CursorVisible;
+	float m_CursorTime;
 
 	GLuint m_Texture;
 	unsigned int m_TextureWidth;
@@ -376,6 +396,7 @@ public:
 
 	void Update(float a_DeltaTime)
 	{
+		m_TextField->Update(a_DeltaTime);
 	}
 
 	void Render()
