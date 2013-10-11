@@ -118,7 +118,9 @@
     <ClInclude Include="Quad.h" />
     <ClInclude Include="SizePolicy.h" />
     <ClInclude Include="Style.h" />
+    <ClInclude Include="TextCharacter.h" />
     <ClInclude Include="TextLayout.h" />
+    <ClInclude Include="TextLine.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
     <ClInclude Include="TriangleOrientation.h" />
