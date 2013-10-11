@@ -17,12 +17,12 @@ namespace ExLibris
 		, m_LinesDirty(false)
 		, m_LayoutDirty(false)
 	{
-		m_GlyphSpace = new TextGlyph;
+		m_GlyphSpace = new TextCharacter;
 	}
 	
 	TextLayout::~TextLayout()
 	{
-		for (std::vector<TextGlyph*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
+		for (std::vector<TextCharacter*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
 		{
 			delete *glyph_it;
 		}
@@ -130,7 +130,7 @@ namespace ExLibris
 
 		if (m_GlyphsDirty)
 		{
-			for (std::vector<TextGlyph*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
+			for (std::vector<TextCharacter*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
 			{
 				delete *glyph_it;
 			}
@@ -177,17 +177,17 @@ namespace ExLibris
 		{
 			TextLine* line = *line_it;
 
-			a_Visitor.VisitTextLineBegin(line->glyphs.size(), line->position, line->width);
+			a_Visitor.VisitTextLineBegin(line->characters.size(), line->position, line->dimensions.x);
 
-			for (std::vector<TextGlyph*>::iterator glyph_it = line->glyphs.begin(); glyph_it != line->glyphs.end(); ++glyph_it)
+			for (std::vector<TextCharacter*>::iterator glyph_it = line->characters.begin(); glyph_it != line->characters.end(); ++glyph_it)
 			{
-				TextGlyph* glyph = *glyph_it;
+				TextCharacter* glyph = *glyph_it;
 
-				if (glyph->type == eGlyphType_Character)
+				if (glyph->type == TextCharacter::eType_Character)
 				{
 					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance);
 				}
-				else if (glyph->type == eGlyphType_Whitespace)
+				else if (glyph->type == TextCharacter::eType_Whitespace)
 				{
 					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance);
 				}
@@ -235,7 +235,7 @@ namespace ExLibris
 			int whitespace_count = 0;
 
 			unsigned int glyph_identifier = 0;
-			GlyphType glyph_type = eGlyphType_Character;
+			TextCharacter::Type glyph_type = TextCharacter::eType_Character;
 
 			if (character == char_carriage_return)
 			{
@@ -247,39 +247,39 @@ namespace ExLibris
 					next_char_valid = (char_next_it != text_utf32.end());
 				}
 
-				glyph_type = eGlyphType_NewLine;
+				glyph_type = TextCharacter::eType_NewLine;
 
 				glyph_identifier = char_new_line;
 			}
 			else if (character == char_new_line)
 			{
-				glyph_type = eGlyphType_NewLine;
+				glyph_type = TextCharacter::eType_NewLine;
 
 				glyph_identifier = char_new_line;
 			}
 			else if (character == char_space)
 			{
-				glyph_type = eGlyphType_Whitespace;
+				glyph_type = TextCharacter::eType_Whitespace;
 				whitespace_count = 1;
 
 				glyph_identifier = character;
 			}
 			else if (character == char_tab)
 			{
-				glyph_type = eGlyphType_Whitespace;
+				glyph_type = TextCharacter::eType_Whitespace;
 				whitespace_count = 4;
 
 				glyph_identifier = character;
 			}
 
 			bool glyph_valid = false;
-			Glyph* glyph_current = nullptr;
+			const Glyph* glyph_current = nullptr;
 			float glyph_advance = 0.0f;
 
 			switch (glyph_type)
 			{
 
-			case eGlyphType_Character:
+			case TextCharacter::eType_Character:
 				{
 					glyph_current = m_Face->FindGlyph(*char_it);
 					if (glyph_current != nullptr)
@@ -294,7 +294,7 @@ namespace ExLibris
 							Glyph* glyph_next = m_Face->FindGlyph(*char_next_it);
 
 							glm::vec2 kerning;
-							if (m_Face->TryGetKerning(glyph_current, glyph_next, kerning))
+							if (m_Face->TryGetKerning((Glyph*)glyph_current, glyph_next, kerning))
 							{
 								glyph_advance += kerning.x;
 							}
@@ -303,7 +303,7 @@ namespace ExLibris
 
 				} break;
 
-			case eGlyphType_Whitespace:
+			case TextCharacter::eType_Whitespace:
 				{
 					glyph_valid = true;
 
@@ -312,7 +312,7 @@ namespace ExLibris
 
 				} break;
 
-			case eGlyphType_NewLine:
+			case TextCharacter::eType_NewLine:
 				{
 					glyph_valid = true;
 
@@ -321,7 +321,7 @@ namespace ExLibris
 
 			if (glyph_valid)
 			{
-				TextGlyph* instance = new TextGlyph;
+				TextCharacter* instance = new TextCharacter;
 				instance->identifier = glyph_identifier;
 				instance->glyph = glyph_current;
 				instance->type = glyph_type;
@@ -339,8 +339,8 @@ namespace ExLibris
 
 		if (m_Glyphs.size() > 0)
 		{
-			TextGlyph* instance = new TextGlyph;
-			instance->type = eGlyphType_End;
+			TextCharacter* instance = new TextCharacter;
+			instance->type = TextCharacter::eType_End;
 			instance->glyph = nullptr;
 			instance->x = 0.0f;
 			instance->advance = 0.0f;
@@ -389,11 +389,11 @@ namespace ExLibris
 
 	void TextLayout::_WordWrappingNone(bool a_WidthFixed, bool a_HeightFixed)
 	{
-		for (std::vector<TextGlyph*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
+		for (std::vector<TextCharacter*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
 		{
-			TextGlyph* glyph = *glyph_it;
+			TextCharacter* glyph = *glyph_it;
 
-			if (glyph->type == eGlyphType_Character || glyph->type == eGlyphType_Whitespace)
+			if (glyph->type == TextCharacter::eType_Character || glyph->type == TextCharacter::eType_Whitespace)
 			{
 				if (a_WidthFixed && m_Cursor.x + glyph->advance >= m_SizeHint.x)
 				{
@@ -405,14 +405,14 @@ namespace ExLibris
 
 				_AddGlyphToCurrentLine(glyph);
 			}
-			else if (glyph->type == eGlyphType_NewLine)
+			else if (glyph->type == TextCharacter::eType_NewLine)
 			{
 				if (!_NextLine(a_HeightFixed))
 				{
 					return;
 				}
 			}
-			else if (glyph->type == eGlyphType_End)
+			else if (glyph->type == TextCharacter::eType_End)
 			{
 				break;
 			}
@@ -421,29 +421,29 @@ namespace ExLibris
 
 	void TextLayout::_WordWrappingGreedy(bool a_WidthFixed, bool a_HeightFixed)
 	{
-		std::vector<TextGlyph*>::iterator word_start = m_Glyphs.begin();
-		std::vector<TextGlyph*>::iterator word_end = word_start;
+		std::vector<TextCharacter*>::iterator word_start = m_Glyphs.begin();
+		std::vector<TextCharacter*>::iterator word_end = word_start;
 		float word_start_x = 0.0f;
 		float word_length = 0.0f;
 
-		std::vector<TextGlyph*>::iterator glyph_it = m_Glyphs.begin();
+		std::vector<TextCharacter*>::iterator glyph_it = m_Glyphs.begin();
 
 		while (glyph_it != m_Glyphs.end())
 		{
-			TextGlyph* glyph = *glyph_it;
+			TextCharacter* glyph = *glyph_it;
 
-			if (glyph->type == eGlyphType_Character)
+			if (glyph->type == TextCharacter::eType_Character)
 			{
 				word_length += glyph->advance;
 				word_end = glyph_it;
 			}
 			else
 			{
-				if (glyph->type == eGlyphType_Whitespace)
+				if (glyph->type == TextCharacter::eType_Whitespace)
 				{
 					// consume as much whitespace as possible
 
-					while (glyph->type == eGlyphType_Whitespace)
+					while (glyph->type == TextCharacter::eType_Whitespace)
 					{
 						word_length += glyph->advance;
 						word_end = glyph_it;
@@ -476,9 +476,9 @@ namespace ExLibris
 						{
 							m_Cursor.x = word_start_x;
 
-							for (std::vector<TextGlyph*>::iterator word_glyph_it = word_start; word_glyph_it != word_end; ++word_glyph_it)
+							for (std::vector<TextCharacter*>::iterator word_glyph_it = word_start; word_glyph_it != word_end; ++word_glyph_it)
 							{
-								TextGlyph* word_glyph = *word_glyph_it;
+								TextCharacter* word_glyph = *word_glyph_it;
 
 								// push characters to next line
 
@@ -490,7 +490,7 @@ namespace ExLibris
 									}
 								}
 
-								if (word_glyph->type == eGlyphType_Character || word_glyph->type == eGlyphType_Whitespace)
+								if (word_glyph->type == TextCharacter::eType_Character || word_glyph->type == TextCharacter::eType_Whitespace)
 								{
 									_AddGlyphToCurrentLine(word_glyph);
 								}
@@ -518,12 +518,12 @@ namespace ExLibris
 
 				if (word_add)
 				{
-					std::vector<TextGlyph*>::iterator word_glyph_it = word_start;
+					std::vector<TextCharacter*>::iterator word_glyph_it = word_start;
 					while (1)
 					{
-						TextGlyph* word_glyph = *word_glyph_it;
+						TextCharacter* word_glyph = *word_glyph_it;
 
-						if (word_glyph->type == eGlyphType_Character || word_glyph->type == eGlyphType_Whitespace)
+						if (word_glyph->type == TextCharacter::eType_Character || word_glyph->type == TextCharacter::eType_Whitespace)
 						{
 							_AddGlyphToCurrentLine(word_glyph);
 						}
@@ -547,7 +547,7 @@ namespace ExLibris
 
 				// new line
 
-				if (glyph->type == eGlyphType_NewLine)
+				if (glyph->type == TextCharacter::eType_NewLine)
 				{
 					if (!_NextLine(a_HeightFixed))
 					{
@@ -583,7 +583,7 @@ namespace ExLibris
 					{
 						TextLine* line = *line_it;
 
-						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->width);
+						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
 
 					break;
@@ -595,9 +595,9 @@ namespace ExLibris
 					{
 						TextLine* line = *line_it;
 
-						line->width = std::max<float>(m_SizeHint.x, line->width);
+						line->dimensions.x = std::max<float>(m_SizeHint.x, line->dimensions.x);
 
-						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->width);
+						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
 
 					break;
@@ -609,9 +609,9 @@ namespace ExLibris
 					{
 						TextLine* line = *line_it;
 
-						line->width = std::min<float>(m_SizeHint.x, line->width);
+						line->dimensions.x = std::min<float>(m_SizeHint.x, line->dimensions.x);
 
-						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->width);
+						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
 
 					break;
@@ -710,7 +710,7 @@ namespace ExLibris
 				{
 					TextLine* line = *line_it;
 
-					line->position.x += m_Dimensions.x - line->width;
+					line->position.x += m_Dimensions.x - line->dimensions.x;
 					line->position.y += offset_y;
 				}
 
@@ -723,7 +723,7 @@ namespace ExLibris
 				{
 					TextLine* line = *line_it;
 
-					line->position.x += (m_Dimensions.x - line->width) / 2.0f;
+					line->position.x += (m_Dimensions.x - line->dimensions.x) / 2.0f;
 					line->position.y += offset_y;
 				}
 
@@ -765,20 +765,20 @@ namespace ExLibris
 
 		m_LineCurrent = new TextLine;
 		m_LineCurrent->position = line_position;
-		m_LineCurrent->width = 0.0f;
+		m_LineCurrent->dimensions = glm::vec2(0.0f, m_Face->GetLineHeight());
 
 		m_Lines.push_back(m_LineCurrent);
 
 		return true;
 	}
 
-	void TextLayout::_AddGlyphToCurrentLine(TextGlyph* a_Glyph)
+	void TextLayout::_AddGlyphToCurrentLine(TextCharacter* a_Glyph)
 	{
-		m_LineCurrent->width += a_Glyph->advance;
+		m_LineCurrent->dimensions.x += a_Glyph->advance;
 		a_Glyph->x = m_Cursor.x;
 		m_Cursor.x += a_Glyph->advance;
 
-		m_LineCurrent->glyphs.push_back(a_Glyph);
+		m_LineCurrent->characters.push_back(a_Glyph);
 	}
 
 }; // namespace ExLibri

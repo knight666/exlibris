@@ -5,6 +5,8 @@
 #include "FontFace.h"
 #include "ITextLayoutVisitor.h"
 #include "SizePolicy.h"
+#include "TextCharacter.h"
+#include "TextLine.h"
 
 namespace ExLibris
 {
@@ -50,30 +52,6 @@ namespace ExLibris
 
 	private:
 
-		enum GlyphType
-		{
-			eGlyphType_Character,
-			eGlyphType_Whitespace,
-			eGlyphType_NewLine,
-			eGlyphType_End
-		};
-
-		struct TextGlyph
-		{
-			unsigned int identifier;
-			Glyph* glyph;
-			GlyphType type;
-			float x;
-			float advance;
-		};
-
-		struct TextLine
-		{
-			std::vector<TextGlyph*> glyphs;
-			glm::vec2 position;
-			float width;
-		};
-
 		std::vector<unsigned int> _AsciiToUtf32(const std::string& a_Text);
 		void _ConvertTextToGlyphs();
 		void _ConvertGlyphsToLines();
@@ -83,17 +61,17 @@ namespace ExLibris
 		void _LayoutLines();
 
 		bool _NextLine(bool a_HeightFixed);
-		void _AddGlyphToCurrentLine(TextGlyph* a_Glyph);
+		void _AddGlyphToCurrentLine(TextCharacter* a_Glyph);
 
 	private:
 
 		FontFace* m_Face;
 		std::string m_Text;
 
-		std::vector<TextGlyph*> m_Glyphs;
+		std::vector<TextCharacter*> m_Glyphs;
 		bool m_GlyphsDirty;
 
-		TextGlyph* m_GlyphSpace;
+		TextCharacter* m_GlyphSpace;
 
 		std::vector<TextLine*> m_Lines;
 		TextLine* m_LineCurrent;
