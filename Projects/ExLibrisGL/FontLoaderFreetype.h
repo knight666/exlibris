@@ -1,17 +1,16 @@
 #ifndef _FONTLOADERFREETYPE_H_
 #define _FONTLOADERFREETYPE_H_
 
-#include "FontFreetype.h"
+#include <vector>
 
-namespace ExLibris
-{
-	class Library;
-};
+#include "FontFreetype.h"
+#include "IFontLoader.h"
 
 namespace ExLibris
 {
 
 	class FontLoaderFreetype
+		: public IFontLoader
 	{
 	
 	public:
@@ -21,13 +20,13 @@ namespace ExLibris
 
 		FT_Library GetLibrary() const;
 
-		FontFreetype* LoadFont(const std::string& a_Path);
+		IFont* LoadFont(const std::string& a_Path);
 	
 	private:
 
-		Library* m_Library;
 		FT_Error m_Error;
 		FT_Library m_FTLibrary;
+		std::vector<FT_Face> m_Faces;
 	
 	}; // class FontLoaderFreetype
 

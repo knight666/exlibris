@@ -1,5 +1,6 @@
 #include "ExLibris.Test.PCH.h"
 
+#include <Family.h>
 #include <Library.h>
 
 using namespace ExLibris;

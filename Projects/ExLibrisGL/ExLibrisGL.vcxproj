@@ -106,6 +106,7 @@
     <ClInclude Include="ExLibrisGL.PCH.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
+    <ClInclude Include="IFontLoader.h" />
     <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="Library.h" />

@@ -114,23 +114,20 @@ public:
 	void SetUp()
 	{
 		library = new Library;
-		loader = new FontLoaderFreetype(library);
-		font = loader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+		IFontLoader* loader = new FontLoaderFreetype(library);
+		library->AddLoader(loader);
+		font = (FontFreetype*)library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
 		face = font->CreateFace(24.0f);
 	}
 
 	void TearDown()
 	{
-		delete face;
-		delete font;
-		delete loader;
 		delete library;
 	}
 
 protected:
 
 	Library* library;
-	FontLoaderFreetype* loader;
 	FontFreetype* font;
 	FontFace* face;
 
@@ -150,7 +147,7 @@ TEST_F(FaceContext, FindGlyph)
 	EXPECT_EQ(25, glyph->index);
 	ASSERT_NE(nullptr, glyph->metrics);
 	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
-	EXPECT_VEC2_EQ(2.0f, 34.0f, glyph->metrics->offset);
+	EXPECT_VEC2_EQ(2.0f, 19.0f, glyph->metrics->offset);
 	EXPECT_VEC2_EQ(2.0625000f, 0.0000000f, glyph->metrics->bounding_box.minimum);
 	EXPECT_VEC2_EQ(16.859375f, 23.000000f, glyph->metrics->bounding_box.maximum);
 }
