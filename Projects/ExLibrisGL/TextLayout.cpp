@@ -22,6 +22,11 @@ namespace ExLibris
 	
 	TextLayout::~TextLayout()
 	{
+		if (m_GlyphSpace != nullptr)
+		{
+			delete m_GlyphSpace;
+		}
+
 		for (std::vector<TextCharacter*>::iterator glyph_it = m_Glyphs.begin(); glyph_it != m_Glyphs.end(); ++glyph_it)
 		{
 			delete *glyph_it;

@@ -22,6 +22,18 @@ namespace Framework
 	
 	ShaderProgram::~ShaderProgram()
 	{
+		if (m_SourceVertex != nullptr)
+		{
+			delete m_SourceVertex;
+		}
+		if (m_SourceFragment != nullptr)
+		{
+			delete m_SourceFragment;
+		}
+		if (m_SourceGeometry != nullptr)
+		{
+			delete m_SourceGeometry;
+		}
 	}
 
 	GLuint ShaderProgram::GetHandle() const

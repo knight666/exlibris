@@ -27,9 +27,7 @@ namespace ExLibris
 
 		bool LoadFontData(FT_Face a_Font);
 
-	private:
-
-		FontFace* _CreateFace(float a_Size);
+		FontFace* CreateFace(float a_Size);
 
 	private:
 
@@ -41,6 +39,7 @@ namespace ExLibris
 
 		FT_Face m_Font;
 		FT_Outline_Funcs m_OutlineCallbacks;
+		std::map<float, FontFace*> m_Faces;
 	
 	}; // class FontFreetype
 

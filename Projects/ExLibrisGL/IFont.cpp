@@ -21,11 +21,6 @@ namespace ExLibris
 	
 	IFont::~IFont()
 	{
-		for (std::map<float, FontFace*>::iterator face_it = m_Faces.begin(); face_it != m_Faces.end(); ++face_it)
-		{
-			delete face_it->second;
-		}
-		m_Faces.clear();
 	}
 
 	Family* IFont::GetFamily() const
@@ -41,25 +36,6 @@ namespace ExLibris
 	Style IFont::GetStyle() const
 	{
 		return m_Style;
-	}
-
-	FontFace* IFont::CreateFace(float a_Size)
-	{
-		std::map<float, FontFace*>::iterator found = m_Faces.find(a_Size);
-		if (found != m_Faces.end())
-		{
-			return found->second;
-		}
-		else
-		{
-			FontFace* face = _CreateFace(a_Size);
-			if (face != nullptr)
-			{
-				m_Faces.insert(std::make_pair(a_Size, face));
-			}
-
-			return face;
-		}
 	}
 
 }; // namespace ExLibris
