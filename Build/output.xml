@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="51" failures="0" disabled="0" errors="0" timestamp="2013-09-26T16:06:44" time="0.05" name="AllTests">
+  <testsuite name="CurvePath" tests="15" failures="0" disabled="0" errors="0" time="0.009">
+    <testcase name="PathMove" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathMoveTwice" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathLine" status="run" time="0.001" classname="CurvePath" />
+    <testcase name="PathTwoLines" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathConic" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathConicNoStartPoint" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathConicPrecisionHigh" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathConicPrecisionOne" status="run" time="0.001" classname="CurvePath" />
+    <testcase name="PathConicPrecisionNone" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathConicTwoCurves" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathQuadratic" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathQuadraticNoStartPoint" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathQuadraticPrecisionHigh" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathQuadraticPrecisionOne" status="run" time="0" classname="CurvePath" />
+    <testcase name="PathQuadraticPrecisionTwoCurves" status="run" time="0" classname="CurvePath" />
+  </testsuite>
+  <testsuite name="Line" tests="12" failures="0" disabled="0" errors="0" time="0.013">
+    <testcase name="Construct" status="run" time="0" classname="Line" />
+    <testcase name="PerpendicularDistanceHorizontal" status="run" time="0" classname="Line" />
+    <testcase name="PerpendicularDistanceVertical" status="run" time="0" classname="Line" />
+    <testcase name="PerpendicularDistanceDiagonal" status="run" time="0.001" classname="Line" />
+    <testcase name="PerpendicularDistanceNone" status="run" time="0" classname="Line" />
+    <testcase name="QuadHorizontal" status="run" time="0" classname="Line" />
+    <testcase name="QuadHorizontalReversed" status="run" time="0" classname="Line" />
+    <testcase name="QuadVertical" status="run" time="0" classname="Line" />
+    <testcase name="QuadVerticalReversed" status="run" time="0" classname="Line" />
+    <testcase name="Collision" status="run" time="0" classname="Line" />
+    <testcase name="CollisionZeroLength" status="run" time="0" classname="Line" />
+    <testcase name="CollisionPerpendicular" status="run" time="0" classname="Line" />
+  </testsuite>
+  <testsuite name="MeshBuilder" tests="4" failures="0" disabled="0" errors="0" time="0.004">
+    <testcase name="BuildTriangle" status="run" time="0" classname="MeshBuilder" />
+    <testcase name="BuildTwoTriangles" status="run" time="0" classname="MeshBuilder" />
+    <testcase name="BuildQuad" status="run" time="0" classname="MeshBuilder" />
+    <testcase name="BuildTwoQuads" status="run" time="0" classname="MeshBuilder" />
+  </testsuite>
+  <testsuite name="Polygon" tests="7" failures="0" disabled="0" errors="0" time="0.006">
+    <testcase name="AddPosition" status="run" time="0" classname="Polygon" />
+    <testcase name="IsPositionInside" status="run" time="0" classname="Polygon" />
+    <testcase name="IsPositionInsideConcave" status="run" time="0" classname="Polygon" />
+    <testcase name="IsPositionInsideEmpty" status="run" time="0" classname="Polygon" />
+    <testcase name="IsPositionInsideNotEnoughVertices" status="run" time="0" classname="Polygon" />
+    <testcase name="Intersects" status="run" time="0.001" classname="Polygon" />
+    <testcase name="IntersectsNoHit" status="run" time="0.001" classname="Polygon" />
+  </testsuite>
+  <testsuite name="PolygonShape" tests="5" failures="0" disabled="0" errors="0" time="0.005">
+    <testcase name="TriangulateEmpty" status="run" time="0" classname="PolygonShape" />
+    <testcase name="TriangulateOne" status="run" time="0.001" classname="PolygonShape" />
+    <testcase name="TriangulateTwo" status="run" time="0" classname="PolygonShape" />
+    <testcase name="TriangulateTwoPolygons" status="run" time="0.001" classname="PolygonShape" />
+    <testcase name="TriangulateTwoPolygonsHole" status="run" time="0.001" classname="PolygonShape" />
+  </testsuite>
+  <testsuite name="Triangle" tests="8" failures="0" disabled="0" errors="0" time="0.006">
+    <testcase name="Construct" status="run" time="0.001" classname="Triangle" />
+    <testcase name="IsConvex" status="run" time="0" classname="Triangle" />
+    <testcase name="IsNotConvex" status="run" time="0" classname="Triangle" />
+    <testcase name="IsPositionInside" status="run" time="0" classname="Triangle" />
+    <testcase name="IsPositionOutsideLeft" status="run" time="0" classname="Triangle" />
+    <testcase name="IsPositionOutsideRight" status="run" time="0" classname="Triangle" />
+    <testcase name="IsPositionOutsideUp" status="run" time="0" classname="Triangle" />
+    <testcase name="IsPositionOutsideDown" status="run" time="0" classname="Triangle" />
+  </testsuite>
+</testsuites>

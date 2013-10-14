@@ -4,6 +4,10 @@
 #include <windows.h>
 #include <GL/glew.h>
 
+#if defined(_WINDOWS) && defined(_DEBUG)
+#	include <vld.h>
+#endif
+
 #include "Application.h"
 
 namespace Framework
