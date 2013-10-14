@@ -136,7 +136,10 @@ public:
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glUseProgram(0);
+		}
 
+		if (builder != nullptr)
+		{
 			delete builder;
 		}
 	}

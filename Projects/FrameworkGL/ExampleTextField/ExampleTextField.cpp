@@ -365,6 +365,8 @@ public:
 
 	ExampleTextField(int a_ArgumentCount, const char** a_Arguments)
 		: fw::Application(a_ArgumentCount, a_Arguments)
+		, m_Library(nullptr)
+		, m_TextField(nullptr)
 	{
 	}
 
@@ -380,11 +382,11 @@ public:
 	bool Initialize()
 	{
 		m_Library = new exl::Library;
-		m_FontLoader = new exl::FontLoaderFreetype(m_Library);
+		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
 		m_FontSize = 24.0f;
 
-		m_Font = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
 		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
 		m_FontFace = m_Font->CreateFace(m_FontSize);
 
@@ -424,6 +426,12 @@ public:
 
 	void Destroy()
 	{
+		if (m_TextField != nullptr)
+		{
+			delete m_TextField;
+		}
+
+		delete m_Library;
 	}
 
 private:
@@ -474,7 +482,6 @@ private:
 private:
 
 	exl::Library* m_Library;
-	exl::FontLoaderFreetype* m_FontLoader;
 	exl::IFont* m_Font;
 	float m_FontSize;
 	exl::FontFace* m_FontFace;
