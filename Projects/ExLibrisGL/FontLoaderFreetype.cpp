@@ -4,18 +4,26 @@
 
 #include "Library.h"
 
+#include <memory>
+
 namespace ExLibris
 {
 
 	FontLoaderFreetype::FontLoaderFreetype(Library* a_Library)
-		: m_Library(a_Library)
+		: IFontLoader(a_Library)
 		, m_Error(0)
 	{
-		m_Error = FT_Init_FreeType(&m_FTLibrary);
+		FT_Init_FreeType(&m_FTLibrary);
 	}
 
 	FontLoaderFreetype::~FontLoaderFreetype()
 	{
+		for (std::vector<FT_Face>::iterator face_it = m_Faces.begin(); face_it != m_Faces.end(); ++face_it)
+		{
+			FT_Done_Face(*face_it);
+		}
+		m_Faces.clear();
+
 		FT_Done_FreeType(m_FTLibrary);
 	}
 
@@ -24,7 +32,7 @@ namespace ExLibris
 		return m_FTLibrary;
 	}
 
-	FontFreetype* FontLoaderFreetype::LoadFont(const std::string& a_Path)
+	IFont* FontLoaderFreetype::LoadFont(const std::string& a_Path)
 	{
 		std::fstream font_file(a_Path, std::fstream::in | std::fstream::binary);
 		if (!font_file.is_open())
@@ -47,6 +55,8 @@ namespace ExLibris
 		{
 			return nullptr;
 		}
+
+		m_Faces.push_back(font_loaded);
 
 		Family* family = m_Library->CreateFamily(font_loaded->family_name);
 

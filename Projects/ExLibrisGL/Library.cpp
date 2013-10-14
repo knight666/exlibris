@@ -2,6 +2,9 @@
 
 #include "Library.h"
 
+#include "Family.h"
+#include "IFontLoader.h"
+
 namespace ExLibris
 {
 
@@ -15,6 +18,51 @@ namespace ExLibris
 		{
 			delete family_it->second;
 		}
+		m_Families.clear();
+
+		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		{
+			delete *loader_it;
+		}
+		m_Loaders.clear();
+	}
+
+	size_t Library::GetLoaderCount() const
+	{
+		return m_Loaders.size();
+	}
+
+	void Library::AddLoader(IFontLoader* a_Loader)
+	{
+		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		{
+			IFontLoader* loader = *loader_it;
+
+			if (loader == a_Loader)
+			{
+				return;
+			}
+		}
+
+		m_Loaders.push_back(a_Loader);
+	}
+
+	IFont* Library::LoadFont(const std::string& a_Path)
+	{
+		IFont* font_loaded = nullptr;
+
+		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		{
+			IFontLoader* loader = *loader_it;
+
+			font_loaded = loader->LoadFont(a_Path);
+			if (font_loaded != nullptr)
+			{
+				break;
+			}
+		}
+
+		return font_loaded;
 	}
 
 	size_t Library::GetFamilyCount() const

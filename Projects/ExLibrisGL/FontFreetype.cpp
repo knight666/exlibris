@@ -68,10 +68,6 @@ namespace ExLibris
 	
 	FontFreetype::~FontFreetype()
 	{
-		if (m_Font != nullptr)
-		{
-			FT_Done_Face(m_Font);
-		}
 	}
 
 	unsigned int FontFreetype::GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const
