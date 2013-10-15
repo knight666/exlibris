@@ -50,14 +50,20 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		Family* family = m_Library->CreateFamily(font_loaded->family_name);
-
-		FontFreetype* font = new FontFreetype(family, font_file_data, font_file_size);
-		if (!font->LoadFontData(font_loaded))
+		m_Error = FT_Select_Charmap(font_loaded, FT_ENCODING_UNICODE);
+		if (m_Error != 0 || font_loaded->charmap == nullptr)
 		{
-			delete font;
 			return nullptr;
 		}
+
+		Family* family = m_Library->CreateFamily(font_loaded->family_name);
+
+		FontFreetype* font = new FontFreetype(family);
+
+		font->SetFontData(font_loaded, font_file_data, (size_t)font_file_size);
+
+		font->SetWeight(((font_loaded->style_flags & FT_STYLE_FLAG_BOLD) != 0) ? eWeight_Bold : eWeight_Normal);
+		font->SetStyle(((font_loaded->style_flags & FT_STYLE_FLAG_ITALIC) != 0) ? eStyle_Italicized : eStyle_None);
 
 		return font;
 	}

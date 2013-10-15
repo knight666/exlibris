@@ -20,12 +20,12 @@ namespace ExLibris
 	
 	public:
 	
-		FontFreetype(Family* a_Family, FT_Byte* a_Buffer, size_t a_BufferSize);
+		FontFreetype(Family* a_Family);
 		~FontFreetype();
 
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
 
-		bool LoadFontData(FT_Face a_Font);
+		void SetFontData(FT_Face a_Font, FT_Byte* a_Buffer, size_t a_BufferSize);
 
 		FontFace* CreateFace(float a_Size);
 

@@ -24,7 +24,10 @@ namespace ExLibris
 		Family* GetFamily() const;
 
 		Weight GetWeight() const;
+		void SetWeight(Weight a_Weight);
+
 		Style GetStyle() const;
+		void SetStyle(Style a_Style);
 
 		virtual unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const = 0;
 
