@@ -54,9 +54,11 @@ namespace ExLibris
 		return 0;
 	}
 
-	FontFreetype::FontFreetype(Family* a_Family)
+	FontFreetype::FontFreetype(Family* a_Family, FT_Byte* a_Buffer, size_t a_BufferSize)
 		: IFont(a_Family)
 		, m_Font(nullptr)
+		, m_Buffer(a_Buffer)
+		, m_BufferSize(a_BufferSize)
 	{
 		m_OutlineCallbacks.move_to = &CurvePathMoveTo;
 		m_OutlineCallbacks.line_to = &CurvePathLineTo;
@@ -68,6 +70,17 @@ namespace ExLibris
 	
 	FontFreetype::~FontFreetype()
 	{
+		if (m_Font != nullptr)
+		{
+			FT_Done_Face(m_Font);
+		}
+
+		if (m_Buffer != nullptr)
+		{
+			delete [] m_Buffer;
+			m_Buffer = nullptr;
+		}
+
 		for (std::map<float, FontFace*>::iterator face_it = m_Faces.begin(); face_it != m_Faces.end(); ++face_it)
 		{
 			delete face_it->second;
@@ -190,10 +203,11 @@ namespace ExLibris
 				}
 			}
 
-			face->AddGlyph(glyph_left);
+			if (!face->AddGlyph(glyph_left))
+			{
+				delete glyph_left;
+			}
 		}
-
-		glyphs.clear();
 
 		m_Faces.insert(std::make_pair(a_Size, face));
 

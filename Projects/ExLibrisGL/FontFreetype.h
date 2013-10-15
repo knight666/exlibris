@@ -20,7 +20,7 @@ namespace ExLibris
 	
 	public:
 	
-		FontFreetype(Family* a_Family);
+		FontFreetype(Family* a_Family, FT_Byte* a_Buffer, size_t a_BufferSize);
 		~FontFreetype();
 
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
@@ -38,7 +38,11 @@ namespace ExLibris
 	private:
 
 		FT_Face m_Font;
+		FT_Byte* m_Buffer;
+		size_t m_BufferSize;
+
 		FT_Outline_Funcs m_OutlineCallbacks;
+
 		std::map<float, FontFace*> m_Faces;
 	
 	}; // class FontFreetype

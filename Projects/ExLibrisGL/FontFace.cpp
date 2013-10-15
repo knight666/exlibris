@@ -71,9 +71,17 @@ namespace ExLibris
 		m_Descender = a_Descender;
 	}
 
-	void FontFace::AddGlyph(Glyph* a_Glyph)
+	bool FontFace::AddGlyph(Glyph* a_Glyph)
 	{
+		std::map<unsigned int, Glyph*>::iterator found = m_Glyphs.find(a_Glyph->index);
+		if (found != m_Glyphs.end())
+		{
+			return false;
+		}
+
 		m_Glyphs.insert(std::make_pair(a_Glyph->index, a_Glyph));
+
+		return true;
 	}
 
 	Glyph* FontFace::FindGlyph(unsigned int a_CodepointUtf32) const

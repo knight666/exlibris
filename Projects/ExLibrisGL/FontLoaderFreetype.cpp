@@ -18,12 +18,6 @@ namespace ExLibris
 
 	FontLoaderFreetype::~FontLoaderFreetype()
 	{
-		for (std::vector<FT_Face>::iterator face_it = m_Faces.begin(); face_it != m_Faces.end(); ++face_it)
-		{
-			FT_Done_Face(*face_it);
-		}
-		m_Faces.clear();
-
 		FT_Done_FreeType(m_FTLibrary);
 	}
 
@@ -56,11 +50,9 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		m_Faces.push_back(font_loaded);
-
 		Family* family = m_Library->CreateFamily(font_loaded->family_name);
 
-		FontFreetype* font = new FontFreetype(family);
+		FontFreetype* font = new FontFreetype(family, font_file_data, font_file_size);
 		if (!font->LoadFontData(font_loaded))
 		{
 			delete font;
