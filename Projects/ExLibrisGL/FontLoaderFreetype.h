@@ -26,7 +26,6 @@ namespace ExLibris
 
 		FT_Error m_Error;
 		FT_Library m_FTLibrary;
-		std::vector<FT_Face> m_Faces;
 	
 	}; // class FontLoaderFreetype
 

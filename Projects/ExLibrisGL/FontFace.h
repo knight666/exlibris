@@ -35,7 +35,7 @@ namespace ExLibris
 		float GetDescender() const;
 		void SetDescender(float a_Descender);
 
-		void AddGlyph(Glyph* a_Glyph);
+		bool AddGlyph(Glyph* a_Glyph);
 		Glyph* FindGlyph(unsigned int a_CodepointUtf32) const;
 
 		bool TryGetKerning(Glyph* a_Left, Glyph* a_Right, glm::vec2& a_Target) const;

@@ -367,6 +367,7 @@ public:
 		: fw::Application(a_ArgumentCount, a_Arguments)
 		, m_Library(nullptr)
 		, m_TextField(nullptr)
+		, m_FontFace(nullptr)
 	{
 	}
 

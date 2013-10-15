@@ -33,6 +33,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Properties\OutAll.props" />
     <Import Project="..\..\Properties\OutDebug.props" />
+    <Import Project="..\..\Properties\LibVisualLeakDetector.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibFreeImage.props" />
@@ -46,6 +47,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Properties\OutAll.props" />
     <Import Project="..\..\Properties\OutRelease.props" />
+    <Import Project="..\..\Properties\LibVisualLeakDetector.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibFreeImage.props" />
