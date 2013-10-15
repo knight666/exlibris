@@ -33,9 +33,19 @@ namespace ExLibris
 		return m_Weight;
 	}
 
+	void IFont::SetWeight(Weight a_Weight)
+	{
+		m_Weight = a_Weight;
+	}
+
 	Style IFont::GetStyle() const
 	{
 		return m_Style;
+	}
+
+	void IFont::SetStyle(Style a_Style)
+	{
+		m_Style = a_Style;
 	}
 
 }; // namespace ExLibris

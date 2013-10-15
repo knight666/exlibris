@@ -54,11 +54,11 @@ namespace ExLibris
 		return 0;
 	}
 
-	FontFreetype::FontFreetype(Family* a_Family, FT_Byte* a_Buffer, size_t a_BufferSize)
+	FontFreetype::FontFreetype(Family* a_Family)
 		: IFont(a_Family)
 		, m_Font(nullptr)
-		, m_Buffer(a_Buffer)
-		, m_BufferSize(a_BufferSize)
+		, m_Buffer(nullptr)
+		, m_BufferSize(0)
 	{
 		m_OutlineCallbacks.move_to = &CurvePathMoveTo;
 		m_OutlineCallbacks.line_to = &CurvePathLineTo;
@@ -98,27 +98,11 @@ namespace ExLibris
 		return (unsigned int)FT_Get_Char_Index(m_Font, (FT_ULong)a_CodepointUtf32);
 	}
 
-	bool FontFreetype::LoadFontData(FT_Face a_Font)
+	void FontFreetype::SetFontData(FT_Face a_Font, FT_Byte* a_Buffer, size_t a_BufferSize)
 	{
-		if (a_Font == nullptr)
-		{
-			return false;
-		}
-
-		FT_Error errors = 0;
-		
-		errors = FT_Select_Charmap(a_Font, FT_ENCODING_UNICODE);
-		if (errors != 0 || a_Font->charmap == nullptr)
-		{
-			return false;
-		}
-
 		m_Font = a_Font;
-
-		m_Weight = ((m_Font->style_flags & FT_STYLE_FLAG_BOLD) != 0) ? eWeight_Bold : eWeight_Normal;
-		m_Style = ((m_Font->style_flags & FT_STYLE_FLAG_ITALIC) != 0) ? eStyle_Italicized : eStyle_None;
-
-		return true;
+		m_Buffer = a_Buffer;
+		m_BufferSize = a_BufferSize;
 	}
 
 	FontFace* FontFreetype::CreateFace(float a_Size)
