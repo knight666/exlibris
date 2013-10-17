@@ -49,15 +49,19 @@ private:
 
 public:
 
-	TextField()
+	TextField(fw::ShaderProgram* a_Program)
 		: m_Layout(nullptr)
 		, m_Texture(0)
 		, m_TextureWidth(0)
 		, m_TexturePitch(0)
 		, m_TextureHeight(0)
 		, m_TextureData(nullptr)
+		, m_TextureShadowPadding(8, 8)
 		, m_CursorVisible(true)
 		, m_CursorTime(0.0f)
+		, m_BufferVertices(0)
+		, m_BufferElements(0)
+		, m_BufferAttributes(0)
 	{
 		m_Layout = new exl::TextLayout;
 
@@ -65,43 +69,51 @@ public:
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		GlyphVertex vertex_data[4] = {
-			{
-				glm::vec2(0.0f, 0.0f),
-				glm::vec2(0.0f, 0.0f)
-			},
-			{
-				glm::vec2(1.0f, 0.0f),
-				glm::vec2(1.0f, 0.0f)
-			},
-			{
-				glm::vec2(0.0f, 1.0f),
-				glm::vec2(0.0f, 1.0f)
-			},
-			{
-				glm::vec2(1.0f, 1.0f),
-				glm::vec2(1.0f, 1.0f)
-			},
-		};
 
 		glGenBuffers(1, &m_BufferVertices);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
-		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		GLuint element_data[6] = {
-			1, 0, 2,
-			1, 2, 3
-		};
+			GlyphVertex vertex_data[4] = {
+				{
+					glm::vec2(0.0f, 0.0f),
+					glm::vec2(0.0f, 0.0f)
+				},
+				{
+					glm::vec2(1.0f, 0.0f),
+					glm::vec2(1.0f, 0.0f)
+				},
+				{
+					glm::vec2(0.0f, 1.0f),
+					glm::vec2(0.0f, 1.0f)
+				},
+				{
+					glm::vec2(1.0f, 1.0f),
+					glm::vec2(1.0f, 1.0f)
+				},
+			};
+
+			glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glGenBuffers(1, &m_BufferElements);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), element_data, GL_STATIC_DRAW);
+
+			GLuint element_data[6] = {
+				1, 0, 2,
+				1, 2, 3
+			};
+
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), element_data, GL_STATIC_DRAW);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glGenVertexArrays(1, &m_BufferAttributes);
+
+		SetShaderProgram(a_Program);
 	}
 
 	~TextField()
@@ -109,6 +121,30 @@ public:
 		delete m_Layout;
 
 		glDeleteTextures(1, &m_Texture);
+		glDeleteBuffers(1, &m_BufferVertices);
+		glDeleteBuffers(1, &m_BufferElements);
+		glDeleteVertexArrays(1, &m_BufferAttributes);
+	}
+
+	void SetShaderProgram(fw::ShaderProgram* a_Program)
+	{
+		m_Program = a_Program;
+
+		glBindVertexArray(m_BufferAttributes);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
+
+			GLint attribute_position = m_Program->GetAttribute("attrPosition");
+			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_Position);
+			glEnableVertexAttribArray(attribute_position);
+
+			GLint attribute_texturecoordinate = m_Program->GetAttribute("attrTextureCoordinate0");
+			glVertexAttribPointer(attribute_texturecoordinate, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_TextureCoordinate);
+			glEnableVertexAttribArray(attribute_texturecoordinate);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
+
+		glBindVertexArray(0);
 	}
 
 	void SetFont(exl::FontFace* a_Font)
@@ -152,44 +188,48 @@ public:
 		}
 	}
 
-	void Render(const glm::vec2& a_Position)
+	void Render(const glm::vec2& a_Position, const glm::mat4x4& a_ProjectionMatrix)
 	{
 		glm::vec2 screen_position = a_Position + m_RenderCorrection + m_LineCorrection;
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
-
-		glVertexPointer(2, GL_FLOAT, sizeof(GlyphVertex), (void*)GlyphVertex::eOffset_Position);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(GlyphVertex), (void*)GlyphVertex::eOffset_TextureCoordinate);
-
-		// render text
 
 		glm::mat4x4 modelview;
 		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
 		modelview = glm::scale(modelview, glm::vec3((float)m_TextureWidth, (float)m_TextureHeight, 1.0f));
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(glm::value_ptr(modelview));
+		glm::mat4x4 mvp = a_ProjectionMatrix * modelview;
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glUseProgram(m_Program->GetHandle());
+
+		// render text
+
+		glUniformMatrix4fv(m_Program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+
+		glUniform2fv(m_Program->GetUniform("uniTextureDimensions"), 1, glm::value_ptr(m_TextureDimensions));
+
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
+		glUniform1i(m_Program->GetUniform("texTexture0"), 0);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(m_BufferAttributes);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glDisable(GL_BLEND);
+		glUseProgram(0);
 
 		// render cursor
 
 		if (m_CursorVisible)
 		{
 			glm::vec2 cursor_position = screen_position + m_CursorPosition;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadMatrixf(glm::value_ptr(a_ProjectionMatrix));
 
 			glm::mat4x4 modelview_cursor;
 			modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
@@ -198,26 +238,24 @@ public:
 			glMatrixMode(GL_MODELVIEW);
 			glLoadMatrixf(glm::value_ptr(modelview_cursor));
 
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(m_BufferAttributes);
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
 		}
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
 private:
 
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
 	{
-		m_TextureWidth = (unsigned int)a_Dimensions.x;
+		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TextureShadowPadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
-		m_TextureHeight = (unsigned int)a_Dimensions.y;
+		m_TextureHeight = (unsigned int)a_Dimensions.y + (m_TextureShadowPadding.y * 2);
+
+		m_TextureDimensions.x = (float)m_TextureWidth;
+		m_TextureDimensions.y = (float)m_TextureHeight;
 
 		m_TextureData = new unsigned char[m_TexturePitch * m_TextureHeight];
-		//memset(m_TextureData, 0, m_TexturePitch * m_TextureHeight);
 
 		unsigned int clear_color = 0x00000000;
 
@@ -231,8 +269,8 @@ private:
 			}
 		}
 
-		m_RenderCorrection.x = 0.0f;
-		m_RenderCorrection.y = -a_Face->GetAscender();
+		m_RenderCorrection.x = (float)(-m_TextureShadowPadding.x);
+		m_RenderCorrection.y = (float)(-m_TextureShadowPadding.y) - a_Face->GetAscender();
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
@@ -264,7 +302,7 @@ private:
 			offset.x = 0.0f;
 		}
 
-		unsigned char* dst = m_TextureData + ((unsigned int)offset.y * m_TexturePitch) + (unsigned int)offset.x * 4;
+		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TextureShadowPadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TextureShadowPadding.x) * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
 		unsigned int src_pitch = bitmap->width * 4;
@@ -350,10 +388,14 @@ private:
 	unsigned int m_TextureWidth;
 	unsigned int m_TexturePitch;
 	unsigned int m_TextureHeight;
+	glm::vec2 m_TextureDimensions;
 	unsigned char* m_TextureData;
+	glm::ivec2 m_TextureShadowPadding;
 
+	fw::ShaderProgram* m_Program;
 	GLuint m_BufferVertices;
 	GLuint m_BufferElements;
+	GLuint m_BufferAttributes;
 
 }; // class TextField
 
@@ -382,6 +424,11 @@ public:
 	
 	bool Initialize()
 	{
+		m_ShaderLoader = new fw::ShaderLoader;
+		m_ProgramText = m_ShaderLoader->LoadProgram("TextShadow", "Shaders/TextShadow");
+		m_ProgramText->Compile();
+		m_ProgramText->Link();
+
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
@@ -391,7 +438,7 @@ public:
 		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
 		m_FontFace = m_Font->CreateFace(m_FontSize);
 
-		m_TextField = new TextField;
+		m_TextField = new TextField(m_ProgramText);
 		m_TextField->SetFont(m_FontFace);
 
 		return true;
@@ -419,10 +466,7 @@ public:
 			-1.0f, 1.0f
 		);
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixf(glm::value_ptr(projection));
-
-		m_TextField->Render(glm::vec2(25.0f, 32.0f));
+		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
 	}
 
 	void Destroy()
@@ -433,6 +477,13 @@ public:
 		}
 
 		delete m_Library;
+
+		if (m_ProgramText != nullptr)
+		{
+			delete m_ProgramText;
+		}
+
+		delete m_ShaderLoader;
 	}
 
 private:
@@ -446,6 +497,21 @@ private:
 	{
 		switch (a_Key)
 		{
+
+		case GLFW_KEY_F5:
+			{
+				if (m_ProgramText != nullptr)
+				{
+					delete m_ProgramText;
+				}
+
+				m_ProgramText = m_ShaderLoader->LoadProgram("TextShadow", "Shaders/TextShadow");
+				m_ProgramText->Compile();
+				m_ProgramText->Link();
+
+				m_TextField->SetShaderProgram(m_ProgramText);
+
+			} break;
 
 		case GLFW_KEY_BACKSPACE:
 			{
@@ -488,6 +554,9 @@ private:
 	exl::FontFace* m_FontFace;
 
 	TextField* m_TextField;
+
+	fw::ShaderLoader* m_ShaderLoader;
+	fw::ShaderProgram* m_ProgramText;
 
 }; // class ExampleTextField
 
