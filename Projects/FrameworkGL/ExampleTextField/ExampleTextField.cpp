@@ -204,7 +204,7 @@ public:
 		glUseProgram(m_Program->GetHandle());
 
 		// render text
-
+			
 		glUniformMatrix4fv(m_Program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
 
 		glUniform2fv(m_Program->GetUniform("uniTextureDimensions"), 1, glm::value_ptr(m_TextureDimensions));
@@ -410,6 +410,8 @@ public:
 		, m_Library(nullptr)
 		, m_TextField(nullptr)
 		, m_FontFace(nullptr)
+		, m_ProgramShadow(nullptr)
+		, m_ProgramBlur(nullptr)
 	{
 	}
 
@@ -425,9 +427,8 @@ public:
 	bool Initialize()
 	{
 		m_ShaderLoader = new fw::ShaderLoader;
-		m_ProgramText = m_ShaderLoader->LoadProgram("TextShadow", "Shaders/TextShadow");
-		m_ProgramText->Compile();
-		m_ProgramText->Link();
+		
+		_LoadShaders();
 
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
@@ -438,7 +439,7 @@ public:
 		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
 		m_FontFace = m_Font->CreateFace(m_FontSize);
 
-		m_TextField = new TextField(m_ProgramText);
+		m_TextField = new TextField(m_ProgramBlur);
 		m_TextField->SetFont(m_FontFace);
 
 		return true;
@@ -478,9 +479,13 @@ public:
 
 		delete m_Library;
 
-		if (m_ProgramText != nullptr)
+		if (m_ProgramShadow != nullptr)
 		{
-			delete m_ProgramText;
+			delete m_ProgramShadow;
+		}
+		if (m_ProgramBlur != nullptr)
+		{
+			delete m_ProgramBlur;
 		}
 
 		delete m_ShaderLoader;
@@ -500,16 +505,9 @@ private:
 
 		case GLFW_KEY_F5:
 			{
-				if (m_ProgramText != nullptr)
-				{
-					delete m_ProgramText;
-				}
+				_LoadShaders();
 
-				m_ProgramText = m_ShaderLoader->LoadProgram("TextShadow", "Shaders/TextShadow");
-				m_ProgramText->Compile();
-				m_ProgramText->Link();
-
-				m_TextField->SetShaderProgram(m_ProgramText);
+				m_TextField->SetShaderProgram(m_ProgramBlur);
 
 			} break;
 
@@ -548,6 +546,29 @@ private:
 
 private:
 
+	void _LoadShaders()
+	{
+		if (m_ProgramShadow != nullptr)
+		{
+			delete m_ProgramShadow;
+		}
+
+		m_ProgramShadow = m_ShaderLoader->LoadProgram("TextShadow", "Shaders/TextShadow");
+		m_ProgramShadow->Compile();
+		m_ProgramShadow->Link();
+
+		if (m_ProgramBlur != nullptr)
+		{
+			delete m_ProgramBlur;
+		}
+
+		m_ProgramBlur = m_ShaderLoader->LoadProgram("TextBlur", "Shaders/TextBlur");
+		m_ProgramBlur->Compile();
+		m_ProgramBlur->Link();
+	}
+
+private:
+
 	exl::Library* m_Library;
 	exl::IFont* m_Font;
 	float m_FontSize;
@@ -556,7 +577,8 @@ private:
 	TextField* m_TextField;
 
 	fw::ShaderLoader* m_ShaderLoader;
-	fw::ShaderProgram* m_ProgramText;
+	fw::ShaderProgram* m_ProgramShadow;
+	fw::ShaderProgram* m_ProgramBlur;
 
 }; // class ExampleTextField
 
