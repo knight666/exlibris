@@ -27,6 +27,7 @@ namespace fw = Framework;
 // ExLibris
 
 #include <CurveSettings.h>
+#include <Family.h>
 #include <FontFace.h>
 #include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
@@ -46,6 +47,7 @@ public:
 	OutlineVisitor()
 		: m_DrawFilled(true)
 		, m_DrawOutline(true)
+		, m_Program(nullptr)
 	{
 		m_CurveSettings.precision = 10;
 
@@ -55,14 +57,12 @@ public:
 
 	~OutlineVisitor()
 	{
-		for (std::map<unsigned int, MeshEntry*>::iterator entry_it = m_MeshCache.begin(); entry_it != m_MeshCache.end(); ++entry_it)
-		{
-			MeshEntry* entry = entry_it->second;
+		_ClearMeshes();
+	}
 
-			delete entry->mesh_filled;
-			delete entry->mesh_outline;
-		}
-		m_MeshCache.clear();
+	void SetShaderProgram(fw::ShaderProgram* a_Program)
+	{
+		m_Program = a_Program;
 	}
 
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
@@ -70,16 +70,7 @@ public:
 		m_Face = a_Face;
 		m_Dimensions = a_Dimensions;
 
-		for (std::map<unsigned int, MeshEntry*>::iterator entry_it = m_MeshCache.begin(); entry_it != m_MeshCache.end(); ++entry_it)
-		{
-			MeshEntry* entry = entry_it->second;
-
-			delete entry->mesh_filled;
-			delete entry->mesh_outline;
-		}
-		m_MeshCache.clear();
-
-		m_GlyphMeshes.clear();
+		_ClearMeshes();
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
@@ -119,6 +110,10 @@ public:
 				if (builder_filled != nullptr && builder_filled->GetVertexCount() > 0)
 				{
 					builder_filled->Accept(*instance->meshes->mesh_filled);
+				}
+
+				if (builder_filled != nullptr)
+				{
 					delete builder_filled;
 				}
 
@@ -126,6 +121,10 @@ public:
 				if (builder_outline != nullptr && builder_outline->GetVertexCount() > 0)
 				{
 					builder_outline->Accept(*instance->meshes->mesh_outline);
+				}
+
+				if (builder_outline != nullptr)
+				{
 					delete builder_outline;
 				}
 			}
@@ -188,35 +187,43 @@ public:
 		m_DrawOutline = a_Value;
 	}
 
-	void Render(fw::ShaderProgram* a_ShaderProgram, const glm::mat4x4& a_MatrixProjection, const glm::mat4x4& a_MatrixModelView, GLint a_AttributePosition)
+	void Render(const glm::mat4x4& a_MatrixProjection, const glm::mat4x4& a_MatrixModelView)
 	{
+		GLint attribute_position = m_Program->GetAttribute("attrPosition");
+		GLint uniform_mvp = m_Program->GetUniform("matModelViewProjection");
+		GLint uniform_color = m_Program->GetUniform("uniColor");
+
+		glUseProgram(m_Program->GetHandle());
+
+		glEnableVertexAttribArray(attribute_position);
+
+		glm::mat4x4 mvp = a_MatrixProjection * a_MatrixModelView;
+
 		for (std::vector<GlyphInstance*>::iterator instance_it = m_GlyphMeshes.begin(); instance_it != m_GlyphMeshes.end(); ++instance_it)
 		{
 			GlyphInstance* instance = *instance_it;
 
-			glm::mat4x4 offset;
-			offset = glm::translate(offset, glm::vec3(instance->position.x, instance->position.y, 0.0f));
+			glm::vec3 glyph_position(instance->position.x, instance->position.y, 0.0f);
 
-			glm::mat4x4 mvp = a_MatrixProjection * a_MatrixModelView * offset;
-
-			glUniformMatrix4fv(a_ShaderProgram->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+			glm::mat4x4 glyph_matrix = glm::translate(mvp, glyph_position);
+			glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(glyph_matrix));
 			
 			if (m_DrawOutline)
 			{
-				glUniform4fv(a_ShaderProgram->GetUniform("uniColor"), 1, glm::value_ptr(m_ColorOutline));
+				glUniform4fv(uniform_color, 1, glm::value_ptr(m_ColorOutline));
 
 				glBindBuffer(GL_ARRAY_BUFFER, instance->meshes->mesh_outline->GetBuffer());
-				glVertexAttribPointer(a_AttributePosition, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+				glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 				glDrawArrays(GL_TRIANGLES, 0, instance->meshes->mesh_outline->GetVertexCount());
 			}
 			
 			if (m_DrawFilled)
 			{
-				glUniform4fv(a_ShaderProgram->GetUniform("uniColor"), 1, glm::value_ptr(m_ColorFilled));
+				glUniform4fv(uniform_color, 1, glm::value_ptr(m_ColorFilled));
 
 				glBindBuffer(GL_ARRAY_BUFFER, instance->meshes->mesh_filled->GetBuffer());
-				glVertexAttribPointer(a_AttributePosition, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+				glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 				glDrawArrays(GL_TRIANGLES, 0, instance->meshes->mesh_filled->GetVertexCount());
 			}
@@ -224,6 +231,27 @@ public:
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glUseProgram(0);
+	}
+
+private:
+
+	void _ClearMeshes() 
+	{
+		for (std::map<unsigned int, MeshEntry*>::iterator entry_it = m_MeshCache.begin(); entry_it != m_MeshCache.end(); ++entry_it)
+		{
+			MeshEntry* entry = entry_it->second;
+
+			delete entry->mesh_filled;
+			delete entry->mesh_outline;
+			delete entry;
+		}
+		m_MeshCache.clear();
+
+		for (std::vector<GlyphInstance*>::iterator glyph_it = m_GlyphMeshes.begin(); glyph_it != m_GlyphMeshes.end(); ++glyph_it)
+		{
+			delete *glyph_it;
+		}
+		m_GlyphMeshes.clear();
 	}
 
 private:
@@ -241,6 +269,8 @@ private:
 
 	exl::CurveSettings m_CurveSettings;
 	exl::LineMeshOptions m_LineOptions;
+
+	fw::ShaderProgram* m_Program;
 
 	std::map<unsigned int, MeshEntry*> m_MeshCache;
 
@@ -298,13 +328,11 @@ public:
 		, m_ShaderLoader(nullptr)
 		, m_ProgramLines(nullptr)
 		, m_ProgramTriangles(nullptr)
-		, m_Mesh(nullptr)
 		, m_TextLayout(nullptr)
 		, m_OutlineVisitor(nullptr)
 		, m_CameraZoom(1.0f)
 		, m_CameraZoomSpeed(0.0f)
 		, m_Library(nullptr)
-		, m_FontLoader(nullptr)
 		, m_Font(nullptr)
 		, m_FontFace(nullptr)
 	{
@@ -332,10 +360,8 @@ public:
 		m_MeshOptions.quality = exl::LineMeshOptions::eQuality_Gapless;
 		m_MeshOptions.thickness = 5.0f;
 
-		m_Mesh = new fw::MeshOpenGL();
-
 		m_Library = new exl::Library;
-		m_FontLoader = new exl::FontLoaderFreetype(m_Library);
+		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
 		Timer timer;
 
@@ -346,10 +372,10 @@ public:
 
 		timer.Start();
 		{
-			font_regular = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-			font_bold = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
-			font_italic = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
-			font_bolditalic = m_FontLoader->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
+			font_regular = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+			font_bold = m_Library->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
+			font_italic = m_Library->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
+			font_bolditalic = m_Library->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
 		}
 		timer.End();
 
@@ -368,15 +394,6 @@ public:
 
 		std::cout << "Creating face:    " << timer.GetMilliSeconds() << " ms." << std::endl;
 
-		timer.Start();
-		{
-			_BuildGlyphMesh();
-
-		}
-		timer.End();
-
-		std::cout << "Creating outline: " << timer.GetMilliSeconds() << " ms." << std::endl;
-
 		m_TextLayout = new exl::TextLayout;
 		m_TextLayout->SetFontFace(m_FontFace);
 		m_TextLayout->SetText("Vegetables on sale");
@@ -384,6 +401,7 @@ public:
 		m_OutlineVisitor = new OutlineVisitor;
 		m_OutlineVisitor->SetColorFilled(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetColorOutline(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
+		m_OutlineVisitor->SetShaderProgram(m_ProgramTriangles);
 
 		m_TextLayout->Accept(*m_OutlineVisitor);
 
@@ -417,32 +435,28 @@ public:
 		modelview = glm::translate(modelview, m_CameraPosition);
 		modelview = glm::scale(modelview, glm::vec3(m_CameraZoom, m_CameraZoom, 1.0f));
 
-		fw::ShaderProgram* outline_program = nullptr;
-
-		if (m_OptionDrawLines)
-		{
-			outline_program = m_ProgramLines;
-		}
-		else
-		{
-			outline_program = m_ProgramTriangles;
-		}
-
-		glUseProgram(outline_program->GetHandle());
-
-		GLint attribute_position = outline_program->GetAttribute("attrPosition");
-		glEnableVertexAttribArray(attribute_position);
-
-		m_OutlineVisitor->Render(outline_program, projection, modelview, attribute_position);
+		m_OutlineVisitor->Render(projection, modelview);
 	}
 
 	void Destroy()
 	{
-		delete m_Mesh;
-		delete m_Glyph;
-		delete m_FontFace;
-		delete m_Font;
-		delete m_FontLoader;
+		if (m_ProgramTriangles != nullptr)
+		{
+			delete m_ProgramTriangles;
+		}
+
+		if (m_ProgramLines != nullptr)
+		{
+			delete m_ProgramLines;
+		}
+
+		if (m_ShaderLoader != nullptr)
+		{
+			delete m_ShaderLoader;
+		}
+
+		delete m_TextLayout;
+		delete m_OutlineVisitor;
 		delete m_Library;
 	}
 
@@ -559,6 +573,15 @@ private:
 			{
 				m_OptionDrawLines = !m_OptionDrawLines;
 
+				if (m_OptionDrawLines)
+				{
+					m_OutlineVisitor->SetShaderProgram(m_ProgramLines);
+				}
+				else
+				{
+					m_OutlineVisitor->SetShaderProgram(m_ProgramTriangles);
+				}
+
 			} break;
 
 		case GLFW_KEY_2:
@@ -666,29 +689,6 @@ private:
 		}
 	}
 
-	void _BuildGlyphMesh() 
-	{
-		m_Glyph = m_FontFace->FindGlyph((unsigned int)L'A');
-
-		std::vector<exl::Polygon> polygons = m_Glyph->outline->BuildPolygons(m_CurveSettings);
-		if (polygons.size() > 0)
-		{
-			m_Shape.Clear();
-
-			for (std::vector<exl::Polygon>::iterator poly_it = polygons.begin(); poly_it != polygons.end(); ++poly_it)
-			{
-				m_Shape.AddPolygon(*poly_it);
-			}
-
-			exl::MeshBuilder* builder = m_Shape.BuildOutlineMesh(m_MeshOptions);
-			if (builder != nullptr && builder->GetVertexCount() > 0)
-			{
-				builder->Accept(*m_Mesh);
-				delete builder;
-			}
-		}
-	}
-
 private:
 
 	bool m_OptionDrawLines;
@@ -699,14 +699,12 @@ private:
 	exl::Style m_FontStyle;
 
 	exl::Library* m_Library;
-	exl::FontLoaderFreetype* m_FontLoader;
 	exl::IFont* m_Font;
 	exl::FontFace* m_FontFace;
 
 	exl::TextLayout* m_TextLayout;
 	OutlineVisitor* m_OutlineVisitor;
 
-	exl::Glyph* m_Glyph;
 	exl::LineShape m_Shape;
 	exl::CurveSettings m_CurveSettings;
 	exl::LineMeshOptions m_MeshOptions;
@@ -714,7 +712,6 @@ private:
 	fw::ShaderLoader* m_ShaderLoader;
 	fw::ShaderProgram* m_ProgramTriangles;
 	fw::ShaderProgram* m_ProgramLines;
-	fw::MeshOpenGL* m_Mesh;
 
 	glm::vec3 m_CameraPosition;
 	glm::vec3 m_CameraVelocity;

@@ -64,22 +64,3 @@ struct FontOptions
 library->AddLoader(loader);
 library->LoadFont("Roboto.fnt");
 library->FindFamily("Roboto")->FindFont(weight | italic)->FindFace(size)
-
-int exlInitialize()
-int exlLoadFontFromFile(FILE* handle)
-int exlLoadFontFromBuffer(const char* buffer, size_t size)
-int exlFindFamily(int* handle, const char* name)
-int exlBindFamily(int handle)
-int exlSetParameterI(int parameter, int value)
-int exlCreateFont(int count, int* handle)
-
-
-int family_handle = 1;
-exlBindFamily(family_handle);
-
-exlSetFaceParameterI(EXL_PARAMETER_WEIGHT, EXL_WEIGHT_BOLD);
-exlSetFaceParameterI(EXL_PARAMETER_ITALIC, EXL_TRUE);
-exlSetFaceParameterF(EXL_PARAMETER_SIZE, 20.0f);
-
-int font_handle;
-exlCreateFont(1, &font_handle);
