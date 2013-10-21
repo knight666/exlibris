@@ -56,7 +56,7 @@ public:
 		, m_TexturePitch(0)
 		, m_TextureHeight(0)
 		, m_TextureData(nullptr)
-		, m_TextureShadowPadding(8, 8)
+		, m_TexturePadding(8, 8)
 		, m_CursorVisible(true)
 		, m_CursorTime(0.0f)
 		, m_BufferVertices(0)
@@ -246,9 +246,11 @@ private:
 
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
 	{
-		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TextureShadowPadding.x * 2);
+		// texture must be padded in order to support effects like glow and shadows
+
+		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TexturePadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
-		m_TextureHeight = (unsigned int)a_Dimensions.y + (m_TextureShadowPadding.y * 2);
+		m_TextureHeight = (unsigned int)a_Dimensions.y + (m_TexturePadding.y * 2);
 
 		m_TextureDimensions.x = (float)m_TextureWidth;
 		m_TextureDimensions.y = (float)m_TextureHeight;
@@ -267,8 +269,8 @@ private:
 			}
 		}
 
-		m_RenderCorrection.x = (float)(-m_TextureShadowPadding.x);
-		m_RenderCorrection.y = (float)(-m_TextureShadowPadding.y) - a_Face->GetAscender();
+		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
+		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
@@ -300,7 +302,7 @@ private:
 			offset.x = 0.0f;
 		}
 
-		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TextureShadowPadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TextureShadowPadding.x) * 4);
+		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
 		unsigned int src_pitch = bitmap->width * 4;
@@ -388,7 +390,7 @@ private:
 	unsigned int m_TextureHeight;
 	glm::vec2 m_TextureDimensions;
 	unsigned char* m_TextureData;
-	glm::ivec2 m_TextureShadowPadding;
+	glm::ivec2 m_TexturePadding;
 
 	fw::ShaderProgram* m_Program;
 	GLuint m_BufferVertices;
@@ -408,8 +410,6 @@ public:
 		, m_Library(nullptr)
 		, m_TextField(nullptr)
 		, m_FontFace(nullptr)
-		, m_ProgramShadow(nullptr)
-		, m_ProgramBlur(nullptr)
 		, m_ProgramEffects(nullptr)
 		, m_UseShadow(false)
 		, m_UseGlow(false)
@@ -440,7 +440,7 @@ public:
 		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
 		m_FontFace = m_Font->CreateFace(m_FontSize);
 
-		m_TextField = new TextField(m_ProgramBlur);
+		m_TextField = new TextField(m_ProgramEffects);
 		m_TextField->SetFont(m_FontFace);
 
 		return true;
@@ -484,14 +484,6 @@ public:
 
 		delete m_Library;
 
-		if (m_ProgramShadow != nullptr)
-		{
-			delete m_ProgramShadow;
-		}
-		if (m_ProgramBlur != nullptr)
-		{
-			delete m_ProgramBlur;
-		}
 		if (m_ProgramEffects != nullptr)
 		{
 			delete m_ProgramEffects;
@@ -577,24 +569,6 @@ private:
 
 	void _LoadShaders()
 	{
-		if (m_ProgramShadow != nullptr)
-		{
-			delete m_ProgramShadow;
-		}
-
-		m_ProgramShadow = m_ShaderLoader->LoadProgram("TextShadow", "Shaders/TextShadow");
-		m_ProgramShadow->Compile();
-		m_ProgramShadow->Link();
-
-		if (m_ProgramBlur != nullptr)
-		{
-			delete m_ProgramBlur;
-		}
-
-		m_ProgramBlur = m_ShaderLoader->LoadProgram("TextBlur", "Shaders/TextBlur");
-		m_ProgramBlur->Compile();
-		m_ProgramBlur->Link();
-
 		if (m_ProgramEffects != nullptr)
 		{
 			delete m_ProgramEffects;
@@ -615,8 +589,6 @@ private:
 	TextField* m_TextField;
 
 	fw::ShaderLoader* m_ShaderLoader;
-	fw::ShaderProgram* m_ProgramShadow;
-	fw::ShaderProgram* m_ProgramBlur;
 	fw::ShaderProgram* m_ProgramEffects;
 
 	bool m_UseGlow;
