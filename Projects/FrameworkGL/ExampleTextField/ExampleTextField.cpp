@@ -201,8 +201,6 @@ public:
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glUseProgram(m_Program->GetHandle());
-
 		// render text
 			
 		glUniformMatrix4fv(m_Program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
@@ -412,6 +410,9 @@ public:
 		, m_FontFace(nullptr)
 		, m_ProgramShadow(nullptr)
 		, m_ProgramBlur(nullptr)
+		, m_ProgramEffects(nullptr)
+		, m_UseShadow(false)
+		, m_UseGlow(false)
 	{
 	}
 
@@ -467,6 +468,10 @@ public:
 			-1.0f, 1.0f
 		);
 
+		glUseProgram(m_ProgramEffects->GetHandle());
+		glUniform1i(m_ProgramEffects->GetUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
+		glUniform1i(m_ProgramEffects->GetUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
+
 		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
 	}
 
@@ -487,6 +492,10 @@ public:
 		{
 			delete m_ProgramBlur;
 		}
+		if (m_ProgramEffects != nullptr)
+		{
+			delete m_ProgramEffects;
+		}
 
 		delete m_ShaderLoader;
 	}
@@ -500,6 +509,26 @@ private:
 
 	void OnKeyReleased(int a_Key, int a_ScanCode, int a_Modifiers)
 	{
+		if (a_Modifiers & GLFW_MOD_CONTROL)
+		{
+			switch (a_Key)
+			{
+
+			case GLFW_KEY_G:
+				{
+					m_UseGlow = !m_UseGlow;
+
+				} break;
+
+			case GLFW_KEY_S:
+				{
+					m_UseShadow = !m_UseShadow;
+
+				} break;
+
+			}
+		}
+
 		switch (a_Key)
 		{
 
@@ -507,7 +536,7 @@ private:
 			{
 				_LoadShaders();
 
-				m_TextField->SetShaderProgram(m_ProgramBlur);
+				m_TextField->SetShaderProgram(m_ProgramEffects);
 
 			} break;
 
@@ -565,6 +594,15 @@ private:
 		m_ProgramBlur = m_ShaderLoader->LoadProgram("TextBlur", "Shaders/TextBlur");
 		m_ProgramBlur->Compile();
 		m_ProgramBlur->Link();
+
+		if (m_ProgramEffects != nullptr)
+		{
+			delete m_ProgramEffects;
+		}
+
+		m_ProgramEffects = m_ShaderLoader->LoadProgram("TextEffects", "Shaders/TextEffects");
+		m_ProgramEffects->Compile();
+		m_ProgramEffects->Link();
 	}
 
 private:
@@ -579,6 +617,10 @@ private:
 	fw::ShaderLoader* m_ShaderLoader;
 	fw::ShaderProgram* m_ProgramShadow;
 	fw::ShaderProgram* m_ProgramBlur;
+	fw::ShaderProgram* m_ProgramEffects;
+
+	bool m_UseGlow;
+	bool m_UseShadow;
 
 }; // class ExampleTextField
 
