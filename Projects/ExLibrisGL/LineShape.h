@@ -29,7 +29,7 @@ namespace ExLibris
 
 	private:
 
-		void _CheckPolylineOverlap(std::vector<p2t::Point*>& a_Polyline) const;
+		bool _CheckPolylineOverlap(std::vector<p2t::Point*>& a_Polyline) const;
 		void _TriangulateOutlineFast(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness) const;
 		void _TriangulateOutlineGapless(MeshBuilder* a_Target, const Polygon& a_Polygon, float a_Thickness) const;
 

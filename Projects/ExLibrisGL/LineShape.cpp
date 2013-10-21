@@ -76,9 +76,16 @@ namespace ExLibris
 				delete cdt;
 				cdt = nullptr;
 			}
+
+			for (std::vector<p2t::Point*>::iterator point_it = points_allocated.begin(); point_it != points_allocated.end(); ++point_it)
+			{
+				delete *point_it;
+			}
+			points_allocated.clear();
 		}
 
 		const Polygon* polygon;
+		std::vector<p2t::Point*> points_allocated; // workaround for poly2tri leaks
 		std::vector<p2t::Point*> polyline;
 		std::vector<const Polygon*> holes;
 		p2t::CDT* cdt;
@@ -128,12 +135,14 @@ namespace ExLibris
 				{
 					const glm::vec2& position = *position_it;
 
-					convert_current->polyline.push_back(
-						new p2t::Point(
-							(double)position.x,
-							(double)position.y
-						)
+					p2t::Point* position_poly = new p2t::Point(
+						(double)position.x,
+						(double)position.y
 					);
+
+					convert_current->polyline.push_back(position_poly);
+
+					convert_current->points_allocated.push_back(position_poly);
 				}
 
 				converted.push_back(convert_current);
@@ -144,7 +153,11 @@ namespace ExLibris
 		{
 			PolyConvert* convert = *convert_it;
 
-			_CheckPolylineOverlap(convert->polyline);
+			if (_CheckPolylineOverlap(convert->polyline))
+			{
+				convert_current->points_allocated.pop_back();
+			}
+
 			convert->cdt = new p2t::CDT(convert->polyline);
 
 			if (convert->holes.size() > 0)
@@ -158,15 +171,20 @@ namespace ExLibris
 					{
 						const glm::vec2& position = *position_it;
 
-						hole_polyline.push_back(
-							new p2t::Point(
-								(double)position.x,
-								(double)position.y
-							)
+						p2t::Point* position_poly = new p2t::Point(
+							(double)position.x,
+							(double)position.y
 						);
+
+						hole_polyline.push_back(position_poly);
+
+						convert->points_allocated.push_back(position_poly);
 					}
 
-					_CheckPolylineOverlap(hole_polyline);
+					if (_CheckPolylineOverlap(hole_polyline))
+					{
+						convert_current->points_allocated.pop_back();
+					}
 
 					convert->cdt->AddHole(hole_polyline);
 				}
@@ -192,7 +210,6 @@ namespace ExLibris
 				glm::vec2 b((float)point_b->x, (float)point_b->y);
 				glm::vec2 c((float)point_c->x, (float)point_c->y);
 
-				//builder->AddTriangle(a, b, c);
 				builder->AddTriangle(c, b, a);
 			}
 
@@ -204,7 +221,7 @@ namespace ExLibris
 		return builder;
 	}
 
-	void LineShape::_CheckPolylineOverlap(std::vector<p2t::Point*>& a_Polyline) const
+	bool LineShape::_CheckPolylineOverlap(std::vector<p2t::Point*>& a_Polyline) const
 	{
 		// check if last and first position overlap
 
@@ -216,6 +233,12 @@ namespace ExLibris
 		{
 			delete position_last;
 			a_Polyline.pop_back();
+
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
