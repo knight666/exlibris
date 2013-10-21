@@ -224,7 +224,9 @@ public:
 
 		if (m_CursorVisible)
 		{
-			glm::vec2 cursor_position = screen_position + m_CursorPosition;
+			glDisable(GL_DEPTH_TEST);
+
+			glm::vec2 cursor_position = screen_position + m_CursorPosition + glm::vec2((float)m_TexturePadding.x, (float)m_TexturePadding.y);
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(glm::value_ptr(a_ProjectionMatrix));
@@ -239,6 +241,8 @@ public:
 			glBindVertexArray(m_BufferAttributes);
 				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
+
+			glEnable(GL_DEPTH_TEST);
 		}
 	}
 
