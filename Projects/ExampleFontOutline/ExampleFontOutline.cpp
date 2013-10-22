@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,7 @@
 #include <MeshOpenGL.h>
 #include <ShaderLoader.h>
 #include <ShaderProgram.h>
+#include <TextHelper.h>
 
 namespace fw = Framework;
 
@@ -335,6 +337,7 @@ public:
 		, m_Library(nullptr)
 		, m_Font(nullptr)
 		, m_FontFace(nullptr)
+		, m_TextHelper(nullptr)
 	{
 	}
 
@@ -362,6 +365,9 @@ public:
 
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
+
+		m_TextHelper = new fw::TextHelper(m_Library, m_ShaderLoader);
+		_DrawInstructions();
 
 		Timer timer;
 
@@ -436,6 +442,8 @@ public:
 		modelview = glm::scale(modelview, glm::vec3(m_CameraZoom, m_CameraZoom, 1.0f));
 
 		m_OutlineVisitor->Render(projection, modelview);
+
+		m_TextHelper->Render(projection);
 	}
 
 	void Destroy()
@@ -455,6 +463,7 @@ public:
 			delete m_ShaderLoader;
 		}
 
+		delete m_TextHelper;
 		delete m_TextLayout;
 		delete m_OutlineVisitor;
 		delete m_Library;
@@ -658,6 +667,26 @@ private:
 
 private:
 
+	void _DrawInstructions()
+	{
+		m_TextHelper->Clear();
+
+		std::stringstream text;
+
+		text
+			<< "<Arrow keys> - Move\n"
+			<< "<+>/<-> - Zoom\n"
+			<< "\n"
+			<< "<1> - Draw triangles or lines\n"
+			<< "<2> - Filled on/off\n"
+			<< "<3> - Outline on/off\n"
+			<< "\n"
+			<< "<Ctrl> + <B> - Bold\n"
+			<< "<Ctrl> + <I> - Italic\n";
+
+		m_TextHelper->AddText(text.str(), glm::vec2(20.0f, 20.0f));
+	}
+
 	void _LoadShaders()
 	{
 		if (m_ProgramTriangles != nullptr)
@@ -701,6 +730,7 @@ private:
 	exl::Library* m_Library;
 	exl::IFont* m_Font;
 	exl::FontFace* m_FontFace;
+	fw::TextHelper* m_TextHelper;
 
 	exl::TextLayout* m_TextLayout;
 	OutlineVisitor* m_OutlineVisitor;
