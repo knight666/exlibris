@@ -10,7 +10,7 @@ out vec4 fragColor;
 void main()
 {
 	vec4 color_text = vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 color_shadow = vec4(0.45, 0.45, 0.45, 1.0);
+	vec4 color_shadow = vec4(0.25, 0.25, 0.25, 1.0);
 	
 	vec4 color_sample = texture(texTexture0, vertTextureCoordinate);
 	

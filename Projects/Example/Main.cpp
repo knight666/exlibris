@@ -66,7 +66,7 @@ public:
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
 		m_TextHelper = new fw::TextHelper(m_Library, m_ShaderLoader);
-		m_TextHelper->AddText("De kat krabt de krullen van de trap.", glm::vec2(20.0f, 20.0f));
+		m_TextHelper->AddText("<?xml xs:stuff=\"thangs;\" value='$blah;' foo=`&bar^~` [blocky]>#yolo</xml>", glm::vec2(20.0f, 20.0f));
 
 		return true;
 	}
