@@ -6,6 +6,7 @@
 namespace ExLibris
 {
 	class FontFace;
+	class IFont;
 	class Library;
 	class TextLayout;
 }
@@ -35,7 +36,8 @@ namespace Framework
 
 	private:
 
-		ExLibris::FontFace* m_Font;
+		ExLibris::IFont* m_Font;
+		ExLibris::FontFace* m_FontFace;
 
 		std::vector<TextLabel*> m_Labels;
 

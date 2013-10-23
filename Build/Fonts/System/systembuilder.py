@@ -180,6 +180,6 @@ output_file.write('static const unsigned int s_GlyphBitmapsEncoded[] = {\n')
 
 for g in glyphs:
 	encoded = EncodeGlyph(g['x'], g['y'])
-	output_file.write('\t{0}, {1}, {2}, // {3}\n'.format(encoded[0], encoded[1], encoded[2], g['codepoint']))
+	output_file.write('\t{0}, {1}, {2}, /* {3} */\n'.format(encoded[0], encoded[1], encoded[2], g['codepoint']))
 
 output_file.write('};')
