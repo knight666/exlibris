@@ -20,6 +20,7 @@
 
 // Framework
 
+#include "FontSystem.h"
 #include "ShaderLoader.h"
 #include "ShaderProgram.h"
 
@@ -302,9 +303,10 @@ namespace Framework
 	TextHelper::TextHelper(ExLibris::Library* a_Library, ShaderLoader* a_ShaderLoader)
 		: m_Program(nullptr)
 		, m_Font(nullptr)
+		, m_FontFace(nullptr)
 	{
-		ExLibris::IFont* font = a_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		m_Font = font->CreateFace(10.0f);
+		m_Font = new FontSystem;
+		m_FontFace = m_Font->CreateFace(10.0f);
 
 		glGenBuffers(1, &m_BufferVertices);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
@@ -368,6 +370,9 @@ namespace Framework
 	
 	TextHelper::~TextHelper()
 	{
+		delete m_FontFace;
+		delete m_Font;
+
 		delete m_Program;
 
 		for (std::vector<TextLabel*>::iterator label_it = m_Labels.begin(); label_it != m_Labels.end(); ++label_it)
@@ -385,7 +390,7 @@ namespace Framework
 
 	void TextHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0, 1.0, 1.0, 1.0)*/)
 	{
-		TextLabel* label = new TextLabel(m_Font);
+		TextLabel* label = new TextLabel(m_FontFace);
 		label->SetPosition(a_Position);
 		label->SetText(a_Text);
 		label->SetColor(a_Color);
