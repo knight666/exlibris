@@ -1,6 +1,7 @@
 # Project
 syntax: regexp
 Build/.*(Debug|Release)\.(dll|exe|exp|lib)
+.*systemfont.txt
 
 # CMake
 syntax: glob
