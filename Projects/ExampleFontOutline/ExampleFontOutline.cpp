@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+// Windows
+
+#include <windows.h>
+
 // Framework
 
 #include <Application.h>
