@@ -32,7 +32,7 @@ namespace Framework
 		void Clear();
 		void AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color = glm::vec4(1.0, 1.0, 1.0, 1.0));
 
-		void Render(const glm::mat4x4& a_ProjectionMatrix);
+		void Render(int a_ScreenWidth, int a_ScreenHeight) const;
 
 	private:
 

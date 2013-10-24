@@ -77,22 +77,12 @@ public:
 
 	void Render()
 	{
-		float ratio;
-		int width, height;
-
-		glfwGetFramebufferSize(GetWindow(), &width, &height);
-		ratio = width / (float) height;
-
-		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4x4 projection = glm::ortho<float>(
-			0.0f, (float)width,
-			(float)height, 0.0f,
-			-1.0f, 1.0f
-		);
+		int width, height;
+		glfwGetFramebufferSize(GetWindow(), &width, &height);
 
-		m_TextHelper->Render(projection);
+		m_TextHelper->Render(width, height);
 	}
 
 	void Destroy()
