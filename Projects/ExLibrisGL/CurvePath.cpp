@@ -25,6 +25,11 @@ namespace ExLibris
 
 	const glm::vec2& CurvePath::GetPosition(size_t a_Index) const
 	{
+		if (a_Index >= m_Positions.size())
+		{
+			throw std::exception("CurvePath::GetPosition - Index out of range.");
+		}
+
 		return m_Positions[a_Index];
 	}
 
