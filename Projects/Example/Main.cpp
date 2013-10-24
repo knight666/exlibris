@@ -65,8 +65,10 @@ public:
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
+		glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);
+
 		m_TextHelper = new fw::TextHelper(m_Library, m_ShaderLoader);
-		m_TextHelper->AddText("<?xml xs:stuff=\"thangs;\" value='$blah;' foo=`&bar^~` [blocky]>#yolo</xml>", glm::vec2(20.0f, 20.0f));
+		m_TextHelper->AddText("<?xml xs:stuff=\"thangs;\" value='$blah;' e-mail='blah@foo.bat,die.com'\nfoo=`&*%bar^~` [blocky]>#yolo</xml>\nARRESTED DEVELOPMENT\njemig", glm::vec2(20.0f, 20.0f), color);
 
 		return true;
 	}
