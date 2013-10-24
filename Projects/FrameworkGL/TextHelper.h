@@ -7,14 +7,10 @@ namespace ExLibris
 {
 	class FontFace;
 	class IFont;
-	class Library;
-	class TextLayout;
 }
 
 namespace Framework
 {
-	class ShaderLoader;
-	class ShaderProgram;
 	class TextLabel;
 }
 
@@ -26,7 +22,7 @@ namespace Framework
 	
 	public:
 	
-		TextHelper(ExLibris::Library* a_Library, ShaderLoader* a_ShaderLoader);
+		TextHelper();
 		~TextHelper();
 	
 		void Clear();
@@ -36,12 +32,27 @@ namespace Framework
 
 	private:
 
+		void _LoadShader();
+		void _CreateVertexBuffer();
+		void _CreateVertexArray();
+
+	private:
+
 		ExLibris::IFont* m_Font;
 		ExLibris::FontFace* m_FontFace;
 
 		std::vector<TextLabel*> m_Labels;
 
-		ShaderProgram* m_Program;
+		GLuint m_ShaderVertex;
+		GLuint m_ShaderFragment;
+		GLuint m_Program;
+		GLint m_AttributePosition;
+		GLint m_AttributeTextureCoordinate0;
+		GLint m_UniformModelViewProjection;
+		GLint m_UniformTexture0;
+		GLint m_UniformTextureDimensions;
+		GLint m_UniformTextColor;
+
 		GLuint m_BufferVertices;
 		GLuint m_BufferElements;
 		GLuint m_BufferAttributes;

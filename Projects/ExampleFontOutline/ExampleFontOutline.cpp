@@ -367,7 +367,15 @@ public:
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
-		m_TextHelper = new fw::TextHelper(m_Library, m_ShaderLoader);
+		try
+		{
+			m_TextHelper = new fw::TextHelper;
+		}
+		catch (std::exception& e)
+		{
+			MessageBoxA(0, e.what(), "Error while creating TextHelper", MB_OK);
+			return false;
+		}
 		_DrawInstructions();
 
 		Timer timer;

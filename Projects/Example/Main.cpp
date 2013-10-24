@@ -1,37 +1,23 @@
-﻿#if defined(_WINDOWS) && defined(_DEBUG)
-#	include <vld.h>
-#endif
-
-// STL
+﻿// STL
 
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
+// Windows
+
+#include <windows.h>
+
 // Framework
 
 #include <Application.h>
-#include <FontSystem.h>
-#include <MeshOpenGL.h>
-#include <ShaderLoader.h>
-#include <ShaderProgram.h>
 
 namespace fw = Framework;
 
-// GLM
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 // ExLibris
 
-#include <FontFace.h>
-#include <FontFreetype.h>
-#include <FontLoaderFreetype.h>
-#include <Library.h>
 #include <TextHelper.h>
-#include <TextLayout.h>
 
 namespace exl = ExLibris;
 
@@ -43,9 +29,6 @@ public:
 
 	Example(int a_ArgumentCount, const char** a_Arguments)
 		: fw::Application(a_ArgumentCount, a_Arguments)
-		, m_Library(nullptr)
-		, m_Font(nullptr)
-		, m_Face(nullptr)
 	{
 	}
 
@@ -60,14 +43,17 @@ public:
 
 	bool Initialize()
 	{
-		m_ShaderLoader = new fw::ShaderLoader();
-
-		m_Library = new exl::Library;
-		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
-
+		try
+		{
+			m_TextHelper = new fw::TextHelper;
+		}
+		catch (std::exception& e)
+		{
+			MessageBoxA(0, e.what(), "Error while creating TextHelper", MB_OK);
+			return false;
+		}
+		
 		glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);
-
-		m_TextHelper = new fw::TextHelper(m_Library, m_ShaderLoader);
 		m_TextHelper->AddText("<?xml xs:stuff=\"thangs;\" value='$blah;' e-mail='blah@foo.bat,die.com'\nfoo=`&*%bar^~` [blocky]>#yolo</xml>\nARRESTED DEVELOPMENT\njemig", glm::vec2(20.0f, 20.0f), color);
 
 		return true;
@@ -90,16 +76,10 @@ public:
 	void Destroy()
 	{
 		delete m_TextHelper;
-		delete m_Library;
-		delete m_ShaderLoader;
 	}
 
 private:
 
-	fw::ShaderLoader* m_ShaderLoader;
-	exl::Library* m_Library;
-	exl::IFont* m_Font;
-	exl::FontFace* m_Face;
 	fw::TextHelper* m_TextHelper;
 
 }; // class Example

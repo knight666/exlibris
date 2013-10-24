@@ -11,56 +11,42 @@
 
 #include <FontFace.h>
 #include <IFont.h>
-#include <Library.h>
 #include <TextLayout.h>
 
 // Framework
 
 #include "FontSystem.h"
-#include "ShaderLoader.h"
-#include "ShaderProgram.h"
 
 namespace Framework
 {
 
 	static const std::string s_VertexShaderSource = "\
-		#version 330 core \
-		\
+		#version 330 core\n \
 		in vec2 attrPosition; \
 		in vec2 attrTextureCoordinate0; \
-		\
 		out vec2 vertTextureCoordinate; \
-		\
 		uniform mat4 matModelViewProjection; \
-		\
 		void main() \
 		{ \
 			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
 			vertTextureCoordinate = attrTextureCoordinate0; \
-		} \
-	";
+		}";
 
 	static const std::string s_FragmentShaderSource = "\
-		#version 330 core \
+		#version 330 core\n \
 		\
 		in vec2 vertTextureCoordinate; \
-		\
 		uniform sampler2D texTexture0; \
 		uniform vec2 uniTextureDimensions; \
 		uniform vec4 uniTextColor; \
-		\
 		out vec4 fragColor; \
-		\
 		void main() \
 		{ \
 			vec4 color_sample = uniTextColor * texture(texTexture0, vertTextureCoordinate).a; \
-			\
 			vec2 shadow_offset = vec2(-1.0, -1.0) / uniTextureDimensions; \
 			vec4 shadow_sample = vec4(0.25, 0.25, 0.25, texture(texTexture0, vertTextureCoordinate + shadow_offset).a); \
-			\
 			fragColor = mix(shadow_sample, color_sample, color_sample.a); \
-		} \
-	";
+		}";
 
 	class TextLabel
 		: public ExLibris::ITextLayoutVisitor
@@ -306,80 +292,33 @@ namespace Framework
 		glm::vec2 texture_coordinate;
 	};
 
-	TextHelper::TextHelper(ExLibris::Library* a_Library, ShaderLoader* a_ShaderLoader)
-		: m_Program(nullptr)
-		, m_Font(nullptr)
+	TextHelper::TextHelper()
+		: m_Font(nullptr)
 		, m_FontFace(nullptr)
+		, m_ShaderVertex(0)
+		, m_ShaderFragment(0)
+		, m_Program(0)
+		, m_AttributePosition(-1)
+		, m_AttributeTextureCoordinate0(-1)
+		, m_UniformModelViewProjection(-1)
+		, m_UniformTexture0(-1)
+		, m_UniformTextureDimensions(-1)
+		, m_BufferVertices(0)
+		, m_BufferElements(0)
+		, m_BufferAttributes(0)
 	{
 		m_Font = new FontSystem;
 		m_FontFace = m_Font->CreateFace(10.0f);
 
-		glGenBuffers(1, &m_BufferVertices);
-		glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
-
-			GlyphVertex vertex_data[4] = {
-				{
-					glm::vec2(0.0f, 0.0f),
-					glm::vec2(0.0f, 0.0f)
-				},
-				{
-					glm::vec2(1.0f, 0.0f),
-					glm::vec2(1.0f, 0.0f)
-				},
-				{
-					glm::vec2(0.0f, 1.0f),
-					glm::vec2(0.0f, 1.0f)
-				},
-				{
-					glm::vec2(1.0f, 1.0f),
-					glm::vec2(1.0f, 1.0f)
-				},
-			};
-
-			glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glGenBuffers(1, &m_BufferElements);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
-
-			GLuint element_data[6] = {
-				1, 0, 2,
-				1, 2, 3
-			};
-
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), element_data, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		m_Program = a_ShaderLoader->LoadProgram("TextHelper", "Shaders/TextHelper");
-		m_Program->Compile();
-		m_Program->Link();
-
-		glGenVertexArrays(1, &m_BufferAttributes);
-		glBindVertexArray(m_BufferAttributes);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
-
-			GLint attribute_position = m_Program->GetAttribute("attrPosition");
-			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_Position);
-			glEnableVertexAttribArray(attribute_position);
-
-			GLint attribute_texturecoordinate = m_Program->GetAttribute("attrTextureCoordinate0");
-			glVertexAttribPointer(attribute_texturecoordinate, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_TextureCoordinate);
-			glEnableVertexAttribArray(attribute_texturecoordinate);
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
-
-		glBindVertexArray(0);
+		_LoadShader();
+		_CreateVertexBuffer();
+		_CreateVertexArray();
 	}
 	
 	TextHelper::~TextHelper()
 	{
 		delete m_FontFace;
 		delete m_Font;
-
-		delete m_Program;
 
 		for (std::vector<TextLabel*>::iterator label_it = m_Labels.begin(); label_it != m_Labels.end(); ++label_it)
 		{
@@ -388,6 +327,10 @@ namespace Framework
 			delete label;
 		}
 		m_Labels.clear();
+
+		glDeleteShader(m_ShaderFragment);
+		glDeleteShader(m_ShaderVertex);
+		glDeleteProgram(m_Program);
 
 		glDeleteBuffers(1, &m_BufferVertices);
 		glDeleteBuffers(1, &m_BufferElements);
@@ -431,10 +374,10 @@ namespace Framework
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glUseProgram(m_Program->GetHandle());
+		glUseProgram(m_Program);
 
 		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(m_Program->GetUniform("texTexture0"), 0);
+		glUniform1i(m_UniformTexture0, 0);
 
 		glBindVertexArray(m_BufferAttributes);
 
@@ -442,13 +385,13 @@ namespace Framework
 		{
 			TextLabel* label = *label_it;
 
-			glUniform4fv(m_Program->GetUniform("uniTextColor"), 1, glm::value_ptr(label->GetColor()));
+			glUniform4fv(m_UniformTextColor, 1, glm::value_ptr(label->GetColor()));
 
 			glBindTexture(GL_TEXTURE_2D, label->GetTexture());
-			glUniform2fv(m_Program->GetUniform("uniTextureDimensions"), 1, glm::value_ptr(label->GetTextureDimensions()));
+			glUniform2fv(m_UniformTextureDimensions, 1, glm::value_ptr(label->GetTextureDimensions()));
 
 			glm::mat4x4 mvp = projection * label->GetModelviewMatrix();
-			glUniformMatrix4fv(m_Program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+			glUniformMatrix4fv(m_UniformModelViewProjection, 1, GL_FALSE, glm::value_ptr(mvp));
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
@@ -462,6 +405,180 @@ namespace Framework
 		glEnable(GL_DEPTH_TEST);
 
 		glPopAttrib();
+	}
+
+	void TextHelper::_LoadShader()
+	{
+		GLint success;
+		const GLchar* source_vertex = s_VertexShaderSource.c_str();
+		const GLchar* source_fragment = s_FragmentShaderSource.c_str();
+
+		m_ShaderVertex = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(m_ShaderVertex, 1, &source_vertex, nullptr);
+		glCompileShader(m_ShaderVertex);
+
+		glGetShaderiv(m_ShaderVertex, GL_COMPILE_STATUS, &success);
+		if (success != GL_TRUE)
+		{
+			std::stringstream ss;
+			ss << "Failed to compile vertex shader.";
+
+			GLint info_log_length = 0;
+			glGetShaderiv(m_ShaderVertex, GL_INFO_LOG_LENGTH, &info_log_length);
+			if (info_log_length > 1)
+			{
+				GLchar* info_log = new GLchar[info_log_length + 1];
+				glGetShaderInfoLog(m_ShaderVertex, info_log_length, 0, info_log);
+
+				ss << std::endl << std::endl << info_log;
+
+				delete [] info_log;
+			}
+			
+			throw std::exception(ss.str().c_str());
+		}
+
+		m_ShaderFragment = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(m_ShaderFragment, 1, &source_fragment, nullptr);
+		glCompileShader(m_ShaderFragment);
+
+		glGetShaderiv(m_ShaderFragment, GL_COMPILE_STATUS, &success);
+		if (success != GL_TRUE)
+		{
+			std::stringstream ss;
+			ss << "Failed to compile fragment shader.";
+
+			GLint info_log_length = 0;
+			glGetShaderiv(m_ShaderFragment, GL_INFO_LOG_LENGTH, &info_log_length);
+			if (info_log_length > 1)
+			{
+				GLchar* info_log = new GLchar[info_log_length + 1];
+				glGetShaderInfoLog(m_ShaderFragment, info_log_length, 0, info_log);
+
+				ss << std::endl << std::endl << info_log;
+
+				delete [] info_log;
+			}
+
+			throw std::exception(ss.str().c_str());
+		}
+
+		m_Program = glCreateProgram();
+		glAttachShader(m_Program, m_ShaderVertex);
+		glAttachShader(m_Program, m_ShaderFragment);
+		glLinkProgram(m_Program);
+
+		GLchar* log_program = nullptr;
+
+		GLint success_link = 0;
+		glGetProgramiv(m_Program, GL_LINK_STATUS, &success_link);
+
+		GLint success_validate = 0;
+		glValidateProgram(m_Program);
+		glGetProgramiv(m_Program, GL_VALIDATE_STATUS, &success_validate);
+
+		if (success_link != GL_TRUE || success_validate != GL_TRUE)
+		{
+			std::stringstream ss;
+
+			if (success_link != GL_TRUE)
+			{
+				ss << "Linking program failed.";
+			}
+			else if (success_validate != GL_TRUE)
+			{
+				ss << "Program validation failed.";
+			}
+
+			GLint info_log_length = 0;
+			glGetShaderiv(m_Program, GL_INFO_LOG_LENGTH, &info_log_length);
+			if (info_log_length > 1)
+			{
+				GLchar* info_log = new GLchar[info_log_length + 1];
+				glGetShaderInfoLog(m_Program, info_log_length, 0, info_log);
+
+				ss << std::endl << std::endl << info_log;
+
+				delete [] info_log;
+			}
+
+			throw std::exception(ss.str().c_str());
+		}
+
+		m_AttributePosition = glGetAttribLocation(m_Program, "attrPosition");
+		m_AttributeTextureCoordinate0 = glGetAttribLocation(m_Program, "attrTextureCoordinate0");
+		if (m_AttributePosition == -1 || m_AttributeTextureCoordinate0 == -1)
+		{
+			throw std::exception("Failed to find attribute locations.");
+		}
+
+		m_UniformModelViewProjection = glGetUniformLocation(m_Program, "matModelViewProjection");
+		m_UniformTexture0 = glGetUniformLocation(m_Program, "texTexture0");
+		m_UniformTextureDimensions = glGetUniformLocation(m_Program, "uniTextureDimensions");
+		m_UniformTextColor = glGetUniformLocation(m_Program, "uniTextColor");
+		if (m_UniformModelViewProjection == -1 || m_UniformTexture0 == -1 || m_UniformTextureDimensions == -1 || m_UniformTextColor == -1)
+		{
+			throw new std::exception("Failed to find uniform locations.");
+		}
+	}
+
+	void TextHelper::_CreateVertexBuffer()
+	{
+		glGenBuffers(1, &m_BufferVertices);
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
+
+			GlyphVertex vertex_data[4] = {
+				{
+					glm::vec2(0.0f, 0.0f),
+					glm::vec2(0.0f, 0.0f)
+				},
+				{
+					glm::vec2(1.0f, 0.0f),
+					glm::vec2(1.0f, 0.0f)
+				},
+				{
+					glm::vec2(0.0f, 1.0f),
+					glm::vec2(0.0f, 1.0f)
+				},
+				{
+					glm::vec2(1.0f, 1.0f),
+					glm::vec2(1.0f, 1.0f)
+				},
+			};
+
+			glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glGenBuffers(1, &m_BufferElements);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
+
+			GLuint element_data[6] = {
+				1, 0, 2,
+				1, 2, 3
+			};
+
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), element_data, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	void TextHelper::_CreateVertexArray()
+	{
+		glGenVertexArrays(1, &m_BufferAttributes);
+		glBindVertexArray(m_BufferAttributes);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
+
+			glVertexAttribPointer(m_AttributePosition, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_Position);
+			glEnableVertexAttribArray(m_AttributePosition);
+
+			glVertexAttribPointer(m_AttributeTextureCoordinate0, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_TextureCoordinate);
+			glEnableVertexAttribArray(m_AttributeTextureCoordinate0);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferElements);
+
+		glBindVertexArray(0);
 	}
 
 }; // namespace Framework
