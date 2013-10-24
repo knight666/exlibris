@@ -2,10 +2,6 @@
 
 #include "TextHelper.h"
 
-// Windows
-
-#include <ShlObj.h>
-
 // GLM
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -26,6 +22,45 @@
 
 namespace Framework
 {
+
+	static const std::string s_VertexShaderSource = "\
+		#version 330 core \
+		\
+		in vec2 attrPosition; \
+		in vec2 attrTextureCoordinate0; \
+		\
+		out vec2 vertTextureCoordinate; \
+		\
+		uniform mat4 matModelViewProjection; \
+		\
+		void main() \
+		{ \
+			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
+			vertTextureCoordinate = attrTextureCoordinate0; \
+		} \
+	";
+
+	static const std::string s_FragmentShaderSource = "\
+		#version 330 core \
+		\
+		in vec2 vertTextureCoordinate; \
+		\
+		uniform sampler2D texTexture0; \
+		uniform vec2 uniTextureDimensions; \
+		uniform vec4 uniTextColor; \
+		\
+		out vec4 fragColor; \
+		\
+		void main() \
+		{ \
+			vec4 color_sample = uniTextColor * texture(texTexture0, vertTextureCoordinate).a; \
+			\
+			vec2 shadow_offset = vec2(-1.0, -1.0) / uniTextureDimensions; \
+			vec4 shadow_sample = vec4(0.25, 0.25, 0.25, texture(texTexture0, vertTextureCoordinate + shadow_offset).a); \
+			\
+			fragColor = mix(shadow_sample, color_sample, color_sample.a); \
+		} \
+	";
 
 	class TextLabel
 		: public ExLibris::ITextLayoutVisitor
@@ -150,8 +185,6 @@ namespace Framework
 			glm::vec2 offset = m_LineOffset + metrics->offset;
 			offset.x += a_X;
 
-			glm::vec2 shadow_offset = offset + glm::vec2(2.0f, 1.0f);
-
 			m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
 
 			if (offset.x < 0.0f)
@@ -161,12 +194,6 @@ namespace Framework
 			}
 
 			unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
-
-			unsigned char* dst_shadow =
-				m_TextureData + 
-				(((unsigned int)shadow_offset.y + m_TexturePadding.y) * m_TexturePitch) + 
-				((unsigned int)(shadow_offset.x + m_TexturePadding.x) * 4);
-
 			unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
 			unsigned int src_pitch = bitmap->width * 4;
@@ -174,27 +201,6 @@ namespace Framework
 
 			for (unsigned int y = 0; y < bitmap->height; ++y)
 			{
-				/*if (dst_shadow >= m_TextureData && dst_shadow + src_pitch < dst_end)
-				{
-					unsigned int* dst_line = (unsigned int*)dst_shadow;
-					unsigned int* src_line = (unsigned int*)src;
-
-					for (unsigned int x = 0; x < bitmap->width; ++x)
-					{
-						unsigned int src_a = (*src_line & 0x000000FF);
-
-						if (src_a > 0)
-						{
-							*dst_line = 0x313131FF;
-						}
-
-						++dst_line;
-						++src_line;
-					}
-
-					dst_shadow += m_TexturePitch;
-				}*/
-
 				if (dst >= m_TextureData && dst + src_pitch < dst_end)
 				{
 					unsigned int* dst_line = (unsigned int*)dst;
@@ -436,8 +442,9 @@ namespace Framework
 		{
 			TextLabel* label = *label_it;
 
-			glBindTexture(GL_TEXTURE_2D, label->GetTexture());
+			glUniform4fv(m_Program->GetUniform("uniTextColor"), 1, glm::value_ptr(label->GetColor()));
 
+			glBindTexture(GL_TEXTURE_2D, label->GetTexture());
 			glUniform2fv(m_Program->GetUniform("uniTextureDimensions"), 1, glm::value_ptr(label->GetTextureDimensions()));
 
 			glm::mat4x4 mvp = projection * label->GetModelviewMatrix();
