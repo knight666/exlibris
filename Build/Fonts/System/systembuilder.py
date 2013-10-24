@@ -3,6 +3,38 @@
 # script for converting a tga image to a series of
 # glyph bitmaps encoded into 12 bytes
 
+# Explanation
+# ============================
+#
+# Each glyph in the bitmap is represented as an 8 x 12 pixel bitmap.
+#
+# The script encodes divides the bitmap into three sections of 8 x 4
+# pixels. Because we only care if a pixel is on (1) or off (0), each
+# section can be represented using a 32-bit integer, where each pixel
+# is a bit in the integer.
+#
+# For example, let's say we have the following bitmap section:
+#
+# .XX.
+# X..X
+# X..X
+# .XX.
+#
+# Each pixel becomes a bit in the integer, so we can convert it like
+# this:
+#
+# .XX.  X..X  X..X  .XX.
+#
+# 0110  1001  1001  0110   =   54060
+#
+# In order to store this number in static memory in C++, we have to
+# convert it to hexadecimal and save it as a string
+#
+# 54060 = 0xD32C
+#
+# On the C++ side, a glyph bitmap is decoded by taking the three
+# relevant encoded integers and adding a pixel if a bit is set.
+
 import struct
 
 
