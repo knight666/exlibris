@@ -5,6 +5,52 @@
 
 using namespace ExLibris;
 
+TEST(MeshBuilder, Construct)
+{
+	MeshBuilder builder;
+
+	EXPECT_EQ(0, builder.GetVertexCount());
+}
+
+TEST(MeshBuilder, AddTriangle)
+{
+	MeshBuilder builder;
+	builder.AddTriangle(
+		glm::vec2(56.0f, 12.8f),
+		glm::vec2(33.45f, 12.9f),
+		glm::vec2(54.9f, 12.56f)
+	);
+
+	EXPECT_EQ(3, builder.GetVertexCount());
+}
+
+TEST(MeshBuilder, AddQuad)
+{
+	MeshBuilder builder;
+	builder.AddQuad(
+		glm::vec2(56.98f, 124.8f),
+		glm::vec2(1.48f, 91.8f),
+		glm::vec2(55.67f, 99.9f),
+		glm::vec2(25.9f, -76.4f)
+	);
+
+	EXPECT_EQ(6, builder.GetVertexCount());
+}
+
+TEST(MeshBuilder, Clear)
+{
+	MeshBuilder builder;
+	builder.AddTriangle(
+		glm::vec2(-12.0f, 15.9f),
+		glm::vec2(-12.9f, 19.8f),
+		glm::vec2(-55.8f, 812.9f)
+	);
+
+	builder.Clear();
+
+	EXPECT_EQ(0, builder.GetVertexCount());
+}
+
 TEST(MeshBuilder, BuildTriangle)
 {
 	MeshBuilder builder;
@@ -119,4 +165,15 @@ TEST(MeshBuilder, BuildTwoQuads)
 	EXPECT_VEC2_EQ(516.0f, 76.0f, visitor.triangles[3].a);
 	EXPECT_VEC2_EQ(865.0f, 345.0f, visitor.triangles[3].b);
 	EXPECT_VEC2_EQ(912.0f, 345.0f, visitor.triangles[3].c);
+}
+
+TEST(MeshBuilder, BuildEmpty)
+{
+	MeshBuilder builder;
+
+	MockMeshVisitor visitor;
+	builder.Accept(visitor);
+
+	EXPECT_EQ(0, visitor.vertex_count);
+	ASSERT_EQ(0, visitor.triangles.size());
 }
