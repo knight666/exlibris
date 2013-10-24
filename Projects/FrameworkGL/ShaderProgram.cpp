@@ -22,6 +22,11 @@ namespace Framework
 	
 	ShaderProgram::~ShaderProgram()
 	{
+		if (m_Log != nullptr)
+		{
+			delete [] m_Log;
+		}
+
 		if (m_SourceVertex != nullptr)
 		{
 			delete m_SourceVertex;
@@ -196,6 +201,11 @@ namespace Framework
 		glGetProgramiv(m_Handle, GL_INFO_LOG_LENGTH, &info_log_length);
 		if (info_log_length > 1)
 		{
+			if (m_Log != nullptr)
+			{
+				delete [] m_Log;
+				m_Log = nullptr;
+			}
 			m_Log = new GLchar[info_log_length + 1];
 			glGetShaderInfoLog(m_Handle, info_log_length, 0, m_Log);
 
