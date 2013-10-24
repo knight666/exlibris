@@ -409,8 +409,17 @@ namespace Framework
 		m_Labels.clear();
 	}
 
-	void TextHelper::Render(const glm::mat4x4& a_ProjectionMatrix)
+	void TextHelper::Render(int a_ScreenWidth, int a_ScreenHeight) const
 	{
+		glPushAttrib(GL_VIEWPORT_BIT);
+		glViewport(0, 0, a_ScreenWidth, a_ScreenHeight);
+
+		glm::mat4x4 projection = glm::ortho<float>(
+			0.0f, (float)a_ScreenWidth,
+			(float)a_ScreenHeight, 0.0f,
+			-1.0f, 1.0f
+		);
+
 		glDisable(GL_DEPTH_TEST);
 
 		glEnable(GL_BLEND);
@@ -423,7 +432,7 @@ namespace Framework
 
 		glBindVertexArray(m_BufferAttributes);
 
-		for (std::vector<TextLabel*>::iterator label_it = m_Labels.begin(); label_it != m_Labels.end(); ++label_it)
+		for (std::vector<TextLabel*>::const_iterator label_it = m_Labels.begin(); label_it != m_Labels.end(); ++label_it)
 		{
 			TextLabel* label = *label_it;
 
@@ -431,7 +440,7 @@ namespace Framework
 
 			glUniform2fv(m_Program->GetUniform("uniTextureDimensions"), 1, glm::value_ptr(label->GetTextureDimensions()));
 
-			glm::mat4x4 mvp = a_ProjectionMatrix * label->GetModelviewMatrix();
+			glm::mat4x4 mvp = projection * label->GetModelviewMatrix();
 			glUniformMatrix4fv(m_Program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -444,6 +453,8 @@ namespace Framework
 		glDisable(GL_BLEND);
 
 		glEnable(GL_DEPTH_TEST);
+
+		glPopAttrib();
 	}
 
 }; // namespace Framework

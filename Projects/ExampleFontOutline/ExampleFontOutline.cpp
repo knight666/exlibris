@@ -9,6 +9,7 @@
 // Framework
 
 #include <Application.h>
+#include <FontSystem.h>
 #include <MeshOpenGL.h>
 #include <ShaderLoader.h>
 #include <ShaderProgram.h>
@@ -33,9 +34,9 @@ namespace fw = Framework;
 #include <FontFace.h>
 #include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
+#include <Library.h>
 #include <LineShape.h>
 #include <Polygon.h>
-#include <Library.h>
 #include <TextLayout.h>
 
 namespace exl = ExLibris;
@@ -443,7 +444,7 @@ public:
 
 		m_OutlineVisitor->Render(projection, modelview);
 
-		m_TextHelper->Render(projection);
+		m_TextHelper->Render(width, height);
 	}
 
 	void Destroy()
@@ -680,6 +681,9 @@ private:
 			<< "<1> - Draw triangles or lines\n"
 			<< "<2> - Filled on/off\n"
 			<< "<3> - Outline on/off\n"
+			<< "\n"
+			<< "<L> - Toggle outline quality\n"
+			<< "<O><P> - Outline precision\n"
 			<< "\n"
 			<< "<Ctrl> + <B> - Bold\n"
 			<< "<Ctrl> + <I> - Italic\n";
