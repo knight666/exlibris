@@ -35,6 +35,8 @@ namespace ExLibris
 		float GetDescender() const;
 		void SetDescender(float a_Descender);
 
+		size_t GetGlyphCount() const;
+
 		bool AddGlyph(Glyph* a_Glyph);
 		Glyph* FindGlyph(unsigned int a_CodepointUtf32) const;
 
