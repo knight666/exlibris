@@ -2,6 +2,8 @@
 
 #include "CurvePath.h"
 
+#include "Exception.h"
+
 namespace ExLibris
 {
 
@@ -27,7 +29,7 @@ namespace ExLibris
 	{
 		if (a_Index >= m_Positions.size())
 		{
-			throw std::exception("CurvePath::GetPosition - Index out of range.");
+			EXL_THROW("CurvePath::GetPosition", "Position index out of range");
 		}
 
 		return m_Positions[a_Index];
