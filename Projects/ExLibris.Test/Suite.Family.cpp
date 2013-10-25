@@ -69,18 +69,72 @@ TEST(Family, FindFontMatchStyle)
 	EXPECT_EQ(font, font_found);
 }
 
+TEST(Family, FindFontBestMatchWeight)
+{
+	Family* fam = new Family(nullptr, "Racketeer");
+
+	MockFont* font_first = new MockFont(fam);
+	font_first->SetWeight(eWeight_Normal);
+	font_first->SetStyle(eStyle_None);
+	fam->AddFont(font_first);
+
+	MockFont* font_second = new MockFont(fam);
+	font_second->SetWeight(eWeight_Bold);
+	font_second->SetStyle(eStyle_None);
+	fam->AddFont(font_second);
+
+	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_None);
+	EXPECT_EQ(font_second, font_found);
+}
+
+TEST(Family, FindFontBestMatchStyle)
+{
+	Family* fam = new Family(nullptr, "Hairy Head");
+
+	MockFont* font_first = new MockFont(fam);
+	font_first->SetWeight(eWeight_Normal);
+	font_first->SetStyle(eStyle_Italicized);
+	fam->AddFont(font_first);
+
+	MockFont* font_second = new MockFont(fam);
+	font_second->SetWeight(eWeight_Normal);
+	font_second->SetStyle(eStyle_None);
+	fam->AddFont(font_second);
+
+	IFont* font_found = fam->FindFont(eWeight_Normal, eStyle_Italicized);
+	EXPECT_EQ(font_first, font_found);
+}
+
+TEST(Family, FindFontPartialMatch)
+{
+	Family* fam = new Family(nullptr, "Ringading");
+
+	MockFont* font = new MockFont(fam);
+	font->SetWeight(eWeight_Bold);
+	font->SetStyle(eStyle_None);
+	fam->AddFont(font);
+
+	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_Italicized);
+	EXPECT_EQ(font, font_found);
+}
+
+TEST(Family, FindFontNoMatch)
+{
+	Family* fam = new Family(nullptr, "Destroyer of Cookies");
+
+	MockFont* font = new MockFont(fam);
+	font->SetWeight(eWeight_Normal);
+	font->SetStyle(eStyle_None);
+	fam->AddFont(font);
+
+	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_Italicized);
+	EXPECT_EQ(nullptr, font_found);
+}
+
 TEST(Family, FindFontEmpty)
 {
 	Family* fam = new Family(nullptr, "Teacup");
 
 	IFont* font_found = fam->FindFont(eWeight_Normal, eStyle_Italicized);
-	ASSERT_EQ(nullptr, font_found);
-}
-
-TEST(Family, FindFontNotFound)
-{
-	Family* fam = new Family(nullptr, "Teacup");
-
-	IFont* font_found = fam->FindFont(eWeight_Normal, eStyle_Italicized);
-	ASSERT_EQ(nullptr, font_found);
+	EXPECT_EQ(nullptr, font_found);
 }
