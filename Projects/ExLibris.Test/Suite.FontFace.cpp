@@ -21,7 +21,10 @@ TEST(FontFace, ConstructFromFont)
 {
 	MockFont* font = new MockFont(nullptr);
 
-	FontFace* face = font->CreateFace(12.0f);
+	FaceOptions options;
+	options.size = 12.0f;
+
+	FontFace* face = font->CreateFace(options);
 	ASSERT_NE(nullptr, face);
 
 	EXPECT_EQ(font, face->GetFont());

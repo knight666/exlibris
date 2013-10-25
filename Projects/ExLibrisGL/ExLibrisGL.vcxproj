@@ -97,6 +97,7 @@
     <ClInclude Include="Alignment.h" />
     <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="FaceOptions.h" />
     <ClInclude Include="Family.h" />
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />

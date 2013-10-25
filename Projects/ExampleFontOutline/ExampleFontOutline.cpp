@@ -359,7 +359,9 @@ public:
 		m_ShaderLoader = new fw::ShaderLoader();
 		_LoadShaders();
 
-		m_FontSize = 100.0f;
+		m_FaceOptions.size = 100.0f;
+		m_FaceOptions.bitmap_quality = exl::eBitmapQuality_None;
+
 		m_FontWeight = exl::eWeight_Normal;
 		m_FontStyle = exl::eStyle_None;
 
@@ -402,10 +404,10 @@ public:
 
 		timer.Start();
 		{
-			font_regular->CreateFace(m_FontSize);
-			font_bold->CreateFace(m_FontSize);
-			font_italic->CreateFace(m_FontSize);
-			font_bolditalic->CreateFace(m_FontSize);
+			font_regular->CreateFace(m_FaceOptions);
+			font_bold->CreateFace(m_FaceOptions);
+			font_italic->CreateFace(m_FaceOptions);
+			font_bolditalic->CreateFace(m_FaceOptions);
 
 			_LoadFontFace();
 		}
@@ -730,7 +732,7 @@ private:
 		if (family != nullptr)
 		{
 			m_Font = family->FindFont(m_FontWeight, m_FontStyle);
-			m_FontFace = m_Font->CreateFace(m_FontSize);
+			m_FontFace = m_Font->CreateFace(m_FaceOptions);
 		}
 	}
 
@@ -739,7 +741,7 @@ private:
 	bool m_OptionDrawLines;
 
 	std::string m_FontPath;
-	float m_FontSize;
+	exl::FaceOptions m_FaceOptions;
 	exl::Weight m_FontWeight;
 	exl::Style m_FontStyle;
 

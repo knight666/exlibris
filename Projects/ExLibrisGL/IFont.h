@@ -1,6 +1,7 @@
 #ifndef _IFONT_H_
 #define _IFONT_H_
 
+#include "FaceOptions.h"
 #include "Style.h"
 #include "Weight.h"
 
@@ -31,7 +32,7 @@ namespace ExLibris
 
 		virtual unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const = 0;
 
-		virtual FontFace* CreateFace(float a_Size) = 0;
+		virtual FontFace* CreateFace(const FaceOptions& a_Options) = 0;
 
 	protected:
 

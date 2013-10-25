@@ -20,7 +20,10 @@ public:
 
 		font = (FontFreetype*)library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
 
-		face = font->CreateFace(24.0f);
+		FaceOptions options;
+		options.size = 24.0f;
+
+		face = font->CreateFace(options);
 	}
 
 	void TearDown()
