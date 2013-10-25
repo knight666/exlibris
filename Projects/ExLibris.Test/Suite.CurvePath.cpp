@@ -2,6 +2,8 @@
 
 #include "CurvePath.h"
 
+#include "Exception.h"
+
 using namespace ExLibris;
 
 TEST(CurvePath, Construct)
@@ -59,7 +61,7 @@ TEST(CurvePath, GetPositionEmpty)
 {
 	CurvePath path;
 
-	EXPECT_THROW(path.GetPosition(3), std::exception);
+	EXPECT_THROW(path.GetPosition(3), Exception);
 }
 
 TEST(CurvePath, GetPositionOutOfRange)
@@ -68,7 +70,7 @@ TEST(CurvePath, GetPositionOutOfRange)
 
 	path.Move(glm::vec2(25.0f, 125.9f));
 
-	EXPECT_THROW(path.GetPosition(3), std::exception);
+	EXPECT_THROW(path.GetPosition(3), Exception);
 }
 
 TEST(CurvePath, BuildMove)
