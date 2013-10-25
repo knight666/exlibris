@@ -131,7 +131,7 @@ namespace Framework
 		}
 	}
 
-	ExLibris::FontFace* FontSystem::CreateFace(float a_Size)
+	ExLibris::FontFace* FontSystem::CreateFace(const ExLibris::FaceOptions& a_Options)
 	{
 		ExLibris::FontFace* face = new ExLibris::FontFace(this);
 		face->SetSize(12.0f);

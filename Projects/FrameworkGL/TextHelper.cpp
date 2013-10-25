@@ -308,7 +308,9 @@ namespace Framework
 		, m_BufferAttributes(0)
 	{
 		m_Font = new FontSystem;
-		m_FontFace = m_Font->CreateFace(10.0f);
+
+		ExLibris::FaceOptions options;
+		m_FontFace = m_Font->CreateFace(options);
 
 		_LoadShader();
 		_CreateVertexBuffer();

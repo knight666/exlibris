@@ -105,9 +105,9 @@ namespace ExLibris
 		m_BufferSize = a_BufferSize;
 	}
 
-	FontFace* FontFreetype::CreateFace(float a_Size)
+	FontFace* FontFreetype::CreateFace(const FaceOptions& a_Options)
 	{
-		std::map<float, FontFace*>::iterator found = m_Faces.find(a_Size);
+		std::map<float, FontFace*>::iterator found = m_Faces.find(a_Options.size);
 		if (found != m_Faces.end())
 		{
 			return found->second;
@@ -120,14 +120,14 @@ namespace ExLibris
 
 		FT_Error errors = 0;
 
-		errors = FT_Set_Char_Size(m_Font, 0, Fixed26Dot6::ToFixed(a_Size), 0, 96);
+		errors = FT_Set_Char_Size(m_Font, 0, Fixed26Dot6::ToFixed(a_Options.size), 0, 96);
 		if (errors != 0)
 		{
 			return nullptr;
 		}
 
 		FontFace* face = new FontFace(this);
-		face->SetSize(a_Size);
+		face->SetSize(a_Options.size);
 		face->SetLineHeight(Fixed26Dot6::ToFloat(m_Font->size->metrics.height));
 		face->SetAscender(Fixed26Dot6::ToFloat(m_Font->size->metrics.ascender));
 		face->SetDescender(Fixed26Dot6::ToFloat(m_Font->size->metrics.descender));
@@ -145,8 +145,20 @@ namespace ExLibris
 				glyph->index = (unsigned int)codepoint;
 
 				_LoadMetrics(m_Font->glyph, glyph, m_Font->size->metrics);
-				_LoadBitmap(m_Font->glyph, glyph);
-				_LoadOutline(m_Font->glyph, glyph);
+
+				if (a_Options.bitmap_quality == eBitmapQuality_Color)
+				{
+					_LoadBitmapColor(m_Font->glyph, glyph);
+				}
+				else if (a_Options.bitmap_quality == eBitmapQuality_Mono)
+				{
+					_LoadBitmapMono(m_Font->glyph, glyph);
+				}
+
+				if (a_Options.outline)
+				{
+					_LoadOutline(m_Font->glyph, glyph);
+				}
 
 				glyphs.push_back(glyph);
 			}
@@ -155,45 +167,46 @@ namespace ExLibris
 		}
 		while (codepoint != 0);
 
-		// kerning
-
-		for (std::vector<Glyph*>::iterator glyph_left_it = glyphs.begin(); glyph_left_it != glyphs.end(); ++glyph_left_it)
+		if (a_Options.kerning)
 		{
-			Glyph* glyph_left = *glyph_left_it;
-
-			if (glyph_left_it + 1 != glyphs.end())
+			for (std::vector<Glyph*>::iterator glyph_left_it = glyphs.begin(); glyph_left_it != glyphs.end(); ++glyph_left_it)
 			{
-				for (std::vector<Glyph*>::iterator glyph_right_it = glyph_left_it + 1; glyph_right_it != glyphs.end(); ++glyph_right_it)
+				Glyph* glyph_left = *glyph_left_it;
+
+				if (glyph_left_it + 1 != glyphs.end())
 				{
-					Glyph* glyph_right = *glyph_right_it;
-
-					FT_Vector kerning_fixed;
-
-					errors = FT_Get_Kerning(m_Font, glyph_left->index, glyph_right->index, FT_KERNING_DEFAULT, &kerning_fixed);
-					if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+					for (std::vector<Glyph*>::iterator glyph_right_it = glyph_left_it + 1; glyph_right_it != glyphs.end(); ++glyph_right_it)
 					{
-						glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
+						Glyph* glyph_right = *glyph_right_it;
 
-						glyph_left->kernings.insert(std::make_pair(glyph_right->index, kerning));
-					}
+						FT_Vector kerning_fixed;
 
-					errors = FT_Get_Kerning(m_Font, glyph_right->index, glyph_left->index, FT_KERNING_DEFAULT, &kerning_fixed);
-					if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
-					{
-						glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
+						errors = FT_Get_Kerning(m_Font, glyph_left->index, glyph_right->index, FT_KERNING_DEFAULT, &kerning_fixed);
+						if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+						{
+							glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
 
-						glyph_right->kernings.insert(std::make_pair(glyph_left->index, kerning));
+							glyph_left->kernings.insert(std::make_pair(glyph_right->index, kerning));
+						}
+
+						errors = FT_Get_Kerning(m_Font, glyph_right->index, glyph_left->index, FT_KERNING_DEFAULT, &kerning_fixed);
+						if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+						{
+							glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
+
+							glyph_right->kernings.insert(std::make_pair(glyph_left->index, kerning));
+						}
 					}
 				}
-			}
 
-			if (!face->AddGlyph(glyph_left))
-			{
-				delete glyph_left;
+				if (!face->AddGlyph(glyph_left))
+				{
+					delete glyph_left;
+				}
 			}
 		}
-
-		m_Faces.insert(std::make_pair(a_Size, face));
+		
+		m_Faces.insert(std::make_pair(a_Options.size, face));
 
 		return face;
 	}
@@ -224,7 +237,7 @@ namespace ExLibris
 		return true;
 	}
 
-	bool FontFreetype::_LoadBitmap(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	bool FontFreetype::_LoadBitmapColor(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
 	{
 		FT_Error errors = 0;
 
@@ -236,8 +249,8 @@ namespace ExLibris
 
 		FT_Bitmap& glyph_bitmap = a_Slot->bitmap;
 
-		unsigned int data_length = glyph_bitmap.width * glyph_bitmap.rows * 4;
-		if (data_length == 0)
+		unsigned int bitmap_size = glyph_bitmap.width * glyph_bitmap.rows * 4;
+		if (bitmap_size == 0)
 		{
 			return false;
 		}
@@ -245,13 +258,13 @@ namespace ExLibris
 		a_Glyph->bitmap = new GlyphBitmap;
 		a_Glyph->bitmap->width = glyph_bitmap.width;
 		a_Glyph->bitmap->height = glyph_bitmap.rows;
-		a_Glyph->bitmap->data = new unsigned char[data_length];
+		a_Glyph->bitmap->data = new unsigned char[bitmap_size];
 
 		unsigned char* src_line = glyph_bitmap.buffer;
 		unsigned int src_pitch = glyph_bitmap.pitch;
 
 		unsigned char* dst_line = a_Glyph->bitmap->data;
-		unsigned int dst_pitch = a_Glyph->bitmap->width * 4;
+		unsigned int dst_pitch = glyph_bitmap.width * 4;
 
 		for (int y = 0; y < glyph_bitmap.rows; ++y)
 		{
@@ -268,6 +281,67 @@ namespace ExLibris
 
 				dst += 4;
 				src++;
+			}
+
+			src_line += src_pitch;
+			dst_line += dst_pitch;
+		}
+
+		return true;
+	}
+
+	bool FontFreetype::_LoadBitmapMono(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	{
+		FT_Error errors = 0;
+
+		errors = FT_Render_Glyph(a_Slot, FT_RENDER_MODE_MONO);
+		if (errors != 0)
+		{
+			return false;
+		}
+
+		FT_Bitmap& glyph_bitmap = a_Slot->bitmap;
+
+		unsigned int bitmap_size = glyph_bitmap.width * glyph_bitmap.rows * 4;
+		if (bitmap_size == 0)
+		{
+			return false;
+		}
+
+		a_Glyph->bitmap = new GlyphBitmap;
+		a_Glyph->bitmap->width = glyph_bitmap.width;
+		a_Glyph->bitmap->height = glyph_bitmap.rows;
+		a_Glyph->bitmap->data = new unsigned char[bitmap_size];
+
+		unsigned char* src_line = glyph_bitmap.buffer;
+		unsigned int src_pitch = glyph_bitmap.pitch;
+
+		unsigned char* dst_line = a_Glyph->bitmap->data;
+		unsigned int dst_pitch = glyph_bitmap.width * 4;
+
+		for (int y = 0; y < glyph_bitmap.rows; ++y)
+		{
+			int mask = 0x80;
+
+			unsigned char* src = src_line;
+			unsigned char* dst = dst_line;
+
+			for (int x = 0; x < glyph_bitmap.width; ++x)
+			{
+				char value = ((*src & mask) == mask) ? 0xFF : 0x00;
+				dst[0] = value;
+				dst[1] = value;
+				dst[2] = value;
+				dst[3] = value;
+
+				dst += 4;
+
+				mask >>= 1;
+				if (mask <= 0)
+				{
+					mask = 0x80;
+					src++;
+				}
 			}
 
 			src_line += src_pitch;

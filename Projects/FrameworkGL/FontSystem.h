@@ -24,7 +24,7 @@ namespace Framework
 	
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
 
-		ExLibris::FontFace* CreateFace(float a_Size);
+		ExLibris::FontFace* CreateFace(const ExLibris::FaceOptions& a_Options);
 
 	private:
 

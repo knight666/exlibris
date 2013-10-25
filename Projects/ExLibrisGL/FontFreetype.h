@@ -27,12 +27,13 @@ namespace ExLibris
 
 		void SetFontData(FT_Face a_Font, FT_Byte* a_Buffer, size_t a_BufferSize);
 
-		FontFace* CreateFace(float a_Size);
+		FontFace* CreateFace(const FaceOptions& a_Options);
 
 	private:
 
 		bool _LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Size_Metrics a_FontMetrics) const;
-		bool _LoadBitmap(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
+		bool _LoadBitmapColor(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
+		bool _LoadBitmapMono(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
 		bool _LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
 
 	private:
