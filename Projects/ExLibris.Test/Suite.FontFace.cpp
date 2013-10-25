@@ -1,10 +1,7 @@
 #include "ExLibris.Test.PCH.h"
 
 #include <FontFace.h>
-#include <FontFreetype.h>
-#include <FontLoaderFreetype.h>
 #include <Glyph.h>
-#include <Library.h>
 
 #include "Mock.Font.h"
 
@@ -17,6 +14,7 @@ TEST(FontFace, Construct)
 	EXPECT_EQ(nullptr, face->GetFont());
 	EXPECT_FLOAT_EQ(0.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(0.0f, face->GetLineHeight());
+	EXPECT_EQ(0, face->GetGlyphCount());
 }
 
 TEST(FontFace, ConstructFromFont)
@@ -29,6 +27,47 @@ TEST(FontFace, ConstructFromFont)
 	EXPECT_EQ(font, face->GetFont());
 	EXPECT_FLOAT_EQ(12.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(24.0f, face->GetLineHeight());
+	EXPECT_EQ(0, face->GetGlyphCount());
+}
+
+TEST(FontFace, AddGlyph)
+{
+	FontFace* face = new FontFace(nullptr);
+
+	Glyph* glyph = new Glyph;
+	glyph->index = 144;
+	
+	EXPECT_TRUE(face->AddGlyph(glyph));
+
+	EXPECT_EQ(1, face->GetGlyphCount());
+}
+
+TEST(FontFace, AddGlyphTwice)
+{
+	FontFace* face = new FontFace(nullptr);
+
+	Glyph* glyph = new Glyph;
+	glyph->index = 33;
+	
+	EXPECT_TRUE(face->AddGlyph(glyph));
+	EXPECT_FALSE(face->AddGlyph(glyph));
+
+	EXPECT_EQ(1, face->GetGlyphCount());
+}
+
+TEST(FontFace, AddGlyphSameIndex)
+{
+	FontFace* face = new FontFace(nullptr);
+
+	Glyph* glyph_first = new Glyph;
+	glyph_first->index = 187;
+	EXPECT_TRUE(face->AddGlyph(glyph_first));
+
+	Glyph* glyph_second = new Glyph;
+	glyph_second->index = 187;
+	EXPECT_FALSE(face->AddGlyph(glyph_second));
+
+	EXPECT_EQ(1, face->GetGlyphCount());
 }
 
 TEST(FontFace, FindGlyph)
@@ -103,69 +142,4 @@ TEST(FontFace, TryGetKerningNotFound)
 
 	glm::vec2 kerning_actual;
 	EXPECT_FALSE(face->TryGetKerning(glyph, glyph_other, kerning_actual));
-}
-
-class FaceContext
-	: public ::testing::Test
-{
-
-public:
-
-	void SetUp()
-	{
-		library = new Library;
-		IFontLoader* loader = new FontLoaderFreetype(library);
-		library->AddLoader(loader);
-		font = (FontFreetype*)library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		face = font->CreateFace(24.0f);
-	}
-
-	void TearDown()
-	{
-		delete library;
-	}
-
-protected:
-
-	Library* library;
-	FontFreetype* font;
-	FontFace* face;
-
-};
-
-TEST_F(FaceContext, LineHeight)
-{
-	EXPECT_FLOAT_EQ(24.0f, face->GetSize());
-	EXPECT_FLOAT_EQ(42.0f, face->GetLineHeight());
-}
-
-TEST_F(FaceContext, FindGlyph)
-{
-	Glyph* glyph = face->FindGlyph((unsigned int)'6');
-	ASSERT_NE(nullptr, glyph);
-
-	EXPECT_EQ(25, glyph->index);
-	ASSERT_NE(nullptr, glyph->metrics);
-	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
-	EXPECT_VEC2_EQ(2.0f, 19.0f, glyph->metrics->offset);
-	EXPECT_VEC2_EQ(2.0625000f, 0.0000000f, glyph->metrics->bounding_box.minimum);
-	EXPECT_VEC2_EQ(16.859375f, 23.000000f, glyph->metrics->bounding_box.maximum);
-}
-
-TEST_F(FaceContext, FindGlyphOutline)
-{
-	Glyph* glyph = face->FindGlyph((unsigned int)'-');
-	ASSERT_NE(nullptr, glyph);
-
-	ASSERT_NE(nullptr, glyph->outline);
-	EXPECT_EQ(5, glyph->outline->GetCommandCount());
-
-	EXPECT_EQ(5, glyph->outline->GetPositionCount());
-	EXPECT_VEC2_EQ(8.2031250f, -8.5937500f, glyph->outline->GetPosition(0));
-}
-
-TEST_F(FaceContext, FindGlyphNotFound)
-{
-	Glyph* glyph = face->FindGlyph(0x777126);
-	ASSERT_EQ(nullptr, glyph);
 }

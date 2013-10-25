@@ -71,6 +71,11 @@ namespace ExLibris
 		m_Descender = a_Descender;
 	}
 
+	size_t FontFace::GetGlyphCount() const
+	{
+		return m_Glyphs.size();
+	}
+
 	bool FontFace::AddGlyph(Glyph* a_Glyph)
 	{
 		std::map<unsigned int, Glyph*>::iterator found = m_Glyphs.find(a_Glyph->index);
