@@ -54,7 +54,9 @@ public:
 		}
 		
 		glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);
-		m_TextHelper->AddText("<?xml xs:stuff=\"thangs;\" value='$blah;' e-mail='blah@foo.bat,die.com'\nfoo=`&*%bar^~` [blocky]>#yolo</xml>\nARRESTED DEVELOPMENT\njemig", glm::vec2(20.0f, 20.0f), color);
+		m_TextHelper->AddText("Debug text can be rendered without any external dependencies.", glm::vec2(20.0f, 20.0f), color);
+
+		m_TextHelper->AddText("ASCII table:\n\n !\"#$%&'()*+,-./0123456789:;<=>?\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n`abcdefghijklmnopqrstuvwxyz{|}~\xfe", glm::vec2(20.0f, 80.0f), color);
 
 		return true;
 	}
