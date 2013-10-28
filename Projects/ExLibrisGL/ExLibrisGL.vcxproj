@@ -83,7 +83,6 @@
     </ClCompile>
     <ClCompile Include="IFont.cpp" />
     <ClCompile Include="CurvePath.cpp" />
-    <ClCompile Include="IO\FileBuffer.cpp" />
     <ClCompile Include="Library.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineShape.cpp" />
@@ -112,8 +111,6 @@
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IFontLoader.h" />
     <ClInclude Include="IMeshVisitor.h" />
-    <ClInclude Include="IO\FileBuffer.h" />
-    <ClInclude Include="IO\Ownership.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="Library.h" />
     <ClInclude Include="Line.h" />
