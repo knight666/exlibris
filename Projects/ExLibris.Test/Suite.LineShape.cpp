@@ -35,6 +35,137 @@ TEST(LineShape, ClearPolygons)
 	EXPECT_EQ(0, shape.GetPolygonCount());
 }
 
+TEST(LineShape, FilledEmpty)
+{
+	LineShape shape;
+
+	MeshBuilder* builder = shape.BuildFilledMesh();
+	ASSERT_EQ(0, builder->GetVertexCount());
+}
+
+TEST(LineShape, FilledOneTriangle)
+{
+	LineShape shape;
+
+	Polygon polygon;
+	polygon.positions.push_back(glm::vec2(56.9f, -91.9f));
+	polygon.positions.push_back(glm::vec2(6.43f, 12.8f));
+	polygon.positions.push_back(glm::vec2(-11.9f, 14.5f));
+
+	shape.AddPolygon(polygon);
+
+	MeshBuilder* builder = shape.BuildFilledMesh();
+	ASSERT_EQ(3, builder->GetVertexCount());
+
+	MockMeshVisitor visitor;
+	builder->Accept(visitor);
+
+	EXPECT_VEC2_EQ(56.9f, -91.9f, visitor.triangles[0].a);
+	EXPECT_VEC2_EQ(-11.9f, 14.5f, visitor.triangles[0].b);
+	EXPECT_VEC2_EQ(6.43f, 12.8f, visitor.triangles[0].c);
+}
+
+TEST(LineShape, FilledTwoTriangles)
+{
+	LineShape shape;
+
+	Polygon polygon;
+	polygon.positions.push_back(glm::vec2(16.4f, 78.8f));
+	polygon.positions.push_back(glm::vec2(12.9f, 105.9f));
+	polygon.positions.push_back(glm::vec2(-25.9f, 56.0f));
+	polygon.positions.push_back(glm::vec2(-125.0f, 32.9f));
+
+	shape.AddPolygon(polygon);
+
+	MeshBuilder* builder = shape.BuildFilledMesh();
+	ASSERT_EQ(12, builder->GetVertexCount());
+
+	MockMeshVisitor visitor;
+	builder->Accept(visitor);
+
+	EXPECT_VEC2_EQ(58.82f, 11.0f, visitor.triangles[0].a);
+	EXPECT_VEC2_EQ(-125.0f, 32.9f, visitor.triangles[0].b);
+	EXPECT_VEC2_EQ(-25.9f, 56.0f, visitor.triangles[0].c);
+
+	EXPECT_VEC2_EQ(58.82f, 11.0f, visitor.triangles[1].a);
+	EXPECT_VEC2_EQ(-25.9f, 56.0f, visitor.triangles[1].b);
+	EXPECT_VEC2_EQ(16.4f, 78.8f, visitor.triangles[1].c);
+}
+
+TEST(LineShape, FilledTwoPolygons)
+{
+	LineShape shape;
+
+	Polygon polygon_first;
+	polygon_first.positions.push_back(glm::vec2(-20.0f, -10.0f));
+	polygon_first.positions.push_back(glm::vec2(30.0f, 10.0f));
+	polygon_first.positions.push_back(glm::vec2(30.0f, 55.0f));
+
+	Polygon polygon_second;
+	polygon_second.positions.push_back(glm::vec2(50.0f, -20.0f));
+	polygon_second.positions.push_back(glm::vec2(80.0f, 10.0f));
+	polygon_second.positions.push_back(glm::vec2(120.0f, 20.0f));
+
+	shape.AddPolygon(polygon_first);
+	shape.AddPolygon(polygon_second);
+
+	MeshBuilder* builder = shape.BuildFilledMesh();
+	ASSERT_EQ(6, builder->GetVertexCount());
+
+	MockMeshVisitor visitor;
+	builder->Accept(visitor);
+
+	EXPECT_VEC2_EQ(30.0f, 55.0f, visitor.triangles[0].a);
+	EXPECT_VEC2_EQ(30.0f, 10.0f, visitor.triangles[0].b);
+	EXPECT_VEC2_EQ(-20.0f, -10.0f, visitor.triangles[0].c);
+
+	EXPECT_VEC2_EQ(50.0f, -20.0f, visitor.triangles[1].a);
+	EXPECT_VEC2_EQ(80.0f, 10.0f, visitor.triangles[1].b);
+	EXPECT_VEC2_EQ(120.0f, 20.0f, visitor.triangles[1].c);
+}
+
+TEST(LineShape, FilledTwoPolygonsWithHole)
+{
+	// o ------------- o
+	// |               |
+	// |       o       |
+	// |     /   \     |
+	// |    /     \    |
+	// |   o ----- o   |
+	// |               |
+	// o --------------o
+
+	LineShape shape;
+
+	Polygon polygon_first;
+	polygon_first.positions.push_back(glm::vec2(-50.0f, -50.0f));
+	polygon_first.positions.push_back(glm::vec2(50.0f, -50.0f));
+	polygon_first.positions.push_back(glm::vec2(50.0f, 50.0f));
+	polygon_first.positions.push_back(glm::vec2(-50.0f, 50.0f));
+
+	Polygon polygon_second;
+	polygon_second.positions.push_back(glm::vec2(0.0f, -25.0f));
+	polygon_second.positions.push_back(glm::vec2(-25.0f, 25.0f));
+	polygon_second.positions.push_back(glm::vec2(25.0f, 25.0f));
+
+	shape.AddPolygon(polygon_first);
+	shape.AddPolygon(polygon_second);
+
+	MeshBuilder* builder = shape.BuildFilledMesh();
+	ASSERT_EQ(21, builder->GetVertexCount());
+
+	MockMeshVisitor visitor;
+	builder->Accept(visitor);
+
+	EXPECT_VEC2_EQ(50.0f, 50.0f, visitor.triangles[0].a);
+	EXPECT_VEC2_EQ(-25.0f, 25.0f, visitor.triangles[0].b);
+	EXPECT_VEC2_EQ(-50.0f, 50.0f, visitor.triangles[0].c);
+
+	EXPECT_VEC2_EQ(50.0f, 50.0f, visitor.triangles[6].a);
+	EXPECT_VEC2_EQ(25.0f, 25.0f, visitor.triangles[6].b);
+	EXPECT_VEC2_EQ(-25.0f, 25.0f, visitor.triangles[6].c);
+}
+
 TEST(LineShape, OutlineStraightLine)
 {
 	LineShape shape;
