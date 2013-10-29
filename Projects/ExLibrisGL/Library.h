@@ -48,6 +48,7 @@ namespace ExLibris
 		void AddLoader(IFontLoader* a_Loader);
 
 		IFont* LoadFont(const std::string& a_Path);
+		IFont* LoadFont(std::istream& a_Stream);
 
 		size_t GetFamilyCount() const;
 		Family* CreateFamily(const std::string& a_Name);

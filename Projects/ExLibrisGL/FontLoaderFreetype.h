@@ -43,7 +43,7 @@ namespace ExLibris
 
 		FT_Library GetLibrary() const;
 
-		IFont* LoadFont(const std::string& a_Path);
+		IFont* LoadFont(std::istream& a_Stream);
 	
 	private:
 
