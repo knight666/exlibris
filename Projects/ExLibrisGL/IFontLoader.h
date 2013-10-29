@@ -46,8 +46,8 @@ namespace ExLibris
 		virtual ~IFontLoader()
 		{
 		}
-	
-		virtual IFont* LoadFont(const std::string& a_Path) = 0;
+
+		virtual IFont* LoadFont(std::istream& a_Stream) = 0;
 
 	protected:
 
