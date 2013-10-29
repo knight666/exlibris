@@ -2,8 +2,6 @@
 
 #include "FreetypeErrors.h"
 
-#include <sstream>
-
 namespace ExLibris {
 namespace Freetype {
 
@@ -24,7 +22,38 @@ namespace Freetype {
 		// general
 
 		TRANSLATE_CASE(Ok, "no errors")
-		TRANSLATE_CASE(Cannot_Open_Resource, "cannot open resource")		TRANSLATE_CASE(Unknown_File_Format, "unknown file format")		TRANSLATE_CASE(Invalid_File_Format, "invalid file format")		TRANSLATE_CASE(Invalid_Version, "invalid FreeType version")		TRANSLATE_CASE(Lower_Module_Version, "module version is too low")		TRANSLATE_CASE(Invalid_Argument, "invalid argument")		TRANSLATE_CASE(Unimplemented_Feature, "feature not implemented")		TRANSLATE_CASE(Invalid_Table, "invalid table")		TRANSLATE_CASE(Invalid_Offset, "invalid offset in table")		TRANSLATE_CASE(Array_Too_Large, "could not allocate array: out of memory")		TRANSLATE_CASE(Missing_Module, "missing module")		TRANSLATE_CASE(Missing_Property, "missing property")		TRANSLATE_CASE(Invalid_Glyph_Index, "invalid glyph index")		TRANSLATE_CASE(Invalid_Character_Code, "invalid character code")		TRANSLATE_CASE(Cannot_Render_Glyph, "unsupported glyph image format")		TRANSLATE_CASE(Invalid_Outline, "invalid outline for glyph")		TRANSLATE_CASE(Invalid_Composite, "invalid composite glyph")		TRANSLATE_CASE(Too_Many_Hints, "too many hints for glyph")		TRANSLATE_CASE(Invalid_Pixel_Size, "invalid pixel size")		TRANSLATE_CASE(Invalid_Handle, "invalid object handle")		TRANSLATE_CASE(Invalid_Library_Handle, "invalid library handle")		TRANSLATE_CASE(Invalid_Driver_Handle, "invalid module handle")		TRANSLATE_CASE(Invalid_Face_Handle, "invalid face handle")		TRANSLATE_CASE(Invalid_Size_Handle, "invalid size handle")		TRANSLATE_CASE(Invalid_Slot_Handle, "invalid glyph slot handle")		TRANSLATE_CASE(Invalid_CharMap_Handle, "invalid charmap handle")		TRANSLATE_CASE(Invalid_Cache_Handle, "invalid cache manager handle")		TRANSLATE_CASE(Invalid_Stream_Handle, "invalid stream handle")		TRANSLATE_CASE(Too_Many_Drivers, "too many modules")		TRANSLATE_CASE(Too_Many_Extensions, "too many extensions")		TRANSLATE_CASE(Out_Of_Memory, "out of memory")		TRANSLATE_CASE(Unlisted_Object, "unlisted object")
+		TRANSLATE_CASE(Cannot_Open_Resource, "cannot open resource")
+		TRANSLATE_CASE(Unknown_File_Format, "unknown file format")
+		TRANSLATE_CASE(Invalid_File_Format, "invalid file format")
+		TRANSLATE_CASE(Invalid_Version, "invalid FreeType version")
+		TRANSLATE_CASE(Lower_Module_Version, "module version is too low")
+		TRANSLATE_CASE(Invalid_Argument, "invalid argument")
+		TRANSLATE_CASE(Unimplemented_Feature, "feature not implemented")
+		TRANSLATE_CASE(Invalid_Table, "invalid table")
+		TRANSLATE_CASE(Invalid_Offset, "invalid offset in table")
+		TRANSLATE_CASE(Array_Too_Large, "could not allocate array: out of memory")
+		TRANSLATE_CASE(Missing_Module, "missing module")
+		TRANSLATE_CASE(Missing_Property, "missing property")
+		TRANSLATE_CASE(Invalid_Glyph_Index, "invalid glyph index")
+		TRANSLATE_CASE(Invalid_Character_Code, "invalid character code")
+		TRANSLATE_CASE(Cannot_Render_Glyph, "unsupported glyph image format")
+		TRANSLATE_CASE(Invalid_Outline, "invalid outline for glyph")
+		TRANSLATE_CASE(Invalid_Composite, "invalid composite glyph")
+		TRANSLATE_CASE(Too_Many_Hints, "too many hints for glyph")
+		TRANSLATE_CASE(Invalid_Pixel_Size, "invalid pixel size")
+		TRANSLATE_CASE(Invalid_Handle, "invalid object handle")
+		TRANSLATE_CASE(Invalid_Library_Handle, "invalid library handle")
+		TRANSLATE_CASE(Invalid_Driver_Handle, "invalid module handle")
+		TRANSLATE_CASE(Invalid_Face_Handle, "invalid face handle")
+		TRANSLATE_CASE(Invalid_Size_Handle, "invalid size handle")
+		TRANSLATE_CASE(Invalid_Slot_Handle, "invalid glyph slot handle")
+		TRANSLATE_CASE(Invalid_CharMap_Handle, "invalid charmap handle")
+		TRANSLATE_CASE(Invalid_Cache_Handle, "invalid cache manager handle")
+		TRANSLATE_CASE(Invalid_Stream_Handle, "invalid stream handle")
+		TRANSLATE_CASE(Too_Many_Drivers, "too many modules")
+		TRANSLATE_CASE(Too_Many_Extensions, "too many extensions")
+		TRANSLATE_CASE(Out_Of_Memory, "out of memory")
+		TRANSLATE_CASE(Unlisted_Object, "unlisted object")
 		TRANSLATE_CASE(Cannot_Open_Stream, "cannot open stream")
 		TRANSLATE_CASE(Invalid_Stream_Seek, "invalid stream seek")
 		TRANSLATE_CASE(Invalid_Stream_Skip, "invalid stream skip")
@@ -81,7 +110,17 @@ namespace Freetype {
 		TRANSLATE_CASE(Missing_Bbx_Field, "`BBX' field missing")
 		TRANSLATE_CASE(Bbx_Too_Big, "`BBX' too big")
 		TRANSLATE_CASE(Corrupted_Font_Header, "Font header corrupted or missing fields")
-		TRANSLATE_CASE(Corrupted_Font_Glyphs, "Font glyphs corrupted or missing fields")		default:			{				std::stringstream ss;				ss << "Unknown error: (" << a_Error << ")";				return ss.str();			} break;		}
+		TRANSLATE_CASE(Corrupted_Font_Glyphs, "Font glyphs corrupted or missing fields")
+
+		default:
+			{
+				std::stringstream ss;
+				ss << "Unknown error: (" << a_Error << ")";
+
+				return ss.str();
+
+			} break;
+		}
 
 		return "";
 	}

@@ -26,6 +26,7 @@
 
 #include "FontLoaderFreetype.h"
 
+#include "FreetypeErrors.h"
 #include "Library.h"
 
 namespace ExLibris
@@ -33,14 +34,25 @@ namespace ExLibris
 
 	FontLoaderFreetype::FontLoaderFreetype(Library* a_Library)
 		: IFontLoader(a_Library)
-		, m_Error(0)
 	{
-		FT_Init_FreeType(&m_FTLibrary);
+		FT_Error errors = 0;
+		
+		errors = FT_Init_FreeType(&m_FTLibrary);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("FontLoaderFreetype::FontLoaderFreetype", errors);
+		}
 	}
 
 	FontLoaderFreetype::~FontLoaderFreetype()
 	{
-		FT_Done_FreeType(m_FTLibrary);
+		FT_Error errors = 0;
+
+		errors = FT_Done_FreeType(m_FTLibrary);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("FontLoaderFreetype::~FontLoaderFreetype", errors);
+		}
 	}
 
 	FT_Library FontLoaderFreetype::GetLibrary() const
@@ -62,16 +74,29 @@ namespace ExLibris
 		FT_Byte* font_file_data = new FT_Byte[(unsigned int)font_file_size];
 		a_Stream.read((char*)font_file_data, font_file_size);
 
+		FT_Error errors = 0;
+
 		FT_Face font_loaded = nullptr;
-		m_Error = FT_New_Memory_Face(m_FTLibrary, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
-		if (m_Error != 0)
+		errors = FT_New_Memory_Face(m_FTLibrary, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
+		if (errors != FT_Err_Ok)
 		{
+			EXL_FT_THROW("FontLoaderFreetype::LoadFont", errors);
+
 			return nullptr;
 		}
 
-		m_Error = FT_Select_Charmap(font_loaded, FT_ENCODING_UNICODE);
-		if (m_Error != 0 || font_loaded->charmap == nullptr)
+		errors = FT_Select_Charmap(font_loaded, FT_ENCODING_UNICODE);
+		if (errors != FT_Err_Ok)
 		{
+			EXL_FT_THROW("FontLoaderFreetype::LoadFont", errors);
+
+			return nullptr;
+		}
+
+		if (font_loaded->charmap == nullptr)
+		{
+			EXL_THROW("FontLoaderFreetype::LoadFont", "Font does not have a unicode charmap.");
+
 			return nullptr;
 		}
 

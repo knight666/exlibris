@@ -47,7 +47,6 @@ namespace ExLibris
 	
 	private:
 
-		FT_Error m_Error;
 		FT_Library m_FTLibrary;
 	
 	}; // class FontLoaderFreetype
