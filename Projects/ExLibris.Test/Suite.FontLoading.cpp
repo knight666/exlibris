@@ -1,5 +1,6 @@
 #include "ExLibris.Test.PCH.h"
 
+#include <Exception.h>
 #include <Family.h>
 #include <FontFace.h>
 #include <FontLoaderFreetype.h>
@@ -18,6 +19,18 @@ TEST(FontLoaderFreetype, LoadFont)
 	EXPECT_NE(nullptr, font_loaded);
 
 	EXPECT_STREQ("Roboto", font_loaded->GetFamily()->GetName().c_str());
+}
+
+TEST(FontLoaderFreetype, LoadInvalidFile)
+{
+	Library lib;
+	FontLoaderFreetype* loader = new FontLoaderFreetype(&lib);
+
+	std::fstream in_stream("Tests/hello.txt", std::ios::in | std::ios::binary);
+
+	EXPECT_THROW({
+		IFont* font_loaded = loader->LoadFont(in_stream);
+	}, Exception);
 }
 
 TEST(FontLoaderFreetype, LoadFontFileNotFound)

@@ -29,6 +29,7 @@
 #include "CurvePath.h"
 #include "FontFace.h"
 #include "FreetypeConversion.h"
+#include "FreetypeErrors.h"
 #include "Glyph.h"
 #include "PolygonShape.h"
 
@@ -145,8 +146,10 @@ namespace ExLibris
 		FT_Error errors = 0;
 
 		errors = FT_Set_Char_Size(m_Font, 0, Fixed26Dot6::ToFixed(a_Options.size), 0, 96);
-		if (errors != 0)
+		if (errors != FT_Err_Ok)
 		{
+			EXL_FT_THROW("FontFreetype::CreateFace", errors);
+
 			return nullptr;
 		}
 
@@ -163,7 +166,7 @@ namespace ExLibris
 		do
 		{
 			errors = FT_Load_Glyph(m_Font, codepoint, FT_LOAD_DEFAULT);
-			if (errors == 0)
+			if (errors == FT_Err_Ok)
 			{
 				Glyph* glyph = new Glyph;
 				glyph->index = (unsigned int)codepoint;
@@ -206,7 +209,7 @@ namespace ExLibris
 						FT_Vector kerning_fixed;
 
 						errors = FT_Get_Kerning(m_Font, glyph_left->index, glyph_right->index, FT_KERNING_DEFAULT, &kerning_fixed);
-						if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+						if (errors == FT_Err_Ok && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
 						{
 							glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
 
@@ -214,7 +217,7 @@ namespace ExLibris
 						}
 
 						errors = FT_Get_Kerning(m_Font, glyph_right->index, glyph_left->index, FT_KERNING_DEFAULT, &kerning_fixed);
-						if (errors == 0 && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
+						if (errors == FT_Err_Ok && (kerning_fixed.x != 0 || kerning_fixed.y != 0))
 						{
 							glm::vec2 kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
 
@@ -250,7 +253,7 @@ namespace ExLibris
 
 		FT_BBox bounding_box;
 		errors = FT_Outline_Get_BBox(&a_Slot->outline, &bounding_box);
-		if (errors == 0)
+		if (errors == FT_Err_Ok)
 		{
 			a_Glyph->metrics->bounding_box.minimum.x = Fixed26Dot6::ToFloat(bounding_box.xMin);
 			a_Glyph->metrics->bounding_box.minimum.y = Fixed26Dot6::ToFloat(bounding_box.yMin);
@@ -266,8 +269,10 @@ namespace ExLibris
 		FT_Error errors = 0;
 
 		errors = FT_Render_Glyph(a_Slot, FT_RENDER_MODE_NORMAL);
-		if (errors != 0)
+		if (errors != FT_Err_Ok)
 		{
+			EXL_FT_THROW("FontFreetype::_LoadBitmapColor", errors);
+
 			return false;
 		}
 
@@ -319,8 +324,10 @@ namespace ExLibris
 		FT_Error errors = 0;
 
 		errors = FT_Render_Glyph(a_Slot, FT_RENDER_MODE_MONO);
-		if (errors != 0)
+		if (errors != FT_Err_Ok)
 		{
+			EXL_FT_THROW("FontFreetype::_LoadBitmapMono", errors);
+
 			return false;
 		}
 
@@ -395,8 +402,10 @@ namespace ExLibris
 		a_Glyph->outline = new CurvePath;
 
 		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph->outline);
-		if (errors != 0)
+		if (errors != FT_Err_Ok)
 		{
+			EXL_FT_THROW("FontFreetype::_LoadOutline", errors);
+
 			return false;
 		}
 

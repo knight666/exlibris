@@ -24,11 +24,17 @@
 
 #pragma once
 
+#include <sstream>
 #include <ft2build.h>
 
+#include "Exception.h"
+
 #define EXL_FT_THROW(_module, _error) { \
-	std::string what = "FreeType error: " + ExLibris::Freetype::TranslateError((_error)) + " [" (_error) "]"; \
-	EXL_THROW(_module, what.c_str()); \
+	std::stringstream what; \
+	what << "Error: "; \
+	what << ExLibris::Freetype::TranslateError((_error)); \
+	what << " [" << (_error) << "]"; \
+	EXL_THROW(_module, what.str().c_str()); \
 }
 
 namespace ExLibris {
