@@ -73,20 +73,38 @@ namespace ExLibris
 
 	IFont* Library::LoadFont(const std::string& a_Path)
 	{
-		IFont* font_loaded = nullptr;
+		std::fstream file_stream(a_Path, std::ios::in | std::ios::binary);
+		if (!file_stream.is_open())
+		{
+			return nullptr;
+		}
+
+		IFont* result = LoadFont(file_stream);
+
+		file_stream.close();
+
+		return result;
+	}
+
+	IFont* Library::LoadFont(std::istream& a_Stream)
+	{
+		if (m_Loaders.size() == 0)
+		{
+			return nullptr;
+		}
 
 		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
 		{
 			IFontLoader* loader = *loader_it;
 
-			font_loaded = loader->LoadFont(a_Path);
-			if (font_loaded != nullptr)
+			IFont* loaded = loader->LoadFont(a_Stream);
+			if (loaded != nullptr)
 			{
-				break;
+				return loaded;
 			}
 		}
 
-		return font_loaded;
+		return nullptr;
 	}
 
 	size_t Library::GetFamilyCount() const

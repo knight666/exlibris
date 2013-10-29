@@ -48,24 +48,21 @@ namespace ExLibris
 		return m_FTLibrary;
 	}
 
-	IFont* FontLoaderFreetype::LoadFont(const std::string& a_Path)
+	IFont* FontLoaderFreetype::LoadFont(std::istream& a_Stream)
 	{
-		std::fstream font_file(a_Path, std::fstream::in | std::fstream::binary);
-		if (!font_file.is_open())
+		a_Stream.seekg(0, std::ios_base::end);
+		std::streamoff font_file_size = a_Stream.tellg();
+		a_Stream.seekg(0, std::ios_base::beg);
+
+		if (font_file_size <= 0)
 		{
 			return nullptr;
 		}
 
-		font_file.seekg(0, std::ios_base::end);
-		std::streamoff font_file_size = font_file.tellg();
-		font_file.seekg(0, std::ios_base::beg);
-
 		FT_Byte* font_file_data = new FT_Byte[(unsigned int)font_file_size];
-		font_file.read((char*)font_file_data, font_file_size);
+		a_Stream.read((char*)font_file_data, font_file_size);
 
-		font_file.close();
-
-		FT_Face font_loaded;
+		FT_Face font_loaded = nullptr;
 		m_Error = FT_New_Memory_Face(m_FTLibrary, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
 		if (m_Error != 0)
 		{

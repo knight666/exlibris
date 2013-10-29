@@ -12,7 +12,9 @@ TEST(FontLoaderFreetype, LoadFont)
 	Library lib;
 	FontLoaderFreetype* loader = new FontLoaderFreetype(&lib);
 
-	IFont* font_loaded = loader->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+	std::fstream in_stream("Fonts/Roboto/Roboto-Regular.ttf", std::ios::in | std::ios::binary);
+
+	IFont* font_loaded = loader->LoadFont(in_stream);
 	EXPECT_NE(nullptr, font_loaded);
 
 	EXPECT_STREQ("Roboto", font_loaded->GetFamily()->GetName().c_str());
@@ -23,7 +25,9 @@ TEST(FontLoaderFreetype, LoadFontFileNotFound)
 	Library lib;
 	FontLoaderFreetype* loader = new FontLoaderFreetype(&lib);
 
-	IFont* font_loaded = loader->LoadFont("Fonts/Arial.ttf");
+	std::fstream in_stream("Fonts/Arial.ttf", std::ios::in | std::ios::binary);
+
+	IFont* font_loaded = loader->LoadFont(in_stream);
 	EXPECT_EQ(nullptr, font_loaded);
 }
 
