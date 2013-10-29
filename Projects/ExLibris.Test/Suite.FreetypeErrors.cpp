@@ -11,5 +11,5 @@ TEST(FreetypeErrors, TranslateOutOfMemory)
 
 TEST(FreetypeErrors, TranslateUnknown)
 {
-	EXPECT_STREQ("Unknown error: (-1)", Freetype::TranslateError(-1).c_str());
+	EXPECT_STREQ("Unknown", Freetype::TranslateError(-1).c_str());
 }

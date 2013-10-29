@@ -24,9 +24,8 @@
 
 #pragma once
 
-#include <vector>
-
 #include "FontFreetype.h"
+#include "FreetypeErrors.h"
 #include "IFontLoader.h"
 
 namespace ExLibris
