@@ -89,7 +89,6 @@
     <ClCompile Include="LineShape.cpp" />
     <ClCompile Include="MeshBuilder.cpp" />
     <ClCompile Include="Polygon.cpp" />
-    <ClCompile Include="PolygonShape.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="Triangle.cpp" />
@@ -119,7 +118,6 @@
     <ClInclude Include="LineMeshOptions.h" />
     <ClInclude Include="LineShape.h" />
     <ClInclude Include="MeshBuilder.h" />
-    <ClInclude Include="PolygonShape.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="SizePolicy.h" />
