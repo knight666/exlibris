@@ -29,7 +29,6 @@
 #include "CurvePath.h"
 #include "FontFace.h"
 #include "FreetypeConversion.h"
-#include "FreetypeErrors.h"
 #include "Glyph.h"
 #include "PolygonShape.h"
 

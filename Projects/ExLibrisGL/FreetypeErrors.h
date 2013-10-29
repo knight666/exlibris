@@ -25,7 +25,9 @@
 #pragma once
 
 #include <sstream>
+
 #include <ft2build.h>
+#include <freetype/freetype.h>
 
 #include "Exception.h"
 

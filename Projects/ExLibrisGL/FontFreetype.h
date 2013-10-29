@@ -24,9 +24,7 @@
 
 #pragma once
 
-#include <ft2build.h>
-#include <freetype/freetype.h>
-
+#include "FreetypeErrors.h"
 #include "IFont.h"
 
 namespace ExLibris

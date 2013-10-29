@@ -114,10 +114,7 @@ namespace Freetype {
 
 		default:
 			{
-				std::stringstream ss;
-				ss << "Unknown error: (" << a_Error << ")";
-
-				return ss.str();
+				return "Unknown";
 
 			} break;
 		}
