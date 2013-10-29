@@ -77,7 +77,6 @@
     <ClCompile Include="Suite.LineShape.cpp" />
     <ClCompile Include="Suite.MeshBuilder.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
-    <ClCompile Include="Suite.PolygonShape.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
