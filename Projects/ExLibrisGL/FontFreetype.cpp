@@ -30,7 +30,6 @@
 #include "FontFace.h"
 #include "FreetypeConversion.h"
 #include "Glyph.h"
-#include "PolygonShape.h"
 
 namespace ExLibris
 {
