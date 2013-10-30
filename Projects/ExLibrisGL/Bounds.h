@@ -39,8 +39,10 @@ namespace ExLibris
 		Bounds(const Bounds& a_Other);
 
 		const glm::vec2& GetMinimum() const;
+		void SetMinimum(const glm::vec2& a_Minimum);
 
 		const glm::vec2& GetMaximum() const;
+		void SetMaximum(const glm::vec2& a_Maximum);
 
 		float GetWidth() const;
 		float GetHeight() const;
