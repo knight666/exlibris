@@ -45,7 +45,6 @@ namespace ExLibris
 		: m_Minimum(a_Other.GetMinimum())
 		, m_Maximum(a_Other.GetMaximum())
 	{
-		Validate();
 	}
 
 	const glm::vec2& Bounds::GetMinimum() const
@@ -60,80 +59,32 @@ namespace ExLibris
 
 	float Bounds::GetWidth() const
 	{
-		if (IsValid())
-		{
-			return std::fabsf(m_Maximum.x - m_Minimum.x);
-		}
-		else
-		{
-			return 0.0f;
-		}
+		return IsValid() ? glm::abs(m_Maximum.x - m_Minimum.x) : 0.0f;
 	}
 
 	float Bounds::GetHeight() const
 	{
-		if (IsValid())
-		{
-			return std::fabsf(m_Maximum.y - m_Minimum.y);
-		}
-		else
-		{
-			return 0.0f;
-		}
+		return IsValid() ? glm::abs(m_Maximum.y - m_Minimum.y) : 0.0f;
 	}
 
 	glm::vec2 Bounds::GetDimensions() const
 	{
-		if (IsValid())
-		{
-			return glm::vec2(
-				std::fabsf(m_Maximum.x - m_Minimum.x),
-				std::fabsf(m_Maximum.y - m_Minimum.y)
-			);
-		}
-		else
-		{
-			return glm::vec2(0.0f, 0.0f);
-		}
+		return IsValid() ? glm::abs(m_Maximum - m_Minimum) : glm::vec2(0.0f, 0.0f);
 	}
 
 	float Bounds::GetHalfWidth() const
 	{
-		if (IsValid())
-		{
-			return (std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f);
-		}
-		else
-		{
-			return 0.0f;
-		}
+		return IsValid() ? (glm::abs(m_Maximum.x - m_Minimum.x) / 2.0f) : 0.0f;
 	}
 
 	float Bounds::GetHalfHeight() const
 	{
-		if (IsValid())
-		{
-			return (std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f);
-		}
-		else
-		{
-			return 0.0f;
-		}
+		return IsValid() ? (glm::abs(m_Maximum.y - m_Minimum.y) / 2.0f) : 0.0f;
 	}
 
 	glm::vec2 Bounds::GetHalfDimensions() const
 	{
-		if (IsValid())
-		{
-			return glm::vec2(
-				std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f,
-				std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f
-			);
-		}
-		else
-		{
-			return glm::vec2(0.0f, 0.0f);
-		}
+		return IsValid() ? (glm::abs(m_Maximum - m_Minimum) / 2.0f) : glm::vec2(0.0f, 0.0f);
 	}
 
 	glm::vec2 Bounds::GetCenter() const
@@ -153,8 +104,6 @@ namespace ExLibris
 	{
 		m_Minimum = a_Other.GetMinimum();
 		m_Maximum = a_Other.GetMaximum();
-
-		Validate();
 
 		return *this;
 	}
