@@ -60,6 +60,15 @@ TEST(Bounds, Copy)
 	EXPECT_VEC2_EQ(16.9f, 107.88f, copy.GetMaximum());
 }
 
+TEST(Bounds, CopyInvalid)
+{
+	Bounds bounds;
+
+	Bounds copy(bounds);
+
+	EXPECT_FALSE(copy.IsValid());
+}
+
 TEST(Bounds, Assignment)
 {
 	Bounds bounds(
@@ -71,6 +80,15 @@ TEST(Bounds, Assignment)
 
 	EXPECT_VEC2_EQ(-117.8f, 15.9f, copy.GetMinimum());
 	EXPECT_VEC2_EQ(22.8f, 67.83f, copy.GetMaximum());
+}
+
+TEST(Bounds, AssignmentInvalid)
+{
+	Bounds bounds;
+
+	Bounds copy = bounds;
+
+	EXPECT_FALSE(copy.IsValid());
 }
 
 TEST(Bounds, GetDimensions)
