@@ -50,6 +50,8 @@ namespace ExLibris
 		float GetHalfHeight() const;
 		glm::vec2 GetHalfDimensions() const;
 
+		glm::vec2 GetCenter() const;
+
 		Bounds& operator = (const Bounds& a_Other);
 
 		bool IsValid() const;
