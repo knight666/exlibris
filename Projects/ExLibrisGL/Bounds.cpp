@@ -58,6 +58,42 @@ namespace ExLibris
 		return m_Maximum;
 	}
 
+	float Bounds::GetWidth() const
+	{
+		return std::fabsf(m_Maximum.x - m_Minimum.x);
+	}
+
+	float Bounds::GetHeight() const
+	{
+		return std::fabsf(m_Maximum.y - m_Minimum.y);
+	}
+
+	glm::vec2 Bounds::GetDimensions() const
+	{
+		return glm::vec2(
+			std::fabsf(m_Maximum.x - m_Minimum.x),
+			std::fabsf(m_Maximum.y - m_Minimum.y)
+		);
+	}
+
+	float Bounds::GetHalfWidth() const
+	{
+		return (std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f);
+	}
+
+	float Bounds::GetHalfHeight() const
+	{
+		return (std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f);
+	}
+
+	glm::vec2 Bounds::GetHalfDimensions() const
+	{
+		return glm::vec2(
+			std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f,
+			std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f
+		);
+	}
+
 	Bounds& Bounds::operator = (const Bounds& a_Other)
 	{
 		m_Minimum = a_Other.GetMinimum();

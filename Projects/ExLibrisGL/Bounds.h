@@ -42,6 +42,14 @@ namespace ExLibris
 
 		const glm::vec2& GetMaximum() const;
 
+		float GetWidth() const;
+		float GetHeight() const;
+		glm::vec2 GetDimensions() const;
+
+		float GetHalfWidth() const;
+		float GetHalfHeight() const;
+		glm::vec2 GetHalfDimensions() const;
+
 		Bounds& operator = (const Bounds& a_Other);
 
 		bool IsValid() const;
