@@ -102,6 +102,18 @@ namespace ExLibris
 		return IsValid() ? glm::abs(m_Maximum - m_Minimum) : glm::vec2(0.0f, 0.0f);
 	}
 
+	void Bounds::SetDimensions(const glm::vec2& a_Dimensions)
+	{
+		if (!IsValid())
+		{
+			m_Minimum = glm::vec2(0.0f, 0.0f);
+		}
+
+		m_Maximum = m_Minimum + a_Dimensions;
+
+		Validate();
+	}
+
 	float Bounds::GetHalfWidth() const
 	{
 		return IsValid() ? (glm::abs(m_Maximum.x - m_Minimum.x) / 2.0f) : 0.0f;
@@ -115,6 +127,16 @@ namespace ExLibris
 	glm::vec2 Bounds::GetHalfDimensions() const
 	{
 		return IsValid() ? (glm::abs(m_Maximum - m_Minimum) / 2.0f) : glm::vec2(0.0f, 0.0f);
+	}
+
+	void Bounds::SetHalfDimensions(const glm::vec2& a_HalfDimensions)
+	{
+		glm::vec2 center = GetCenter();
+
+		m_Minimum = center - a_HalfDimensions;
+		m_Maximum = center + a_HalfDimensions;
+
+		Validate();
 	}
 
 	glm::vec2 Bounds::GetCenter() const
