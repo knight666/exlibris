@@ -36,12 +36,17 @@ namespace ExLibris
 	
 		Bounds();
 		Bounds(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum);
+		Bounds(const Bounds& a_Other);
 
 		const glm::vec2& GetMinimum() const;
 
 		const glm::vec2& GetMaximum() const;
 
+		Bounds& operator = (const Bounds& a_Other);
+
 		bool IsValid() const;
+		void Invalidate();
+		void Validate();
 	
 	private:
 

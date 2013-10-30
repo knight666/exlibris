@@ -30,15 +30,22 @@ namespace ExLibris
 {
 
 	Bounds::Bounds()
-		: m_Minimum(std::numeric_limits<float>::max(), std::numeric_limits<float>::max())
-		, m_Maximum(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max())
 	{
+		Invalidate();
 	}
 
 	Bounds::Bounds(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum)
 		: m_Minimum(a_Minimum)
 		, m_Maximum(a_Maximum)
 	{
+		Validate();
+	}
+
+	Bounds::Bounds(const Bounds& a_Other)
+		: m_Minimum(a_Other.GetMinimum())
+		, m_Maximum(a_Other.GetMaximum())
+	{
+		Validate();
 	}
 
 	const glm::vec2& Bounds::GetMinimum() const
@@ -51,9 +58,45 @@ namespace ExLibris
 		return m_Maximum;
 	}
 
+	Bounds& Bounds::operator = (const Bounds& a_Other)
+	{
+		m_Minimum = a_Other.GetMinimum();
+		m_Maximum = a_Other.GetMaximum();
+
+		Validate();
+
+		return *this;
+	}
+
 	bool Bounds::IsValid() const
 	{
 		return ((m_Minimum.x <= m_Maximum.x) && (m_Minimum.y <= m_Maximum.y));
+	}
+
+	void Bounds::Invalidate()
+	{
+		m_Minimum.x = std::numeric_limits<float>::max();
+		m_Minimum.y = std::numeric_limits<float>::max();
+
+		m_Maximum.x = -std::numeric_limits<float>::max();
+		m_Maximum.y = -std::numeric_limits<float>::max();
+	}
+
+	void Bounds::Validate()
+	{
+		if (m_Minimum.x > m_Maximum.x)
+		{
+			float swap = m_Maximum.x;
+			m_Maximum.x = m_Minimum.x;
+			m_Minimum.x = swap;
+		}
+
+		if (m_Minimum.y > m_Maximum.y)
+		{
+			float swap = m_Maximum.y;
+			m_Maximum.y = m_Minimum.y;
+			m_Minimum.y = swap;
+		}
 	}
 
 }; // namespace ExLibris
