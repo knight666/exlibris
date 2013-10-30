@@ -72,3 +72,18 @@ TEST(Bounds, Assignment)
 	EXPECT_VEC2_EQ(-117.8f, 15.9f, copy.GetMinimum());
 	EXPECT_VEC2_EQ(22.8f, 67.83f, copy.GetMaximum());
 }
+
+TEST(Bounds, Dimensions)
+{
+	Bounds bounds(
+		glm::vec2(17.98f, -99.12f),
+		glm::vec2(108.72f, 15.8f)
+	);
+
+	EXPECT_FLOAT_EQ(108.72f - 17.98f, bounds.GetWidth());
+	EXPECT_FLOAT_EQ(15.8f - -99.12f, bounds.GetHeight());
+	EXPECT_VEC2_EQ((108.72f - 17.98f), (15.8f - -99.12f), bounds.GetDimensions());
+	EXPECT_FLOAT_EQ((108.72f - 17.98f) / 2.0f, bounds.GetHalfWidth());
+	EXPECT_FLOAT_EQ((15.8f - -99.12f) / 2.0f, bounds.GetHalfHeight());
+	EXPECT_VEC2_EQ((108.72f - 17.98f) / 2.0f, (15.8f - -99.12f) / 2.0f, bounds.GetHalfDimensions());
+}
