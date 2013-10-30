@@ -51,6 +51,7 @@ namespace ExLibris
 		glm::vec2 GetHalfDimensions() const;
 
 		glm::vec2 GetCenter() const;
+		void SetCenter(const glm::vec2& a_Center);
 
 		Bounds& operator = (const Bounds& a_Other);
 

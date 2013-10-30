@@ -73,22 +73,117 @@ TEST(Bounds, Assignment)
 	EXPECT_VEC2_EQ(22.8f, 67.83f, copy.GetMaximum());
 }
 
-TEST(Bounds, Dimensions)
+TEST(Bounds, GetDimensions)
 {
 	Bounds bounds(
 		glm::vec2(17.98f, -99.12f),
 		glm::vec2(108.72f, 15.8f)
 	);
 
-	EXPECT_FLOAT_EQ(108.72f - 17.98f, bounds.GetWidth());
-	EXPECT_FLOAT_EQ(15.8f - -99.12f, bounds.GetHeight());
-	EXPECT_VEC2_EQ((108.72f - 17.98f), (15.8f - -99.12f), bounds.GetDimensions());
-	EXPECT_FLOAT_EQ((108.72f - 17.98f) / 2.0f, bounds.GetHalfWidth());
-	EXPECT_FLOAT_EQ((15.8f - -99.12f) / 2.0f, bounds.GetHalfHeight());
-	EXPECT_VEC2_EQ((108.72f - 17.98f) / 2.0f, (15.8f - -99.12f) / 2.0f, bounds.GetHalfDimensions());
+	EXPECT_VEC2_EQ(
+		(108.72f - 17.98f),
+		(15.8f - -99.12f),
+		bounds.GetDimensions()
+	);
 }
 
-TEST(Bounds, Center)
+TEST(Bounds, GetDimensionsInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_VEC2_EQ(0.0f, 0.0f, bounds.GetDimensions());
+}
+
+TEST(Bounds, GetWidth)
+{
+	Bounds bounds(
+		glm::vec2(15.89f, -5.8f),
+		glm::vec2(115.8f, 881.98f)
+	);
+
+	EXPECT_FLOAT_EQ((115.8f - 15.89f), bounds.GetWidth());
+}
+
+TEST(Bounds, GetWidthInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_FLOAT_EQ(0.0f, bounds.GetWidth());
+}
+
+TEST(Bounds, GetHeight)
+{
+	Bounds bounds(
+		glm::vec2(22.9f, -87.7f),
+		glm::vec2(18.17f, 9.8765f)
+	);
+
+	EXPECT_FLOAT_EQ((87.7f + 9.8765f), bounds.GetHeight());
+}
+
+TEST(Bounds, GetHeightInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_FLOAT_EQ(0.0f, bounds.GetHeight());
+}
+
+TEST(Bounds, GetHalfDimensions)
+{
+	Bounds bounds(
+		glm::vec2(6.9f, 12.78f),
+		glm::vec2(16.87f, 29.9f)
+	);
+
+	EXPECT_VEC2_EQ(
+		(16.87f - 6.9f) / 2.0f,
+		(29.9f - 12.78f) / 2.0f,
+		bounds.GetHalfDimensions()
+	);
+}
+
+TEST(Bounds, GetHalfDimensionsInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_VEC2_EQ(0.0f, 0.0f, bounds.GetHalfDimensions());
+}
+
+TEST(Bounds, GetHalfWidth)
+{
+	Bounds bounds(
+		glm::vec2(16.87f, 115.8f),
+		glm::vec2(-38.8f, 108.9f)
+	);
+
+	EXPECT_FLOAT_EQ((38.8f + 16.87f) / 2.0f, bounds.GetHalfWidth());
+}
+
+TEST(Bounds, GetHalfWidthInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_FLOAT_EQ(0.0f, bounds.GetHalfWidth());
+}
+
+TEST(Bounds, GetHalfHeight)
+{
+	Bounds bounds(
+		glm::vec2(33.9f, 88.8f),
+		glm::vec2(16.87f, 18.8f)
+	);
+
+	EXPECT_FLOAT_EQ((88.8f - 18.8f) / 2.0f, bounds.GetHalfHeight());
+}
+
+TEST(Bounds, GetHalfHeightInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_FLOAT_EQ(0.0f, bounds.GetHalfHeight());
+}
+
+TEST(Bounds, GetCenter)
 {
 	Bounds bounds(
 		glm::vec2(22.87f, 25.87f),
@@ -100,4 +195,34 @@ TEST(Bounds, Center)
 		25.87f + (100.9f - 25.87f) / 2.0f,
 		bounds.GetCenter()
 	);
+}
+
+TEST(Bounds, GetCenterInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_VEC2_EQ(0.0f, 0.0f, bounds.GetCenter());
+}
+
+TEST(Bounds, SetCenter)
+{
+	Bounds bounds(
+		glm::vec2(100.0f, 100.0f),
+		glm::vec2(250.0f, 250.0f)
+	);
+
+	bounds.SetCenter(glm::vec2(10.0f, 20.0f));
+
+	EXPECT_VEC2_EQ(-65.0f, -55.0f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(85.0f, 95.0f, bounds.GetMaximum());
+}
+
+TEST(Bounds, SetCenterInvalid)
+{
+	Bounds bounds;
+
+	bounds.SetCenter(glm::vec2(56.4f, -69.8f));
+
+	EXPECT_VEC2_EQ(56.4f, -69.8f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(56.4f, -69.8f, bounds.GetMaximum());
 }
