@@ -94,6 +94,11 @@ namespace ExLibris
 		);
 	}
 
+	glm::vec2 Bounds::GetCenter() const
+	{
+		return m_Minimum + GetHalfDimensions();
+	}
+
 	Bounds& Bounds::operator = (const Bounds& a_Other)
 	{
 		m_Minimum = a_Other.GetMinimum();

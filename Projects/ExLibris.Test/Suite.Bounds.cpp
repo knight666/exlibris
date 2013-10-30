@@ -87,3 +87,17 @@ TEST(Bounds, Dimensions)
 	EXPECT_FLOAT_EQ((15.8f - -99.12f) / 2.0f, bounds.GetHalfHeight());
 	EXPECT_VEC2_EQ((108.72f - 17.98f) / 2.0f, (15.8f - -99.12f) / 2.0f, bounds.GetHalfDimensions());
 }
+
+TEST(Bounds, Center)
+{
+	Bounds bounds(
+		glm::vec2(22.87f, 25.87f),
+		glm::vec2(45.98f, 100.9f)
+	);
+
+	EXPECT_VEC2_EQ(
+		22.87f + (45.98f - 22.87f) / 2.0f,
+		25.87f + (100.9f - 25.87f) / 2.0f,
+		bounds.GetCenter()
+	);
+}
