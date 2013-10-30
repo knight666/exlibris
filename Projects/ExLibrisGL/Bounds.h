@@ -45,7 +45,10 @@ namespace ExLibris
 		void SetMaximum(const glm::vec2& a_Maximum);
 
 		float GetWidth() const;
+		void SetWidth(float a_Width);
+
 		float GetHeight() const;
+		void SetHeight(float a_Height);
 
 		glm::vec2 GetDimensions() const;
 		void SetDimensions(const glm::vec2& a_Dimensions);

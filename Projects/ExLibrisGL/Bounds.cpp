@@ -92,9 +92,43 @@ namespace ExLibris
 		return IsValid() ? glm::abs(m_Maximum.x - m_Minimum.x) : 0.0f;
 	}
 
+	void Bounds::SetWidth(float a_Width)
+	{
+		if (m_Minimum.x > m_Maximum.x)
+		{
+			m_Minimum.x = 0.0f;
+		}
+
+		m_Maximum.x = m_Minimum.x + a_Width;
+
+		if (m_Minimum.x > m_Maximum.x)
+		{
+			float swap = m_Maximum.x;
+			m_Maximum.x = m_Minimum.x;
+			m_Minimum.x = swap;
+		}
+	}
+
 	float Bounds::GetHeight() const
 	{
 		return IsValid() ? glm::abs(m_Maximum.y - m_Minimum.y) : 0.0f;
+	}
+
+	void Bounds::SetHeight(float a_Height)
+	{
+		if (m_Minimum.y > m_Maximum.y)
+		{
+			m_Minimum.y = 0.0f;
+		}
+
+		m_Maximum.y = m_Minimum.y + a_Height;
+
+		if (m_Minimum.y > m_Maximum.y)
+		{
+			float swap = m_Maximum.y;
+			m_Maximum.y = m_Minimum.y;
+			m_Minimum.y = swap;
+		}
 	}
 
 	glm::vec2 Bounds::GetDimensions() const
