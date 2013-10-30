@@ -52,9 +52,39 @@ namespace ExLibris
 		return m_Minimum;
 	}
 
+	void Bounds::SetMinimum(const glm::vec2& a_Minimum)
+	{
+		if (IsValid())
+		{
+			m_Minimum = a_Minimum;
+
+			Validate();
+		}
+		else
+		{
+			m_Minimum = a_Minimum;
+			m_Maximum = a_Minimum;
+		}
+	}
+
 	const glm::vec2& Bounds::GetMaximum() const
 	{
 		return m_Maximum;
+	}
+
+	void Bounds::SetMaximum(const glm::vec2& a_Maximum)
+	{
+		if (IsValid())
+		{
+			m_Maximum = a_Maximum;
+
+			Validate();
+		}
+		else
+		{
+			m_Minimum = a_Maximum;
+			m_Maximum = a_Maximum;
+		}
 	}
 
 	float Bounds::GetWidth() const

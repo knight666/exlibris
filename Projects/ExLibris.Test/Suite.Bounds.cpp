@@ -47,6 +47,112 @@ TEST(Bounds, ConstructSwappedY)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
+TEST(Bounds, SetMinimum)
+{
+	Bounds bounds(
+		glm::vec2(-98.8f, 99.8f),
+		glm::vec2(12.8f, 812.9f)
+	);
+
+	bounds.SetMinimum(glm::vec2(-107.2f, 8.87f));
+
+	EXPECT_VEC2_EQ(-107.2f, 8.87f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(12.8f, 812.9f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMinimumSwappedX)
+{
+	Bounds bounds(
+		glm::vec2(23.87f, 1.87f),
+		glm::vec2(87.7f, 117.8f)
+	);
+
+	bounds.SetMinimum(glm::vec2(187.9f, -8.8f));
+
+	EXPECT_VEC2_EQ(87.7f, -8.8f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(187.9f, 117.8f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMinimumSwappedY)
+{
+	Bounds bounds(
+		glm::vec2(1.87f, -98.6f),
+		glm::vec2(38.12f, 8.76f)
+	);
+
+	bounds.SetMinimum(glm::vec2(-98.76f, 115.8f));
+
+	EXPECT_VEC2_EQ(-98.76f, 8.76f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(38.12f, 115.8f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMinimumInvalid)
+{
+	Bounds bounds;
+
+	bounds.SetMinimum(glm::vec2(32.57f, 19.97f));
+
+	EXPECT_VEC2_EQ(32.57f, 19.97f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(32.57f, 19.97f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMaximum)
+{
+	Bounds bounds(
+		glm::vec2(3.87f, 18.97f),
+		glm::vec2(33.87f, 188.81f)
+	);
+
+	bounds.SetMaximum(glm::vec2(42.0f, 230.17f));
+
+	EXPECT_VEC2_EQ(3.87f, 18.97f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(42.0f, 230.17f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMaximumSwappedX)
+{
+	Bounds bounds(
+		glm::vec2(16.7f, 32.8f),
+		glm::vec2(110.8f, 881.8f)
+	);
+
+	bounds.SetMaximum(glm::vec2(-76.8f, 1085.7f));
+
+	EXPECT_VEC2_EQ(-76.8f, 32.8f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(16.7f, 1085.7f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMaximumSwappedY)
+{
+	Bounds bounds(
+		glm::vec2(18.77f, 15.87f),
+		glm::vec2(-86.8f, 110.8f)
+	);
+
+	bounds.SetMaximum(glm::vec2(116.9f, -78.8f));
+
+	EXPECT_VEC2_EQ(-86.8f, -78.8f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(116.9f, 15.87f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
+TEST(Bounds, SetMaximumInvalid)
+{
+	Bounds bounds;
+
+	bounds.SetMaximum(glm::vec2(16.87f, 12.787f));
+
+	EXPECT_VEC2_EQ(16.87f, 12.787f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(16.87f, 12.787f, bounds.GetMaximum());
+	EXPECT_TRUE(bounds.IsValid());
+}
+
 TEST(Bounds, Copy)
 {
 	Bounds bounds(
