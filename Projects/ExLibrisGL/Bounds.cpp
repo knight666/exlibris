@@ -60,43 +60,93 @@ namespace ExLibris
 
 	float Bounds::GetWidth() const
 	{
-		return std::fabsf(m_Maximum.x - m_Minimum.x);
+		if (IsValid())
+		{
+			return std::fabsf(m_Maximum.x - m_Minimum.x);
+		}
+		else
+		{
+			return 0.0f;
+		}
 	}
 
 	float Bounds::GetHeight() const
 	{
-		return std::fabsf(m_Maximum.y - m_Minimum.y);
+		if (IsValid())
+		{
+			return std::fabsf(m_Maximum.y - m_Minimum.y);
+		}
+		else
+		{
+			return 0.0f;
+		}
 	}
 
 	glm::vec2 Bounds::GetDimensions() const
 	{
-		return glm::vec2(
-			std::fabsf(m_Maximum.x - m_Minimum.x),
-			std::fabsf(m_Maximum.y - m_Minimum.y)
-		);
+		if (IsValid())
+		{
+			return glm::vec2(
+				std::fabsf(m_Maximum.x - m_Minimum.x),
+				std::fabsf(m_Maximum.y - m_Minimum.y)
+			);
+		}
+		else
+		{
+			return glm::vec2(0.0f, 0.0f);
+		}
 	}
 
 	float Bounds::GetHalfWidth() const
 	{
-		return (std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f);
+		if (IsValid())
+		{
+			return (std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f);
+		}
+		else
+		{
+			return 0.0f;
+		}
 	}
 
 	float Bounds::GetHalfHeight() const
 	{
-		return (std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f);
+		if (IsValid())
+		{
+			return (std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f);
+		}
+		else
+		{
+			return 0.0f;
+		}
 	}
 
 	glm::vec2 Bounds::GetHalfDimensions() const
 	{
-		return glm::vec2(
-			std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f,
-			std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f
-		);
+		if (IsValid())
+		{
+			return glm::vec2(
+				std::fabsf(m_Maximum.x - m_Minimum.x) / 2.0f,
+				std::fabsf(m_Maximum.y - m_Minimum.y) / 2.0f
+			);
+		}
+		else
+		{
+			return glm::vec2(0.0f, 0.0f);
+		}
 	}
 
 	glm::vec2 Bounds::GetCenter() const
 	{
-		return m_Minimum + GetHalfDimensions();
+		return (m_Minimum + m_Maximum) / 2.0f;
+	}
+
+	void Bounds::SetCenter(const glm::vec2& a_Center)
+	{
+		glm::vec2 half_dimensions = GetHalfDimensions();
+
+		m_Minimum = a_Center - half_dimensions;
+		m_Maximum = a_Center + half_dimensions;
 	}
 
 	Bounds& Bounds::operator = (const Bounds& a_Other)
