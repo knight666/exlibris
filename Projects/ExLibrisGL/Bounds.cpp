@@ -245,6 +245,34 @@ namespace ExLibris
 		return (difference.x <= half_dimensions.x && difference.y <= half_dimensions.y);
 	}
 
+	bool Bounds::IsContained(const Bounds& a_Other) const
+	{
+		if (!IsValid() || !a_Other.IsValid())
+		{
+			return false;
+		}
+
+		if (a_Other.GetMinimum().x < m_Minimum.x || a_Other.GetMinimum().x > m_Maximum.x)
+		{
+			return false;
+		}
+		if (a_Other.GetMinimum().y < m_Minimum.y || a_Other.GetMinimum().y > m_Maximum.y)
+		{
+			return false;
+		}
+
+		if (a_Other.GetMaximum().x < m_Minimum.x || a_Other.GetMaximum().x > m_Maximum.x)
+		{
+			return false;
+		}
+		if (a_Other.GetMaximum().y < m_Minimum.y || a_Other.GetMaximum().y > m_Maximum.y)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	// Validity
 
 	bool Bounds::IsValid() const
