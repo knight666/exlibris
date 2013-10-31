@@ -290,6 +290,28 @@ namespace ExLibris
 		);
 	}
 
+	void Bounds::Unite(const Bounds& a_Other)
+	{
+		if (IsValid() && a_Other.IsValid())
+		{
+			m_Minimum = glm::min(m_Minimum, a_Other.GetMinimum());
+			m_Maximum = glm::max(m_Maximum, a_Other.GetMaximum());
+		}
+	}
+
+	Bounds Bounds::GetUnited(const Bounds& a_Other) const
+	{
+		if (!IsValid() || !a_Other.IsValid())
+		{
+			return Bounds();
+		}
+
+		return Bounds(
+			glm::min(m_Minimum, a_Other.GetMinimum()),
+			glm::max(m_Maximum, a_Other.GetMaximum())
+		);
+	}
+
 	// Validity
 
 	bool Bounds::IsValid() const
