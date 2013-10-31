@@ -38,11 +38,18 @@ namespace ExLibris
 		Bounds(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum);
 		Bounds(const Bounds& a_Other);
 
+		// Properties
+
 		const glm::vec2& GetMinimum() const;
 		void SetMinimum(const glm::vec2& a_Minimum);
 
 		const glm::vec2& GetMaximum() const;
 		void SetMaximum(const glm::vec2& a_Maximum);
+
+		glm::vec2 GetCenter() const;
+		void SetCenter(const glm::vec2& a_Center);
+
+		// Dimensions
 
 		float GetWidth() const;
 		void SetWidth(float a_Width);
@@ -54,15 +61,19 @@ namespace ExLibris
 		void SetDimensions(const glm::vec2& a_Dimensions);
 
 		float GetHalfWidth() const;
+		void SetHalfWidth(float a_HalfWidth);
+
 		float GetHalfHeight() const;
+		void SetHalfHeight(float a_HalfHeight);
 
 		glm::vec2 GetHalfDimensions() const;
 		void SetHalfDimensions(const glm::vec2& a_HalfDimensions);
 
-		glm::vec2 GetCenter() const;
-		void SetCenter(const glm::vec2& a_Center);
+		// Operators
 
 		Bounds& operator = (const Bounds& a_Other);
+
+		// Validity
 
 		bool IsValid() const;
 		void Invalidate();
