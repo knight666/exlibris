@@ -73,6 +73,10 @@ namespace ExLibris
 
 		Bounds& operator = (const Bounds& a_Other);
 
+		// Intersection
+
+		bool IsIntersected(const Bounds& a_Other) const;
+
 		// Validity
 
 		bool IsValid() const;
