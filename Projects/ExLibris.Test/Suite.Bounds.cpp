@@ -197,6 +197,55 @@ TEST(Bounds, SetMaximumInvalid)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
+TEST(Bounds, GetCorners)
+{
+	Bounds bounds(
+		glm::vec2(-98.8f, 11.8f),
+		glm::vec2(5.67f, 67.9f)
+	);
+
+	EXPECT_FLOAT_EQ(-98.8f, bounds.GetLeft());
+	EXPECT_FLOAT_EQ(5.67f, bounds.GetRight());
+	EXPECT_FLOAT_EQ(11.8f, bounds.GetTop());
+	EXPECT_FLOAT_EQ(67.9f, bounds.GetBottom());
+
+	EXPECT_VEC2_EQ(-98.8f, 11.8f, bounds.GetTopLeft());
+	EXPECT_VEC2_EQ(5.67f, 11.8f, bounds.GetTopRight());
+	EXPECT_VEC2_EQ(-98.8f, 67.9f, bounds.GetBottomLeft());
+	EXPECT_VEC2_EQ(5.67f, 67.9f, bounds.GetBottomRight());
+}
+
+TEST(Bounds, GetCornersInvalid)
+{
+	Bounds bounds;
+
+	EXPECT_FLOAT_EQ(std::numeric_limits<float>::max(), bounds.GetLeft());
+	EXPECT_FLOAT_EQ(-std::numeric_limits<float>::max(), bounds.GetRight());
+	EXPECT_FLOAT_EQ(std::numeric_limits<float>::max(), bounds.GetTop());
+	EXPECT_FLOAT_EQ(-std::numeric_limits<float>::max(), bounds.GetBottom());
+
+	EXPECT_VEC2_EQ(
+		std::numeric_limits<float>::max(),
+		std::numeric_limits<float>::max(),
+		bounds.GetTopLeft()
+	);
+	EXPECT_VEC2_EQ(
+		-std::numeric_limits<float>::max(),
+		std::numeric_limits<float>::max(),
+		bounds.GetTopRight()
+	);
+	EXPECT_VEC2_EQ(
+		std::numeric_limits<float>::max(),
+		-std::numeric_limits<float>::max(),
+		bounds.GetBottomLeft()
+	);
+	EXPECT_VEC2_EQ(
+		-std::numeric_limits<float>::max(),
+		-std::numeric_limits<float>::max(),
+		bounds.GetBottomRight()
+	);
+}
+
 TEST(Bounds, GetDimensions)
 {
 	Bounds bounds(

@@ -102,6 +102,48 @@ namespace ExLibris
 		m_Maximum = a_Center + half_dimensions;
 	}
 
+	// Corners
+
+	float Bounds::GetLeft() const
+	{
+		return m_Minimum.x;
+	}
+
+	float Bounds::GetRight() const
+	{
+		return m_Maximum.x;
+	}
+
+	float Bounds::GetTop() const
+	{
+		return m_Minimum.y;
+	}
+
+	float Bounds::GetBottom() const
+	{
+		return m_Maximum.y;
+	}
+
+	glm::vec2 Bounds::GetTopLeft() const
+	{
+		return m_Minimum;
+	}
+
+	glm::vec2 Bounds::GetTopRight() const
+	{
+		return glm::vec2(m_Maximum.x, m_Minimum.y);
+	}
+
+	glm::vec2 Bounds::GetBottomLeft() const
+	{
+		return glm::vec2(m_Minimum.x, m_Maximum.y);
+	}
+
+	glm::vec2 Bounds::GetBottomRight() const
+	{
+		return m_Maximum;
+	}
+
 	// Dimensions
 
 	float Bounds::GetWidth() const

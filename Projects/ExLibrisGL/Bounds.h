@@ -49,6 +49,18 @@ namespace ExLibris
 		glm::vec2 GetCenter() const;
 		void SetCenter(const glm::vec2& a_Center);
 
+		// Corners
+
+		float GetLeft() const;
+		float GetRight() const;
+		float GetTop() const;
+		float GetBottom() const;
+
+		glm::vec2 GetTopLeft() const;
+		glm::vec2 GetTopRight() const;
+		glm::vec2 GetBottomLeft() const;
+		glm::vec2 GetBottomRight() const;
+
 		// Dimensions
 
 		float GetWidth() const;
