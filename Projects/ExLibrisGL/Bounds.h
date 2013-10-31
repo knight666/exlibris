@@ -77,6 +77,9 @@ namespace ExLibris
 
 		bool IsIntersected(const Bounds& a_Other) const;
 
+		void Intersect(const Bounds& a_Other);
+		Bounds GetIntersection(const Bounds& a_Other) const;
+
 		bool IsContained(const Bounds& a_Other) const;
 
 		// Validity

@@ -858,6 +858,77 @@ TEST(Bounds, IsIntersectedInvalidRight)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
+TEST(Bounds, Intersect)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(-150.0f, -56.0f),
+		glm::vec2(67.0f, 119.0f)
+	);
+
+	bounds_left.Intersect(bounds_right);
+
+	EXPECT_VEC2_EQ(-100.0f, -56.0f, bounds_left.GetMinimum());
+	EXPECT_VEC2_EQ(67.0f, 100.0f, bounds_left.GetMaximum());
+}
+
+TEST(Bounds, IntersectOutside)
+{
+	Bounds bounds_left(
+		glm::vec2(35.81f, 12.9f),
+		glm::vec2(157.9f, 115.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(-156.8f, 2.8f),
+		glm::vec2(-59.9f, 8.7f)
+	);
+
+	bounds_left.Intersect(bounds_right);
+
+	EXPECT_VEC2_EQ(35.81f, 12.9f, bounds_left.GetMinimum());
+	EXPECT_VEC2_EQ(157.9f, 115.0f, bounds_left.GetMaximum());
+}
+
+TEST(Bounds, GetIntersection)
+{
+	Bounds bounds_left(
+		glm::vec2(456.8f, 12.9f),
+		glm::vec2(1078.2f, 115.8f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(115.8f, 13.8f),
+		glm::vec2(667.9f, 87.8f)
+	);
+
+	Bounds intersection = bounds_left.GetIntersection(bounds_right);
+
+	EXPECT_VEC2_EQ(456.8f, 13.8f, intersection.GetMinimum());
+	EXPECT_VEC2_EQ(667.9f, 87.8f, intersection.GetMaximum());
+}
+
+TEST(Bounds, GetIntersectionOutside)
+{
+	Bounds bounds_left(
+		glm::vec2(55.0f, 12.8f),
+		glm::vec2(314.9f, 45.9f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(608.0f, 156.9f),
+		glm::vec2(898.2f, 278.2f)
+	);
+
+	Bounds intersection = bounds_left.GetIntersection(bounds_right);
+
+	EXPECT_FALSE(intersection.IsValid());
+}
+
 TEST(Bounds, IsContained)
 {
 	Bounds bounds_left(

@@ -248,6 +248,33 @@ namespace ExLibris
 		);
 	}
 
+	void Bounds::Intersect(const Bounds& a_Other)
+	{
+		if (IsIntersected(a_Other))
+		{
+			glm::vec2 clamped_minimum = glm::clamp(a_Other.GetMinimum(), m_Minimum, m_Maximum);
+			glm::vec2 clamped_maximum = glm::clamp(a_Other.GetMaximum(), m_Minimum, m_Maximum);
+
+			m_Minimum = clamped_minimum;
+			m_Maximum = clamped_maximum;
+		}
+	}
+
+	Bounds Bounds::GetIntersection(const Bounds& a_Other) const
+	{
+		if (!IsIntersected(a_Other))
+		{
+			return Bounds();
+		}
+
+		Bounds intersection(
+			glm::clamp(a_Other.GetMinimum(), m_Minimum, m_Maximum),
+			glm::clamp(a_Other.GetMaximum(), m_Minimum, m_Maximum)
+		);
+
+		return intersection;
+	}
+
 	bool Bounds::IsContained(const Bounds& a_Other) const
 	{
 		if (!IsValid() || !a_Other.IsValid())
