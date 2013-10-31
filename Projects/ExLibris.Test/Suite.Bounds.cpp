@@ -744,7 +744,22 @@ TEST(Bounds, IsIntersected)
 	EXPECT_TRUE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedHorizontalOnly)
+TEST(Bounds, IsIntersectedOverlapBoth)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(90.0f, -150.0f),
+		glm::vec2(190.0f, -90.0f)
+	);
+
+	EXPECT_TRUE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedOverlapHorizontal)
 {
 	Bounds bounds_left(
 		glm::vec2(25.0f, 75.0f),
@@ -759,7 +774,7 @@ TEST(Bounds, IsIntersectedHorizontalOnly)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedVerticalOnly)
+TEST(Bounds, IsIntersectedOverlapVertical)
 {
 	Bounds bounds_left(
 		glm::vec2(40.0f, 50.0f),
@@ -774,16 +789,46 @@ TEST(Bounds, IsIntersectedVerticalOnly)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOutside)
+TEST(Bounds, IsIntersectedOutsideBoth)
 {
 	Bounds bounds_left(
-		glm::vec2(-10.0f, -10.0f),
-		glm::vec2(10.0f, 10.0f)
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
 	);
 
 	Bounds bounds_right(
-		glm::vec2(20.0f, 40.0f),
-		glm::vec2(80.0f, 100.0f)
+		glm::vec2(-250.0f, 101.0f),
+		glm::vec2(-215.0f, 113.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedOutsideHorizontal)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(-150.0f, -25.0f),
+		glm::vec2(-101.0f, 25.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedOutsideVertical)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(20.0f, 150.0f),
+		glm::vec2(20.0f, 175.0f)
 	);
 
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
@@ -828,6 +873,21 @@ TEST(Bounds, IsContained)
 	EXPECT_TRUE(bounds_left.IsContained(bounds_right));
 }
 
+TEST(Bounds, IsContainedOverlapBoth)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(55.0f, 78.0f),
+		glm::vec2(225.0f, 178.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
+}
+
 TEST(Bounds, IsContainedOverlapHorizontal)
 {
 	Bounds bounds_left(
@@ -843,21 +903,6 @@ TEST(Bounds, IsContainedOverlapHorizontal)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOutsideHorizontal)
-{
-	Bounds bounds_left(
-		glm::vec2(-100.0f, -100.0f),
-		glm::vec2(100.0f, 100.0f)
-	);
-
-	Bounds bounds_right(
-		glm::vec2(150.0f, 15.0f),
-		glm::vec2(250.0f, 66.0f)
-	);
-
-	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
-}
-
 TEST(Bounds, IsContainedOverlapVertical)
 {
 	Bounds bounds_left(
@@ -868,6 +913,36 @@ TEST(Bounds, IsContainedOverlapVertical)
 	Bounds bounds_right(
 		glm::vec2(33.0f, -200.0f),
 		glm::vec2(34.0f, -80.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
+}
+
+TEST(Bounds, IsContainedOutsideBoth)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(777.0f, 777.0f),
+		glm::vec2(888.0f, 888.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
+}
+
+TEST(Bounds, IsContainedOutsideHorizontal)
+{
+	Bounds bounds_left(
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(150.0f, 15.0f),
+		glm::vec2(250.0f, 66.0f)
 	);
 
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
