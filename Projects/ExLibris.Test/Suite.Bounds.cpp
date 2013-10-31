@@ -1051,9 +1051,103 @@ TEST(Bounds, IsContainedInvalidRight)
 	Bounds bounds_left(
 		glm::vec2(-15.7f, 12.8f),
 		glm::vec2(25.8f, 25.8f)
-	);
+		);
 
 	Bounds bounds_right;
 
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
+}
+
+TEST(Bounds, Unite)
+{
+	Bounds left(
+		glm::vec2(15.9f, 22.5f),
+		glm::vec2(16.87f, 23.8f)
+	);
+
+	Bounds right(
+		glm::vec2(33.8f, 82.2f),
+		glm::vec2(67.2f, 119.8f)
+	);
+
+	left.Unite(right);
+
+	EXPECT_VEC2_EQ(15.9f, 22.5f, left.GetMinimum());
+	EXPECT_VEC2_EQ(67.2f, 119.8f, left.GetMaximum());
+}
+
+TEST(Bounds, UniteInvalidLeft)
+{
+	Bounds left;
+
+	Bounds right(
+		glm::vec2(-17.98f, 11.8f),
+		glm::vec2(15.82f, 188.2f)
+	);
+
+	left.Unite(right);
+
+	EXPECT_FALSE(left.IsValid());
+}
+
+TEST(Bounds, UniteInvalidRight)
+{
+	Bounds left(
+		glm::vec2(22.98f, 15.87f),
+		glm::vec2(56.78f, 34.98f)
+	);
+
+	Bounds right;
+
+	left.Unite(right);
+
+	EXPECT_TRUE(left.IsValid());
+	EXPECT_VEC2_EQ(22.98f, 15.87f, left.GetMinimum());
+	EXPECT_VEC2_EQ(56.78f, 34.98f, left.GetMaximum());
+}
+
+TEST(Bounds, GetUnited)
+{
+	Bounds left(
+		glm::vec2(3.8f, 11.8f),
+		glm::vec2(56.9f, 16.87f)
+	);
+
+	Bounds right(
+		glm::vec2(9.87f, 119.14f),
+		glm::vec2(11.8f, 1176.72f)
+	);
+
+	Bounds united = left.GetUnited(right);
+
+	EXPECT_VEC2_EQ(3.8f, 11.8f, united.GetMinimum());
+	EXPECT_VEC2_EQ(56.9f, 1176.72f, united.GetMaximum());
+}
+
+TEST(Bounds, GetUnitedInvalidLeft)
+{
+	Bounds left;
+
+	Bounds right(
+		glm::vec2(15.87f, 119.8f),
+		glm::vec2(2.876f, 18.76f)
+	);
+
+	Bounds united = left.GetUnited(right);
+
+	EXPECT_FALSE(united.IsValid());
+}
+
+TEST(Bounds, GetUnitedInvalidRight)
+{
+	Bounds left(
+		glm::vec2(22.87f, 112.7f),
+		glm::vec2(35.97f, 176.66f)
+	);
+
+	Bounds right;
+
+	Bounds united = left.GetUnited(right);
+
+	EXPECT_FALSE(united.IsValid());
 }

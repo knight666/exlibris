@@ -82,6 +82,9 @@ namespace ExLibris
 
 		bool IsContained(const Bounds& a_Other) const;
 
+		void Unite(const Bounds& a_Other);
+		Bounds GetUnited(const Bounds& a_Other) const;
+
 		// Validity
 
 		bool IsValid() const;
