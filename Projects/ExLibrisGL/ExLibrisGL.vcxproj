@@ -72,7 +72,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bounds.cpp" />
+    <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Family.cpp" />
     <ClCompile Include="FontFace.cpp" />
@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Alignment.h" />
-    <ClInclude Include="Bounds.h" />
+    <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FaceOptions.h" />

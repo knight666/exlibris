@@ -29,7 +29,7 @@
 namespace ExLibris
 {
 
-	struct BoundingBox
+	struct BoundingBoxOld
 	{
 		glm::vec2 minimum;
 		glm::vec2 maximum;
@@ -39,7 +39,7 @@ namespace ExLibris
 	{
 		glm::vec2 offset;
 		float advance;
-		BoundingBox bounding_box;
+		BoundingBoxOld bounding_box;
 	};
 
 }; // namespace ExLibris

@@ -1,19 +1,19 @@
 #include "ExLibris.Test.PCH.h"
 
-#include <Bounds.h>
+#include <BoundingBox.h>
 
 using namespace ExLibris;
 
-TEST(Bounds, Construct)
+TEST(BoundingBox, Construct)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_FALSE(bounds.IsValid());
 }
 
-TEST(Bounds, ConstructPositions)
+TEST(BoundingBox, ConstructPositions)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-887.8f, 92.9f),
 		glm::vec2(88.81f, 215.9f)
 	);
@@ -23,9 +23,9 @@ TEST(Bounds, ConstructPositions)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, ConstructSwappedX)
+TEST(BoundingBox, ConstructSwappedX)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(25.08f, -76.2f),
 		glm::vec2(3.98f, 88.77f)
 	);
@@ -35,9 +35,9 @@ TEST(Bounds, ConstructSwappedX)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, ConstructSwappedY)
+TEST(BoundingBox, ConstructSwappedY)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(10.78f, 107.82f),
 		glm::vec2(45.78f, 15.8f)
 	);
@@ -47,53 +47,53 @@ TEST(Bounds, ConstructSwappedY)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, Copy)
+TEST(BoundingBox, Copy)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-45.8f, 99.2f),
 		glm::vec2(16.9f, 107.88f)
 	);
 
-	Bounds copy(bounds);
+	BoundingBox copy(bounds);
 
 	EXPECT_VEC2_EQ(-45.8f, 99.2f, copy.GetMinimum());
 	EXPECT_VEC2_EQ(16.9f, 107.88f, copy.GetMaximum());
 }
 
-TEST(Bounds, CopyInvalid)
+TEST(BoundingBox, CopyInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
-	Bounds copy(bounds);
+	BoundingBox copy(bounds);
 
 	EXPECT_FALSE(copy.IsValid());
 }
 
-TEST(Bounds, Assignment)
+TEST(BoundingBox, Assignment)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(22.8f, 15.9f),
 		glm::vec2(-117.8f, 67.83f)
 	);
 
-	Bounds copy = bounds;
+	BoundingBox copy = bounds;
 
 	EXPECT_VEC2_EQ(-117.8f, 15.9f, copy.GetMinimum());
 	EXPECT_VEC2_EQ(22.8f, 67.83f, copy.GetMaximum());
 }
 
-TEST(Bounds, AssignmentInvalid)
+TEST(BoundingBox, AssignmentInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
-	Bounds copy = bounds;
+	BoundingBox copy = bounds;
 
 	EXPECT_FALSE(copy.IsValid());
 }
 
-TEST(Bounds, SetMinimum)
+TEST(BoundingBox, SetMinimum)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-98.8f, 99.8f),
 		glm::vec2(12.8f, 812.9f)
 	);
@@ -105,9 +105,9 @@ TEST(Bounds, SetMinimum)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMinimumSwappedX)
+TEST(BoundingBox, SetMinimumSwappedX)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(23.87f, 1.87f),
 		glm::vec2(87.7f, 117.8f)
 	);
@@ -119,9 +119,9 @@ TEST(Bounds, SetMinimumSwappedX)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMinimumSwappedY)
+TEST(BoundingBox, SetMinimumSwappedY)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(1.87f, -98.6f),
 		glm::vec2(38.12f, 8.76f)
 	);
@@ -133,9 +133,9 @@ TEST(Bounds, SetMinimumSwappedY)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMinimumInvalid)
+TEST(BoundingBox, SetMinimumInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetMinimum(glm::vec2(32.57f, 19.97f));
 
@@ -144,9 +144,9 @@ TEST(Bounds, SetMinimumInvalid)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMaximum)
+TEST(BoundingBox, SetMaximum)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(3.87f, 18.97f),
 		glm::vec2(33.87f, 188.81f)
 	);
@@ -158,9 +158,9 @@ TEST(Bounds, SetMaximum)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMaximumSwappedX)
+TEST(BoundingBox, SetMaximumSwappedX)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(16.7f, 32.8f),
 		glm::vec2(110.8f, 881.8f)
 	);
@@ -172,9 +172,9 @@ TEST(Bounds, SetMaximumSwappedX)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMaximumSwappedY)
+TEST(BoundingBox, SetMaximumSwappedY)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(18.77f, 15.87f),
 		glm::vec2(-86.8f, 110.8f)
 	);
@@ -186,9 +186,9 @@ TEST(Bounds, SetMaximumSwappedY)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, SetMaximumInvalid)
+TEST(BoundingBox, SetMaximumInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetMaximum(glm::vec2(16.87f, 12.787f));
 
@@ -197,9 +197,9 @@ TEST(Bounds, SetMaximumInvalid)
 	EXPECT_TRUE(bounds.IsValid());
 }
 
-TEST(Bounds, GetCorners)
+TEST(BoundingBox, GetCorners)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-98.8f, 11.8f),
 		glm::vec2(5.67f, 67.9f)
 	);
@@ -215,9 +215,9 @@ TEST(Bounds, GetCorners)
 	EXPECT_VEC2_EQ(5.67f, 67.9f, bounds.GetBottomRight());
 }
 
-TEST(Bounds, GetCornersInvalid)
+TEST(BoundingBox, GetCornersInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_FLOAT_EQ(std::numeric_limits<float>::max(), bounds.GetLeft());
 	EXPECT_FLOAT_EQ(-std::numeric_limits<float>::max(), bounds.GetRight());
@@ -246,9 +246,9 @@ TEST(Bounds, GetCornersInvalid)
 	);
 }
 
-TEST(Bounds, GetDimensions)
+TEST(BoundingBox, GetDimensions)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(17.98f, -99.12f),
 		glm::vec2(108.72f, 15.8f)
 	);
@@ -260,16 +260,16 @@ TEST(Bounds, GetDimensions)
 	);
 }
 
-TEST(Bounds, GetDimensionsInvalid)
+TEST(BoundingBox, GetDimensionsInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_VEC2_EQ(0.0f, 0.0f, bounds.GetDimensions());
 }
 
-TEST(Bounds, SetDimensions)
+TEST(BoundingBox, SetDimensions)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(12.97f, 19.7f),
 		glm::vec2(188.97f, 81.8f)
 	);
@@ -280,9 +280,9 @@ TEST(Bounds, SetDimensions)
 	EXPECT_VEC2_EQ(12.97f + 53.0f, 19.7f + 53.0f, bounds.GetMaximum());
 }
 
-TEST(Bounds, SetDimensionsNegativeWidth)
+TEST(BoundingBox, SetDimensionsNegativeWidth)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-15.86f, 17.98f),
 		glm::vec2(33.76f, 35.97f)
 	);
@@ -293,9 +293,9 @@ TEST(Bounds, SetDimensionsNegativeWidth)
 	EXPECT_VEC2_EQ(-15.86f, 17.98f + 22.8f, bounds.GetMaximum());
 }
 
-TEST(Bounds, SetDimensionsNegativeHeight)
+TEST(BoundingBox, SetDimensionsNegativeHeight)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(32.45f, 117.98f),
 		glm::vec2(45.87f, 256.16f)
 	);
@@ -306,9 +306,9 @@ TEST(Bounds, SetDimensionsNegativeHeight)
 	EXPECT_VEC2_EQ(32.45f + 33.87f, 117.98f, bounds.GetMaximum());
 }
 
-TEST(Bounds, SetDimensionsInvalid)
+TEST(BoundingBox, SetDimensionsInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetDimensions(glm::vec2(19.9f, 112.9f));
 
@@ -316,9 +316,9 @@ TEST(Bounds, SetDimensionsInvalid)
 	EXPECT_VEC2_EQ(19.9f, 112.9f, bounds.GetMaximum());
 }
 
-TEST(Bounds, GetWidth)
+TEST(BoundingBox, GetWidth)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(15.89f, -5.8f),
 		glm::vec2(115.8f, 881.98f)
 	);
@@ -326,16 +326,16 @@ TEST(Bounds, GetWidth)
 	EXPECT_FLOAT_EQ((115.8f - 15.89f), bounds.GetWidth());
 }
 
-TEST(Bounds, GetWidthInvalid)
+TEST(BoundingBox, GetWidthInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_FLOAT_EQ(0.0f, bounds.GetWidth());
 }
 
-TEST(Bounds, SetWidth)
+TEST(BoundingBox, SetWidth)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-16.97f, 11.98f),
 		glm::vec2(11.98f, 112.8f)
 	);
@@ -354,9 +354,9 @@ TEST(Bounds, SetWidth)
 	);
 }
 
-TEST(Bounds, SetWidthNegative)
+TEST(BoundingBox, SetWidthNegative)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(11.87f, 116.8f),
 		glm::vec2(14.98f, 216.87f)
 	);
@@ -375,9 +375,9 @@ TEST(Bounds, SetWidthNegative)
 	);
 }
 
-TEST(Bounds, SetWidthInvalid)
+TEST(BoundingBox, SetWidthInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetWidth(76.9f);
 
@@ -385,9 +385,9 @@ TEST(Bounds, SetWidthInvalid)
 	EXPECT_FLOAT_EQ(76.9f, bounds.GetMaximum().x);
 }
 
-TEST(Bounds, GetHeight)
+TEST(BoundingBox, GetHeight)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(22.9f, -87.7f),
 		glm::vec2(18.17f, 9.8765f)
 	);
@@ -395,16 +395,16 @@ TEST(Bounds, GetHeight)
 	EXPECT_FLOAT_EQ((87.7f + 9.8765f), bounds.GetHeight());
 }
 
-TEST(Bounds, GetHeightInvalid)
+TEST(BoundingBox, GetHeightInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_FLOAT_EQ(0.0f, bounds.GetHeight());
 }
 
-TEST(Bounds, SetHeight)
+TEST(BoundingBox, SetHeight)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(16.8f, 116.8f),
 		glm::vec2(21.98f, 156.87f)
 	);
@@ -423,9 +423,9 @@ TEST(Bounds, SetHeight)
 	);
 }
 
-TEST(Bounds, SetHeightNegative)
+TEST(BoundingBox, SetHeightNegative)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-16.8f, 11.08f),
 		glm::vec2(35.87f, 116.9f)
 	);
@@ -444,9 +444,9 @@ TEST(Bounds, SetHeightNegative)
 	);
 }
 
-TEST(Bounds, SetHeightInvalid)
+TEST(BoundingBox, SetHeightInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetHeight(1116.8f);
 
@@ -454,9 +454,9 @@ TEST(Bounds, SetHeightInvalid)
 	EXPECT_FLOAT_EQ(1116.8f, bounds.GetMaximum().y);
 }
 
-TEST(Bounds, GetHalfDimensions)
+TEST(BoundingBox, GetHalfDimensions)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(6.9f, 12.78f),
 		glm::vec2(16.87f, 29.9f)
 	);
@@ -468,16 +468,16 @@ TEST(Bounds, GetHalfDimensions)
 	);
 }
 
-TEST(Bounds, GetHalfDimensionsInvalid)
+TEST(BoundingBox, GetHalfDimensionsInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_VEC2_EQ(0.0f, 0.0f, bounds.GetHalfDimensions());
 }
 
-TEST(Bounds, SetHalfDimensions)
+TEST(BoundingBox, SetHalfDimensions)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(10.0f, 10.0f),
 		glm::vec2(50.0f, 50.0f)
 	);
@@ -501,9 +501,9 @@ TEST(Bounds, SetHalfDimensions)
 	);
 }
 
-TEST(Bounds, SetHalfDimensionsNegativeWidth)
+TEST(BoundingBox, SetHalfDimensionsNegativeWidth)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(30.0f, 25.0f),
 		glm::vec2(60.0f, 150.0f)
 	);
@@ -527,9 +527,9 @@ TEST(Bounds, SetHalfDimensionsNegativeWidth)
 	);
 }
 
-TEST(Bounds, SetHalfDimensionsNegativeHeight)
+TEST(BoundingBox, SetHalfDimensionsNegativeHeight)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(16.87f, 11.87f),
 		glm::vec2(194.5f, 68.8f)
 	);
@@ -553,9 +553,9 @@ TEST(Bounds, SetHalfDimensionsNegativeHeight)
 	);
 }
 
-TEST(Bounds, SetHalfDimensionsInvalid)
+TEST(BoundingBox, SetHalfDimensionsInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetHalfDimensions(glm::vec2(17.98, 22.83f));
 
@@ -576,9 +576,9 @@ TEST(Bounds, SetHalfDimensionsInvalid)
 	);
 }
 
-TEST(Bounds, GetHalfWidth)
+TEST(BoundingBox, GetHalfWidth)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(16.87f, 115.8f),
 		glm::vec2(-38.8f, 108.9f)
 	);
@@ -586,16 +586,16 @@ TEST(Bounds, GetHalfWidth)
 	EXPECT_FLOAT_EQ((38.8f + 16.87f) / 2.0f, bounds.GetHalfWidth());
 }
 
-TEST(Bounds, GetHalfWidthInvalid)
+TEST(BoundingBox, GetHalfWidthInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_FLOAT_EQ(0.0f, bounds.GetHalfWidth());
 }
 
-TEST(Bounds, SetHalfWidth)
+TEST(BoundingBox, SetHalfWidth)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(14.5f, 118.7f),
 		glm::vec2(36.8f, 156.87f)
 	);
@@ -619,9 +619,9 @@ TEST(Bounds, SetHalfWidth)
 	);
 }
 
-TEST(Bounds, SetHalfWidthNegative)
+TEST(BoundingBox, SetHalfWidthNegative)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(11.87f, 87.86f),
 		glm::vec2(11.97f, 1964.2f)
 	);
@@ -645,9 +645,9 @@ TEST(Bounds, SetHalfWidthNegative)
 	);
 }
 
-TEST(Bounds, SetHalfWidthInvalid)
+TEST(BoundingBox, SetHalfWidthInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetHalfWidth(33.8f);
 
@@ -655,9 +655,9 @@ TEST(Bounds, SetHalfWidthInvalid)
 	EXPECT_FLOAT_EQ(33.8f, bounds.GetMaximum().x);
 }
 
-TEST(Bounds, GetHalfHeight)
+TEST(BoundingBox, GetHalfHeight)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(33.9f, 88.8f),
 		glm::vec2(16.87f, 18.8f)
 	);
@@ -665,16 +665,16 @@ TEST(Bounds, GetHalfHeight)
 	EXPECT_FLOAT_EQ((88.8f - 18.8f) / 2.0f, bounds.GetHalfHeight());
 }
 
-TEST(Bounds, GetHalfHeightInvalid)
+TEST(BoundingBox, GetHalfHeightInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_FLOAT_EQ(0.0f, bounds.GetHalfHeight());
 }
 
-TEST(Bounds, SetHalfHeight)
+TEST(BoundingBox, SetHalfHeight)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(-3.7f, 116.87f),
 		glm::vec2(25.8f, 150.12f)
 	);
@@ -698,9 +698,9 @@ TEST(Bounds, SetHalfHeight)
 	);
 }
 
-TEST(Bounds, SetHalfHeightNegative)
+TEST(BoundingBox, SetHalfHeightNegative)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(1.87f, 116.87f),
 		glm::vec2(16.43f, 198.78f)
 	);
@@ -724,9 +724,9 @@ TEST(Bounds, SetHalfHeightNegative)
 	);
 }
 
-TEST(Bounds, SetHalfHeightInvalid)
+TEST(BoundingBox, SetHalfHeightInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetHalfHeight(16.98f);
 
@@ -734,9 +734,9 @@ TEST(Bounds, SetHalfHeightInvalid)
 	EXPECT_FLOAT_EQ(16.98f, bounds.GetMaximum().y);
 }
 
-TEST(Bounds, GetCenter)
+TEST(BoundingBox, GetCenter)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(22.87f, 25.87f),
 		glm::vec2(45.98f, 100.9f)
 	);
@@ -748,16 +748,16 @@ TEST(Bounds, GetCenter)
 	);
 }
 
-TEST(Bounds, GetCenterInvalid)
+TEST(BoundingBox, GetCenterInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	EXPECT_VEC2_EQ(0.0f, 0.0f, bounds.GetCenter());
 }
 
-TEST(Bounds, SetCenter)
+TEST(BoundingBox, SetCenter)
 {
-	Bounds bounds(
+	BoundingBox bounds(
 		glm::vec2(100.0f, 100.0f),
 		glm::vec2(250.0f, 250.0f)
 	);
@@ -768,9 +768,9 @@ TEST(Bounds, SetCenter)
 	EXPECT_VEC2_EQ(85.0f, 95.0f, bounds.GetMaximum());
 }
 
-TEST(Bounds, SetCenterInvalid)
+TEST(BoundingBox, SetCenterInvalid)
 {
-	Bounds bounds;
+	BoundingBox bounds;
 
 	bounds.SetCenter(glm::vec2(56.4f, -69.8f));
 
@@ -778,14 +778,14 @@ TEST(Bounds, SetCenterInvalid)
 	EXPECT_VEC2_EQ(56.4f, -69.8f, bounds.GetMaximum());
 }
 
-TEST(Bounds, IsIntersected)
+TEST(BoundingBox, IsIntersected)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-25.0f, -25.0f),
 		glm::vec2(50.0f, 50.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(0.0f, 0.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
@@ -793,14 +793,14 @@ TEST(Bounds, IsIntersected)
 	EXPECT_TRUE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOverlapBoth)
+TEST(BoundingBox, IsIntersectedOverlapBoth)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(90.0f, -150.0f),
 		glm::vec2(190.0f, -90.0f)
 	);
@@ -808,14 +808,14 @@ TEST(Bounds, IsIntersectedOverlapBoth)
 	EXPECT_TRUE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOverlapHorizontal)
+TEST(BoundingBox, IsIntersectedOverlapHorizontal)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(25.0f, 75.0f),
 		glm::vec2(100.0f, 150.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(50.0f, 200.0f),
 		glm::vec2(150.0f, 250.0f)
 	);
@@ -823,14 +823,14 @@ TEST(Bounds, IsIntersectedOverlapHorizontal)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOverlapVertical)
+TEST(BoundingBox, IsIntersectedOverlapVertical)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(40.0f, 50.0f),
 		glm::vec2(60.0f, 70.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(80.0f, 55.0f),
 		glm::vec2(120.0f, 120.0f)
 	);
@@ -838,14 +838,14 @@ TEST(Bounds, IsIntersectedOverlapVertical)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOutsideBoth)
+TEST(BoundingBox, IsIntersectedOutsideBoth)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(-250.0f, 101.0f),
 		glm::vec2(-215.0f, 113.0f)
 	);
@@ -853,14 +853,14 @@ TEST(Bounds, IsIntersectedOutsideBoth)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOutsideHorizontal)
+TEST(BoundingBox, IsIntersectedOutsideHorizontal)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(-150.0f, -25.0f),
 		glm::vec2(-101.0f, 25.0f)
 	);
@@ -868,14 +868,14 @@ TEST(Bounds, IsIntersectedOutsideHorizontal)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedOutsideVertical)
+TEST(BoundingBox, IsIntersectedOutsideVertical)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(20.0f, 150.0f),
 		glm::vec2(20.0f, 175.0f)
 	);
@@ -883,11 +883,11 @@ TEST(Bounds, IsIntersectedOutsideVertical)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedInvalidLeft)
+TEST(BoundingBox, IsIntersectedInvalidLeft)
 {
-	Bounds bounds_left;
+	BoundingBox bounds_left;
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(-33.6f, 55.8f),
 		glm::vec2(117.9f, 168.8f)
 	);
@@ -895,26 +895,26 @@ TEST(Bounds, IsIntersectedInvalidLeft)
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, IsIntersectedInvalidRight)
+TEST(BoundingBox, IsIntersectedInvalidRight)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(17.98f, 110.8f),
 		glm::vec2(125.8f, 256.8f)
 	);
 
-	Bounds bounds_right;
+	BoundingBox bounds_right;
 
 	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
 }
 
-TEST(Bounds, Intersect)
+TEST(BoundingBox, Intersect)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(-150.0f, -56.0f),
 		glm::vec2(67.0f, 119.0f)
 	);
@@ -925,14 +925,14 @@ TEST(Bounds, Intersect)
 	EXPECT_VEC2_EQ(67.0f, 100.0f, bounds_left.GetMaximum());
 }
 
-TEST(Bounds, IntersectOutside)
+TEST(BoundingBox, IntersectOutside)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(35.81f, 12.9f),
 		glm::vec2(157.9f, 115.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(-156.8f, 2.8f),
 		glm::vec2(-59.9f, 8.7f)
 	);
@@ -943,49 +943,49 @@ TEST(Bounds, IntersectOutside)
 	EXPECT_VEC2_EQ(157.9f, 115.0f, bounds_left.GetMaximum());
 }
 
-TEST(Bounds, GetIntersection)
+TEST(BoundingBox, GetIntersection)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(456.8f, 12.9f),
 		glm::vec2(1078.2f, 115.8f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(115.8f, 13.8f),
 		glm::vec2(667.9f, 87.8f)
 	);
 
-	Bounds intersection = bounds_left.GetIntersection(bounds_right);
+	BoundingBox intersection = bounds_left.GetIntersection(bounds_right);
 
 	EXPECT_VEC2_EQ(456.8f, 13.8f, intersection.GetMinimum());
 	EXPECT_VEC2_EQ(667.9f, 87.8f, intersection.GetMaximum());
 }
 
-TEST(Bounds, GetIntersectionOutside)
+TEST(BoundingBox, GetIntersectionOutside)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(55.0f, 12.8f),
 		glm::vec2(314.9f, 45.9f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(608.0f, 156.9f),
 		glm::vec2(898.2f, 278.2f)
 	);
 
-	Bounds intersection = bounds_left.GetIntersection(bounds_right);
+	BoundingBox intersection = bounds_left.GetIntersection(bounds_right);
 
 	EXPECT_FALSE(intersection.IsValid());
 }
 
-TEST(Bounds, IsContained)
+TEST(BoundingBox, IsContained)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(25.0f, 25.0f),
 		glm::vec2(50.0f, 50.0f)
 	);
@@ -993,14 +993,14 @@ TEST(Bounds, IsContained)
 	EXPECT_TRUE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOverlapBoth)
+TEST(BoundingBox, IsContainedOverlapBoth)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(55.0f, 78.0f),
 		glm::vec2(225.0f, 178.0f)
 	);
@@ -1008,14 +1008,14 @@ TEST(Bounds, IsContainedOverlapBoth)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOverlapHorizontal)
+TEST(BoundingBox, IsContainedOverlapHorizontal)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(75.0f, -40.0f),
 		glm::vec2(125.0f, 30.0f)
 	);
@@ -1023,14 +1023,14 @@ TEST(Bounds, IsContainedOverlapHorizontal)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOverlapVertical)
+TEST(BoundingBox, IsContainedOverlapVertical)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(33.0f, -200.0f),
 		glm::vec2(34.0f, -80.0f)
 	);
@@ -1038,14 +1038,14 @@ TEST(Bounds, IsContainedOverlapVertical)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOutsideBoth)
+TEST(BoundingBox, IsContainedOutsideBoth)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(777.0f, 777.0f),
 		glm::vec2(888.0f, 888.0f)
 	);
@@ -1053,14 +1053,14 @@ TEST(Bounds, IsContainedOutsideBoth)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOutsideHorizontal)
+TEST(BoundingBox, IsContainedOutsideHorizontal)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(150.0f, 15.0f),
 		glm::vec2(250.0f, 66.0f)
 	);
@@ -1068,14 +1068,14 @@ TEST(Bounds, IsContainedOutsideHorizontal)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedOutsideVertical)
+TEST(BoundingBox, IsContainedOutsideVertical)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-100.0f, -100.0f),
 		glm::vec2(100.0f, 100.0f)
 	);
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(-56.0f, -2000.0f),
 		glm::vec2(-43.0f, -1500.0f)
 	);
@@ -1083,11 +1083,11 @@ TEST(Bounds, IsContainedOutsideVertical)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedInvalidLeft)
+TEST(BoundingBox, IsContainedInvalidLeft)
 {
-	Bounds bounds_left;
+	BoundingBox bounds_left;
 
-	Bounds bounds_right(
+	BoundingBox bounds_right(
 		glm::vec2(55.8f, 112.8f),
 		glm::vec2(112.8f, 187.12f)
 	);
@@ -1095,26 +1095,26 @@ TEST(Bounds, IsContainedInvalidLeft)
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, IsContainedInvalidRight)
+TEST(BoundingBox, IsContainedInvalidRight)
 {
-	Bounds bounds_left(
+	BoundingBox bounds_left(
 		glm::vec2(-15.7f, 12.8f),
 		glm::vec2(25.8f, 25.8f)
 		);
 
-	Bounds bounds_right;
+	BoundingBox bounds_right;
 
 	EXPECT_FALSE(bounds_left.IsContained(bounds_right));
 }
 
-TEST(Bounds, Unite)
+TEST(BoundingBox, Unite)
 {
-	Bounds left(
+	BoundingBox left(
 		glm::vec2(15.9f, 22.5f),
 		glm::vec2(16.87f, 23.8f)
 	);
 
-	Bounds right(
+	BoundingBox right(
 		glm::vec2(33.8f, 82.2f),
 		glm::vec2(67.2f, 119.8f)
 	);
@@ -1125,11 +1125,11 @@ TEST(Bounds, Unite)
 	EXPECT_VEC2_EQ(67.2f, 119.8f, left.GetMaximum());
 }
 
-TEST(Bounds, UniteInvalidLeft)
+TEST(BoundingBox, UniteInvalidLeft)
 {
-	Bounds left;
+	BoundingBox left;
 
-	Bounds right(
+	BoundingBox right(
 		glm::vec2(-17.98f, 11.8f),
 		glm::vec2(15.82f, 188.2f)
 	);
@@ -1139,14 +1139,14 @@ TEST(Bounds, UniteInvalidLeft)
 	EXPECT_FALSE(left.IsValid());
 }
 
-TEST(Bounds, UniteInvalidRight)
+TEST(BoundingBox, UniteInvalidRight)
 {
-	Bounds left(
+	BoundingBox left(
 		glm::vec2(22.98f, 15.87f),
 		glm::vec2(56.78f, 34.98f)
 	);
 
-	Bounds right;
+	BoundingBox right;
 
 	left.Unite(right);
 
@@ -1155,48 +1155,48 @@ TEST(Bounds, UniteInvalidRight)
 	EXPECT_VEC2_EQ(56.78f, 34.98f, left.GetMaximum());
 }
 
-TEST(Bounds, GetUnited)
+TEST(BoundingBox, GetUnited)
 {
-	Bounds left(
+	BoundingBox left(
 		glm::vec2(3.8f, 11.8f),
 		glm::vec2(56.9f, 16.87f)
 	);
 
-	Bounds right(
+	BoundingBox right(
 		glm::vec2(9.87f, 119.14f),
 		glm::vec2(11.8f, 1176.72f)
 	);
 
-	Bounds united = left.GetUnited(right);
+	BoundingBox united = left.GetUnited(right);
 
 	EXPECT_VEC2_EQ(3.8f, 11.8f, united.GetMinimum());
 	EXPECT_VEC2_EQ(56.9f, 1176.72f, united.GetMaximum());
 }
 
-TEST(Bounds, GetUnitedInvalidLeft)
+TEST(BoundingBox, GetUnitedInvalidLeft)
 {
-	Bounds left;
+	BoundingBox left;
 
-	Bounds right(
+	BoundingBox right(
 		glm::vec2(15.87f, 119.8f),
 		glm::vec2(2.876f, 18.76f)
 	);
 
-	Bounds united = left.GetUnited(right);
+	BoundingBox united = left.GetUnited(right);
 
 	EXPECT_FALSE(united.IsValid());
 }
 
-TEST(Bounds, GetUnitedInvalidRight)
+TEST(BoundingBox, GetUnitedInvalidRight)
 {
-	Bounds left(
+	BoundingBox left(
 		glm::vec2(22.87f, 112.7f),
 		glm::vec2(35.97f, 176.66f)
 	);
 
-	Bounds right;
+	BoundingBox right;
 
-	Bounds united = left.GetUnited(right);
+	BoundingBox united = left.GetUnited(right);
 
 	EXPECT_FALSE(united.IsValid());
 }

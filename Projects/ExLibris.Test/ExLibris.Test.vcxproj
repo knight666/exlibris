@@ -67,7 +67,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Suite.Bounds.cpp" />
+    <ClCompile Include="Suite.BoundingBox.cpp" />
     <ClCompile Include="Suite.CurvePath.cpp" />
     <ClCompile Include="Suite.Family.cpp" />
     <ClCompile Include="Suite.FreetypeErrors.cpp" />
