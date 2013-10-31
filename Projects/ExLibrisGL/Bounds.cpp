@@ -230,6 +230,21 @@ namespace ExLibris
 		return *this;
 	}
 
+	// Intersection
+
+	bool Bounds::IsIntersected(const Bounds& a_Other) const
+	{
+		if (!IsValid() || !a_Other.IsValid())
+		{
+			return false;
+		}
+
+		glm::vec2 difference = glm::abs(GetCenter() - a_Other.GetCenter());
+		glm::vec2 half_dimensions = GetHalfDimensions() + a_Other.GetHalfDimensions();
+
+		return (difference.x <= half_dimensions.x && difference.y <= half_dimensions.y);
+	}
+
 	// Validity
 
 	bool Bounds::IsValid() const

@@ -728,3 +728,87 @@ TEST(Bounds, SetCenterInvalid)
 	EXPECT_VEC2_EQ(56.4f, -69.8f, bounds.GetMinimum());
 	EXPECT_VEC2_EQ(56.4f, -69.8f, bounds.GetMaximum());
 }
+
+TEST(Bounds, IsIntersected)
+{
+	Bounds bounds_left(
+		glm::vec2(-25.0f, -25.0f),
+		glm::vec2(50.0f, 50.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(0.0f, 0.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+
+	EXPECT_TRUE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedHorizontalOnly)
+{
+	Bounds bounds_left(
+		glm::vec2(25.0f, 75.0f),
+		glm::vec2(100.0f, 150.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(50.0f, 200.0f),
+		glm::vec2(150.0f, 250.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedVerticalOnly)
+{
+	Bounds bounds_left(
+		glm::vec2(40.0f, 50.0f),
+		glm::vec2(60.0f, 70.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(80.0f, 55.0f),
+		glm::vec2(120.0f, 120.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedOutside)
+{
+	Bounds bounds_left(
+		glm::vec2(-10.0f, -10.0f),
+		glm::vec2(10.0f, 10.0f)
+	);
+
+	Bounds bounds_right(
+		glm::vec2(20.0f, 40.0f),
+		glm::vec2(80.0f, 100.0f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedInvalidLeft)
+{
+	Bounds bounds_left;
+
+	Bounds bounds_right(
+		glm::vec2(-33.6f, 55.8f),
+		glm::vec2(117.9f, 168.8f)
+	);
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
+
+TEST(Bounds, IsIntersectedInvalidRight)
+{
+	Bounds bounds_left(
+		glm::vec2(17.98f, 110.8f),
+		glm::vec2(125.8f, 256.8f)
+	);
+
+	Bounds bounds_right;
+
+	EXPECT_FALSE(bounds_left.IsIntersected(bounds_right));
+}
