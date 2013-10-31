@@ -29,14 +29,14 @@
 namespace ExLibris
 {
 
-	class Bounds
+	class BoundingBox
 	{
 	
 	public:
 	
-		Bounds();
-		Bounds(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum);
-		Bounds(const Bounds& a_Other);
+		BoundingBox();
+		BoundingBox(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum);
+		BoundingBox(const BoundingBox& a_Other);
 
 		// Properties
 
@@ -83,19 +83,19 @@ namespace ExLibris
 
 		// Operators
 
-		Bounds& operator = (const Bounds& a_Other);
+		BoundingBox& operator = (const BoundingBox& a_Other);
 
 		// Intersection
 
-		bool IsIntersected(const Bounds& a_Other) const;
+		bool IsIntersected(const BoundingBox& a_Other) const;
 
-		void Intersect(const Bounds& a_Other);
-		Bounds GetIntersection(const Bounds& a_Other) const;
+		void Intersect(const BoundingBox& a_Other);
+		BoundingBox GetIntersection(const BoundingBox& a_Other) const;
 
-		bool IsContained(const Bounds& a_Other) const;
+		bool IsContained(const BoundingBox& a_Other) const;
 
-		void Unite(const Bounds& a_Other);
-		Bounds GetUnited(const Bounds& a_Other) const;
+		void Unite(const BoundingBox& a_Other);
+		BoundingBox GetUnited(const BoundingBox& a_Other) const;
 
 		// Validity
 

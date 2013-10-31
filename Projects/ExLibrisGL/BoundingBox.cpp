@@ -24,24 +24,24 @@
 
 #include "ExLibrisGL.PCH.h"
 
-#include "Bounds.h"
+#include "BoundingBox.h"
 
 namespace ExLibris
 {
 
-	Bounds::Bounds()
+	BoundingBox::BoundingBox()
 	{
 		Invalidate();
 	}
 
-	Bounds::Bounds(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum)
+	BoundingBox::BoundingBox(const glm::vec2& a_Minimum, const glm::vec2& a_Maximum)
 		: m_Minimum(a_Minimum)
 		, m_Maximum(a_Maximum)
 	{
 		Validate();
 	}
 
-	Bounds::Bounds(const Bounds& a_Other)
+	BoundingBox::BoundingBox(const BoundingBox& a_Other)
 		: m_Minimum(a_Other.GetMinimum())
 		, m_Maximum(a_Other.GetMaximum())
 	{
@@ -49,12 +49,12 @@ namespace ExLibris
 
 	// Properties
 
-	const glm::vec2& Bounds::GetMinimum() const
+	const glm::vec2& BoundingBox::GetMinimum() const
 	{
 		return m_Minimum;
 	}
 
-	void Bounds::SetMinimum(const glm::vec2& a_Minimum)
+	void BoundingBox::SetMinimum(const glm::vec2& a_Minimum)
 	{
 		if (IsValid())
 		{
@@ -69,12 +69,12 @@ namespace ExLibris
 		}
 	}
 
-	const glm::vec2& Bounds::GetMaximum() const
+	const glm::vec2& BoundingBox::GetMaximum() const
 	{
 		return m_Maximum;
 	}
 
-	void Bounds::SetMaximum(const glm::vec2& a_Maximum)
+	void BoundingBox::SetMaximum(const glm::vec2& a_Maximum)
 	{
 		if (IsValid())
 		{
@@ -89,12 +89,12 @@ namespace ExLibris
 		}
 	}
 
-	glm::vec2 Bounds::GetCenter() const
+	glm::vec2 BoundingBox::GetCenter() const
 	{
 		return (m_Minimum + m_Maximum) / 2.0f;
 	}
 
-	void Bounds::SetCenter(const glm::vec2& a_Center)
+	void BoundingBox::SetCenter(const glm::vec2& a_Center)
 	{
 		glm::vec2 half_dimensions = GetHalfDimensions();
 
@@ -104,54 +104,54 @@ namespace ExLibris
 
 	// Corners
 
-	float Bounds::GetLeft() const
+	float BoundingBox::GetLeft() const
 	{
 		return m_Minimum.x;
 	}
 
-	float Bounds::GetRight() const
+	float BoundingBox::GetRight() const
 	{
 		return m_Maximum.x;
 	}
 
-	float Bounds::GetTop() const
+	float BoundingBox::GetTop() const
 	{
 		return m_Minimum.y;
 	}
 
-	float Bounds::GetBottom() const
+	float BoundingBox::GetBottom() const
 	{
 		return m_Maximum.y;
 	}
 
-	glm::vec2 Bounds::GetTopLeft() const
+	glm::vec2 BoundingBox::GetTopLeft() const
 	{
 		return m_Minimum;
 	}
 
-	glm::vec2 Bounds::GetTopRight() const
+	glm::vec2 BoundingBox::GetTopRight() const
 	{
 		return glm::vec2(m_Maximum.x, m_Minimum.y);
 	}
 
-	glm::vec2 Bounds::GetBottomLeft() const
+	glm::vec2 BoundingBox::GetBottomLeft() const
 	{
 		return glm::vec2(m_Minimum.x, m_Maximum.y);
 	}
 
-	glm::vec2 Bounds::GetBottomRight() const
+	glm::vec2 BoundingBox::GetBottomRight() const
 	{
 		return m_Maximum;
 	}
 
 	// Dimensions
 
-	float Bounds::GetWidth() const
+	float BoundingBox::GetWidth() const
 	{
 		return IsValid() ? glm::abs(m_Maximum.x - m_Minimum.x) : 0.0f;
 	}
 
-	void Bounds::SetWidth(float a_Width)
+	void BoundingBox::SetWidth(float a_Width)
 	{
 		if (m_Minimum.x > m_Maximum.x)
 		{
@@ -168,12 +168,12 @@ namespace ExLibris
 		}
 	}
 
-	float Bounds::GetHeight() const
+	float BoundingBox::GetHeight() const
 	{
 		return IsValid() ? glm::abs(m_Maximum.y - m_Minimum.y) : 0.0f;
 	}
 
-	void Bounds::SetHeight(float a_Height)
+	void BoundingBox::SetHeight(float a_Height)
 	{
 		if (m_Minimum.y > m_Maximum.y)
 		{
@@ -190,12 +190,12 @@ namespace ExLibris
 		}
 	}
 
-	glm::vec2 Bounds::GetDimensions() const
+	glm::vec2 BoundingBox::GetDimensions() const
 	{
 		return IsValid() ? glm::abs(m_Maximum - m_Minimum) : glm::vec2(0.0f, 0.0f);
 	}
 
-	void Bounds::SetDimensions(const glm::vec2& a_Dimensions)
+	void BoundingBox::SetDimensions(const glm::vec2& a_Dimensions)
 	{
 		if (!IsValid())
 		{
@@ -207,12 +207,12 @@ namespace ExLibris
 		Validate();
 	}
 
-	float Bounds::GetHalfWidth() const
+	float BoundingBox::GetHalfWidth() const
 	{
 		return IsValid() ? (glm::abs(m_Maximum.x - m_Minimum.x) / 2.0f) : 0.0f;
 	}
 
-	void Bounds::SetHalfWidth(float a_HalfWidth)
+	void BoundingBox::SetHalfWidth(float a_HalfWidth)
 	{
 		float center_x  = (m_Minimum.x + m_Maximum.x) / 2.0f;
 
@@ -227,12 +227,12 @@ namespace ExLibris
 		}
 	}
 
-	float Bounds::GetHalfHeight() const
+	float BoundingBox::GetHalfHeight() const
 	{
 		return IsValid() ? (glm::abs(m_Maximum.y - m_Minimum.y) / 2.0f) : 0.0f;
 	}
 
-	void Bounds::SetHalfHeight(float a_HalfHeight)
+	void BoundingBox::SetHalfHeight(float a_HalfHeight)
 	{
 		float center_y  = (m_Minimum.y + m_Maximum.y) / 2.0f;
 
@@ -247,12 +247,12 @@ namespace ExLibris
 		}
 	}
 
-	glm::vec2 Bounds::GetHalfDimensions() const
+	glm::vec2 BoundingBox::GetHalfDimensions() const
 	{
 		return IsValid() ? (glm::abs(m_Maximum - m_Minimum) / 2.0f) : glm::vec2(0.0f, 0.0f);
 	}
 
-	void Bounds::SetHalfDimensions(const glm::vec2& a_HalfDimensions)
+	void BoundingBox::SetHalfDimensions(const glm::vec2& a_HalfDimensions)
 	{
 		glm::vec2 center = GetCenter();
 
@@ -264,7 +264,7 @@ namespace ExLibris
 
 	// Operators
 
-	Bounds& Bounds::operator = (const Bounds& a_Other)
+	BoundingBox& BoundingBox::operator = (const BoundingBox& a_Other)
 	{
 		m_Minimum = a_Other.GetMinimum();
 		m_Maximum = a_Other.GetMaximum();
@@ -274,7 +274,7 @@ namespace ExLibris
 
 	// Intersection
 
-	bool Bounds::IsIntersected(const Bounds& a_Other) const
+	bool BoundingBox::IsIntersected(const BoundingBox& a_Other) const
 	{
 		if (!IsValid() || !a_Other.IsValid())
 		{
@@ -290,7 +290,7 @@ namespace ExLibris
 		);
 	}
 
-	void Bounds::Intersect(const Bounds& a_Other)
+	void BoundingBox::Intersect(const BoundingBox& a_Other)
 	{
 		if (IsIntersected(a_Other))
 		{
@@ -302,14 +302,14 @@ namespace ExLibris
 		}
 	}
 
-	Bounds Bounds::GetIntersection(const Bounds& a_Other) const
+	BoundingBox BoundingBox::GetIntersection(const BoundingBox& a_Other) const
 	{
 		if (!IsIntersected(a_Other))
 		{
-			return Bounds();
+			return BoundingBox();
 		}
 
-		Bounds intersection(
+		BoundingBox intersection(
 			glm::clamp(a_Other.GetMinimum(), m_Minimum, m_Maximum),
 			glm::clamp(a_Other.GetMaximum(), m_Minimum, m_Maximum)
 		);
@@ -317,7 +317,7 @@ namespace ExLibris
 		return intersection;
 	}
 
-	bool Bounds::IsContained(const Bounds& a_Other) const
+	bool BoundingBox::IsContained(const BoundingBox& a_Other) const
 	{
 		if (!IsValid() || !a_Other.IsValid())
 		{
@@ -332,7 +332,7 @@ namespace ExLibris
 		);
 	}
 
-	void Bounds::Unite(const Bounds& a_Other)
+	void BoundingBox::Unite(const BoundingBox& a_Other)
 	{
 		if (IsValid() && a_Other.IsValid())
 		{
@@ -341,14 +341,14 @@ namespace ExLibris
 		}
 	}
 
-	Bounds Bounds::GetUnited(const Bounds& a_Other) const
+	BoundingBox BoundingBox::GetUnited(const BoundingBox& a_Other) const
 	{
 		if (!IsValid() || !a_Other.IsValid())
 		{
-			return Bounds();
+			return BoundingBox();
 		}
 
-		return Bounds(
+		return BoundingBox(
 			glm::min(m_Minimum, a_Other.GetMinimum()),
 			glm::max(m_Maximum, a_Other.GetMaximum())
 		);
@@ -356,12 +356,12 @@ namespace ExLibris
 
 	// Validity
 
-	bool Bounds::IsValid() const
+	bool BoundingBox::IsValid() const
 	{
 		return ((m_Minimum.x <= m_Maximum.x) && (m_Minimum.y <= m_Maximum.y));
 	}
 
-	void Bounds::Invalidate()
+	void BoundingBox::Invalidate()
 	{
 		m_Minimum.x = std::numeric_limits<float>::max();
 		m_Minimum.y = std::numeric_limits<float>::max();
@@ -370,7 +370,7 @@ namespace ExLibris
 		m_Maximum.y = -std::numeric_limits<float>::max();
 	}
 
-	void Bounds::Validate()
+	void BoundingBox::Validate()
 	{
 		if (m_Minimum.x > m_Maximum.x)
 		{
