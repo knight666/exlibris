@@ -544,6 +544,68 @@ TEST(Bounds, GetHalfWidthInvalid)
 	EXPECT_FLOAT_EQ(0.0f, bounds.GetHalfWidth());
 }
 
+TEST(Bounds, SetHalfWidth)
+{
+	Bounds bounds(
+		glm::vec2(14.5f, 118.7f),
+		glm::vec2(36.8f, 156.87f)
+	);
+
+	bounds.SetHalfWidth(15.5f);
+
+	EXPECT_VEC2_EQ(
+		14.5f + (36.8f - 14.5f) / 2.0f,
+		118.7f + (156.87f - 118.7f) / 2.0f,
+		bounds.GetCenter()
+	);
+	EXPECT_VEC2_EQ(
+		14.5f + (36.8f - 14.5f) / 2.0f - 15.5f,
+		118.7f, 
+		bounds.GetMinimum()
+	);
+	EXPECT_VEC2_EQ(
+		14.5f + (36.8f - 14.5f) / 2.0f + 15.5f,
+		156.87f, 
+		bounds.GetMaximum()
+	);
+}
+
+TEST(Bounds, SetHalfWidthNegative)
+{
+	Bounds bounds(
+		glm::vec2(11.87f, 87.86f),
+		glm::vec2(11.97f, 1964.2f)
+	);
+
+	bounds.SetHalfWidth(-33.7f);
+
+	EXPECT_VEC2_EQ(
+		11.87f + (11.97f - 11.87f) / 2.0f,
+		87.86f + (1964.2f - 87.86f) / 2.0f,
+		bounds.GetCenter()
+	);
+	EXPECT_VEC2_EQ(
+		11.87f + (11.97f - 11.87f) / 2.0f - 33.7f,
+		87.86f,
+		bounds.GetMinimum()
+	);
+	EXPECT_VEC2_EQ(
+		11.87f + (11.97f - 11.87f) / 2.0f + 33.7f,
+		1964.2f,
+		bounds.GetMaximum()
+	);
+}
+
+TEST(Bounds, SetHalfWidthInvalid)
+{
+	Bounds bounds;
+
+	bounds.SetHalfWidth(33.8f);
+
+	EXPECT_FLOAT_EQ(-33.8f, bounds.GetMinimum().x);
+	EXPECT_FLOAT_EQ(33.8f, bounds.GetMaximum().x);
+}
+
 TEST(Bounds, GetHalfHeight)
 {
 	Bounds bounds(
@@ -559,6 +621,68 @@ TEST(Bounds, GetHalfHeightInvalid)
 	Bounds bounds;
 
 	EXPECT_FLOAT_EQ(0.0f, bounds.GetHalfHeight());
+}
+
+TEST(Bounds, SetHalfHeight)
+{
+	Bounds bounds(
+		glm::vec2(-3.7f, 116.87f),
+		glm::vec2(25.8f, 150.12f)
+	);
+
+	bounds.SetHalfHeight(44.8f);
+
+	EXPECT_VEC2_EQ(
+		-3.7f + (25.8f - -3.7f) / 2.0f,
+		116.87f + (150.12f - 116.87f) / 2.0f,
+		bounds.GetCenter()
+	);
+	EXPECT_VEC2_EQ(
+		-3.7f,
+		116.87f + (150.12f - 116.87f) / 2.0f - 44.8f, 
+		bounds.GetMinimum()
+	);
+	EXPECT_VEC2_EQ(
+		25.8f,
+		116.87f + (150.12f - 116.87f) / 2.0f + 44.8f, 
+		bounds.GetMaximum()
+	);
+}
+
+TEST(Bounds, SetHalfHeightNegative)
+{
+	Bounds bounds(
+		glm::vec2(1.87f, 116.87f),
+		glm::vec2(16.43f, 198.78f)
+	);
+
+	bounds.SetHalfHeight(-3.57f);
+
+	EXPECT_VEC2_EQ(
+		1.87f + (16.43f - 1.87f) / 2.0f,
+		116.87f + (198.78f - 116.87f) / 2.0f,
+		bounds.GetCenter()
+	);
+	EXPECT_VEC2_EQ(
+		1.87f,
+		116.87f + (198.78f - 116.87f) / 2.0f - 3.57f,
+		bounds.GetMinimum()
+	);
+	EXPECT_VEC2_EQ(
+		16.43f,
+		116.87f + (198.78f - 116.87f) / 2.0f + 3.57f,
+		bounds.GetMaximum()
+	);
+}
+
+TEST(Bounds, SetHalfHeightInvalid)
+{
+	Bounds bounds;
+
+	bounds.SetHalfHeight(16.98f);
+
+	EXPECT_FLOAT_EQ(-16.98f, bounds.GetMinimum().y);
+	EXPECT_FLOAT_EQ(16.98f, bounds.GetMaximum().y);
 }
 
 TEST(Bounds, GetCenter)

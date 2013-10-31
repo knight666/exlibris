@@ -47,6 +47,8 @@ namespace ExLibris
 	{
 	}
 
+	// Properties
+
 	const glm::vec2& Bounds::GetMinimum() const
 	{
 		return m_Minimum;
@@ -86,6 +88,21 @@ namespace ExLibris
 			m_Maximum = a_Maximum;
 		}
 	}
+
+	glm::vec2 Bounds::GetCenter() const
+	{
+		return (m_Minimum + m_Maximum) / 2.0f;
+	}
+
+	void Bounds::SetCenter(const glm::vec2& a_Center)
+	{
+		glm::vec2 half_dimensions = GetHalfDimensions();
+
+		m_Minimum = a_Center - half_dimensions;
+		m_Maximum = a_Center + half_dimensions;
+	}
+
+	// Dimensions
 
 	float Bounds::GetWidth() const
 	{
@@ -153,9 +170,39 @@ namespace ExLibris
 		return IsValid() ? (glm::abs(m_Maximum.x - m_Minimum.x) / 2.0f) : 0.0f;
 	}
 
+	void Bounds::SetHalfWidth(float a_HalfWidth)
+	{
+		float center_x  = (m_Minimum.x + m_Maximum.x) / 2.0f;
+
+		m_Minimum.x = center_x - a_HalfWidth;
+		m_Maximum.x = center_x + a_HalfWidth;
+
+		if (m_Minimum.x > m_Maximum.x)
+		{
+			float swap = m_Maximum.x;
+			m_Maximum.x = m_Minimum.x;
+			m_Minimum.x = swap;
+		}
+	}
+
 	float Bounds::GetHalfHeight() const
 	{
 		return IsValid() ? (glm::abs(m_Maximum.y - m_Minimum.y) / 2.0f) : 0.0f;
+	}
+
+	void Bounds::SetHalfHeight(float a_HalfHeight)
+	{
+		float center_y  = (m_Minimum.y + m_Maximum.y) / 2.0f;
+
+		m_Minimum.y = center_y - a_HalfHeight;
+		m_Maximum.y = center_y + a_HalfHeight;
+
+		if (m_Minimum.y > m_Maximum.y)
+		{
+			float swap = m_Maximum.y;
+			m_Maximum.y = m_Minimum.y;
+			m_Minimum.y = swap;
+		}
 	}
 
 	glm::vec2 Bounds::GetHalfDimensions() const
@@ -173,18 +220,7 @@ namespace ExLibris
 		Validate();
 	}
 
-	glm::vec2 Bounds::GetCenter() const
-	{
-		return (m_Minimum + m_Maximum) / 2.0f;
-	}
-
-	void Bounds::SetCenter(const glm::vec2& a_Center)
-	{
-		glm::vec2 half_dimensions = GetHalfDimensions();
-
-		m_Minimum = a_Center - half_dimensions;
-		m_Maximum = a_Center + half_dimensions;
-	}
+	// Operators
 
 	Bounds& Bounds::operator = (const Bounds& a_Other)
 	{
@@ -193,6 +229,8 @@ namespace ExLibris
 
 		return *this;
 	}
+
+	// Validity
 
 	bool Bounds::IsValid() const
 	{
