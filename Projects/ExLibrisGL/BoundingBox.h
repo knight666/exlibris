@@ -64,9 +64,16 @@ namespace ExLibris
 		void SetBottom(float a_Bottom);
 
 		glm::vec2 GetTopLeft() const;
+		void SetTopLeft(const glm::vec2& a_TopLeft);
+
 		glm::vec2 GetTopRight() const;
+		void SetTopRight(const glm::vec2& a_TopRight);
+
 		glm::vec2 GetBottomLeft() const;
+		void SetBottomLeft(const glm::vec2& a_BottomLeft);
+
 		glm::vec2 GetBottomRight() const;
+		void SetBottomRight(const glm::vec2& a_BottomRight);
 
 		// Dimensions
 
