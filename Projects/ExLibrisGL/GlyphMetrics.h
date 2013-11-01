@@ -24,22 +24,16 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "BoundingBox.h"
 
 namespace ExLibris
 {
-
-	struct BoundingBoxOld
-	{
-		glm::vec2 minimum;
-		glm::vec2 maximum;
-	};
 
 	struct GlyphMetrics
 	{
 		glm::vec2 offset;
 		float advance;
-		BoundingBoxOld bounding_box;
+		BoundingBox bounding_box;
 	};
 
 }; // namespace ExLibris

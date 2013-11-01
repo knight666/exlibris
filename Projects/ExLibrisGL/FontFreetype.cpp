@@ -253,10 +253,16 @@ namespace ExLibris
 		errors = FT_Outline_Get_BBox(&a_Slot->outline, &bounding_box);
 		if (errors == FT_Err_Ok)
 		{
-			a_Glyph->metrics->bounding_box.minimum.x = Fixed26Dot6::ToFloat(bounding_box.xMin);
-			a_Glyph->metrics->bounding_box.minimum.y = Fixed26Dot6::ToFloat(bounding_box.yMin);
-			a_Glyph->metrics->bounding_box.maximum.x = Fixed26Dot6::ToFloat(bounding_box.xMax);
-			a_Glyph->metrics->bounding_box.maximum.y = Fixed26Dot6::ToFloat(bounding_box.yMax);
+			a_Glyph->metrics->bounding_box = BoundingBox(
+				glm::vec2(
+					Fixed26Dot6::ToFloat(bounding_box.xMin),
+					Fixed26Dot6::ToFloat(bounding_box.yMin)
+				),
+				glm::vec2(
+					Fixed26Dot6::ToFloat(bounding_box.xMax),
+					Fixed26Dot6::ToFloat(bounding_box.yMax)
+				)
+			);
 		}
 
 		return true;
