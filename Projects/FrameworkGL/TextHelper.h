@@ -1,17 +1,13 @@
-#ifndef _TEXTHELPER_H_
-#define _TEXTHELPER_H_
+#pragma once
 
 #include <glm/glm.hpp>
+
+#include "RenderCommandText.h"
 
 namespace ExLibris
 {
 	class FontFace;
 	class IFont;
-}
-
-namespace Framework
-{
-	class TextLabel;
 }
 
 namespace Framework
@@ -32,33 +28,22 @@ namespace Framework
 
 	private:
 
-		void _LoadShader();
-		void _CreateVertexBuffer();
-		void _CreateVertexArray();
+		void _LoadShader(
+			GLuint& a_Program,
+			GLuint& a_VertexShader, const std::string& a_VertexSource,
+			GLuint& a_FragmentShader, const std::string& a_FragmentSource
+		);
+		void _CreateTextState();
 
 	private:
 
 		ExLibris::IFont* m_Font;
 		ExLibris::FontFace* m_FontFace;
 
-		std::vector<TextLabel*> m_Labels;
+		RenderCommandText::RenderState* m_RenderStateText;
 
-		GLuint m_ShaderVertex;
-		GLuint m_ShaderFragment;
-		GLuint m_Program;
-		GLint m_AttributePosition;
-		GLint m_AttributeTextureCoordinate0;
-		GLint m_UniformModelViewProjection;
-		GLint m_UniformTexture0;
-		GLint m_UniformTextureDimensions;
-		GLint m_UniformTextColor;
+		std::vector<IRenderCommand*> m_Commands;
 
-		GLuint m_BufferVertices;
-		GLuint m_BufferElements;
-		GLuint m_BufferAttributes;
-	
 	}; // class TextHelper
 
 }; // namespace Framework
-
-#endif

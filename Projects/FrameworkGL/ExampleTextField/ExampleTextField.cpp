@@ -5,12 +5,17 @@
 #include <string>
 #include <vector>
 
+// Windows
+
+#include <windows.h>
+
 // Framework
 
 #include <Application.h>
 #include <MeshOpenGL.h>
 #include <ShaderLoader.h>
 #include <ShaderProgram.h>
+#include <TextHelper.h>
 
 namespace fw = Framework;
 
@@ -435,6 +440,19 @@ public:
 		
 		_LoadShaders();
 
+		try
+		{
+			m_TextHelper = new fw::TextHelper;
+		}
+		catch (std::exception& e)
+		{
+			MessageBoxA(0, e.what(), "Error while creating TextHelper", MB_OK);
+			return false;
+		}
+
+		m_TextHelper->AddText("This is just a test.", glm::vec2(20.0f, 20.0f));
+		m_TextHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
@@ -478,10 +496,14 @@ public:
 		glUniform1i(m_ProgramEffects->GetUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
 		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
+
+		m_TextHelper->Render(width, height);
 	}
 
 	void Destroy()
 	{
+		delete m_TextHelper;
+
 		if (m_TextField != nullptr)
 		{
 			delete m_TextField;
@@ -590,6 +612,7 @@ private:
 	exl::IFont* m_Font;
 	exl::FaceOptions m_FaceOptions;
 	exl::FontFace* m_FontFace;
+	fw::TextHelper* m_TextHelper;
 
 	TextField* m_TextField;
 
