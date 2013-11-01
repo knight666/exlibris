@@ -246,6 +246,110 @@ TEST(BoundingBox, GetCornersInvalid)
 	);
 }
 
+TEST(BoundingBox, SetLeft)
+{
+	BoundingBox box(
+		glm::vec2(88.2f, 881.7f),
+		glm::vec2(22.5f, 1176.62f)
+	);
+
+	box.SetLeft(-15.8f);
+
+	EXPECT_VEC2_EQ(-15.8f, 881.7f, box.GetMinimum());
+	EXPECT_VEC2_EQ(88.2f, 1176.62f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetLeftSwapped)
+{
+	BoundingBox box(
+		glm::vec2(1.87f, 1128.7f),
+		glm::vec2(4.97f, 1598.55f)
+	);
+
+	box.SetLeft(115.8f);
+
+	EXPECT_VEC2_EQ(4.97f, 1128.7f, box.GetMinimum());
+	EXPECT_VEC2_EQ(115.8f, 1598.55f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetRight)
+{
+	BoundingBox box(
+		glm::vec2(44.14f, 86.2f),
+		glm::vec2(115.87f, 108.87f)
+	);
+
+	box.SetRight(200.8f);
+
+	EXPECT_VEC2_EQ(44.14f, 86.2f, box.GetMinimum());
+	EXPECT_VEC2_EQ(200.8f, 108.87f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetRightSwapped)
+{
+	BoundingBox box(
+		glm::vec2(1.87f, 11.87f),
+		glm::vec2(2.87f, 777.7f)
+	);
+
+	box.SetRight(-67.87f);
+
+	EXPECT_VEC2_EQ(-67.87f, 11.87f, box.GetMinimum());
+	EXPECT_VEC2_EQ(1.87f, 777.7f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTop)
+{
+	BoundingBox box(
+		glm::vec2(-16.87f, 11.87f),
+		glm::vec2(17.98f, 55.87f)
+	);
+
+	box.SetTop(-6.87f);
+
+	EXPECT_VEC2_EQ(-16.87f, -6.87f, box.GetMinimum());
+	EXPECT_VEC2_EQ(17.98f, 55.87f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopSwapped)
+{
+	BoundingBox box(
+		glm::vec2(6.87f, 11.97f),
+		glm::vec2(18.65f, 45.87f)
+	);
+
+	box.SetTop(115.87f);
+
+	EXPECT_VEC2_EQ(6.87f, 45.87f, box.GetMinimum());
+	EXPECT_VEC2_EQ(18.65f, 115.87f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottom)
+{
+	BoundingBox box(
+		glm::vec2(44.8f, 11.97f),
+		glm::vec2(118.7f, 15.97f)
+	);
+
+	box.SetBottom(45.87f);
+
+	EXPECT_VEC2_EQ(44.8f, 11.97f, box.GetMinimum());
+	EXPECT_VEC2_EQ(118.7f, 45.87f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomSwapped)
+{
+	BoundingBox box(
+		glm::vec2(3.87f, 11.98f),
+		glm::vec2(14.67f, 116.8f)
+	);
+
+	box.SetBottom(-6.87f);
+
+	EXPECT_VEC2_EQ(3.87f, -6.87f, box.GetMinimum());
+	EXPECT_VEC2_EQ(14.67f, 11.98f, box.GetMaximum());
+}
+
 TEST(BoundingBox, GetDimensions)
 {
 	BoundingBox bounds(
