@@ -272,6 +272,16 @@ TEST(BoundingBox, SetLeftSwapped)
 	EXPECT_VEC2_EQ(115.8f, 1598.55f, box.GetMaximum());
 }
 
+TEST(BoundingBox, SetLeftInvalid)
+{
+	BoundingBox box;
+
+	box.SetLeft(15.98f);
+
+	EXPECT_FLOAT_EQ(15.98f, box.GetMinimum().x);
+	EXPECT_FLOAT_EQ(15.98f, box.GetMaximum().x);
+}
+
 TEST(BoundingBox, SetRight)
 {
 	BoundingBox box(
@@ -296,6 +306,16 @@ TEST(BoundingBox, SetRightSwapped)
 
 	EXPECT_VEC2_EQ(-67.87f, 11.87f, box.GetMinimum());
 	EXPECT_VEC2_EQ(1.87f, 777.7f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetRightInvalid)
+{
+	BoundingBox box;
+
+	box.SetRight(33.7f);
+
+	EXPECT_FLOAT_EQ(33.7f, box.GetMinimum().x);
+	EXPECT_FLOAT_EQ(33.7f, box.GetMaximum().x);
 }
 
 TEST(BoundingBox, SetTop)
@@ -324,6 +344,16 @@ TEST(BoundingBox, SetTopSwapped)
 	EXPECT_VEC2_EQ(18.65f, 115.87f, box.GetMaximum());
 }
 
+TEST(BoundingBox, SetTopInvalid)
+{
+	BoundingBox box;
+
+	box.SetTop(-6.87f);
+
+	EXPECT_FLOAT_EQ(-6.87f, box.GetMinimum().y);
+	EXPECT_FLOAT_EQ(-6.87f, box.GetMaximum().y);
+}
+
 TEST(BoundingBox, SetBottom)
 {
 	BoundingBox box(
@@ -348,6 +378,212 @@ TEST(BoundingBox, SetBottomSwapped)
 
 	EXPECT_VEC2_EQ(3.87f, -6.87f, box.GetMinimum());
 	EXPECT_VEC2_EQ(14.67f, 11.98f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomInvalid)
+{
+	BoundingBox box;
+
+	box.SetBottom(56.7f);
+
+	EXPECT_FLOAT_EQ(56.7f, box.GetMinimum().y);
+	EXPECT_FLOAT_EQ(56.7f, box.GetMaximum().y);
+}
+
+TEST(BoundingBox, SetTopLeft)
+{
+	BoundingBox box(
+		glm::vec2(-9.82f, 11.9f),
+		glm::vec2(16.98f, 25.98f)
+	);
+
+	box.SetTopLeft(glm::vec2(-98.98f, 11.98f));
+
+	EXPECT_VEC2_EQ(-98.98f, 11.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(16.98f, 25.98f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopLeftSwappedHorizontal)
+{
+	BoundingBox box(
+		glm::vec2(5.98f, 11.9f),
+		glm::vec2(32.97f, 112.8f)
+	);
+
+	box.SetTopLeft(glm::vec2(55.98f, -9.86f));
+
+	EXPECT_VEC2_EQ(32.97f, -9.86f, box.GetMinimum());
+	EXPECT_VEC2_EQ(55.98f, 112.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopLeftSwappedVertical)
+{
+	BoundingBox box(
+		glm::vec2(67.8f, 112.08f),
+		glm::vec2(118.23f, 167.98f)
+	);
+
+	box.SetTopLeft(glm::vec2(14.98f, 256.88f));
+
+	EXPECT_VEC2_EQ(14.98f, 167.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(118.23f, 256.88f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopLeftInvalid)
+{
+	BoundingBox box;
+
+	box.SetTopLeft(glm::vec2(22.98f, 12.98f));
+
+	EXPECT_VEC2_EQ(22.98f, 12.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(22.98f, 12.98f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopRight)
+{
+	BoundingBox box(
+		glm::vec2(15.98f, 11.98f),
+		glm::vec2(84.56f, 99.8f)
+	);
+
+	box.SetTopRight(glm::vec2(116.82f, 9.76f));
+
+	EXPECT_VEC2_EQ(15.98f, 9.76f, box.GetMinimum());
+	EXPECT_VEC2_EQ(116.82f, 99.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopRightSwappedHorizontal)
+{
+	BoundingBox box(
+		glm::vec2(5.98f, 11.9f),
+		glm::vec2(32.97f, 112.8f)
+	);
+
+	box.SetTopRight(glm::vec2(-15.56f, -9.86f));
+
+	EXPECT_VEC2_EQ(-15.56f, -9.86f, box.GetMinimum());
+	EXPECT_VEC2_EQ(5.98f, 112.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopRightSwappedVertical)
+{
+	BoundingBox box(
+		glm::vec2(6.98f, 11.08f),
+		glm::vec2(15.87f, 18.98f)
+	);
+
+	box.SetTopRight(glm::vec2(21.61f, 5.84f));
+
+	EXPECT_VEC2_EQ(6.98f, 5.84f, box.GetMinimum());
+	EXPECT_VEC2_EQ(21.61f, 18.98f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetTopRightInvalid)
+{
+	BoundingBox box;
+
+	box.SetTopRight(glm::vec2(22.12f, -67.98f));
+
+	EXPECT_VEC2_EQ(22.12f, -67.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(22.12f, -67.98f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomLeft)
+{
+	BoundingBox box(
+		glm::vec2(17.98f, 112.98f),
+		glm::vec2(45.98f, 187.27f)
+	);
+
+	box.SetBottomLeft(glm::vec2(4.87f, 214.9f));
+
+	EXPECT_VEC2_EQ(4.87f, 112.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(45.98f, 214.9f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomLeftSwappedHorizontal)
+{
+	BoundingBox box(
+		glm::vec2(19.37f, -1.96f),
+		glm::vec2(25.98f, 58.98f)
+	);
+
+	box.SetBottomLeft(glm::vec2(45.91f, 64.82f));
+
+	EXPECT_VEC2_EQ(25.98f, -1.96f, box.GetMinimum());
+	EXPECT_VEC2_EQ(45.91f, 64.82f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomLeftSwappedVertical)
+{
+	BoundingBox box(
+		glm::vec2(1.93f, -47.28f),
+		glm::vec2(24.87f, 18.98f)
+	);
+
+	box.SetBottomLeft(glm::vec2(-5.43f, -133.52f));
+
+	EXPECT_VEC2_EQ(-5.43f, -133.52f, box.GetMinimum());
+	EXPECT_VEC2_EQ(24.87f, -47.28f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomLeftInvalid)
+{
+	BoundingBox box;
+
+	box.SetBottomLeft(glm::vec2(55.82f, 10.8f));
+
+	EXPECT_VEC2_EQ(55.82f, 10.8f, box.GetMinimum());
+	EXPECT_VEC2_EQ(55.82f, 10.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomRight)
+{
+	BoundingBox box(
+		glm::vec2(16.98f, 1.876f),
+		glm::vec2(25.97f, 2.97f)
+	);
+
+	box.SetBottomRight(glm::vec2(45.97f, 5.67f));
+
+	EXPECT_VEC2_EQ(16.98f, 1.876f, box.GetMinimum());
+	EXPECT_VEC2_EQ(45.97f, 5.67f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomRightSwappedHorizontal)
+{
+	BoundingBox box(
+		glm::vec2(22.97f, 15.98f),
+		glm::vec2(45.87f, 25.45f)
+	);
+
+	box.SetBottomRight(glm::vec2(-34.9f, 234.93f));
+
+	EXPECT_VEC2_EQ(-34.9f, 15.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(22.97f, 234.93f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomRightSwappedVertical)
+{
+	BoundingBox box(
+		glm::vec2(45.8f, 12.08f),
+		glm::vec2(173.2f, 15.98f)
+	);
+
+	box.SetBottomRight(glm::vec2(252.7f, -25.98f));
+
+	EXPECT_VEC2_EQ(45.8f, -25.98f, box.GetMinimum());
+	EXPECT_VEC2_EQ(252.7f, 12.08f, box.GetMaximum());
+}
+
+TEST(BoundingBox, SetBottomRightInvalid)
+{
+	BoundingBox box;
+
+	box.SetBottomRight(glm::vec2(22.14f, 13.9f));
+
+	EXPECT_VEC2_EQ(22.14f, 13.9f, box.GetMinimum());
+	EXPECT_VEC2_EQ(22.14f, 13.9f, box.GetMaximum());
 }
 
 TEST(BoundingBox, GetDimensions)

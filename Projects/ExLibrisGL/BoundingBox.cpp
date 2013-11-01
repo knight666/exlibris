@@ -111,13 +111,20 @@ namespace ExLibris
 
 	void BoundingBox::SetLeft(float a_Left)
 	{
-		m_Minimum.x = a_Left;
-
-		if (m_Minimum.x > m_Maximum.x)
+		if (m_Minimum.x < m_Maximum.x)
 		{
-			float swap = m_Maximum.x;
-			m_Maximum.x = m_Minimum.x;
-			m_Minimum.x = swap;
+			m_Minimum.x = a_Left;
+
+			if (m_Minimum.x > m_Maximum.x)
+			{
+				float swap = m_Maximum.x;
+				m_Maximum.x = m_Minimum.x;
+				m_Minimum.x = swap;
+			}
+		}
+		else
+		{
+			m_Minimum.x = m_Maximum.x = a_Left;
 		}
 	}
 
@@ -128,13 +135,20 @@ namespace ExLibris
 
 	void BoundingBox::SetRight(float a_Right)
 	{
-		m_Maximum.x = a_Right;
-
-		if (m_Minimum.x > m_Maximum.x)
+		if (m_Minimum.x < m_Maximum.x)
 		{
-			float swap = m_Maximum.x;
-			m_Maximum.x = m_Minimum.x;
-			m_Minimum.x = swap;
+			m_Maximum.x = a_Right;
+
+			if (m_Minimum.x > m_Maximum.x)
+			{
+				float swap = m_Maximum.x;
+				m_Maximum.x = m_Minimum.x;
+				m_Minimum.x = swap;
+			}
+		}
+		else
+		{
+			m_Minimum.x = m_Maximum.x = a_Right;
 		}
 	}
 
@@ -145,13 +159,20 @@ namespace ExLibris
 
 	void BoundingBox::SetTop(float a_Top)
 	{
-		m_Minimum.y = a_Top;
-
-		if (m_Minimum.y > m_Maximum.y)
+		if (m_Minimum.y < m_Maximum.y)
 		{
-			float swap = m_Maximum.y;
-			m_Maximum.y = m_Minimum.y;
-			m_Minimum.y = swap;
+			m_Minimum.y = a_Top;
+
+			if (m_Minimum.y > m_Maximum.y)
+			{
+				float swap = m_Maximum.y;
+				m_Maximum.y = m_Minimum.y;
+				m_Minimum.y = swap;
+			}
+		}
+		else
+		{
+			m_Minimum.y = m_Maximum.y = a_Top;
 		}
 	}
 
@@ -162,13 +183,20 @@ namespace ExLibris
 
 	void BoundingBox::SetBottom(float a_Bottom)
 	{
-		m_Maximum.y = a_Bottom;
-
-		if (m_Minimum.y > m_Maximum.y)
+		if (m_Minimum.y < m_Maximum.y)
 		{
-			float swap = m_Maximum.y;
-			m_Maximum.y = m_Minimum.y;
-			m_Minimum.y = swap;
+			m_Maximum.y = a_Bottom;
+
+			if (m_Minimum.y > m_Maximum.y)
+			{
+				float swap = m_Maximum.y;
+				m_Maximum.y = m_Minimum.y;
+				m_Minimum.y = swap;
+			}
+		}
+		else
+		{
+			m_Minimum.y = m_Maximum.y = a_Bottom;
 		}
 	}
 
@@ -177,9 +205,40 @@ namespace ExLibris
 		return m_Minimum;
 	}
 
+	void BoundingBox::SetTopLeft(const glm::vec2& a_TopLeft)
+	{
+		if (IsValid())
+		{
+			m_Minimum = a_TopLeft;
+
+			Validate();
+		}
+		else
+		{
+			m_Minimum = a_TopLeft;
+			m_Maximum = a_TopLeft;
+		}
+	}
+
 	glm::vec2 BoundingBox::GetTopRight() const
 	{
 		return glm::vec2(m_Maximum.x, m_Minimum.y);
+	}
+
+	void BoundingBox::SetTopRight(const glm::vec2& a_TopRight)
+	{
+		if (IsValid())
+		{
+			m_Maximum.x = a_TopRight.x;
+			m_Minimum.y = a_TopRight.y;
+
+			Validate();
+		}
+		else
+		{
+			m_Minimum = a_TopRight;
+			m_Maximum = a_TopRight;
+		}
 	}
 
 	glm::vec2 BoundingBox::GetBottomLeft() const
@@ -187,9 +246,40 @@ namespace ExLibris
 		return glm::vec2(m_Minimum.x, m_Maximum.y);
 	}
 
+	void BoundingBox::SetBottomLeft(const glm::vec2& a_BottomLeft)
+	{
+		if (IsValid())
+		{
+			m_Minimum.x = a_BottomLeft.x;
+			m_Maximum.y = a_BottomLeft.y;
+
+			Validate();
+		}
+		else
+		{
+			m_Minimum = a_BottomLeft;
+			m_Maximum = a_BottomLeft;
+		}
+	}
+
 	glm::vec2 BoundingBox::GetBottomRight() const
 	{
 		return m_Maximum;
+	}
+
+	void BoundingBox::SetBottomRight(const glm::vec2& a_BottomRight)
+	{
+		if (IsValid())
+		{
+			m_Maximum = a_BottomRight;
+
+			Validate();
+		}
+		else
+		{
+			m_Minimum = a_BottomRight;
+			m_Maximum = a_BottomRight;
+		}
 	}
 
 	// Dimensions
