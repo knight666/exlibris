@@ -52,9 +52,16 @@ namespace ExLibris
 		// Corners
 
 		float GetLeft() const;
+		void SetLeft(float a_Left);
+
 		float GetRight() const;
+		void SetRight(float a_Right);
+
 		float GetTop() const;
+		void SetTop(float a_Top);
+
 		float GetBottom() const;
+		void SetBottom(float a_Bottom);
 
 		glm::vec2 GetTopLeft() const;
 		glm::vec2 GetTopRight() const;

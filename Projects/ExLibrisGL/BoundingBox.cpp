@@ -109,9 +109,33 @@ namespace ExLibris
 		return m_Minimum.x;
 	}
 
+	void BoundingBox::SetLeft(float a_Left)
+	{
+		m_Minimum.x = a_Left;
+
+		if (m_Minimum.x > m_Maximum.x)
+		{
+			float swap = m_Maximum.x;
+			m_Maximum.x = m_Minimum.x;
+			m_Minimum.x = swap;
+		}
+	}
+
 	float BoundingBox::GetRight() const
 	{
 		return m_Maximum.x;
+	}
+
+	void BoundingBox::SetRight(float a_Right)
+	{
+		m_Maximum.x = a_Right;
+
+		if (m_Minimum.x > m_Maximum.x)
+		{
+			float swap = m_Maximum.x;
+			m_Maximum.x = m_Minimum.x;
+			m_Minimum.x = swap;
+		}
 	}
 
 	float BoundingBox::GetTop() const
@@ -119,9 +143,33 @@ namespace ExLibris
 		return m_Minimum.y;
 	}
 
+	void BoundingBox::SetTop(float a_Top)
+	{
+		m_Minimum.y = a_Top;
+
+		if (m_Minimum.y > m_Maximum.y)
+		{
+			float swap = m_Maximum.y;
+			m_Maximum.y = m_Minimum.y;
+			m_Minimum.y = swap;
+		}
+	}
+
 	float BoundingBox::GetBottom() const
 	{
 		return m_Maximum.y;
+	}
+
+	void BoundingBox::SetBottom(float a_Bottom)
+	{
+		m_Maximum.y = a_Bottom;
+
+		if (m_Minimum.y > m_Maximum.y)
+		{
+			float swap = m_Maximum.y;
+			m_Maximum.y = m_Minimum.y;
+			m_Minimum.y = swap;
+		}
 	}
 
 	glm::vec2 BoundingBox::GetTopLeft() const
