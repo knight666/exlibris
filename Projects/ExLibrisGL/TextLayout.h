@@ -102,6 +102,7 @@ namespace ExLibris
 
 		glm::vec2 m_Cursor;
 		glm::vec2 m_Dimensions;
+		BoundingBox m_BoundingBox;
 
 		glm::vec2 m_SizeHint;
 		HorizontalAlignment m_HorizontalAlignment;

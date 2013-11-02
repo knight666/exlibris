@@ -253,7 +253,7 @@ public:
 
 private:
 
-	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
+	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
 	{
 		// texture must be padded in order to support effects like glow and shadows
 
@@ -282,7 +282,7 @@ private:
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
 	}
 
-	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
+	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
 		m_LineOffset = a_Offset;
 		m_LineOffset.y += m_Font->GetDescender();
@@ -466,10 +466,10 @@ public:
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
-		m_FaceOptions.size = 24.0f;
+		m_FaceOptions.size = 60.0f;
 
-		m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
+		//m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Font = m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
 
 		m_FontFace = m_Font->CreateFace(m_FaceOptions);
 
@@ -505,7 +505,7 @@ public:
 		glUniform1i(m_ProgramEffects->GetUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
 		glUniform1i(m_ProgramEffects->GetUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
-		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
+		m_TextField->Render(glm::vec2(25.0f, 64.0f), projection);
 
 		m_DebugHelper->Render(width, height);
 	}

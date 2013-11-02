@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "BoundingBox.h"
 #include "TextCharacter.h"
 
 namespace ExLibris
@@ -35,6 +36,7 @@ namespace ExLibris
 		std::vector<TextCharacter*> characters;
 		glm::vec2 position;
 		glm::vec2 dimensions;
+		BoundingBox bounding_box;
 
 	}; // struct TextLine
 
