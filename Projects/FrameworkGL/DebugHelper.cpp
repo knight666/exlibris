@@ -82,6 +82,8 @@ namespace Framework
 		, m_FontFace(nullptr)
 		, m_RenderStateText(nullptr)
 		, m_RenderStateLines(nullptr)
+		, m_Color(1.0f, 1.0f, 1.0f, 1.0f)
+		, m_Thickness(1.0f)
 	{
 		m_Font = new FontSystem;
 
@@ -113,18 +115,28 @@ namespace Framework
 		delete m_RenderStateText;
 	}
 
-	void DebugHelper::AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::SetColor(const glm::vec4& a_Color)
+	{
+		m_Color = a_Color;
+	}
+
+	void DebugHelper::SetThickness(float a_Thickness)
+	{
+		m_Thickness = a_Thickness;
+	}
+
+	void DebugHelper::AddLine(const glm::vec2& a_Start, const glm::vec2& a_End)
 	{
 		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
 		command->AddLine(a_Start, a_End);
-		command->SetColor(a_Color);
-		command->SetThickness(a_Thickness);
+		command->SetColor(m_Color);
+		command->SetThickness(m_Thickness);
 		command->Batch();
 
 		m_Commands.push_back(command);
 	}
 
-	void DebugHelper::AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddBox(const ExLibris::BoundingBox& a_Box)
 	{
 		glm::vec2 box_ul = a_Box.GetTopLeft();
 		glm::vec2 box_ur = a_Box.GetTopRight();
@@ -136,18 +148,18 @@ namespace Framework
 		command->AddLine(box_ur, box_lr);
 		command->AddLine(box_lr, box_ll);
 		command->AddLine(box_ll, box_ul);
-		command->SetColor(a_Color);
-		command->SetThickness(a_Thickness);
+		command->SetColor(m_Color);
+		command->SetThickness(m_Thickness);
 		command->Batch();
 
 		m_Commands.push_back(command);
 	}
 
-	void DebugHelper::AddCircle(const glm::vec2& a_Position, float a_Radius, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddCircle(const glm::vec2& a_Position, float a_Radius)
 	{
 		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
-		command->SetColor(a_Color);
-		command->SetThickness(a_Thickness);
+		command->SetColor(m_Color);
+		command->SetThickness(m_Thickness);
 
 		int steps = 20;
 		float degrees_step = 360.0f / (float)steps;
@@ -175,12 +187,12 @@ namespace Framework
 		m_Commands.push_back(command);
 	}
 	
-	void DebugHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position)
 	{
 		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_FontFace);
 		command->SetText(a_Text);
 		command->SetPosition(a_Position);
-		command->SetColor(a_Color);
+		command->SetColor(m_Color);
 		command->Batch();
 
 		m_Commands.push_back(command);
