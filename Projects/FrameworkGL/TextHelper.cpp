@@ -113,17 +113,6 @@ namespace Framework
 		delete m_RenderStateText;
 	}
 
-	void TextHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
-	{
-		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_FontFace);
-		command->SetText(a_Text);
-		command->SetPosition(a_Position);
-		command->SetColor(a_Color);
-		command->Batch();
-
-		m_Commands.push_back(command);
-	}
-
 	void TextHelper::AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
 	{
 		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
@@ -149,6 +138,49 @@ namespace Framework
 		command->AddLine(box_ll, box_ul);
 		command->SetColor(a_Color);
 		command->SetThickness(a_Thickness);
+		command->Batch();
+
+		m_Commands.push_back(command);
+	}
+
+	void TextHelper::AddCircle(const glm::vec2& a_Position, float a_Radius, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	{
+		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
+		command->SetColor(a_Color);
+		command->SetThickness(a_Thickness);
+
+		int steps = 20;
+		float degrees_step = 360.0f / (float)steps;
+		float degrees = 0.0f;
+
+		for (int i = 0; i < steps; ++i)
+		{
+			glm::vec2 position_current(
+				a_Position.x + glm::cos(glm::radians(degrees)) * a_Radius,
+				a_Position.y + glm::sin(glm::radians(degrees)) * a_Radius
+			);
+
+			glm::vec2 position_next(
+				a_Position.x + glm::cos(glm::radians(degrees + degrees_step)) * a_Radius,
+				a_Position.y + glm::sin(glm::radians(degrees + degrees_step)) * a_Radius
+			);
+
+			command->AddLine(position_current, position_next);
+
+			degrees += degrees_step;
+		}
+
+		command->Batch();
+
+		m_Commands.push_back(command);
+	}
+	
+	void TextHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	{
+		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_FontFace);
+		command->SetText(a_Text);
+		command->SetPosition(a_Position);
+		command->SetColor(a_Color);
 		command->Batch();
 
 		m_Commands.push_back(command);

@@ -25,10 +25,11 @@ namespace Framework
 	
 		void Clear();
 
-		void AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
 		void AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 		void AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		void AddCircle(const glm::vec2& a_Position, float a_Radius, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		void AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 		void Render(int a_ScreenWidth, int a_ScreenHeight) const;
 
