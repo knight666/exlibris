@@ -451,9 +451,17 @@ public:
 		}
 
 		m_DebugHelper->AddText("This is just a test.", glm::vec2(20.0f, 20.0f));
-		m_DebugHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddBox(exl::BoundingBox(glm::vec2(10.0f, 10.0f), glm::vec2(630.0f, 470.0f)), 1.0f);
-		m_DebugHelper->AddCircle(glm::vec2(120.0f, 120.0f), 25.0f, 2.5f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_DebugHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f));
+
+		m_DebugHelper->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		m_DebugHelper->SetThickness(1.0f);
+		m_DebugHelper->AddBox(exl::BoundingBox(glm::vec2(10.0f, 10.0f), glm::vec2(630.0f, 470.0f)));
+
+		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_DebugHelper->SetThickness(2.5f);
+		m_DebugHelper->AddCircle(glm::vec2(120.0f, 120.0f), 25.0f);
 
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));

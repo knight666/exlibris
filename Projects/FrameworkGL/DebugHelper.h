@@ -25,11 +25,15 @@ namespace Framework
 	
 		void Clear();
 
-		void AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		void AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		void AddCircle(const glm::vec2& a_Position, float a_Radius, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		void SetColor(const glm::vec4& a_Color);
 
-		void AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		void SetThickness(float a_Thickness);
+
+		void AddLine(const glm::vec2& a_Start, const glm::vec2& a_End);
+		void AddBox(const ExLibris::BoundingBox& a_Box);
+		void AddCircle(const glm::vec2& a_Position, float a_Radius);
+
+		void AddText(const std::string& a_Text, const glm::vec2& a_Position);
 
 		void Render(int a_ScreenWidth, int a_ScreenHeight) const;
 
@@ -52,6 +56,9 @@ namespace Framework
 		RenderCommandLines::RenderState* m_RenderStateLines;
 
 		std::vector<IRenderCommand*> m_Commands;
+
+		glm::vec4 m_Color;
+		float m_Thickness;
 
 	}; // class TextHelper
 

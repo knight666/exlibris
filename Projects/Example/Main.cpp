@@ -52,11 +52,10 @@ public:
 			MessageBoxA(0, e.what(), "Error while creating TextHelper", MB_OK);
 			return false;
 		}
-		
-		glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);
-		m_DebugHelper->AddText("Debug text can be rendered without any external dependencies.", glm::vec2(20.0f, 20.0f), color);
 
-		m_DebugHelper->AddText("ASCII table:\n\n !\"#$%&'()*+,-./0123456789:;<=>?\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n`abcdefghijklmnopqrstuvwxyz{|}~\xfe", glm::vec2(20.0f, 80.0f), color);
+		m_DebugHelper->AddText("Debug text can be rendered without any external dependencies.", glm::vec2(20.0f, 20.0f));
+
+		m_DebugHelper->AddText("ASCII table:\n\n !\"#$%&'()*+,-./0123456789:;<=>?\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n`abcdefghijklmnopqrstuvwxyz{|}~\xfe", glm::vec2(20.0f, 80.0f));
 
 		return true;
 	}
