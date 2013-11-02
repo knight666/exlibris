@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "BoundingBox.h"
+#include "RenderCommandLines.h"
 #include "RenderCommandText.h"
 
 namespace ExLibris
@@ -22,7 +24,11 @@ namespace Framework
 		~TextHelper();
 	
 		void Clear();
-		void AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color = glm::vec4(1.0, 1.0, 1.0, 1.0));
+
+		void AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		void AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		void AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness = 1.0f, const glm::vec4& a_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 		void Render(int a_ScreenWidth, int a_ScreenHeight) const;
 
@@ -34,6 +40,7 @@ namespace Framework
 			GLuint& a_FragmentShader, const std::string& a_FragmentSource
 		);
 		void _CreateTextState();
+		void _CreateLinesState();
 
 	private:
 
@@ -41,6 +48,7 @@ namespace Framework
 		ExLibris::FontFace* m_FontFace;
 
 		RenderCommandText::RenderState* m_RenderStateText;
+		RenderCommandLines::RenderState* m_RenderStateLines;
 
 		std::vector<IRenderCommand*> m_Commands;
 
