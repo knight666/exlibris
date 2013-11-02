@@ -17,7 +17,7 @@ namespace fw = Framework;
 
 // ExLibris
 
-#include <TextHelper.h>
+#include <DebugHelper.h>
 
 namespace exl = ExLibris;
 
@@ -45,7 +45,7 @@ public:
 	{
 		try
 		{
-			m_TextHelper = new fw::TextHelper;
+			m_DebugHelper = new fw::DebugHelper;
 		}
 		catch (std::exception& e)
 		{
@@ -54,9 +54,9 @@ public:
 		}
 		
 		glm::vec4 color(1.0f, 1.0f, 0.0f, 1.0f);
-		m_TextHelper->AddText("Debug text can be rendered without any external dependencies.", glm::vec2(20.0f, 20.0f), color);
+		m_DebugHelper->AddText("Debug text can be rendered without any external dependencies.", glm::vec2(20.0f, 20.0f), color);
 
-		m_TextHelper->AddText("ASCII table:\n\n !\"#$%&'()*+,-./0123456789:;<=>?\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n`abcdefghijklmnopqrstuvwxyz{|}~\xfe", glm::vec2(20.0f, 80.0f), color);
+		m_DebugHelper->AddText("ASCII table:\n\n !\"#$%&'()*+,-./0123456789:;<=>?\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n`abcdefghijklmnopqrstuvwxyz{|}~\xfe", glm::vec2(20.0f, 80.0f), color);
 
 		return true;
 	}
@@ -72,17 +72,17 @@ public:
 		int width, height;
 		glfwGetFramebufferSize(GetWindow(), &width, &height);
 
-		m_TextHelper->Render(width, height);
+		m_DebugHelper->Render(width, height);
 	}
 
 	void Destroy()
 	{
-		delete m_TextHelper;
+		delete m_DebugHelper;
 	}
 
 private:
 
-	fw::TextHelper* m_TextHelper;
+	fw::DebugHelper* m_DebugHelper;
 
 }; // class Example
 

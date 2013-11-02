@@ -12,10 +12,10 @@
 // Framework
 
 #include <Application.h>
+#include <DebugHelper.h>
 #include <MeshOpenGL.h>
 #include <ShaderLoader.h>
 #include <ShaderProgram.h>
-#include <TextHelper.h>
 
 namespace fw = Framework;
 
@@ -442,7 +442,7 @@ public:
 
 		try
 		{
-			m_TextHelper = new fw::TextHelper;
+			m_DebugHelper = new fw::DebugHelper;
 		}
 		catch (std::exception& e)
 		{
@@ -450,10 +450,10 @@ public:
 			return false;
 		}
 
-		m_TextHelper->AddText("This is just a test.", glm::vec2(20.0f, 20.0f));
-		m_TextHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_TextHelper->AddBox(exl::BoundingBox(glm::vec2(10.0f, 10.0f), glm::vec2(630.0f, 470.0f)), 1.0f);
-		m_TextHelper->AddCircle(glm::vec2(120.0f, 120.0f), 25.0f, 2.5f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_DebugHelper->AddText("This is just a test.", glm::vec2(20.0f, 20.0f));
+		m_DebugHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_DebugHelper->AddBox(exl::BoundingBox(glm::vec2(10.0f, 10.0f), glm::vec2(630.0f, 470.0f)), 1.0f);
+		m_DebugHelper->AddCircle(glm::vec2(120.0f, 120.0f), 25.0f, 2.5f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
@@ -499,12 +499,12 @@ public:
 
 		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
 
-		m_TextHelper->Render(width, height);
+		m_DebugHelper->Render(width, height);
 	}
 
 	void Destroy()
 	{
-		delete m_TextHelper;
+		delete m_DebugHelper;
 
 		if (m_TextField != nullptr)
 		{
@@ -614,7 +614,7 @@ private:
 	exl::IFont* m_Font;
 	exl::FaceOptions m_FaceOptions;
 	exl::FontFace* m_FontFace;
-	fw::TextHelper* m_TextHelper;
+	fw::DebugHelper* m_DebugHelper;
 
 	TextField* m_TextField;
 
