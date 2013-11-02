@@ -15,13 +15,13 @@ namespace ExLibris
 namespace Framework
 {
 
-	class TextHelper
+	class DebugHelper
 	{
 	
 	public:
 	
-		TextHelper();
-		~TextHelper();
+		DebugHelper();
+		~DebugHelper();
 	
 		void Clear();
 

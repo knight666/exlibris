@@ -13,11 +13,11 @@
 // Framework
 
 #include <Application.h>
+#include <DebugHelper.h>
 #include <FontSystem.h>
 #include <MeshOpenGL.h>
 #include <ShaderLoader.h>
 #include <ShaderProgram.h>
-#include <TextHelper.h>
 
 namespace fw = Framework;
 
@@ -342,7 +342,7 @@ public:
 		, m_Library(nullptr)
 		, m_Font(nullptr)
 		, m_FontFace(nullptr)
-		, m_TextHelper(nullptr)
+		, m_DebugHelper(nullptr)
 	{
 	}
 
@@ -375,7 +375,7 @@ public:
 
 		try
 		{
-			m_TextHelper = new fw::TextHelper;
+			m_DebugHelper = new fw::DebugHelper;
 		}
 		catch (std::exception& e)
 		{
@@ -458,7 +458,7 @@ public:
 
 		m_OutlineVisitor->Render(projection, modelview);
 
-		m_TextHelper->Render(width, height);
+		m_DebugHelper->Render(width, height);
 	}
 
 	void Destroy()
@@ -478,7 +478,7 @@ public:
 			delete m_ShaderLoader;
 		}
 
-		delete m_TextHelper;
+		delete m_DebugHelper;
 		delete m_TextLayout;
 		delete m_OutlineVisitor;
 		delete m_Library;
@@ -684,7 +684,7 @@ private:
 
 	void _DrawInstructions()
 	{
-		m_TextHelper->Clear();
+		m_DebugHelper->Clear();
 
 		std::stringstream text;
 
@@ -702,7 +702,7 @@ private:
 			<< "<Ctrl> + <B> - Bold\n"
 			<< "<Ctrl> + <I> - Italic\n";
 
-		m_TextHelper->AddText(text.str(), glm::vec2(20.0f, 20.0f));
+		m_DebugHelper->AddText(text.str(), glm::vec2(20.0f, 20.0f));
 	}
 
 	void _LoadShaders()
@@ -748,7 +748,7 @@ private:
 	exl::Library* m_Library;
 	exl::IFont* m_Font;
 	exl::FontFace* m_FontFace;
-	fw::TextHelper* m_TextHelper;
+	fw::DebugHelper* m_DebugHelper;
 
 	exl::TextLayout* m_TextLayout;
 	OutlineVisitor* m_OutlineVisitor;

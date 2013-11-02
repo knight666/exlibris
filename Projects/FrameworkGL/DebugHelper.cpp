@@ -1,6 +1,6 @@
 #include "FrameworkGL.PCH.h"
 
-#include "TextHelper.h"
+#include "DebugHelper.h"
 
 // GLM
 
@@ -77,7 +77,7 @@ namespace Framework
 		glm::vec2 texture_coordinate;
 	};
 
-	TextHelper::TextHelper()
+	DebugHelper::DebugHelper()
 		: m_Font(nullptr)
 		, m_FontFace(nullptr)
 		, m_RenderStateText(nullptr)
@@ -92,7 +92,7 @@ namespace Framework
 		_CreateLinesState();
 	}
 	
-	TextHelper::~TextHelper()
+	DebugHelper::~DebugHelper()
 	{
 		Clear();
 
@@ -113,7 +113,7 @@ namespace Framework
 		delete m_RenderStateText;
 	}
 
-	void TextHelper::AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
 	{
 		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
 		command->AddLine(a_Start, a_End);
@@ -124,7 +124,7 @@ namespace Framework
 		m_Commands.push_back(command);
 	}
 
-	void TextHelper::AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
 	{
 		glm::vec2 box_ul = a_Box.GetTopLeft();
 		glm::vec2 box_ur = a_Box.GetTopRight();
@@ -143,7 +143,7 @@ namespace Framework
 		m_Commands.push_back(command);
 	}
 
-	void TextHelper::AddCircle(const glm::vec2& a_Position, float a_Radius, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddCircle(const glm::vec2& a_Position, float a_Radius, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
 	{
 		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
 		command->SetColor(a_Color);
@@ -175,7 +175,7 @@ namespace Framework
 		m_Commands.push_back(command);
 	}
 	
-	void TextHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	void DebugHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
 	{
 		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_FontFace);
 		command->SetText(a_Text);
@@ -186,7 +186,7 @@ namespace Framework
 		m_Commands.push_back(command);
 	}
 
-	void TextHelper::Clear()
+	void DebugHelper::Clear()
 	{
 		for (std::vector<IRenderCommand*>::const_iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
 		{
@@ -197,7 +197,7 @@ namespace Framework
 		m_Commands.clear();
 	}
 
-	void TextHelper::Render(int a_ScreenWidth, int a_ScreenHeight) const
+	void DebugHelper::Render(int a_ScreenWidth, int a_ScreenHeight) const
 	{
 		if (m_Commands.size() == 0)
 		{
@@ -236,7 +236,7 @@ namespace Framework
 		glPopAttrib();
 	}
 
-	void TextHelper::_LoadShader(GLuint& a_Program, GLuint& a_VertexShader, const std::string& a_VertexSource, GLuint& a_FragmentShader, const std::string& a_FragmentSource)
+	void DebugHelper::_LoadShader(GLuint& a_Program, GLuint& a_VertexShader, const std::string& a_VertexSource, GLuint& a_FragmentShader, const std::string& a_FragmentSource)
 	{
 		GLint success;
 		const GLchar* source_vertex = a_VertexSource.c_str();
@@ -335,7 +335,7 @@ namespace Framework
 		}
 	}
 
-	void TextHelper::_CreateTextState()
+	void DebugHelper::_CreateTextState()
 	{
 		m_RenderStateText = new RenderCommandText::RenderState;
 
@@ -421,7 +421,7 @@ namespace Framework
 		glBindVertexArray(0);
 	}
 
-	void TextHelper::_CreateLinesState()
+	void DebugHelper::_CreateLinesState()
 	{
 		m_RenderStateLines = new RenderCommandLines::RenderState;
 
