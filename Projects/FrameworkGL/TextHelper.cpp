@@ -34,7 +34,6 @@ namespace Framework
 
 	static const std::string g_TextSourceFragment = "\
 		#version 330 core\n \
-		\
 		in vec2 vertTextureCoordinate; \
 		uniform sampler2D texTexture0; \
 		uniform vec2 uniTextureDimensions; \
@@ -46,6 +45,24 @@ namespace Framework
 			vec2 shadow_offset = vec2(-1.0, -1.0) / uniTextureDimensions; \
 			vec4 shadow_sample = vec4(0.25, 0.25, 0.25, texture(texTexture0, vertTextureCoordinate + shadow_offset).a); \
 			fragColor = mix(shadow_sample, color_sample, color_sample.a); \
+		}";
+
+	static const std::string g_LinesSourceVertex = "\
+		#version 330 core\n \
+		in vec2 attrPosition; \
+		uniform mat4 matModelViewProjection; \
+		void main() \
+		{ \
+			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
+		}";
+
+	static const std::string g_LinesSourceFragment = "\
+		#version 330 core\n\
+		uniform vec4 uniColor; \
+		out vec4 fragColor; \
+		void main() \
+		{ \
+			fragColor = uniColor; \
 		}";
 
 	struct GlyphVertex
@@ -63,6 +80,8 @@ namespace Framework
 	TextHelper::TextHelper()
 		: m_Font(nullptr)
 		, m_FontFace(nullptr)
+		, m_RenderStateText(nullptr)
+		, m_RenderStateLines(nullptr)
 	{
 		m_Font = new FontSystem;
 
@@ -70,6 +89,7 @@ namespace Framework
 		m_FontFace = m_Font->CreateFace(options);
 
 		_CreateTextState();
+		_CreateLinesState();
 	}
 	
 	TextHelper::~TextHelper()
@@ -79,8 +99,13 @@ namespace Framework
 		delete m_FontFace;
 		delete m_Font;
 
-		glDeleteShader(m_RenderStateText->fragment_shader);
+		glDeleteShader(m_RenderStateLines->vertex_shader);
+		glDeleteShader(m_RenderStateLines->fragment_shader);
+		glDeleteProgram(m_RenderStateLines->program);
+		delete m_RenderStateLines;
+
 		glDeleteShader(m_RenderStateText->vertex_shader);
+		glDeleteShader(m_RenderStateText->fragment_shader);
 		glDeleteProgram(m_RenderStateText->program);
 		glDeleteBuffers(1, &m_RenderStateText->vertex_buffer);
 		glDeleteBuffers(1, &m_RenderStateText->element_buffer);
@@ -88,12 +113,42 @@ namespace Framework
 		delete m_RenderStateText;
 	}
 
-	void TextHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0, 1.0, 1.0, 1.0)*/)
+	void TextHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
 	{
 		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_FontFace);
 		command->SetText(a_Text);
 		command->SetPosition(a_Position);
 		command->SetColor(a_Color);
+		command->Batch();
+
+		m_Commands.push_back(command);
+	}
+
+	void TextHelper::AddLine(const glm::vec2& a_Start, const glm::vec2& a_End, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	{
+		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
+		command->AddLine(a_Start, a_End);
+		command->SetColor(a_Color);
+		command->SetThickness(a_Thickness);
+		command->Batch();
+
+		m_Commands.push_back(command);
+	}
+
+	void TextHelper::AddBox(const ExLibris::BoundingBox& a_Box, float a_Thickness /*= 1.0f*/, const glm::vec4& a_Color /*= glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)*/)
+	{
+		glm::vec2 box_ul = a_Box.GetTopLeft();
+		glm::vec2 box_ur = a_Box.GetTopRight();
+		glm::vec2 box_ll = a_Box.GetBottomLeft();
+		glm::vec2 box_lr = a_Box.GetBottomRight();
+
+		RenderCommandLines* command = new RenderCommandLines(m_RenderStateLines);
+		command->AddLine(box_ul, box_ur);
+		command->AddLine(box_ur, box_lr);
+		command->AddLine(box_lr, box_ll);
+		command->AddLine(box_ll, box_ul);
+		command->SetColor(a_Color);
+		command->SetThickness(a_Thickness);
 		command->Batch();
 
 		m_Commands.push_back(command);
@@ -332,6 +387,30 @@ namespace Framework
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RenderStateText->element_buffer);
 
 		glBindVertexArray(0);
+	}
+
+	void TextHelper::_CreateLinesState()
+	{
+		m_RenderStateLines = new RenderCommandLines::RenderState;
+
+		_LoadShader(
+			m_RenderStateLines->program,
+			m_RenderStateLines->vertex_shader, g_LinesSourceVertex,
+			m_RenderStateLines->fragment_shader, g_LinesSourceFragment
+		);
+
+		m_RenderStateLines->attribute_position = glGetAttribLocation(m_RenderStateLines->program, "attrPosition");
+		if (m_RenderStateLines->attribute_position == -1)
+		{
+			throw std::exception("Failed to find attribute locations.");
+		}
+
+		m_RenderStateLines->uniform_modelviewprojection = glGetUniformLocation(m_RenderStateLines->program, "matModelViewProjection");
+		m_RenderStateLines->uniform_color = glGetUniformLocation(m_RenderStateLines->program, "uniColor");
+		if (m_RenderStateLines->uniform_modelviewprojection == -1 || m_RenderStateLines->uniform_color == -1)
+		{
+			throw new std::exception("Failed to find uniform locations.");
+		}
 	}
 
 }; // namespace Framework

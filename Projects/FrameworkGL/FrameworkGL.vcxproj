@@ -38,6 +38,7 @@
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -49,6 +50,7 @@
     <Import Project="..\..\Properties\LibGLEW.props" />
     <Import Project="..\..\Properties\LibGLFW.props" />
     <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
     <Import Project="..\..\Properties\ProjExLibris.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -73,6 +75,7 @@
     <ClInclude Include="FrameworkGL.PCH.h" />
     <ClInclude Include="IRenderCommand.h" />
     <ClInclude Include="MeshOpenGL.h" />
+    <ClInclude Include="RenderCommandLines.h" />
     <ClInclude Include="RenderCommandText.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="ShaderProgram.h" />
@@ -87,6 +90,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="MeshOpenGL.cpp" />
+    <ClCompile Include="RenderCommandLines.cpp" />
     <ClCompile Include="RenderCommandText.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />

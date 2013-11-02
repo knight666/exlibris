@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <glm/glm.hpp>
+
 namespace ExLibris
 {
 	class FontFace;
