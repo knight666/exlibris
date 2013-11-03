@@ -172,6 +172,15 @@ namespace ExLibris
 		}
 	}
 
+	std::vector<TextLine*> TextLayout::GetLines() const
+	{
+		std::vector<TextLine*> lines;
+
+		lines.assign(m_Lines.begin(), m_Lines.end());
+
+		return lines;
+	}
+
 	void TextLayout::Accept(ITextLayoutVisitor& a_Visitor)
 	{
 		Layout();

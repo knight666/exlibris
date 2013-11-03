@@ -71,6 +71,8 @@ namespace ExLibris
 
 		void Layout();
 
+		std::vector<TextLine*> GetLines() const;
+
 		void Accept(ITextLayoutVisitor& a_Visitor);
 
 	private:
