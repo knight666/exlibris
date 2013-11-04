@@ -261,10 +261,6 @@ private:
 
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
 	{
-		m_DebugHelper->Clear();
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddBox(a_BoundingBox);
-
 		// texture must be padded in order to support effects like glow and shadows
 
 		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TexturePadding.x * 2);
@@ -290,12 +286,22 @@ private:
 
 		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
+
+		exl::BoundingBox box = a_BoundingBox;
+		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
+
+		m_DebugHelper->Clear();
+		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_DebugHelper->AddBox(box);
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
+		exl::BoundingBox box = a_BoundingBox;
+		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
+
 		m_DebugHelper->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddBox(a_BoundingBox);
+		m_DebugHelper->AddBox(box);
 
 		m_LineOffset = a_Offset;
 		m_LineOffset.y += m_Font->GetDescender();
@@ -326,10 +332,11 @@ private:
 
 		glm::vec2 correction(8.0f, 8.0f);
 
-		//exl::BoundingBox box = metrics->bounding_box;
-		exl::BoundingBox box(glm::vec2(0.0f, 0.0f), glm::vec2((float)bitmap->width, (float)bitmap->height));
-		//box.SetCenter(box.GetCenter() + m_Position + m_RenderCorrection + m_LineCorrection + correction + offset);
-		box.SetCenter(box.GetCenter() + m_Position + offset);
+		exl::BoundingBox box(
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2((float)bitmap->width, (float)bitmap->height)
+		);
+		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
 
 		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
 		m_DebugHelper->AddBox(box);
