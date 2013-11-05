@@ -3,6 +3,11 @@
 
 namespace Framework
 {
+	class ShaderProgram;
+}
+
+namespace Framework
+{
 
 	class ShaderSource
 	{
@@ -10,7 +15,12 @@ namespace Framework
 	public:
 
 		ShaderSource(const std::string& a_FileName, GLenum a_Target);
+		ShaderSource(ShaderProgram* a_Program, GLenum a_Target);
 		~ShaderSource();
+
+		GLuint GetHandle() const;
+
+		bool Compile(const std::string& a_Source);
 
 		void Load(const std::string& a_Source);
 		bool IsLoaded() const;
@@ -20,9 +30,11 @@ namespace Framework
 
 		const GLchar* GetLog() const;
 
-		GLuint GetHandle() const;
+		std::string GetLogString() const;
 
 	private:
+
+		ShaderProgram* m_Program;
 
 		GLuint m_Handle;
 		GLenum m_Target;
@@ -31,6 +43,7 @@ namespace Framework
 		std::string m_Source;
 
 		GLchar* m_Log;
+		GLint m_LogLength;
 		bool m_Compiled;
 
 	}; // class ShaderSource

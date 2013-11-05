@@ -18,6 +18,9 @@ namespace Framework
 
 		const std::string& GetName() const;
 
+		void LoadSource(GLenum a_Target, const std::string& a_Source);
+		void LoadSourceFromFile(GLenum a_Target, const std::string& a_FilePath);
+
 		void SetSourceVertex(ShaderSource* a_Source);
 		void SetSourceGeometry(ShaderSource* a_Source);
 		void SetSourceFragment(ShaderSource* a_Source);
@@ -32,6 +35,8 @@ namespace Framework
 		void Link();
 		bool IsLinked() const;
 
+		std::string GetLog() const;
+
 	private:
 
 		GLuint m_Handle;
@@ -42,6 +47,7 @@ namespace Framework
 		ShaderSource* m_SourceFragment;
 
 		GLchar* m_Log;
+		GLint m_LogLength;
 		bool m_Loaded;
 		bool m_Compiled;
 		bool m_Linked;
