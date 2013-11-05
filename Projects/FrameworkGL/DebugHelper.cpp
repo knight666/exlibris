@@ -21,63 +21,6 @@
 namespace Framework
 {
 
-	static const std::string g_TextSourceVertex = "\
-		#version 330 core\n \
-		in vec2 attrPosition; \
-		in vec2 attrTextureCoordinate0; \
-		out vec2 vertTextureCoordinate; \
-		uniform mat4 matModelViewProjection; \
-		void main() \
-		{ \
-			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
-			vertTextureCoordinate = attrTextureCoordinate0; \
-		}";
-
-	static const std::string g_TextSourceFragment = "\
-		#version 330 core\n \
-		in vec2 vertTextureCoordinate; \
-		uniform sampler2D texTexture0; \
-		uniform vec2 uniTextureDimensions; \
-		uniform vec4 uniTextColor; \
-		out vec4 fragColor; \
-		void main() \
-		{ \
-			vec4 color_sample = uniTextColor * texture(texTexture0, vertTextureCoordinate).a; \
-			vec2 shadow_offset = vec2(-1.0, -1.0) / uniTextureDimensions; \
-			vec4 shadow_sample = vec4(0.25, 0.25, 0.25, texture(texTexture0, vertTextureCoordinate + shadow_offset).a); \
-			fragColor = mix(shadow_sample, color_sample, color_sample.a); \
-		}";
-
-	static const std::string g_LinesSourceVertex = "\
-		#version 330 core\n \
-		in vec2 attrPosition; \
-		uniform mat4 matModelViewProjection; \
-		void main() \
-		{ \
-			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
-		}";
-
-	static const std::string g_LinesSourceFragment = "\
-		#version 330 core\n\
-		uniform vec4 uniColor; \
-		out vec4 fragColor; \
-		void main() \
-		{ \
-			fragColor = uniColor; \
-		}";
-
-	struct GlyphVertex
-	{
-		enum Offset
-		{
-			eOffset_Position = 0,
-			eOffset_TextureCoordinate = sizeof(glm::vec2)
-		};
-
-		glm::vec2 position;
-		glm::vec2 texture_coordinate;
-	};
-
 	DebugHelper::DebugHelper()
 		: m_Font(nullptr)
 		, m_FontFace(nullptr)
@@ -91,8 +34,8 @@ namespace Framework
 		ExLibris::FaceOptions options;
 		m_FontFace = m_Font->CreateFace(options);
 
-		_CreateTextState();
-		_CreateLinesState();
+		m_RenderStateText = RenderCommandText::CreateRenderState();
+		m_RenderStateLines = RenderCommandLines::CreateRenderState();
 	}
 	
 	DebugHelper::~DebugHelper()
@@ -243,108 +186,6 @@ namespace Framework
 		glEnable(GL_DEPTH_TEST);
 
 		glPopAttrib();
-	}
-
-	void DebugHelper::_CreateTextState()
-	{
-		m_RenderStateText = new RenderCommandText::RenderState;
-
-		m_RenderStateText->program = ShaderProgram::Create(g_TextSourceVertex, g_TextSourceFragment);
-
-		GLint attribute_position = m_RenderStateText->program->FindAttribute("attrPosition");
-		GLint attribute_texturecoordinate0 = m_RenderStateText->program->FindAttribute("attrTextureCoordinate0");
-		if (attribute_position == -1 || attribute_texturecoordinate0 == -1)
-		{
-			throw std::exception("Failed to find attribute locations.");
-		}
-
-		m_RenderStateText->uniform_modelviewprojection = m_RenderStateText->program->FindUniform("matModelViewProjection");
-		m_RenderStateText->uniform_texture0 = m_RenderStateText->program->FindUniform("texTexture0");
-		m_RenderStateText->uniform_texturedimensions = m_RenderStateText->program->FindUniform("uniTextureDimensions");
-		m_RenderStateText->uniform_textcolor = m_RenderStateText->program->FindUniform("uniTextColor");
-		if (m_RenderStateText->uniform_modelviewprojection == -1 || m_RenderStateText->uniform_texture0 == -1 || m_RenderStateText->uniform_texturedimensions == -1 || m_RenderStateText->uniform_textcolor == -1)
-		{
-			throw new std::exception("Failed to find uniform locations.");
-		}
-
-		// vertex buffer
-
-		glGenBuffers(1, &m_RenderStateText->vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_RenderStateText->vertex_buffer);
-
-			GlyphVertex vertex_data[4] = {
-				{
-					glm::vec2(0.0f, 0.0f),
-					glm::vec2(0.0f, 0.0f)
-				},
-				{
-					glm::vec2(1.0f, 0.0f),
-					glm::vec2(1.0f, 0.0f)
-				},
-				{
-					glm::vec2(0.0f, 1.0f),
-					glm::vec2(0.0f, 1.0f)
-				},
-				{
-					glm::vec2(1.0f, 1.0f),
-					glm::vec2(1.0f, 1.0f)
-				},
-			};
-
-			glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		// element buffer
-
-		glGenBuffers(1, &m_RenderStateText->element_buffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RenderStateText->element_buffer);
-
-			GLuint element_data[6] = {
-				1, 0, 2,
-				1, 2, 3
-			};
-
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), element_data, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		// vertex attribute buffer
-
-		glGenVertexArrays(1, &m_RenderStateText->vertex_attribute_buffer);
-		glBindVertexArray(m_RenderStateText->vertex_attribute_buffer);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_RenderStateText->vertex_buffer);
-
-			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_Position);
-			glEnableVertexAttribArray(attribute_position);
-
-			glVertexAttribPointer(attribute_texturecoordinate0, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_TextureCoordinate);
-			glEnableVertexAttribArray(attribute_texturecoordinate0);
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RenderStateText->element_buffer);
-
-		glBindVertexArray(0);
-	}
-
-	void DebugHelper::_CreateLinesState()
-	{
-		m_RenderStateLines = new RenderCommandLines::RenderState;
-
-		m_RenderStateLines->program = ShaderProgram::Create(g_LinesSourceVertex, g_LinesSourceFragment);
-
-		m_RenderStateLines->attribute_position = m_RenderStateLines->program->FindAttribute("attrPosition");
-		if (m_RenderStateLines->attribute_position == -1)
-		{
-			throw std::exception("Failed to find attribute locations.");
-		}
-
-		m_RenderStateLines->uniform_modelviewprojection = m_RenderStateLines->program->FindUniform("matModelViewProjection");
-		m_RenderStateLines->uniform_color = m_RenderStateLines->program->FindUniform("uniColor");
-		if (m_RenderStateLines->uniform_modelviewprojection == -1 || m_RenderStateLines->uniform_color == -1)
-		{
-			throw new std::exception("Failed to find uniform locations.");
-		}
 	}
 
 }; // namespace Framework

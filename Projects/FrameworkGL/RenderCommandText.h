@@ -38,6 +38,8 @@ namespace Framework
 			GLuint element_buffer;
 			GLuint vertex_attribute_buffer;
 		};
+
+		static RenderState* CreateRenderState();
 	
 	public:
 	

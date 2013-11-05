@@ -26,6 +26,8 @@ namespace Framework
 			GLint uniform_modelviewprojection;
 			GLint uniform_color;
 		};
+
+		static RenderState* CreateRenderState();
 	
 	public:
 	

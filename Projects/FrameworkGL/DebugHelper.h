@@ -39,11 +39,6 @@ namespace Framework
 
 	private:
 
-		void _CreateTextState();
-		void _CreateLinesState();
-
-	private:
-
 		ExLibris::IFont* m_Font;
 		ExLibris::FontFace* m_FontFace;
 
