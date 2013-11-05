@@ -7,6 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Framwork
+
+#include "ShaderProgram.h"
+
 namespace Framework
 {
 
@@ -105,7 +109,7 @@ namespace Framework
 
 	void RenderCommandLines::Render(const glm::mat4x4& a_Projection) const
 	{
-		glUseProgram(m_State->program);
+		glUseProgram(m_State->program->GetHandle());
 
 		glUniform4fv(m_State->uniform_color, 1, glm::value_ptr(m_Color));
 

@@ -39,11 +39,6 @@ namespace Framework
 
 	private:
 
-		void _LoadShader(
-			GLuint& a_Program,
-			GLuint& a_VertexShader, const std::string& a_VertexSource,
-			GLuint& a_FragmentShader, const std::string& a_FragmentSource
-		);
 		void _CreateTextState();
 		void _CreateLinesState();
 

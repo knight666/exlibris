@@ -16,6 +16,7 @@
 // Framework
 
 #include "FontSystem.h"
+#include "ShaderProgram.h"
 
 namespace Framework
 {
@@ -101,14 +102,10 @@ namespace Framework
 		delete m_FontFace;
 		delete m_Font;
 
-		glDeleteShader(m_RenderStateLines->vertex_shader);
-		glDeleteShader(m_RenderStateLines->fragment_shader);
-		glDeleteProgram(m_RenderStateLines->program);
+		delete m_RenderStateLines->program;
 		delete m_RenderStateLines;
 
-		glDeleteShader(m_RenderStateText->vertex_shader);
-		glDeleteShader(m_RenderStateText->fragment_shader);
-		glDeleteProgram(m_RenderStateText->program);
+		delete m_RenderStateText->program;
 		glDeleteBuffers(1, &m_RenderStateText->vertex_buffer);
 		glDeleteBuffers(1, &m_RenderStateText->element_buffer);
 		glDeleteVertexArrays(1, &m_RenderStateText->vertex_attribute_buffer);
@@ -248,126 +245,23 @@ namespace Framework
 		glPopAttrib();
 	}
 
-	void DebugHelper::_LoadShader(GLuint& a_Program, GLuint& a_VertexShader, const std::string& a_VertexSource, GLuint& a_FragmentShader, const std::string& a_FragmentSource)
-	{
-		GLint success;
-		const GLchar* source_vertex = a_VertexSource.c_str();
-		const GLchar* source_fragment = a_FragmentSource.c_str();
-
-		a_VertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(a_VertexShader, 1, &source_vertex, nullptr);
-		glCompileShader(a_VertexShader);
-
-		glGetShaderiv(a_VertexShader, GL_COMPILE_STATUS, &success);
-		if (success != GL_TRUE)
-		{
-			std::stringstream ss;
-			ss << "Failed to compile vertex shader.";
-
-			GLint info_log_length = 0;
-			glGetShaderiv(a_VertexShader, GL_INFO_LOG_LENGTH, &info_log_length);
-			if (info_log_length > 1)
-			{
-				GLchar* info_log = new GLchar[info_log_length + 1];
-				glGetShaderInfoLog(a_VertexShader, info_log_length, 0, info_log);
-
-				ss << std::endl << std::endl << info_log;
-
-				delete [] info_log;
-			}
-			
-			throw std::exception(ss.str().c_str());
-		}
-
-		a_FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(a_FragmentShader, 1, &source_fragment, nullptr);
-		glCompileShader(a_FragmentShader);
-
-		glGetShaderiv(a_FragmentShader, GL_COMPILE_STATUS, &success);
-		if (success != GL_TRUE)
-		{
-			std::stringstream ss;
-			ss << "Failed to compile fragment shader.";
-
-			GLint info_log_length = 0;
-			glGetShaderiv(a_FragmentShader, GL_INFO_LOG_LENGTH, &info_log_length);
-			if (info_log_length > 1)
-			{
-				GLchar* info_log = new GLchar[info_log_length + 1];
-				glGetShaderInfoLog(a_FragmentShader, info_log_length, 0, info_log);
-
-				ss << std::endl << std::endl << info_log;
-
-				delete [] info_log;
-			}
-
-			throw std::exception(ss.str().c_str());
-		}
-
-		a_Program = glCreateProgram();
-		glAttachShader(a_Program, a_VertexShader);
-		glAttachShader(a_Program, a_FragmentShader);
-		glLinkProgram(a_Program);
-
-		GLchar* log_program = nullptr;
-
-		GLint success_link = 0;
-		glGetProgramiv(a_Program, GL_LINK_STATUS, &success_link);
-
-		GLint success_validate = 0;
-		glValidateProgram(a_Program);
-		glGetProgramiv(a_Program, GL_VALIDATE_STATUS, &success_validate);
-
-		if (success_link != GL_TRUE || success_validate != GL_TRUE)
-		{
-			std::stringstream ss;
-
-			if (success_link != GL_TRUE)
-			{
-				ss << "Linking program failed.";
-			}
-			else if (success_validate != GL_TRUE)
-			{
-				ss << "Program validation failed.";
-			}
-
-			GLint info_log_length = 0;
-			glGetShaderiv(a_Program, GL_INFO_LOG_LENGTH, &info_log_length);
-			if (info_log_length > 1)
-			{
-				GLchar* info_log = new GLchar[info_log_length + 1];
-				glGetShaderInfoLog(a_Program, info_log_length, 0, info_log);
-
-				ss << std::endl << std::endl << info_log;
-
-				delete [] info_log;
-			}
-
-			throw std::exception(ss.str().c_str());
-		}
-	}
-
 	void DebugHelper::_CreateTextState()
 	{
 		m_RenderStateText = new RenderCommandText::RenderState;
 
-		_LoadShader(
-			m_RenderStateText->program,
-			m_RenderStateText->vertex_shader, g_TextSourceVertex,
-			m_RenderStateText->fragment_shader, g_TextSourceFragment
-		);
+		m_RenderStateText->program = ShaderProgram::Create(g_TextSourceVertex, g_TextSourceFragment);
 
-		GLint attribute_position = glGetAttribLocation(m_RenderStateText->program, "attrPosition");
-		GLint attribute_texturecoordinate0 = glGetAttribLocation(m_RenderStateText->program, "attrTextureCoordinate0");
+		GLint attribute_position = m_RenderStateText->program->FindAttribute("attrPosition");
+		GLint attribute_texturecoordinate0 = m_RenderStateText->program->FindAttribute("attrTextureCoordinate0");
 		if (attribute_position == -1 || attribute_texturecoordinate0 == -1)
 		{
 			throw std::exception("Failed to find attribute locations.");
 		}
 
-		m_RenderStateText->uniform_modelviewprojection = glGetUniformLocation(m_RenderStateText->program, "matModelViewProjection");
-		m_RenderStateText->uniform_texture0 = glGetUniformLocation(m_RenderStateText->program, "texTexture0");
-		m_RenderStateText->uniform_texturedimensions = glGetUniformLocation(m_RenderStateText->program, "uniTextureDimensions");
-		m_RenderStateText->uniform_textcolor = glGetUniformLocation(m_RenderStateText->program, "uniTextColor");
+		m_RenderStateText->uniform_modelviewprojection = m_RenderStateText->program->FindUniform("matModelViewProjection");
+		m_RenderStateText->uniform_texture0 = m_RenderStateText->program->FindUniform("texTexture0");
+		m_RenderStateText->uniform_texturedimensions = m_RenderStateText->program->FindUniform("uniTextureDimensions");
+		m_RenderStateText->uniform_textcolor = m_RenderStateText->program->FindUniform("uniTextColor");
 		if (m_RenderStateText->uniform_modelviewprojection == -1 || m_RenderStateText->uniform_texture0 == -1 || m_RenderStateText->uniform_texturedimensions == -1 || m_RenderStateText->uniform_textcolor == -1)
 		{
 			throw new std::exception("Failed to find uniform locations.");
@@ -437,20 +331,16 @@ namespace Framework
 	{
 		m_RenderStateLines = new RenderCommandLines::RenderState;
 
-		_LoadShader(
-			m_RenderStateLines->program,
-			m_RenderStateLines->vertex_shader, g_LinesSourceVertex,
-			m_RenderStateLines->fragment_shader, g_LinesSourceFragment
-		);
+		m_RenderStateLines->program = ShaderProgram::Create(g_LinesSourceVertex, g_LinesSourceFragment);
 
-		m_RenderStateLines->attribute_position = glGetAttribLocation(m_RenderStateLines->program, "attrPosition");
+		m_RenderStateLines->attribute_position = m_RenderStateLines->program->FindAttribute("attrPosition");
 		if (m_RenderStateLines->attribute_position == -1)
 		{
 			throw std::exception("Failed to find attribute locations.");
 		}
 
-		m_RenderStateLines->uniform_modelviewprojection = glGetUniformLocation(m_RenderStateLines->program, "matModelViewProjection");
-		m_RenderStateLines->uniform_color = glGetUniformLocation(m_RenderStateLines->program, "uniColor");
+		m_RenderStateLines->uniform_modelviewprojection = m_RenderStateLines->program->FindUniform("matModelViewProjection");
+		m_RenderStateLines->uniform_color = m_RenderStateLines->program->FindUniform("uniColor");
 		if (m_RenderStateLines->uniform_modelviewprojection == -1 || m_RenderStateLines->uniform_color == -1)
 		{
 			throw new std::exception("Failed to find uniform locations.");
