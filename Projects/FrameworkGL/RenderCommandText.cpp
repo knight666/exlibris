@@ -13,8 +13,135 @@
 #include <IFont.h>
 #include <TextLayout.h>
 
+// Framework
+
+#include "ShaderProgram.h"
+
 namespace Framework
 {
+	
+	static const std::string g_TextSourceVertex = "\
+		#version 330 core\n \
+		in vec2 attrPosition; \
+		in vec2 attrTextureCoordinate0; \
+		out vec2 vertTextureCoordinate; \
+		uniform mat4 matModelViewProjection; \
+		void main() \
+		{ \
+			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
+			vertTextureCoordinate = attrTextureCoordinate0; \
+		}";
+
+	static const std::string g_TextSourceFragment = "\
+		#version 330 core\n \
+		in vec2 vertTextureCoordinate; \
+		uniform sampler2D texTexture0; \
+		uniform vec2 uniTextureDimensions; \
+		uniform vec4 uniTextColor; \
+		out vec4 fragColor; \
+		void main() \
+		{ \
+			vec4 color_sample = uniTextColor * texture(texTexture0, vertTextureCoordinate).a; \
+			vec2 shadow_offset = vec2(-1.0, -1.0) / uniTextureDimensions; \
+			vec4 shadow_sample = vec4(0.25, 0.25, 0.25, texture(texTexture0, vertTextureCoordinate + shadow_offset).a); \
+			fragColor = mix(shadow_sample, color_sample, color_sample.a); \
+		}";
+
+	struct GlyphVertex
+	{
+		enum Offset
+		{
+			eOffset_Position = 0,
+			eOffset_TextureCoordinate = sizeof(glm::vec2)
+		};
+
+		glm::vec2 position;
+		glm::vec2 texture_coordinate;
+	};
+
+	RenderCommandText::RenderState* RenderCommandText::CreateRenderState()
+	{
+		RenderState* state = new RenderState;
+
+		state->program = ShaderProgram::Create(g_TextSourceVertex, g_TextSourceFragment);
+
+		GLint attribute_position = state->program->FindAttribute("attrPosition");
+		GLint attribute_texturecoordinate0 = state->program->FindAttribute("attrTextureCoordinate0");
+		if (attribute_position == -1 || attribute_texturecoordinate0 == -1)
+		{
+			throw std::exception("Failed to find attribute locations.");
+		}
+
+		state->uniform_modelviewprojection = state->program->FindUniform("matModelViewProjection");
+		state->uniform_texture0 = state->program->FindUniform("texTexture0");
+		state->uniform_texturedimensions = state->program->FindUniform("uniTextureDimensions");
+		state->uniform_textcolor = state->program->FindUniform("uniTextColor");
+		if (state->uniform_modelviewprojection == -1 || state->uniform_texture0 == -1 || state->uniform_texturedimensions == -1 || state->uniform_textcolor == -1)
+		{
+			throw new std::exception("Failed to find uniform locations.");
+		}
+
+		// vertex buffer
+
+		glGenBuffers(1, &state->vertex_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, state->vertex_buffer);
+
+			GlyphVertex vertex_data[4] = {
+				{
+					glm::vec2(0.0f, 0.0f),
+					glm::vec2(0.0f, 0.0f)
+				},
+				{
+					glm::vec2(1.0f, 0.0f),
+					glm::vec2(1.0f, 0.0f)
+				},
+				{
+					glm::vec2(0.0f, 1.0f),
+					glm::vec2(0.0f, 1.0f)
+				},
+				{
+					glm::vec2(1.0f, 1.0f),
+					glm::vec2(1.0f, 1.0f)
+				},
+			};
+
+			glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(GlyphVertex), vertex_data, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		// element buffer
+
+		glGenBuffers(1, &state->element_buffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->element_buffer);
+
+			GLuint element_data[6] = {
+				1, 0, 2,
+				1, 2, 3
+			};
+
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), element_data, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		// vertex attribute buffer
+
+		glGenVertexArrays(1, &state->vertex_attribute_buffer);
+		glBindVertexArray(state->vertex_attribute_buffer);
+
+			glBindBuffer(GL_ARRAY_BUFFER, state->vertex_buffer);
+
+			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_Position);
+			glEnableVertexAttribArray(attribute_position);
+
+			glVertexAttribPointer(attribute_texturecoordinate0, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_TextureCoordinate);
+			glEnableVertexAttribArray(attribute_texturecoordinate0);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->element_buffer);
+
+		glBindVertexArray(0);
+
+		return state;
+	}
 
 	RenderCommandText::RenderCommandText(RenderState* a_State, ExLibris::FontFace* a_Face)
 		: m_State(a_State)
@@ -71,7 +198,7 @@ namespace Framework
 
 	void RenderCommandText::Render(const glm::mat4x4& a_Projection) const
 	{
-		glUseProgram(m_State->program);
+		glUseProgram(m_State->program->GetHandle());
 
 		glActiveTexture(GL_TEXTURE0);
 		glUniform1i(m_State->uniform_texture0, 0);

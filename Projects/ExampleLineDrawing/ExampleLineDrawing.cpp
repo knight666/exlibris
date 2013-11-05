@@ -1,5 +1,6 @@
 // STL
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -8,7 +9,6 @@
 
 #include <Application.h>
 #include <MeshOpenGL.h>
-#include <ShaderLoader.h>
 #include <ShaderProgram.h>
 
 namespace fw = Framework;
@@ -38,7 +38,6 @@ public:
 
 	ExampleLineDrawing(int a_ArgumentCount, const char** a_Arguments)
 		: fw::Application(a_ArgumentCount, a_Arguments)
-		, m_ShaderLoader(nullptr)
 		, m_ProgramLines(nullptr)
 		, m_ProgramTriangles(nullptr)
 		, m_MeshLines(nullptr)
@@ -53,7 +52,6 @@ public:
 
 	bool Initialize()
 	{
-		m_ShaderLoader = new Framework::ShaderLoader();
 		_LoadShaders();
 
 		m_MeshLines = new fw::MeshOpenGL();
@@ -123,10 +121,10 @@ public:
 			}
 
 			glUseProgram(outline_program->GetHandle());
-			glUniformMatrix4fv(outline_program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
-			glUniform4fv(outline_program->GetUniform("uniColor"), 1, glm::value_ptr(outline_color));
+			glUniformMatrix4fv(outline_program->FindUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+			glUniform4fv(outline_program->FindUniform("uniColor"), 1, glm::value_ptr(outline_color));
 
-			GLint attribute_position = outline_program->GetAttribute("attrPosition");
+			GLint attribute_position = outline_program->FindAttribute("attrPosition");
 			glEnableVertexAttribArray(attribute_position);
 
 			glBindBuffer(GL_ARRAY_BUFFER, m_MeshLines->GetBuffer());
@@ -155,10 +153,6 @@ public:
 		if (m_ProgramTriangles != nullptr)
 		{
 			delete m_ProgramTriangles;
-		}
-		if (m_ShaderLoader != nullptr)
-		{
-			delete m_ShaderLoader;
 		}
 	}
 
@@ -232,23 +226,31 @@ private:
 
 	void _LoadShaders()
 	{
-		if (m_ProgramTriangles != nullptr)
+		try
 		{
-			delete m_ProgramTriangles;
+			if (m_ProgramTriangles == nullptr)
+			{
+				m_ProgramTriangles = new fw::ShaderProgram();
+			}
+
+			m_ProgramTriangles->LoadSourceFromFile(GL_VERTEX_SHADER, "Shaders/Triangles2D.vert");
+			m_ProgramTriangles->LoadSourceFromFile(GL_FRAGMENT_SHADER, "Shaders/Triangles2D.frag");
+			m_ProgramTriangles->Link();
+
+			if (m_ProgramLines == nullptr)
+			{
+				m_ProgramLines = new fw::ShaderProgram();
+			}
+
+			m_ProgramLines->LoadSourceFromFile(GL_VERTEX_SHADER, "Shaders/Lines2D.vert");
+			m_ProgramLines->LoadSourceFromFile(GL_FRAGMENT_SHADER, "Shaders/Lines2D.frag");
+			m_ProgramLines->LoadSourceFromFile(GL_GEOMETRY_SHADER, "Shaders/Lines2D.geom");
+			m_ProgramLines->Link();
 		}
-
-		m_ProgramTriangles = m_ShaderLoader->LoadProgram("Triangles2D", "Shaders/Triangles2D");
-		m_ProgramTriangles->Compile();
-		m_ProgramTriangles->Link();
-
-		if (m_ProgramLines != nullptr)
+		catch (const std::exception& e)
 		{
-			delete m_ProgramLines;
+			std::cerr << e.what() << std::endl;
 		}
-
-		m_ProgramLines = m_ShaderLoader->LoadProgram("Triangles2D", "Shaders/Lines2D");
-		m_ProgramLines->Compile();
-		m_ProgramLines->Link();
 	}
 
 private:
@@ -259,7 +261,6 @@ private:
 	bool m_OptionDrawLines;
 	ExLibris::LineMeshOptions m_OptionLineQuality;
 
-	fw::ShaderLoader* m_ShaderLoader;
 	fw::ShaderProgram* m_ProgramTriangles;
 	fw::ShaderProgram* m_ProgramLines;
 	fw::MeshOpenGL* m_MeshLines;

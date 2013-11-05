@@ -11,40 +11,45 @@ namespace Framework
 
 	public:
 
-		ShaderProgram(const std::string& a_Name);
+		static ShaderProgram* Create(
+			const std::string& a_VertexSource,
+			const std::string& a_FragmentSource,
+			const std::string& a_GeometrySource = ""
+		);
+		static ShaderProgram* CreateFromFile(
+			const std::string& a_VertexFile,
+			const std::string& a_FragmentFile,
+			const std::string& a_GeometryFile = ""
+		);
+
+	public:
+
+		ShaderProgram();
 		~ShaderProgram();
 
 		GLuint GetHandle() const;
 
-		const std::string& GetName() const;
+		std::string GetLog() const;
 
-		void SetSourceVertex(ShaderSource* a_Source);
-		void SetSourceGeometry(ShaderSource* a_Source);
-		void SetSourceFragment(ShaderSource* a_Source);
+		void LoadSource(GLenum a_Target, const std::string& a_Source);
+		void LoadSourceFromFile(GLenum a_Target, const std::string& a_FilePath);
 
-		GLint GetAttribute(const std::string& a_Name);
+		GLint FindAttribute(const std::string& a_Name) const;
 
-		GLint GetUniform(const std::string& a_Name);
-
-		void Compile();
-		bool IsCompiled() const;
+		GLint FindUniform(const std::string& a_Name) const;
 
 		void Link();
-		bool IsLinked() const;
 
 	private:
 
 		GLuint m_Handle;
-		std::string m_Name;
 
 		ShaderSource* m_SourceVertex;
 		ShaderSource* m_SourceGeometry;
 		ShaderSource* m_SourceFragment;
 
 		GLchar* m_Log;
-		bool m_Loaded;
-		bool m_Compiled;
-		bool m_Linked;
+		GLint m_LogLength;
 
 		std::map<std::string, GLint> m_CacheAttributes;
 		std::map<std::string, GLint> m_CacheUniforms;
