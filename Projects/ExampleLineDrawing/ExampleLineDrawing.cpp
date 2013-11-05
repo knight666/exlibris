@@ -244,6 +244,7 @@ private:
 
 			m_ProgramLines->LoadSourceFromFile(GL_VERTEX_SHADER, "Shaders/Lines2D.vert");
 			m_ProgramLines->LoadSourceFromFile(GL_FRAGMENT_SHADER, "Shaders/Lines2D.frag");
+			m_ProgramLines->LoadSourceFromFile(GL_GEOMETRY_SHADER, "Shaders/Lines2D.geom");
 			m_ProgramLines->Link();
 		}
 		catch (const std::exception& e)

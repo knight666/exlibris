@@ -16,7 +16,6 @@
 #include <DebugHelper.h>
 #include <FontSystem.h>
 #include <MeshOpenGL.h>
-#include <ShaderLoader.h>
 #include <ShaderProgram.h>
 
 namespace fw = Framework;
@@ -332,7 +331,6 @@ public:
 	ExampleFontOutline(int a_ArgumentCount, const char** a_Arguments)
 		: fw::Application(a_ArgumentCount, a_Arguments)
 		, m_OptionDrawLines(false)
-		, m_ShaderLoader(nullptr)
 		, m_ProgramLines(nullptr)
 		, m_ProgramTriangles(nullptr)
 		, m_TextLayout(nullptr)
@@ -356,7 +354,6 @@ public:
 
 	bool Initialize()
 	{
-		m_ShaderLoader = new fw::ShaderLoader();
 		_LoadShaders();
 
 		m_FaceOptions.size = 100.0f;
@@ -471,11 +468,6 @@ public:
 		if (m_ProgramLines != nullptr)
 		{
 			delete m_ProgramLines;
-		}
-
-		if (m_ShaderLoader != nullptr)
-		{
-			delete m_ShaderLoader;
 		}
 
 		delete m_DebugHelper;
@@ -707,23 +699,31 @@ private:
 
 	void _LoadShaders()
 	{
-		if (m_ProgramTriangles != nullptr)
+		try
 		{
-			delete m_ProgramTriangles;
+			if (m_ProgramTriangles == nullptr)
+			{
+				m_ProgramTriangles = new fw::ShaderProgram();
+			}
+
+			m_ProgramTriangles->LoadSourceFromFile(GL_VERTEX_SHADER, "Shaders/Triangles2D.vert");
+			m_ProgramTriangles->LoadSourceFromFile(GL_FRAGMENT_SHADER, "Shaders/Triangles2D.frag");
+			m_ProgramTriangles->Link();
+
+			if (m_ProgramLines == nullptr)
+			{
+				m_ProgramLines = new fw::ShaderProgram();
+			}
+
+			m_ProgramLines->LoadSourceFromFile(GL_VERTEX_SHADER, "Shaders/Lines2D.vert");
+			m_ProgramLines->LoadSourceFromFile(GL_FRAGMENT_SHADER, "Shaders/Lines2D.frag");
+			m_ProgramLines->LoadSourceFromFile(GL_GEOMETRY_SHADER, "Shaders/Lines2D.geom");
+			m_ProgramLines->Link();
 		}
-
-		m_ProgramTriangles = m_ShaderLoader->LoadProgram("Triangles2D", "Shaders/Triangles2D");
-		m_ProgramTriangles->Compile();
-		m_ProgramTriangles->Link();
-
-		if (m_ProgramLines != nullptr)
+		catch (const std::exception& e)
 		{
-			delete m_ProgramLines;
+			std::cerr << e.what() << std::endl;
 		}
-
-		m_ProgramLines = m_ShaderLoader->LoadProgram("Triangles2D", "Shaders/Lines2D");
-		m_ProgramLines->Compile();
-		m_ProgramLines->Link();
 	}
 
 	void _LoadFontFace()
@@ -757,7 +757,6 @@ private:
 	exl::CurveSettings m_CurveSettings;
 	exl::LineMeshOptions m_MeshOptions;
 
-	fw::ShaderLoader* m_ShaderLoader;
 	fw::ShaderProgram* m_ProgramTriangles;
 	fw::ShaderProgram* m_ProgramLines;
 
