@@ -13,6 +13,46 @@
 
 namespace Framework
 {
+	
+	static const std::string g_LinesSourceVertex = "\
+		#version 330 core\n \
+		in vec2 attrPosition; \
+		uniform mat4 matModelViewProjection; \
+		void main() \
+		{ \
+			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
+		}";
+
+	static const std::string g_LinesSourceFragment = "\
+		#version 330 core\n\
+		uniform vec4 uniColor; \
+		out vec4 fragColor; \
+		void main() \
+		{ \
+			fragColor = uniColor; \
+		}";
+
+	RenderCommandLines::RenderState* RenderCommandLines::CreateRenderState()
+	{
+		RenderState* state = new RenderState;
+
+		state->program = ShaderProgram::Create(g_LinesSourceVertex, g_LinesSourceFragment);
+
+		state->attribute_position = state->program->FindAttribute("attrPosition");
+		if (state->attribute_position == -1)
+		{
+			throw std::exception("Failed to find attribute locations.");
+		}
+
+		state->uniform_modelviewprojection = state->program->FindUniform("matModelViewProjection");
+		state->uniform_color = state->program->FindUniform("uniColor");
+		if (state->uniform_modelviewprojection == -1 || state->uniform_color == -1)
+		{
+			throw new std::exception("Failed to find uniform locations.");
+		}
+
+		return state;
+	}
 
 	RenderCommandLines::RenderCommandLines(RenderState* a_State)
 		: m_State(a_State)
