@@ -13,6 +13,10 @@
 #include <IFont.h>
 #include <TextLayout.h>
 
+// Framework
+
+#include "ShaderProgram.h"
+
 namespace Framework
 {
 
@@ -71,7 +75,7 @@ namespace Framework
 
 	void RenderCommandText::Render(const glm::mat4x4& a_Projection) const
 	{
-		glUseProgram(m_State->program);
+		glUseProgram(m_State->program->GetHandle());
 
 		glActiveTexture(GL_TEXTURE0);
 		glUniform1i(m_State->uniform_texture0, 0);

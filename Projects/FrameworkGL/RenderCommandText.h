@@ -12,6 +12,11 @@ namespace ExLibris
 
 namespace Framework
 {
+	class ShaderProgram;
+}
+
+namespace Framework
+{
 
 	class RenderCommandText
 		: public IRenderCommand
@@ -22,9 +27,7 @@ namespace Framework
 
 		struct RenderState
 		{
-			GLuint vertex_shader;
-			GLuint fragment_shader;
-			GLuint program;
+			ShaderProgram* program;
 
 			GLint uniform_modelviewprojection;
 			GLint uniform_texture0;
