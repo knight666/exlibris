@@ -6,6 +6,11 @@
 
 namespace Framework
 {
+	class ShaderProgram;
+}
+
+namespace Framework
+{
 
 	class RenderCommandLines
 		: public IRenderCommand
@@ -15,14 +20,14 @@ namespace Framework
 
 		struct RenderState
 		{
-			GLuint vertex_shader;
-			GLuint fragment_shader;
-			GLuint program;
+			ShaderProgram* program;
 
 			GLint attribute_position;
 			GLint uniform_modelviewprojection;
 			GLint uniform_color;
 		};
+
+		static RenderState* CreateRenderState();
 	
 	public:
 	

@@ -77,7 +77,6 @@
     <ClInclude Include="MeshOpenGL.h" />
     <ClInclude Include="RenderCommandLines.h" />
     <ClInclude Include="RenderCommandText.h" />
-    <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="ShaderSource.h" />
     <ClInclude Include="DebugHelper.h" />
@@ -92,7 +91,6 @@
     <ClCompile Include="MeshOpenGL.cpp" />
     <ClCompile Include="RenderCommandLines.cpp" />
     <ClCompile Include="RenderCommandText.cpp" />
-    <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="ShaderSource.cpp" />
     <ClCompile Include="DebugHelper.cpp" />

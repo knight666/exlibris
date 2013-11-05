@@ -14,7 +14,6 @@
 #include <Application.h>
 #include <DebugHelper.h>
 #include <MeshOpenGL.h>
-#include <ShaderLoader.h>
 #include <ShaderProgram.h>
 
 namespace fw = Framework;
@@ -139,11 +138,11 @@ public:
 
 			glBindBuffer(GL_ARRAY_BUFFER, m_BufferVertices);
 
-			GLint attribute_position = m_Program->GetAttribute("attrPosition");
+			GLint attribute_position = m_Program->FindAttribute("attrPosition");
 			glVertexAttribPointer(attribute_position, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_Position);
 			glEnableVertexAttribArray(attribute_position);
 
-			GLint attribute_texturecoordinate = m_Program->GetAttribute("attrTextureCoordinate0");
+			GLint attribute_texturecoordinate = m_Program->FindAttribute("attrTextureCoordinate0");
 			glVertexAttribPointer(attribute_texturecoordinate, 2, GL_FLOAT, GL_FALSE, sizeof(GlyphVertex), (const GLvoid*)GlyphVertex::eOffset_TextureCoordinate);
 			glEnableVertexAttribArray(attribute_texturecoordinate);
 
@@ -208,13 +207,13 @@ public:
 
 		// render text
 			
-		glUniformMatrix4fv(m_Program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniformMatrix4fv(m_Program->FindUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
 
-		glUniform2fv(m_Program->GetUniform("uniTextureDimensions"), 1, glm::value_ptr(m_TextureDimensions));
+		glUniform2fv(m_Program->FindUniform("uniTextureDimensions"), 1, glm::value_ptr(m_TextureDimensions));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
-		glUniform1i(m_Program->GetUniform("texTexture0"), 0);
+		glUniform1i(m_Program->FindUniform("texTexture0"), 0);
 
 		glBindVertexArray(m_BufferAttributes);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -436,8 +435,6 @@ public:
 	
 	bool Initialize()
 	{
-		m_ShaderLoader = new fw::ShaderLoader;
-		
 		_LoadShaders();
 
 		try
@@ -502,8 +499,8 @@ public:
 		);
 
 		glUseProgram(m_ProgramEffects->GetHandle());
-		glUniform1i(m_ProgramEffects->GetUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
-		glUniform1i(m_ProgramEffects->GetUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
+		glUniform1i(m_ProgramEffects->FindUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
+		glUniform1i(m_ProgramEffects->FindUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
 		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
 
@@ -525,8 +522,6 @@ public:
 		{
 			delete m_ProgramEffects;
 		}
-
-		delete m_ShaderLoader;
 	}
 
 private:
@@ -606,14 +601,21 @@ private:
 
 	void _LoadShaders()
 	{
-		if (m_ProgramEffects != nullptr)
+		try
 		{
-			delete m_ProgramEffects;
-		}
+			if (m_ProgramEffects == nullptr)
+			{
+				m_ProgramEffects = new fw::ShaderProgram();
+			}
 
-		m_ProgramEffects = m_ShaderLoader->LoadProgram("TextEffects", "Shaders/TextEffects");
-		m_ProgramEffects->Compile();
-		m_ProgramEffects->Link();
+			m_ProgramEffects->LoadSourceFromFile(GL_VERTEX_SHADER, "Shaders/TextEffects.vert");
+			m_ProgramEffects->LoadSourceFromFile(GL_FRAGMENT_SHADER, "Shaders/TextEffects.frag");
+			m_ProgramEffects->Link();
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
 	}
 
 private:
@@ -626,7 +628,6 @@ private:
 
 	TextField* m_TextField;
 
-	fw::ShaderLoader* m_ShaderLoader;
 	fw::ShaderProgram* m_ProgramEffects;
 
 	bool m_UseGlow;
