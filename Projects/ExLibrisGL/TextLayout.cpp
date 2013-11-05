@@ -172,17 +172,26 @@ namespace ExLibris
 		}
 	}
 
+	std::vector<TextLine*> TextLayout::GetLines() const
+	{
+		std::vector<TextLine*> lines;
+
+		lines.assign(m_Lines.begin(), m_Lines.end());
+
+		return lines;
+	}
+
 	void TextLayout::Accept(ITextLayoutVisitor& a_Visitor)
 	{
 		Layout();
 
-		a_Visitor.VisitTextBegin(m_Face, m_Dimensions);
+		a_Visitor.VisitTextBegin(m_Face, m_Dimensions, m_BoundingBox);
 
 		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
 		{
 			TextLine* line = *line_it;
 
-			a_Visitor.VisitTextLineBegin(line->characters.size(), line->position, line->dimensions.x);
+			a_Visitor.VisitTextLineBegin(line->characters.size(), line->position, line->dimensions.x, line->bounding_box);
 
 			for (std::vector<TextCharacter*>::iterator glyph_it = line->characters.begin(); glyph_it != line->characters.end(); ++glyph_it)
 			{
@@ -573,9 +582,13 @@ namespace ExLibris
 
 		m_Dimensions.x = 0.0f;
 
+		m_BoundingBox.SetLeft(0.0f);
+
 		if (m_HorizontalPolicy == eSizePolicy_Fixed)
 		{
 			m_Dimensions.x = std::max<float>(m_SizeHint.x, 0.0f);
+
+			m_BoundingBox.SetRight(std::max<float>(m_SizeHint.x, 0.0f));
 		}
 		else if (lines_valid)
 		{
@@ -589,6 +602,9 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
+						line->bounding_box.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
+
+						m_BoundingBox.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
 					}
 
 					break;
@@ -601,8 +617,11 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						line->dimensions.x = std::max<float>(m_SizeHint.x, line->dimensions.x);
+						line->bounding_box.SetWidth(std::max<float>(m_SizeHint.x, line->dimensions.x));
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
+
+						m_BoundingBox.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
 					}
 
 					break;
@@ -615,6 +634,7 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						line->dimensions.x = std::min<float>(m_SizeHint.x, line->dimensions.x);
+						line->bounding_box.SetWidth(std::min<float>(m_SizeHint.x, line->dimensions.x));
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
@@ -632,6 +652,8 @@ namespace ExLibris
 		if (m_VerticalPolicy == eSizePolicy_Fixed)
 		{
 			m_Dimensions.y = std::max<float>(m_SizeHint.y, 0.0f);
+
+			m_BoundingBox.SetHeight(std::max<float>(m_SizeHint.y, 0.0f));
 		}
 		else if (lines_valid)
 		{
@@ -644,12 +666,16 @@ namespace ExLibris
 				{
 					m_Dimensions.y = lines_height;
 
+					m_BoundingBox.SetHeight(lines_height);
+
 					break;
 				}
 
 			case eSizePolicy_MinimumExpanding:
 				{
 					m_Dimensions.y = std::max<float>(lines_height, m_SizeHint.y);
+
+					m_BoundingBox.SetHeight(std::max<float>(lines_height, m_SizeHint.y));
 
 					break;
 				}
@@ -659,10 +685,19 @@ namespace ExLibris
 					float hint_height = std::max<float>(m_SizeHint.y, 0.0f);
 					m_Dimensions.y = std::min<float>(lines_height, hint_height);
 
+					m_BoundingBox.SetHeight(std::min<float>(lines_height, hint_height));
+
 					break;
 				}
 
 			}
+		}
+
+		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
+		{
+			TextLine* line = *line_it;
+
+			m_BoundingBox.Unite(line->bounding_box);
 		}
 	}
 
@@ -772,6 +807,9 @@ namespace ExLibris
 		m_LineCurrent->position = line_position;
 		m_LineCurrent->dimensions = glm::vec2(0.0f, m_Face->GetLineHeight());
 
+		m_LineCurrent->bounding_box.SetTopLeft(line_position);
+		m_LineCurrent->bounding_box.SetDimensions(glm::vec2(0.0f, m_Face->GetLineHeight()));
+
 		m_Lines.push_back(m_LineCurrent);
 
 		return true;
@@ -782,6 +820,8 @@ namespace ExLibris
 		m_LineCurrent->dimensions.x += a_Glyph->advance;
 		a_Glyph->x = m_Cursor.x;
 		m_Cursor.x += a_Glyph->advance;
+
+		m_LineCurrent->bounding_box.Unite(a_Glyph->glyph->metrics->bounding_box);
 
 		m_LineCurrent->characters.push_back(a_Glyph);
 	}

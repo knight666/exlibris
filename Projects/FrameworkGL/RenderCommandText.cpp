@@ -216,7 +216,7 @@ namespace Framework
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
-	void RenderCommandText::VisitTextBegin(const ExLibris::FontFace* a_Face, const glm::vec2& a_Dimensions)
+	void RenderCommandText::VisitTextBegin(const ExLibris::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
 	{
 		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TexturePadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
@@ -243,7 +243,7 @@ namespace Framework
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
 	}
 
-	void RenderCommandText::VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
+	void RenderCommandText::VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const ExLibris::BoundingBox& a_BoundingBox)
 	{
 		m_LineOffset = a_Offset;
 		m_LineOffset.y += m_Font->GetDescender();
