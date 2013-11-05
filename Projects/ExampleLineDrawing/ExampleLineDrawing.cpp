@@ -123,10 +123,10 @@ public:
 			}
 
 			glUseProgram(outline_program->GetHandle());
-			glUniformMatrix4fv(outline_program->GetUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
-			glUniform4fv(outline_program->GetUniform("uniColor"), 1, glm::value_ptr(outline_color));
+			glUniformMatrix4fv(outline_program->FindUniform("matModelViewProjection"), 1, GL_FALSE, glm::value_ptr(mvp));
+			glUniform4fv(outline_program->FindUniform("uniColor"), 1, glm::value_ptr(outline_color));
 
-			GLint attribute_position = outline_program->GetAttribute("attrPosition");
+			GLint attribute_position = outline_program->FindAttribute("attrPosition");
 			glEnableVertexAttribArray(attribute_position);
 
 			glBindBuffer(GL_ARRAY_BUFFER, m_MeshLines->GetBuffer());
