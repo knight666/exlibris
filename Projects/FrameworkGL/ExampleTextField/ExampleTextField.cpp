@@ -53,8 +53,9 @@ private:
 
 public:
 
-	TextField(fw::ShaderProgram* a_Program)
-		: m_Layout(nullptr)
+	TextField(fw::ShaderProgram* a_Program, fw::DebugHelper* a_DebugHelper)
+		: m_DebugHelper(a_DebugHelper)
+		, m_Layout(nullptr)
 		, m_Texture(0)
 		, m_TextureWidth(0)
 		, m_TexturePitch(0)
@@ -161,6 +162,11 @@ public:
 		m_Layout->Accept(*this);
 	}
 
+	void SetPosition(const glm::vec2& a_Position)
+	{
+		m_Position = a_Position;
+	}
+
 	void AddCharacter(unsigned int a_Character)
 	{
 		m_Text.push_back((char)a_Character);
@@ -192,9 +198,9 @@ public:
 		}
 	}
 
-	void Render(const glm::vec2& a_Position, const glm::mat4x4& a_ProjectionMatrix)
+	void Render(const glm::mat4x4& a_ProjectionMatrix)
 	{
-		glm::vec2 screen_position = a_Position + m_RenderCorrection + m_LineCorrection;
+		glm::vec2 screen_position = m_Position + m_RenderCorrection + m_LineCorrection;
 
 		glm::mat4x4 modelview;
 		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
@@ -252,7 +258,7 @@ public:
 
 private:
 
-	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
+	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
 	{
 		// texture must be padded in order to support effects like glow and shadows
 
@@ -279,10 +285,23 @@ private:
 
 		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
+
+		exl::BoundingBox box = a_BoundingBox;
+		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
+
+		m_DebugHelper->Clear();
+		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_DebugHelper->AddBox(box);
 	}
 
-	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
+	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
+		exl::BoundingBox box = a_BoundingBox;
+		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
+
+		m_DebugHelper->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		m_DebugHelper->AddBox(box);
+
 		m_LineOffset = a_Offset;
 		m_LineOffset.y += m_Font->GetDescender();
 
@@ -309,6 +328,17 @@ private:
 			m_LineCorrection.x = fabs(offset.x);
 			offset.x = 0.0f;
 		}
+
+		glm::vec2 correction(8.0f, 8.0f);
+
+		exl::BoundingBox box(
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2((float)bitmap->width, (float)bitmap->height)
+		);
+		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
+
+		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+		m_DebugHelper->AddBox(box);
 
 		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
@@ -380,6 +410,9 @@ private:
 
 private:
 
+	fw::DebugHelper* m_DebugHelper;
+
+	glm::vec2 m_Position;
 	exl::FontFace* m_Font;
 	exl::TextLayout* m_Layout;
 	std::string m_Text;
@@ -447,31 +480,19 @@ public:
 			return false;
 		}
 
-		m_DebugHelper->AddText("This is just a test.", glm::vec2(20.0f, 20.0f));
-
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f));
-
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		m_DebugHelper->SetThickness(1.0f);
-		m_DebugHelper->AddBox(exl::BoundingBox(glm::vec2(10.0f, 10.0f), glm::vec2(630.0f, 470.0f)));
-
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->SetThickness(2.5f);
-		m_DebugHelper->AddCircle(glm::vec2(120.0f, 120.0f), 25.0f);
-
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
-		m_FaceOptions.size = 24.0f;
+		m_FaceOptions.size = 60.0f;
 
 		m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
+		//m_Font = m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
 
 		m_FontFace = m_Font->CreateFace(m_FaceOptions);
 
-		m_TextField = new TextField(m_ProgramEffects);
+		m_TextField = new TextField(m_ProgramEffects, m_DebugHelper);
 		m_TextField->SetFont(m_FontFace);
+		m_TextField->SetPosition(glm::vec2(25.0f, 64.0f));
 
 		return true;
 	}
@@ -502,7 +523,7 @@ public:
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
-		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
+		m_TextField->Render(projection);
 
 		m_DebugHelper->Render(width, height);
 	}
