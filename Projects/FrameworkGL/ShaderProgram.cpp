@@ -7,16 +7,45 @@
 namespace Framework
 {
 
-	ShaderProgram::ShaderProgram(const std::string& a_Name)
+	ShaderProgram* ShaderProgram::Create(const std::string& a_VertexSource, const std::string& a_FragmentSource, const std::string& a_GeometrySource /*= "" */)
+	{
+		ShaderProgram* program = new ShaderProgram;
+
+		program->LoadSource(GL_VERTEX_SHADER, a_VertexSource);
+		program->LoadSource(GL_FRAGMENT_SHADER, a_FragmentSource);
+		if (a_GeometrySource.size() > 0)
+		{
+			program->LoadSource(GL_GEOMETRY_SHADER, a_GeometrySource);
+		}
+
+		program->Link();
+
+		return program;
+	}
+
+	ShaderProgram* ShaderProgram::CreateFromFile(const std::string& a_VertexFile, const std::string& a_FragmentFile, const std::string& a_GeometryFile /*= "" */)
+	{
+		ShaderProgram* program = new ShaderProgram;
+
+		program->LoadSourceFromFile(GL_VERTEX_SHADER, a_VertexFile);
+		program->LoadSourceFromFile(GL_FRAGMENT_SHADER, a_FragmentFile);
+		if (a_GeometryFile.size() > 0)
+		{
+			program->LoadSourceFromFile(GL_GEOMETRY_SHADER, a_GeometryFile);
+		}
+
+		program->Link();
+
+		return program;
+	}
+
+	ShaderProgram::ShaderProgram()
 		: m_Handle(0)
-		, m_Name(a_Name)
 		, m_SourceVertex(nullptr)
 		, m_SourceGeometry(nullptr)
 		, m_SourceFragment(nullptr)
 		, m_Log(nullptr)
-		, m_Loaded(false)
-		, m_Compiled(false)
-		, m_Linked(false)
+		, m_LogLength(0)
 	{
 		m_Handle = glCreateProgram();
 	}
@@ -49,9 +78,14 @@ namespace Framework
 		return m_Handle;
 	}
 
-	const std::string& ShaderProgram::GetName() const
+	std::string ShaderProgram::GetLog() const
 	{
-		return m_Name;
+		if (m_Log == nullptr)
+		{
+			return "";
+		}
+
+		return std::string(m_Log, m_Log + m_LogLength);
 	}
 
 	void ShaderProgram::LoadSource(GLenum a_Target, const std::string& a_Source)
@@ -114,7 +148,7 @@ namespace Framework
 		if (!source->Compile(a_Source))
 		{
 			std::stringstream ss;
-			ss << "Error while compiling " << target_name << " shader." << std::endl << std::endl << source->GetLogString() << std::endl;
+			ss << "Error while compiling " << target_name << " shader." << std::endl << std::endl << source->GetLog() << std::endl;
 
 			throw std::exception(ss.str().c_str());
 		}
@@ -138,22 +172,7 @@ namespace Framework
 		LoadSource(a_Target, ss.str());
 	}
 
-	void ShaderProgram::SetSourceVertex(ShaderSource* a_Source)
-	{
-		m_SourceVertex = a_Source;
-	}
-
-	void ShaderProgram::SetSourceGeometry(ShaderSource* a_Source)
-	{
-		m_SourceGeometry = a_Source;
-	}
-
-	void ShaderProgram::SetSourceFragment(ShaderSource* a_Source)
-	{
-		m_SourceFragment = a_Source;
-	}
-
-	GLint ShaderProgram::GetAttribute(const std::string& a_Name)
+	GLint ShaderProgram::FindAttribute(const std::string& a_Name) const
 	{
 		GLint result = -1;
 
@@ -166,7 +185,7 @@ namespace Framework
 		return result;
 	}
 
-	GLint ShaderProgram::GetUniform(const std::string& a_Name)
+	GLint ShaderProgram::FindUniform(const std::string& a_Name) const
 	{
 		GLint result = -1;
 
@@ -177,75 +196,6 @@ namespace Framework
 		}
 
 		return result;
-	}
-
-	void ShaderProgram::Compile()
-	{
-		std::cout << "Compiling '" << m_Name << "'..." << std::endl;
-
-		if (
-			!m_SourceVertex || !m_SourceVertex->IsLoaded() || 
-			!m_SourceFragment || !m_SourceFragment->IsLoaded()
-		)
-		{
-			m_Compiled = false;
-			return;
-		}
-
-		m_Compiled = true;
-
-		// geometry
-
-		if (m_SourceGeometry && m_SourceGeometry->IsLoaded())
-		{
-			m_SourceGeometry->Compile();
-
-			m_Compiled = m_Compiled && m_SourceGeometry->IsCompiled();
-			if (!m_SourceGeometry->IsCompiled())
-			{
-				std::cerr << "Failed to compile geometry shader." << std::endl;
-			}
-
-			if (m_SourceGeometry->GetLog())
-			{
-				std::cout << m_SourceGeometry->GetLog() << std::endl;
-			}
-		}
-
-		// vertex
-
-		m_SourceVertex->Compile();
-
-		m_Compiled = m_Compiled && m_SourceVertex->IsCompiled();
-		if (!m_SourceVertex->IsCompiled())
-		{
-			std::cerr << "Failed to compile vertex shader." << std::endl;
-		}
-
-		if (m_SourceVertex->GetLog())
-		{
-			std::cout << m_SourceVertex->GetLog() << std::endl;
-		}
-
-		// fragment
-
-		m_SourceFragment->Compile();
-
-		m_Compiled = m_Compiled && m_SourceFragment->IsCompiled();
-		if (!m_SourceFragment->IsCompiled())
-		{
-			std::cerr << "Failed to compile fragment shader." << std::endl;
-		}
-
-		if (m_SourceFragment->GetLog())
-		{
-			std::cout << m_SourceFragment->GetLog() << std::endl;
-		}
-	}
-
-	bool ShaderProgram::IsCompiled() const
-	{
-		return m_Compiled;
 	}
 
 	void ShaderProgram::Link()
@@ -390,21 +340,6 @@ namespace Framework
 		}
 
 		delete [] property_name;
-	}
-
-	bool ShaderProgram::IsLinked() const
-	{
-		return m_Linked;
-	}
-
-	std::string ShaderProgram::GetLog() const
-	{
-		if (m_Log == nullptr)
-		{
-			return "";
-		}
-
-		return std::string(m_Log, m_Log + m_LogLength);
 	}
 
 }; // namespace Framework

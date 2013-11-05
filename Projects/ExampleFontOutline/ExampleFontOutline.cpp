@@ -196,9 +196,9 @@ public:
 
 	void Render(const glm::mat4x4& a_MatrixProjection, const glm::mat4x4& a_MatrixModelView)
 	{
-		GLint attribute_position = m_Program->GetAttribute("attrPosition");
-		GLint uniform_mvp = m_Program->GetUniform("matModelViewProjection");
-		GLint uniform_color = m_Program->GetUniform("uniColor");
+		GLint attribute_position = m_Program->FindAttribute("attrPosition");
+		GLint uniform_mvp = m_Program->FindUniform("matModelViewProjection");
+		GLint uniform_color = m_Program->FindUniform("uniColor");
 
 		glUseProgram(m_Program->GetHandle());
 
