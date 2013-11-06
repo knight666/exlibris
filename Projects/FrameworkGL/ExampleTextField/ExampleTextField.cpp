@@ -369,11 +369,6 @@ private:
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
-		exl::BoundingBox box = a_BoundingBox;
-		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
-
-		m_HelperLines->AddBox(box);
-
 		m_LineOffset = a_Offset;
 		m_LineOffset.y += m_Font->GetDescender();
 
@@ -381,9 +376,14 @@ private:
 
 		m_LineCorrection.x = 0.0f;
 		m_LineCorrection.y = 0.0f;
+
+		exl::BoundingBox box = a_BoundingBox;
+		box.Translate(m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + m_LineOffset);
+
+		m_HelperLines->AddBox(box);
 	}
 
-	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance)
+	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
 		exl::GlyphMetrics* metrics = a_Glyph->metrics;
 		exl::GlyphBitmap* bitmap = a_Glyph->bitmap;
@@ -393,12 +393,8 @@ private:
 		glm::vec2 offset = m_LineOffset + metrics->offset;
 		offset.x += a_X;
 
-		m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
-
-		glm::vec2 correction(8.0f, 8.0f);
-
-		exl::BoundingBox box = a_Glyph->metrics->bounding_box;
-		box.SetCenter(box.GetCenter() + glm::vec2(a_X, 0.0f) + glm::vec2(m_TexturePadding) + m_RenderCorrection + m_Position + m_LineOffset);
+		exl::BoundingBox box = a_BoundingBox;
+		box.Translate(m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + m_LineOffset);
 
 		m_HelperGlyphs->AddBox(box);
 
@@ -406,7 +402,7 @@ private:
 			glm::vec2(0.0f, 0.0f),
 			glm::vec2((float)bitmap->width, (float)bitmap->height)
 		);
-		box_bitmap.SetCenter(box_bitmap.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
+		box_bitmap.Translate(m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
 
 		m_HelperBitmaps->AddBox(box_bitmap);
 
@@ -453,7 +449,7 @@ private:
 		}
 	}
 
-	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
+	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
 		m_CursorPosition.x = a_X + a_Advance;
 	}
@@ -603,7 +599,7 @@ public:
 
 		char mouse_text[256] = { 0 };
 		sprintf(mouse_text, "Mouse position: (%.2f, %.2f)", mouse_position.x, mouse_position.y);
-		m_DebugHelper->AddText(mouse_text, glm::vec2(10.0f, 10.0f));
+		//m_DebugHelper->AddText(mouse_text, glm::vec2(10.0f, 10.0f));
 
 		m_DebugHelper->Render(width, height);
 	}

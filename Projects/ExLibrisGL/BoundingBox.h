@@ -99,6 +99,11 @@ namespace ExLibris
 
 		BoundingBox& operator = (const BoundingBox& a_Other);
 
+		// Translation
+
+		void Translate(const glm::vec2& a_Offset);
+		BoundingBox GetTranslated(const glm::vec2& a_Offset) const;
+
 		// Intersection
 
 		bool IsIntersected(const BoundingBox& a_Other) const;

@@ -254,7 +254,7 @@ namespace Framework
 		m_LineCorrection.y = 0.0f;
 	}
 
-	void RenderCommandText::VisitTextCharacter(const ExLibris::Glyph* a_Glyph, float a_X, float a_Advance)
+	void RenderCommandText::VisitTextCharacter(const ExLibris::Glyph* a_Glyph, float a_X, float a_Advance, const ExLibris::BoundingBox& a_BoundingBox)
 	{
 		ExLibris::GlyphMetrics* metrics = a_Glyph->metrics;
 		ExLibris::GlyphBitmap* bitmap = a_Glyph->bitmap;
@@ -316,7 +316,7 @@ namespace Framework
 		}
 	}
 
-	void RenderCommandText::VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
+	void RenderCommandText::VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const ExLibris::BoundingBox& a_BoundingBox)
 	{
 		m_CursorPosition.x = a_X + a_Advance;
 	}
