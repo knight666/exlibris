@@ -53,9 +53,8 @@ private:
 
 public:
 
-	TextField(fw::ShaderProgram* a_Program, fw::DebugHelper* a_DebugHelper)
-		: m_DebugHelper(a_DebugHelper)
-		, m_Layout(nullptr)
+	TextField(fw::ShaderProgram* a_Program)
+		: m_Layout(nullptr)
 		, m_Texture(0)
 		, m_TextureWidth(0)
 		, m_TexturePitch(0)
@@ -67,6 +66,12 @@ public:
 		, m_BufferVertices(0)
 		, m_BufferElements(0)
 		, m_BufferAttributes(0)
+		, m_HelperLayout(nullptr)
+		, m_HelperLayoutVisible(true)
+		, m_HelperLines(nullptr)
+		, m_HelperLinesVisible(true)
+		, m_HelperGlyphs(nullptr)
+		, m_HelperGlyphsVisible(true)
 	{
 		m_Layout = new exl::TextLayout;
 
@@ -119,6 +124,10 @@ public:
 		glGenVertexArrays(1, &m_BufferAttributes);
 
 		SetShaderProgram(a_Program);
+
+		m_HelperLayout = new fw::DebugHelper;
+		m_HelperLines = new fw::DebugHelper;
+		m_HelperGlyphs = new fw::DebugHelper;
 	}
 
 	~TextField()
@@ -129,6 +138,25 @@ public:
 		glDeleteBuffers(1, &m_BufferVertices);
 		glDeleteBuffers(1, &m_BufferElements);
 		glDeleteVertexArrays(1, &m_BufferAttributes);
+
+		delete m_HelperLayout;
+		delete m_HelperLines;
+		delete m_HelperGlyphs;
+	}
+
+	void ToggleLayoutOutlineVisible()
+	{
+		m_HelperLayoutVisible = !m_HelperLayoutVisible;
+	}
+
+	void ToggleLinesOutlineVisible()
+	{
+		m_HelperLinesVisible = !m_HelperLinesVisible;
+	}
+
+	void ToggleGlyphsOutlineVisible()
+	{
+		m_HelperGlyphsVisible = !m_HelperGlyphsVisible;
 	}
 
 	void SetShaderProgram(fw::ShaderProgram* a_Program)
@@ -198,7 +226,7 @@ public:
 		}
 	}
 
-	void Render(const glm::mat4x4& a_ProjectionMatrix)
+	void Render(int a_Width, int a_Height)
 	{
 		glm::vec2 screen_position = m_Position + m_RenderCorrection + m_LineCorrection;
 
@@ -206,7 +234,13 @@ public:
 		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
 		modelview = glm::scale(modelview, glm::vec3((float)m_TextureWidth, (float)m_TextureHeight, 1.0f));
 
-		glm::mat4x4 mvp = a_ProjectionMatrix * modelview;
+		glm::mat4x4 projection = glm::ortho<float>(
+			0.0f, (float)a_Width,
+			(float)a_Height, 0.0f,
+			-1.0f, 1.0f
+		);
+
+		glm::mat4x4 mvp = projection * modelview;
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -239,7 +273,7 @@ public:
 			glm::vec2 cursor_position = screen_position + m_CursorPosition + glm::vec2((float)m_TexturePadding.x, (float)m_TexturePadding.y);
 
 			glMatrixMode(GL_PROJECTION);
-			glLoadMatrixf(glm::value_ptr(a_ProjectionMatrix));
+			glLoadMatrixf(glm::value_ptr(projection));
 
 			glm::mat4x4 modelview_cursor;
 			modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
@@ -253,6 +287,21 @@ public:
 			glBindVertexArray(0);
 
 			glEnable(GL_DEPTH_TEST);
+		}
+
+		if (m_HelperLayoutVisible)
+		{
+			m_HelperLayout->Render(a_Width, a_Height);
+		}
+		
+		if (m_HelperLinesVisible)
+		{
+			m_HelperLines->Render(a_Width, a_Height);
+		}
+		
+		if (m_HelperGlyphsVisible)
+		{
+			m_HelperGlyphs->Render(a_Width, a_Height);
 		}
 	}
 
@@ -286,12 +335,19 @@ private:
 		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
 
+		m_HelperLayout->Clear();
+		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+		m_HelperLines->Clear();
+		m_HelperLines->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		m_HelperGlyphs->Clear();
+		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+
 		exl::BoundingBox box = a_BoundingBox;
 		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
 
-		m_DebugHelper->Clear();
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddBox(box);
+		m_HelperLayout->AddBox(box);
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
@@ -299,8 +355,7 @@ private:
 		exl::BoundingBox box = a_BoundingBox;
 		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
 
-		m_DebugHelper->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddBox(box);
+		m_HelperLines->AddBox(box);
 
 		m_LineOffset = a_Offset;
 		m_LineOffset.y += m_Font->GetDescender();
@@ -337,8 +392,7 @@ private:
 		);
 		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
 
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
-		m_DebugHelper->AddBox(box);
+		m_HelperGlyphs->AddBox(box);
 
 		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
@@ -410,7 +464,12 @@ private:
 
 private:
 
-	fw::DebugHelper* m_DebugHelper;
+	fw::DebugHelper* m_HelperLayout;
+	bool m_HelperLayoutVisible;
+	fw::DebugHelper* m_HelperLines;
+	bool m_HelperLinesVisible;
+	fw::DebugHelper* m_HelperGlyphs;
+	bool m_HelperGlyphsVisible;
 
 	glm::vec2 m_Position;
 	exl::FontFace* m_Font;
@@ -490,7 +549,7 @@ public:
 
 		m_FontFace = m_Font->CreateFace(m_FaceOptions);
 
-		m_TextField = new TextField(m_ProgramEffects, m_DebugHelper);
+		m_TextField = new TextField(m_ProgramEffects);
 		m_TextField->SetFont(m_FontFace);
 		m_TextField->SetPosition(glm::vec2(25.0f, 64.0f));
 
@@ -513,17 +572,11 @@ public:
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4x4 projection = glm::ortho<float>(
-			0.0f, (float)width,
-			(float)height, 0.0f,
-			-1.0f, 1.0f
-		);
-
 		glUseProgram(m_ProgramEffects->GetHandle());
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
-		m_TextField->Render(projection);
+		m_TextField->Render(width, height);
 
 		m_DebugHelper->Render(width, height);
 	}
@@ -568,6 +621,25 @@ private:
 			case GLFW_KEY_S:
 				{
 					m_UseShadow = !m_UseShadow;
+
+				} break;
+
+
+			case GLFW_KEY_1:
+				{
+					m_TextField->ToggleLayoutOutlineVisible();
+
+				} break;
+
+			case GLFW_KEY_2:
+				{
+					m_TextField->ToggleLinesOutlineVisible();
+
+				} break;
+
+			case GLFW_KEY_3:
+				{
+					m_TextField->ToggleGlyphsOutlineVisible();
 
 				} break;
 
