@@ -91,8 +91,8 @@ TEST_F(FaceContext, FindGlyph)
 	ASSERT_NE(nullptr, glyph->metrics);
 	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
 	EXPECT_VEC2_EQ(2.0f, 19.0f, glyph->metrics->offset);
-	EXPECT_VEC2_EQ(2.0625000f, 0.0000000f, glyph->metrics->bounding_box.GetMinimum());
-	EXPECT_VEC2_EQ(16.859375f, 23.000000f, glyph->metrics->bounding_box.GetMaximum());
+	EXPECT_VEC2_EQ(2.0625000f, 19.0f, glyph->metrics->bounding_box.GetMinimum());
+	EXPECT_VEC2_EQ(16.859375f, 42.0f, glyph->metrics->bounding_box.GetMaximum());
 }
 
 TEST_F(FaceContext, FindGlyphOutline)
