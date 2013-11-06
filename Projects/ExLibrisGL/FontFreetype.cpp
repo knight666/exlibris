@@ -244,7 +244,7 @@ namespace ExLibris
 
 		a_Glyph->metrics = new GlyphMetrics;
 		a_Glyph->metrics->offset.x = Fixed26Dot6::ToFloat(glyph_metrics.horiBearingX);
-		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(a_FontMetrics.height - glyph_metrics.horiBearingY - a_FontMetrics.ascender);
+		a_Glyph->metrics->offset.y = Fixed26Dot6::ToFloat(a_FontMetrics.height - glyph_metrics.horiBearingY - a_FontMetrics.ascender + a_FontMetrics.descender);
 		a_Glyph->metrics->advance = Fixed26Dot6::ToFloat(glyph_metrics.horiAdvance);
 
 		// bounding box
