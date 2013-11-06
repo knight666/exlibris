@@ -374,11 +374,11 @@ private:
 
 		m_CursorPosition = a_Offset;
 
-		m_LineCorrection.x = 0.0f;
-		m_LineCorrection.y = 0.0f;
-
 		exl::BoundingBox box = a_BoundingBox;
-		box.Translate(m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + m_LineOffset);
+		box.Translate(m_Position + m_LineOffset);
+
+		m_LineCorrection.x = a_BoundingBox.GetMinimum().x;
+		m_LineCorrection.y = a_BoundingBox.GetMinimum().y;
 
 		m_HelperLines->AddBox(box);
 	}
@@ -390,23 +390,14 @@ private:
 
 		m_CursorPosition.x = a_X + a_Advance;
 
-		glm::vec2 offset = m_LineOffset + metrics->offset;
-		offset.x += a_X;
+		glm::vec2 texture_position = a_BoundingBox.GetMinimum() + m_LineOffset - m_LineCorrection + glm::vec2(0.0f, m_Font->GetAscender()) + glm::vec2(m_TexturePadding);
 
 		exl::BoundingBox box = a_BoundingBox;
-		box.Translate(m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + m_LineOffset);
+		box.Translate(m_Position + m_LineOffset);
 
 		m_HelperGlyphs->AddBox(box);
 
-		exl::BoundingBox box_bitmap(
-			glm::vec2(0.0f, 0.0f),
-			glm::vec2((float)bitmap->width, (float)bitmap->height)
-		);
-		box_bitmap.Translate(m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
-
-		m_HelperBitmaps->AddBox(box_bitmap);
-
-		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
+		unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
 		unsigned int src_pitch = bitmap->width * 4;
@@ -599,6 +590,7 @@ public:
 
 		char mouse_text[256] = { 0 };
 		sprintf(mouse_text, "Mouse position: (%.2f, %.2f)", mouse_position.x, mouse_position.y);
+		glfwSetWindowTitle(GetWindow(), mouse_text);
 		//m_DebugHelper->AddText(mouse_text, glm::vec2(10.0f, 10.0f));
 
 		m_DebugHelper->Render(width, height);
