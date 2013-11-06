@@ -199,11 +199,11 @@ namespace ExLibris
 
 				if (glyph->type == TextCharacter::eType_Character)
 				{
-					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance);
+					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance, glyph->bounding_box);
 				}
 				else if (glyph->type == TextCharacter::eType_Whitespace)
 				{
-					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance);
+					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance, glyph->bounding_box);
 				}
 			}
 
@@ -602,7 +602,7 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
-						line->bounding_box.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
+						//line->bounding_box.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
 
 						m_BoundingBox.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
 					}
@@ -617,7 +617,7 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						line->dimensions.x = std::max<float>(m_SizeHint.x, line->dimensions.x);
-						line->bounding_box.SetWidth(std::max<float>(m_SizeHint.x, line->dimensions.x));
+						//line->bounding_box.SetWidth(std::max<float>(m_SizeHint.x, line->dimensions.x));
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 
@@ -634,7 +634,7 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						line->dimensions.x = std::min<float>(m_SizeHint.x, line->dimensions.x);
-						line->bounding_box.SetWidth(std::min<float>(m_SizeHint.x, line->dimensions.x));
+						//line->bounding_box.SetWidth(std::min<float>(m_SizeHint.x, line->dimensions.x));
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
@@ -807,8 +807,9 @@ namespace ExLibris
 		m_LineCurrent->position = line_position;
 		m_LineCurrent->dimensions = glm::vec2(0.0f, m_Face->GetLineHeight());
 
-		m_LineCurrent->bounding_box.SetTopLeft(line_position);
-		m_LineCurrent->bounding_box.SetDimensions(glm::vec2(0.0f, m_Face->GetLineHeight()));
+		//m_LineCurrent->bounding_box.SetTopLeft(line_position);
+		//m_LineCurrent->bounding_box.SetDimensions(glm::vec2(0.0f, m_Face->GetLineHeight()));
+		//m_LineCurrent->bounding_box.SetHeight(m_Face->GetLineHeight());
 
 		m_Lines.push_back(m_LineCurrent);
 
@@ -817,11 +818,18 @@ namespace ExLibris
 
 	void TextLayout::_AddGlyphToCurrentLine(TextCharacter* a_Glyph)
 	{
+		glm::vec2 offset(
+			m_LineCurrent->position.x + m_Cursor.x,
+			m_LineCurrent->position.y
+		);
+
+		a_Glyph->bounding_box = a_Glyph->glyph->metrics->bounding_box.GetTranslated(offset);
+
 		m_LineCurrent->dimensions.x += a_Glyph->advance;
 		a_Glyph->x = m_Cursor.x;
 		m_Cursor.x += a_Glyph->advance;
 
-		m_LineCurrent->bounding_box.Unite(a_Glyph->glyph->metrics->bounding_box);
+		m_LineCurrent->bounding_box.Unite(a_Glyph->bounding_box);
 
 		m_LineCurrent->characters.push_back(a_Glyph);
 	}

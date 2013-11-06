@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "BoundingBox.h"
+
 namespace ExLibris
 {
 	struct Glyph;
@@ -61,6 +63,7 @@ namespace ExLibris
 		const Glyph* glyph;
 		float x;
 		float advance;
+		BoundingBox bounding_box;
 	
 	}; // struct TextCharacter
 
