@@ -582,7 +582,14 @@ namespace ExLibris
 
 		m_Dimensions.x = 0.0f;
 
-		m_BoundingBox.SetLeft(0.0f);
+		m_BoundingBox.Invalidate();
+		
+		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
+		{
+			TextLine* line = *line_it;
+
+			m_BoundingBox.Unite(line->bounding_box);
+		}
 
 		if (m_HorizontalPolicy == eSizePolicy_Fixed)
 		{
@@ -601,11 +608,10 @@ namespace ExLibris
 					{
 						TextLine* line = *line_it;
 
-						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
-						//line->bounding_box.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
-
-						m_BoundingBox.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
+						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->bounding_box.GetDimensions().x);
 					}
+
+					//m_BoundingBox.SetWidth(m_Dimensions.x);
 
 					break;
 				}
@@ -617,12 +623,11 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						line->dimensions.x = std::max<float>(m_SizeHint.x, line->dimensions.x);
-						//line->bounding_box.SetWidth(std::max<float>(m_SizeHint.x, line->dimensions.x));
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
-
-						m_BoundingBox.SetWidth(std::max<float>(m_Dimensions.x, line->dimensions.x));
 					}
+
+					m_BoundingBox.SetWidth(m_Dimensions.x);
 
 					break;
 				}
@@ -634,10 +639,11 @@ namespace ExLibris
 						TextLine* line = *line_it;
 
 						line->dimensions.x = std::min<float>(m_SizeHint.x, line->dimensions.x);
-						//line->bounding_box.SetWidth(std::min<float>(m_SizeHint.x, line->dimensions.x));
 
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
+
+					m_BoundingBox.SetWidth(m_Dimensions.x);
 
 					break;
 				}
@@ -691,13 +697,6 @@ namespace ExLibris
 				}
 
 			}
-		}
-
-		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
-		{
-			TextLine* line = *line_it;
-
-			m_BoundingBox.Unite(line->bounding_box);
 		}
 	}
 
@@ -806,10 +805,6 @@ namespace ExLibris
 		m_LineCurrent = new TextLine;
 		m_LineCurrent->position = line_position;
 		m_LineCurrent->dimensions = glm::vec2(0.0f, m_Face->GetLineHeight());
-
-		//m_LineCurrent->bounding_box.SetTopLeft(line_position);
-		//m_LineCurrent->bounding_box.SetDimensions(glm::vec2(0.0f, m_Face->GetLineHeight()));
-		//m_LineCurrent->bounding_box.SetHeight(m_Face->GetLineHeight());
 
 		m_Lines.push_back(m_LineCurrent);
 
