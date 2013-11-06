@@ -256,11 +256,11 @@ namespace ExLibris
 			a_Glyph->metrics->bounding_box = BoundingBox(
 				glm::vec2(
 					Fixed26Dot6::ToFloat(bounding_box.xMin),
-					Fixed26Dot6::ToFloat(bounding_box.yMin)
+					Fixed26Dot6::ToFloat(a_FontMetrics.height - bounding_box.yMin)
 				),
 				glm::vec2(
 					Fixed26Dot6::ToFloat(bounding_box.xMax),
-					Fixed26Dot6::ToFloat(bounding_box.yMax)
+					Fixed26Dot6::ToFloat(a_FontMetrics.height - bounding_box.yMax)
 				)
 			);
 		}

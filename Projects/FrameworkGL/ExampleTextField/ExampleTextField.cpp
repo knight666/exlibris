@@ -72,6 +72,8 @@ public:
 		, m_HelperLinesVisible(true)
 		, m_HelperGlyphs(nullptr)
 		, m_HelperGlyphsVisible(true)
+		, m_HelperBitmaps(nullptr)
+		, m_HelperBitmapsVisible(true)
 	{
 		m_Layout = new exl::TextLayout;
 
@@ -128,6 +130,7 @@ public:
 		m_HelperLayout = new fw::DebugHelper;
 		m_HelperLines = new fw::DebugHelper;
 		m_HelperGlyphs = new fw::DebugHelper;
+		m_HelperBitmaps = new fw::DebugHelper;
 	}
 
 	~TextField()
@@ -142,6 +145,7 @@ public:
 		delete m_HelperLayout;
 		delete m_HelperLines;
 		delete m_HelperGlyphs;
+		delete m_HelperBitmaps;
 	}
 
 	void ToggleLayoutOutlineVisible()
@@ -157,6 +161,11 @@ public:
 	void ToggleGlyphsOutlineVisible()
 	{
 		m_HelperGlyphsVisible = !m_HelperGlyphsVisible;
+	}
+
+	void ToggleBitmapsOutlineVisible()
+	{
+		m_HelperBitmapsVisible = !m_HelperBitmapsVisible;
 	}
 
 	void SetShaderProgram(fw::ShaderProgram* a_Program)
@@ -303,6 +312,11 @@ public:
 		{
 			m_HelperGlyphs->Render(a_Width, a_Height);
 		}
+		
+		if (m_HelperBitmapsVisible)
+		{
+			m_HelperBitmaps->Render(a_Width, a_Height);
+		}
 	}
 
 private:
@@ -344,6 +358,9 @@ private:
 		m_HelperGlyphs->Clear();
 		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
 
+		m_HelperBitmaps->Clear();
+		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
 		exl::BoundingBox box = a_BoundingBox;
 		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
 
@@ -378,21 +395,20 @@ private:
 
 		m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
 
-		if (offset.x < 0.0f)
-		{
-			m_LineCorrection.x = fabs(offset.x);
-			offset.x = 0.0f;
-		}
-
 		glm::vec2 correction(8.0f, 8.0f);
 
-		exl::BoundingBox box(
+		exl::BoundingBox box = a_Glyph->metrics->bounding_box;
+		box.SetCenter(box.GetCenter() + glm::vec2(a_X, 0.0f) + glm::vec2(m_TexturePadding) + m_RenderCorrection + m_Position + m_LineOffset);
+
+		m_HelperGlyphs->AddBox(box);
+
+		exl::BoundingBox box_bitmap(
 			glm::vec2(0.0f, 0.0f),
 			glm::vec2((float)bitmap->width, (float)bitmap->height)
 		);
-		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
+		box_bitmap.SetCenter(box_bitmap.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection + offset);
 
-		m_HelperGlyphs->AddBox(box);
+		m_HelperBitmaps->AddBox(box_bitmap);
 
 		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
@@ -470,6 +486,8 @@ private:
 	bool m_HelperLinesVisible;
 	fw::DebugHelper* m_HelperGlyphs;
 	bool m_HelperGlyphsVisible;
+	fw::DebugHelper* m_HelperBitmaps;
+	bool m_HelperBitmapsVisible;
 
 	glm::vec2 m_Position;
 	exl::FontFace* m_Font;
@@ -544,14 +562,14 @@ public:
 
 		m_FaceOptions.size = 60.0f;
 
-		m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		//m_Font = m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
+		//m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Font = m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
 
 		m_FontFace = m_Font->CreateFace(m_FaceOptions);
 
 		m_TextField = new TextField(m_ProgramEffects);
 		m_TextField->SetFont(m_FontFace);
-		m_TextField->SetPosition(glm::vec2(25.0f, 64.0f));
+		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
 
 		return true;
 	}
@@ -577,6 +595,15 @@ public:
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
 		m_TextField->Render(width, height);
+
+		glm::dvec2 mouse_position;
+		glfwGetCursorPos(GetWindow(), &mouse_position.x, &mouse_position.y);
+
+		m_DebugHelper->Clear();
+
+		char mouse_text[256] = { 0 };
+		sprintf(mouse_text, "Mouse position: (%.2f, %.2f)", mouse_position.x, mouse_position.y);
+		m_DebugHelper->AddText(mouse_text, glm::vec2(10.0f, 10.0f));
 
 		m_DebugHelper->Render(width, height);
 	}
@@ -640,6 +667,12 @@ private:
 			case GLFW_KEY_3:
 				{
 					m_TextField->ToggleGlyphsOutlineVisible();
+
+				} break;
+
+			case GLFW_KEY_4:
+				{
+					m_TextField->ToggleBitmapsOutlineVisible();
 
 				} break;
 
