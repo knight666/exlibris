@@ -325,9 +325,11 @@ private:
 	{
 		// texture must be padded in order to support effects like glow and shadows
 
-		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TexturePadding.x * 2);
+		glm::vec2 dimensions = a_BoundingBox.GetDimensions();
+
+		m_TextureWidth = (unsigned int)dimensions.x + (m_TexturePadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
-		m_TextureHeight = (unsigned int)a_Dimensions.y + (m_TexturePadding.y * 2);
+		m_TextureHeight = (unsigned int)dimensions.y + (m_TexturePadding.y * 2);
 
 		m_TextureDimensions.x = (float)m_TextureWidth;
 		m_TextureDimensions.y = (float)m_TextureHeight;
@@ -349,6 +351,9 @@ private:
 		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
 
+		m_LineCorrection.x = a_BoundingBox.GetMinimum().x;
+		m_LineCorrection.y = a_BoundingBox.GetMinimum().y;
+
 		m_HelperLayout->Clear();
 		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
@@ -361,24 +366,23 @@ private:
 		m_HelperBitmaps->Clear();
 		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
-		exl::BoundingBox box = a_BoundingBox;
-		box.SetCenter(box.GetCenter() + m_Position + glm::vec2(m_TexturePadding) + m_RenderCorrection);
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position + glm::vec2(0.0f, -a_Face->GetAscender()));
 
 		m_HelperLayout->AddBox(box);
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
-		m_LineOffset = a_Offset;
-		m_LineOffset.y += m_Font->GetDescender();
+		//m_LineOffset = a_Offset;
+		//m_LineOffset.y += m_Font->GetDescender();
+
+		m_LineOffset.x = 0.0f;
+		m_LineOffset.y = m_Font->GetDescender();
 
 		m_CursorPosition = a_Offset;
 
 		exl::BoundingBox box = a_BoundingBox;
 		box.Translate(m_Position + m_LineOffset);
-
-		m_LineCorrection.x = a_BoundingBox.GetMinimum().x;
-		m_LineCorrection.y = a_BoundingBox.GetMinimum().y;
 
 		m_HelperLines->AddBox(box);
 	}
