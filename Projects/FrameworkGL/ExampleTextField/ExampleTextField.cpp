@@ -66,6 +66,14 @@ public:
 		, m_BufferVertices(0)
 		, m_BufferElements(0)
 		, m_BufferAttributes(0)
+		, m_HelperLayout(nullptr)
+		, m_HelperLayoutVisible(true)
+		, m_HelperLines(nullptr)
+		, m_HelperLinesVisible(true)
+		, m_HelperGlyphs(nullptr)
+		, m_HelperGlyphsVisible(true)
+		, m_HelperBitmaps(nullptr)
+		, m_HelperBitmapsVisible(true)
 	{
 		m_Layout = new exl::TextLayout;
 
@@ -118,6 +126,11 @@ public:
 		glGenVertexArrays(1, &m_BufferAttributes);
 
 		SetShaderProgram(a_Program);
+
+		m_HelperLayout = new fw::DebugHelper;
+		m_HelperLines = new fw::DebugHelper;
+		m_HelperGlyphs = new fw::DebugHelper;
+		m_HelperBitmaps = new fw::DebugHelper;
 	}
 
 	~TextField()
@@ -128,6 +141,31 @@ public:
 		glDeleteBuffers(1, &m_BufferVertices);
 		glDeleteBuffers(1, &m_BufferElements);
 		glDeleteVertexArrays(1, &m_BufferAttributes);
+
+		delete m_HelperLayout;
+		delete m_HelperLines;
+		delete m_HelperGlyphs;
+		delete m_HelperBitmaps;
+	}
+
+	void ToggleLayoutOutlineVisible()
+	{
+		m_HelperLayoutVisible = !m_HelperLayoutVisible;
+	}
+
+	void ToggleLinesOutlineVisible()
+	{
+		m_HelperLinesVisible = !m_HelperLinesVisible;
+	}
+
+	void ToggleGlyphsOutlineVisible()
+	{
+		m_HelperGlyphsVisible = !m_HelperGlyphsVisible;
+	}
+
+	void ToggleBitmapsOutlineVisible()
+	{
+		m_HelperBitmapsVisible = !m_HelperBitmapsVisible;
 	}
 
 	void SetShaderProgram(fw::ShaderProgram* a_Program)
@@ -161,6 +199,11 @@ public:
 		m_Layout->Accept(*this);
 	}
 
+	void SetPosition(const glm::vec2& a_Position)
+	{
+		m_Position = a_Position;
+	}
+
 	void AddCharacter(unsigned int a_Character)
 	{
 		m_Text.push_back((char)a_Character);
@@ -192,15 +235,21 @@ public:
 		}
 	}
 
-	void Render(const glm::vec2& a_Position, const glm::mat4x4& a_ProjectionMatrix)
+	void Render(int a_Width, int a_Height)
 	{
-		glm::vec2 screen_position = a_Position + m_RenderCorrection + m_LineCorrection;
+		glm::vec2 screen_position = m_Position + m_RenderCorrection;
 
 		glm::mat4x4 modelview;
 		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
 		modelview = glm::scale(modelview, glm::vec3((float)m_TextureWidth, (float)m_TextureHeight, 1.0f));
 
-		glm::mat4x4 mvp = a_ProjectionMatrix * modelview;
+		glm::mat4x4 projection = glm::ortho<float>(
+			0.0f, (float)a_Width,
+			(float)a_Height, 0.0f,
+			-1.0f, 1.0f
+		);
+
+		glm::mat4x4 mvp = projection * modelview;
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -230,10 +279,10 @@ public:
 		{
 			glDisable(GL_DEPTH_TEST);
 
-			glm::vec2 cursor_position = screen_position + m_CursorPosition + glm::vec2((float)m_TexturePadding.x, (float)m_TexturePadding.y);
+			glm::vec2 cursor_position = screen_position + m_CursorPosition;
 
 			glMatrixMode(GL_PROJECTION);
-			glLoadMatrixf(glm::value_ptr(a_ProjectionMatrix));
+			glLoadMatrixf(glm::value_ptr(projection));
 
 			glm::mat4x4 modelview_cursor;
 			modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
@@ -248,17 +297,39 @@ public:
 
 			glEnable(GL_DEPTH_TEST);
 		}
+
+		if (m_HelperLayoutVisible)
+		{
+			m_HelperLayout->Render(a_Width, a_Height);
+		}
+		
+		if (m_HelperLinesVisible)
+		{
+			m_HelperLines->Render(a_Width, a_Height);
+		}
+		
+		if (m_HelperGlyphsVisible)
+		{
+			m_HelperGlyphs->Render(a_Width, a_Height);
+		}
+		
+		if (m_HelperBitmapsVisible)
+		{
+			m_HelperBitmaps->Render(a_Width, a_Height);
+		}
 	}
 
 private:
 
-	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
+	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
 	{
+		glm::vec2 dimensions = a_BoundingBox.GetDimensions();
+
 		// texture must be padded in order to support effects like glow and shadows
 
-		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TexturePadding.x * 2);
+		m_TextureWidth = (unsigned int)dimensions.x + (m_TexturePadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
-		m_TextureHeight = (unsigned int)a_Dimensions.y + (m_TexturePadding.y * 2);
+		m_TextureHeight = (unsigned int)dimensions.y + (m_TexturePadding.y * 2);
 
 		m_TextureDimensions.x = (float)m_TextureWidth;
 		m_TextureDimensions.y = (float)m_TextureHeight;
@@ -277,40 +348,46 @@ private:
 			}
 		}
 
-		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
-		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
+		m_TextureCorrection = -a_BoundingBox.GetMinimum() + glm::vec2(m_TexturePadding);
+		m_RenderCorrection = -m_TextureCorrection;
+
+		m_HelperLayout->Clear();
+		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+		m_HelperLines->Clear();
+		m_HelperLines->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		m_HelperGlyphs->Clear();
+		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+
+		m_HelperBitmaps->Clear();
+		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
+		m_HelperLayout->AddBox(box);
 	}
 
-	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
+	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
-		m_LineOffset = a_Offset;
-		m_LineOffset.y += m_Font->GetDescender();
-
 		m_CursorPosition = a_Offset;
 
-		m_LineCorrection.x = 0.0f;
-		m_LineCorrection.y = 0.0f;
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
+		m_HelperLines->AddBox(box);
 	}
 
-	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance)
+	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
 		exl::GlyphMetrics* metrics = a_Glyph->metrics;
 		exl::GlyphBitmap* bitmap = a_Glyph->bitmap;
 
 		m_CursorPosition.x = a_X + a_Advance;
 
-		glm::vec2 offset = m_LineOffset + metrics->offset;
-		offset.x += a_X;
+		glm::vec2 texture_position = a_BoundingBox.GetMinimum() + m_TextureCorrection;
 
-		m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
+		m_HelperGlyphs->AddBox(box);
 
-		if (offset.x < 0.0f)
-		{
-			m_LineCorrection.x = fabs(offset.x);
-			offset.x = 0.0f;
-		}
-
-		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
+		unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
 		unsigned int src_pitch = bitmap->width * 4;
@@ -353,7 +430,7 @@ private:
 		}
 	}
 
-	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
+	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
 		m_CursorPosition.x = a_X + a_Advance;
 	}
@@ -380,13 +457,22 @@ private:
 
 private:
 
+	fw::DebugHelper* m_HelperLayout;
+	bool m_HelperLayoutVisible;
+	fw::DebugHelper* m_HelperLines;
+	bool m_HelperLinesVisible;
+	fw::DebugHelper* m_HelperGlyphs;
+	bool m_HelperGlyphsVisible;
+	fw::DebugHelper* m_HelperBitmaps;
+	bool m_HelperBitmapsVisible;
+
+	glm::vec2 m_Position;
 	exl::FontFace* m_Font;
 	exl::TextLayout* m_Layout;
 	std::string m_Text;
 
-	glm::vec2 m_LineOffset;
-	glm::vec2 m_LineCorrection;
 	glm::vec2 m_RenderCorrection;
+	glm::vec2 m_TextureCorrection;
 
 	glm::vec2 m_CursorPosition;
 	bool m_CursorVisible;
@@ -447,31 +533,19 @@ public:
 			return false;
 		}
 
-		m_DebugHelper->AddText("This is just a test.", glm::vec2(20.0f, 20.0f));
-
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->AddText("This is another test.", glm::vec2(20.0f, 40.0f));
-
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		m_DebugHelper->SetThickness(1.0f);
-		m_DebugHelper->AddBox(exl::BoundingBox(glm::vec2(10.0f, 10.0f), glm::vec2(630.0f, 470.0f)));
-
-		m_DebugHelper->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_DebugHelper->SetThickness(2.5f);
-		m_DebugHelper->AddCircle(glm::vec2(120.0f, 120.0f), 25.0f);
-
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 
-		m_FaceOptions.size = 24.0f;
+		m_FaceOptions.size = 60.0f;
 
-		m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		//m_Font = m_FontLoader->LoadFont("Fonts/Mathilde/mathilde.otf");
+		//m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Font = m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
 
 		m_FontFace = m_Font->CreateFace(m_FaceOptions);
 
 		m_TextField = new TextField(m_ProgramEffects);
 		m_TextField->SetFont(m_FontFace);
+		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
 
 		return true;
 	}
@@ -492,17 +566,21 @@ public:
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4x4 projection = glm::ortho<float>(
-			0.0f, (float)width,
-			(float)height, 0.0f,
-			-1.0f, 1.0f
-		);
-
 		glUseProgram(m_ProgramEffects->GetHandle());
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseShadow"), m_UseShadow ? GL_TRUE : GL_FALSE);
 		glUniform1i(m_ProgramEffects->FindUniform("uniUseGlow"), m_UseGlow ? GL_TRUE : GL_FALSE);
 
-		m_TextField->Render(glm::vec2(25.0f, 32.0f), projection);
+		m_TextField->Render(width, height);
+
+		glm::dvec2 mouse_position;
+		glfwGetCursorPos(GetWindow(), &mouse_position.x, &mouse_position.y);
+
+		m_DebugHelper->Clear();
+
+		char mouse_text[256] = { 0 };
+		sprintf(mouse_text, "Mouse position: (%.2f, %.2f)", mouse_position.x, mouse_position.y);
+		glfwSetWindowTitle(GetWindow(), mouse_text);
+		//m_DebugHelper->AddText(mouse_text, glm::vec2(10.0f, 10.0f));
 
 		m_DebugHelper->Render(width, height);
 	}
@@ -547,6 +625,31 @@ private:
 			case GLFW_KEY_S:
 				{
 					m_UseShadow = !m_UseShadow;
+
+				} break;
+
+
+			case GLFW_KEY_1:
+				{
+					m_TextField->ToggleLayoutOutlineVisible();
+
+				} break;
+
+			case GLFW_KEY_2:
+				{
+					m_TextField->ToggleLinesOutlineVisible();
+
+				} break;
+
+			case GLFW_KEY_3:
+				{
+					m_TextField->ToggleGlyphsOutlineVisible();
+
+				} break;
+
+			case GLFW_KEY_4:
+				{
+					m_TextField->ToggleBitmapsOutlineVisible();
 
 				} break;
 

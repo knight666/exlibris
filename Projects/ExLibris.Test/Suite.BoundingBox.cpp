@@ -1118,6 +1118,58 @@ TEST(BoundingBox, SetCenterInvalid)
 	EXPECT_VEC2_EQ(56.4f, -69.8f, bounds.GetMaximum());
 }
 
+TEST(BoundingBox, Translate)
+{
+	BoundingBox box(
+		glm::vec2(-12.9f, 12.8f),
+		glm::vec2(54.8f, 168.8f)
+	);
+
+	box.Translate(glm::vec2(25.9f, 14.8f));
+
+	EXPECT_VEC2_EQ(-12.9f + 25.9f, 12.8f + 14.8f, box.GetMinimum());
+	EXPECT_VEC2_EQ(54.8f + 25.9f, 168.8f + 14.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, TranslateNegative)
+{
+	BoundingBox box(
+		glm::vec2(4.81f, -15.8f),
+		glm::vec2(16.87f, 22.9f)
+	);
+
+	box.Translate(glm::vec2(-25.98f, -15.8f));
+
+	EXPECT_VEC2_EQ(4.81f + -25.98f, -15.8f + -15.8f, box.GetMinimum());
+	EXPECT_VEC2_EQ(16.87f + -25.98f, 22.9f + -15.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, GetTranslated)
+{
+	BoundingBox box(
+		glm::vec2(27.87f, -67.98f),
+		glm::vec2(156.8f, 14.87f)
+	);
+
+	BoundingBox translated = box.GetTranslated(glm::vec2(2.56f, 11.9f));
+
+	EXPECT_VEC2_EQ(27.87f + 2.56f, -67.98f + 11.9f, translated.GetMinimum());
+	EXPECT_VEC2_EQ(156.8f + 2.56f, 14.87f + 11.9f, translated.GetMaximum());
+}
+
+TEST(BoundingBox, GetTranslatedNegative)
+{
+	BoundingBox box(
+		glm::vec2(2.54f, 6.87f),
+		glm::vec2(15.8f, 45.8f)
+	);
+
+	box.Translate(glm::vec2(-5.87f, -1.45f));
+
+	EXPECT_VEC2_EQ(2.54f + -5.87f, 6.87f + -1.45f, box.GetMinimum());
+	EXPECT_VEC2_EQ(15.8f + -5.87f, 45.8f + -1.45f, box.GetMaximum());
+}
+
 TEST(BoundingBox, IsIntersected)
 {
 	BoundingBox bounds_left(
@@ -1476,7 +1528,9 @@ TEST(BoundingBox, UniteInvalidLeft)
 
 	left.Unite(right);
 
-	EXPECT_FALSE(left.IsValid());
+	EXPECT_TRUE(left.IsValid());
+	EXPECT_VEC2_EQ(-17.98f, 11.8f, left.GetMinimum());
+	EXPECT_VEC2_EQ(15.82f, 188.2f, left.GetMaximum());
 }
 
 TEST(BoundingBox, UniteInvalidRight)
@@ -1524,7 +1578,9 @@ TEST(BoundingBox, GetUnitedInvalidLeft)
 
 	BoundingBox united = left.GetUnited(right);
 
-	EXPECT_FALSE(united.IsValid());
+	EXPECT_TRUE(united.IsValid());
+	EXPECT_VEC2_EQ(2.876f, 18.76f, united.GetMinimum());
+	EXPECT_VEC2_EQ(15.87f, 119.8f, united.GetMaximum());
 }
 
 TEST(BoundingBox, GetUnitedInvalidRight)
@@ -1538,5 +1594,7 @@ TEST(BoundingBox, GetUnitedInvalidRight)
 
 	BoundingBox united = left.GetUnited(right);
 
-	EXPECT_FALSE(united.IsValid());
+	EXPECT_TRUE(united.IsValid());
+	EXPECT_VEC2_EQ(22.87f, 112.7f, united.GetMinimum());
+	EXPECT_VEC2_EQ(35.97f, 176.66f, united.GetMaximum());
 }

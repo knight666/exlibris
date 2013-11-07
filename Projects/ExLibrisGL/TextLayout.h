@@ -71,6 +71,8 @@ namespace ExLibris
 
 		void Layout();
 
+		std::vector<TextLine*> GetLines() const;
+
 		void Accept(ITextLayoutVisitor& a_Visitor);
 
 	private:
@@ -102,6 +104,7 @@ namespace ExLibris
 
 		glm::vec2 m_Cursor;
 		glm::vec2 m_Dimensions;
+		BoundingBox m_BoundingBox;
 
 		glm::vec2 m_SizeHint;
 		HorizontalAlignment m_HorizontalAlignment;

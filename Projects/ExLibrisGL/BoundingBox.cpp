@@ -410,6 +410,22 @@ namespace ExLibris
 		return *this;
 	}
 
+	// Translation
+
+	void BoundingBox::Translate(const glm::vec2& a_Offset)
+	{
+		m_Minimum += a_Offset;
+		m_Maximum += a_Offset;
+	}
+
+	BoundingBox BoundingBox::GetTranslated(const glm::vec2& a_Offset) const
+	{
+		return BoundingBox(
+			m_Minimum + a_Offset,
+			m_Maximum + a_Offset
+		);
+	}
+
 	// Intersection
 
 	bool BoundingBox::IsIntersected(const BoundingBox& a_Other) const
@@ -472,20 +488,12 @@ namespace ExLibris
 
 	void BoundingBox::Unite(const BoundingBox& a_Other)
 	{
-		if (IsValid() && a_Other.IsValid())
-		{
-			m_Minimum = glm::min(m_Minimum, a_Other.GetMinimum());
-			m_Maximum = glm::max(m_Maximum, a_Other.GetMaximum());
-		}
+		m_Minimum = glm::min(m_Minimum, a_Other.GetMinimum());
+		m_Maximum = glm::max(m_Maximum, a_Other.GetMaximum());
 	}
 
 	BoundingBox BoundingBox::GetUnited(const BoundingBox& a_Other) const
 	{
-		if (!IsValid() || !a_Other.IsValid())
-		{
-			return BoundingBox();
-		}
-
 		return BoundingBox(
 			glm::min(m_Minimum, a_Other.GetMinimum()),
 			glm::max(m_Maximum, a_Other.GetMaximum())
