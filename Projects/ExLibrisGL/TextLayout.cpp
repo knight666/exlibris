@@ -172,17 +172,26 @@ namespace ExLibris
 		}
 	}
 
+	std::vector<TextLine*> TextLayout::GetLines() const
+	{
+		std::vector<TextLine*> lines;
+
+		lines.assign(m_Lines.begin(), m_Lines.end());
+
+		return lines;
+	}
+
 	void TextLayout::Accept(ITextLayoutVisitor& a_Visitor)
 	{
 		Layout();
 
-		a_Visitor.VisitTextBegin(m_Face, m_Dimensions);
+		a_Visitor.VisitTextBegin(m_Face, m_Dimensions, m_BoundingBox);
 
 		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
 		{
 			TextLine* line = *line_it;
 
-			a_Visitor.VisitTextLineBegin(line->characters.size(), line->position, line->dimensions.x);
+			a_Visitor.VisitTextLineBegin(line->characters.size(), line->position, line->dimensions.x, line->bounding_box);
 
 			for (std::vector<TextCharacter*>::iterator glyph_it = line->characters.begin(); glyph_it != line->characters.end(); ++glyph_it)
 			{
@@ -190,11 +199,11 @@ namespace ExLibris
 
 				if (glyph->type == TextCharacter::eType_Character)
 				{
-					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance);
+					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance, glyph->bounding_box);
 				}
 				else if (glyph->type == TextCharacter::eType_Whitespace)
 				{
-					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance);
+					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance, glyph->bounding_box);
 				}
 			}
 
@@ -573,9 +582,20 @@ namespace ExLibris
 
 		m_Dimensions.x = 0.0f;
 
+		m_BoundingBox.Invalidate();
+		
+		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
+		{
+			TextLine* line = *line_it;
+
+			m_BoundingBox.Unite(line->bounding_box);
+		}
+
 		if (m_HorizontalPolicy == eSizePolicy_Fixed)
 		{
 			m_Dimensions.x = std::max<float>(m_SizeHint.x, 0.0f);
+
+			m_BoundingBox.SetRight(std::max<float>(m_SizeHint.x, 0.0f));
 		}
 		else if (lines_valid)
 		{
@@ -588,8 +608,10 @@ namespace ExLibris
 					{
 						TextLine* line = *line_it;
 
-						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
+						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->bounding_box.GetDimensions().x);
 					}
+
+					//m_BoundingBox.SetWidth(m_Dimensions.x);
 
 					break;
 				}
@@ -605,6 +627,8 @@ namespace ExLibris
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
 
+					m_BoundingBox.SetWidth(m_Dimensions.x);
+
 					break;
 				}
 
@@ -619,6 +643,8 @@ namespace ExLibris
 						m_Dimensions.x = std::max<float>(m_Dimensions.x, line->dimensions.x);
 					}
 
+					m_BoundingBox.SetWidth(m_Dimensions.x);
+
 					break;
 				}
 
@@ -632,6 +658,8 @@ namespace ExLibris
 		if (m_VerticalPolicy == eSizePolicy_Fixed)
 		{
 			m_Dimensions.y = std::max<float>(m_SizeHint.y, 0.0f);
+
+			m_BoundingBox.SetHeight(std::max<float>(m_SizeHint.y, 0.0f));
 		}
 		else if (lines_valid)
 		{
@@ -644,12 +672,16 @@ namespace ExLibris
 				{
 					m_Dimensions.y = lines_height;
 
+					m_BoundingBox.SetHeight(lines_height);
+
 					break;
 				}
 
 			case eSizePolicy_MinimumExpanding:
 				{
 					m_Dimensions.y = std::max<float>(lines_height, m_SizeHint.y);
+
+					m_BoundingBox.SetHeight(std::max<float>(lines_height, m_SizeHint.y));
 
 					break;
 				}
@@ -658,6 +690,8 @@ namespace ExLibris
 				{
 					float hint_height = std::max<float>(m_SizeHint.y, 0.0f);
 					m_Dimensions.y = std::min<float>(lines_height, hint_height);
+
+					m_BoundingBox.SetHeight(std::min<float>(lines_height, hint_height));
 
 					break;
 				}
@@ -779,9 +813,18 @@ namespace ExLibris
 
 	void TextLayout::_AddGlyphToCurrentLine(TextCharacter* a_Glyph)
 	{
+		glm::vec2 offset(
+			m_LineCurrent->position.x + m_Cursor.x,
+			m_LineCurrent->position.y - m_Face->GetAscender() + m_Face->GetDescender()
+		);
+
+		a_Glyph->bounding_box = a_Glyph->glyph->metrics->bounding_box.GetTranslated(offset);
+
 		m_LineCurrent->dimensions.x += a_Glyph->advance;
 		a_Glyph->x = m_Cursor.x;
 		m_Cursor.x += a_Glyph->advance;
+
+		m_LineCurrent->bounding_box.Unite(a_Glyph->bounding_box);
 
 		m_LineCurrent->characters.push_back(a_Glyph);
 	}
