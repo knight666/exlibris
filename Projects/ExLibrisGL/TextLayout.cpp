@@ -815,7 +815,7 @@ namespace ExLibris
 	{
 		glm::vec2 offset(
 			m_LineCurrent->position.x + m_Cursor.x,
-			m_LineCurrent->position.y
+			m_LineCurrent->position.y - m_Face->GetAscender() + m_Face->GetDescender()
 		);
 
 		a_Glyph->bounding_box = a_Glyph->glyph->metrics->bounding_box.GetTranslated(offset);
