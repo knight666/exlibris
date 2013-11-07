@@ -323,9 +323,9 @@ private:
 
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
 	{
-		// texture must be padded in order to support effects like glow and shadows
-
 		glm::vec2 dimensions = a_BoundingBox.GetDimensions();
+
+		// texture must be padded in order to support effects like glow and shadows
 
 		m_TextureWidth = (unsigned int)dimensions.x + (m_TexturePadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
@@ -348,12 +348,8 @@ private:
 			}
 		}
 
-		m_LineOffset = glm::vec2(0.0f, m_Font->GetDescender());
-		glm::vec2 layout_offset = glm::vec2(0.0f, -a_Face->GetAscender());
-
-		m_RenderCorrection = a_BoundingBox.GetMinimum() - glm::vec2(m_TexturePadding) - glm::vec2(0.0f, m_Font->GetAscender());
-
-		m_TextureCorrection = -a_BoundingBox.GetMinimum() + glm::vec2(0.0f, m_Font->GetDescender() + m_Font->GetAscender()) + glm::vec2(m_TexturePadding);
+		m_TextureCorrection = -a_BoundingBox.GetMinimum() + glm::vec2(m_TexturePadding);
+		m_RenderCorrection = -m_TextureCorrection;
 
 		m_HelperLayout->Clear();
 		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -367,8 +363,7 @@ private:
 		m_HelperBitmaps->Clear();
 		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
-		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position + layout_offset);
-
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
 		m_HelperLayout->AddBox(box);
 	}
 
@@ -376,9 +371,7 @@ private:
 	{
 		m_CursorPosition = a_Offset;
 
-		exl::BoundingBox box = a_BoundingBox;
-		box.Translate(m_Position + m_LineOffset);
-
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
 		m_HelperLines->AddBox(box);
 	}
 
@@ -391,9 +384,7 @@ private:
 
 		glm::vec2 texture_position = a_BoundingBox.GetMinimum() + m_TextureCorrection;
 
-		exl::BoundingBox box = a_BoundingBox;
-		box.Translate(m_Position + m_LineOffset);
-
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
 		m_HelperGlyphs->AddBox(box);
 
 		unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
@@ -480,8 +471,6 @@ private:
 	exl::TextLayout* m_Layout;
 	std::string m_Text;
 
-	glm::vec2 m_LineOffset;
-	glm::vec2 m_LineCorrection;
 	glm::vec2 m_RenderCorrection;
 	glm::vec2 m_TextureCorrection;
 
