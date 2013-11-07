@@ -237,7 +237,7 @@ public:
 
 	void Render(int a_Width, int a_Height)
 	{
-		glm::vec2 screen_position = m_Position + glm::vec2(-m_TexturePadding) + glm::vec2(0.0f, -m_Font->GetAscender()) + m_LineCorrection;
+		glm::vec2 screen_position = m_Position + m_RenderCorrection;
 
 		glm::mat4x4 modelview;
 		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
@@ -279,7 +279,7 @@ public:
 		{
 			glDisable(GL_DEPTH_TEST);
 
-			glm::vec2 cursor_position = screen_position + m_CursorPosition + glm::vec2(-m_TexturePadding);
+			glm::vec2 cursor_position = screen_position + m_CursorPosition;
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(glm::value_ptr(projection));
@@ -348,12 +348,12 @@ private:
 			}
 		}
 
-		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
-		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
+		m_LineOffset = glm::vec2(0.0f, m_Font->GetDescender());
+		glm::vec2 layout_offset = glm::vec2(0.0f, -a_Face->GetAscender());
 
-		m_LineCorrection = a_BoundingBox.GetMinimum();
+		m_RenderCorrection = a_BoundingBox.GetMinimum() - glm::vec2(m_TexturePadding) - glm::vec2(0.0f, m_Font->GetAscender());
 
-		m_TextureCorrection = glm::vec2(0.0f, m_Font->GetDescender() + m_Font->GetAscender()) - a_BoundingBox.GetMinimum() + glm::vec2(m_TexturePadding);
+		m_TextureCorrection = -a_BoundingBox.GetMinimum() + glm::vec2(0.0f, m_Font->GetDescender() + m_Font->GetAscender()) + glm::vec2(m_TexturePadding);
 
 		m_HelperLayout->Clear();
 		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -367,19 +367,13 @@ private:
 		m_HelperBitmaps->Clear();
 		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
-		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position + glm::vec2(0.0f, -a_Face->GetAscender()));
+		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position + layout_offset);
 
 		m_HelperLayout->AddBox(box);
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
-		//m_LineOffset = a_Offset;
-		//m_LineOffset.y += m_Font->GetDescender();
-
-		m_LineOffset.x = 0.0f;
-		m_LineOffset.y = m_Font->GetDescender();
-
 		m_CursorPosition = a_Offset;
 
 		exl::BoundingBox box = a_BoundingBox;
