@@ -237,7 +237,7 @@ public:
 
 	void Render(int a_Width, int a_Height)
 	{
-		glm::vec2 screen_position = m_Position + m_RenderCorrection + m_LineCorrection;
+		glm::vec2 screen_position = m_Position + glm::vec2(-m_TexturePadding) + glm::vec2(0.0f, -m_Font->GetAscender()) + m_LineCorrection;
 
 		glm::mat4x4 modelview;
 		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
@@ -279,7 +279,7 @@ public:
 		{
 			glDisable(GL_DEPTH_TEST);
 
-			glm::vec2 cursor_position = screen_position + m_CursorPosition + glm::vec2((float)m_TexturePadding.x, (float)m_TexturePadding.y);
+			glm::vec2 cursor_position = screen_position + m_CursorPosition + glm::vec2(-m_TexturePadding);
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(glm::value_ptr(projection));
@@ -351,8 +351,9 @@ private:
 		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
 		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
 
-		m_LineCorrection.x = a_BoundingBox.GetMinimum().x;
-		m_LineCorrection.y = a_BoundingBox.GetMinimum().y;
+		m_LineCorrection = a_BoundingBox.GetMinimum();
+
+		m_TextureCorrection = glm::vec2(0.0f, m_Font->GetDescender() + m_Font->GetAscender()) - a_BoundingBox.GetMinimum() + glm::vec2(m_TexturePadding);
 
 		m_HelperLayout->Clear();
 		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -394,7 +395,7 @@ private:
 
 		m_CursorPosition.x = a_X + a_Advance;
 
-		glm::vec2 texture_position = a_BoundingBox.GetMinimum() + m_LineOffset - m_LineCorrection + glm::vec2(0.0f, m_Font->GetAscender()) + glm::vec2(m_TexturePadding);
+		glm::vec2 texture_position = a_BoundingBox.GetMinimum() + m_TextureCorrection;
 
 		exl::BoundingBox box = a_BoundingBox;
 		box.Translate(m_Position + m_LineOffset);
@@ -488,6 +489,7 @@ private:
 	glm::vec2 m_LineOffset;
 	glm::vec2 m_LineCorrection;
 	glm::vec2 m_RenderCorrection;
+	glm::vec2 m_TextureCorrection;
 
 	glm::vec2 m_CursorPosition;
 	bool m_CursorVisible;
