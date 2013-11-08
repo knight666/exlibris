@@ -34,31 +34,45 @@
 namespace ExLibris
 {
 
+	struct GlyphTarget
+	{
+		CurvePath* path;
+		FT_BBox bounding_box;
+	};
+
+	inline glm::vec2 GetCurvePosition(const FT_Vector* a_Position, GlyphTarget* a_Target)
+	{
+		return glm::vec2(
+			Fixed26Dot6::ToFloat(a_Position->x - a_Target->bounding_box.xMin), 
+			Fixed26Dot6::ToFloat(a_Target->bounding_box.yMax - a_Position->y)
+		);
+	}
+
 	int CurvePathMoveTo(const FT_Vector* a_To, void* a_User)
 	{
-		CurvePath* path = (CurvePath*)a_User;
+		GlyphTarget* target = (GlyphTarget*)a_User;
 
-		path->Move(Fixed26Dot6::ToFloatVec2(a_To));
+		target->path->Move(GetCurvePosition(a_To, target));
 
 		return 0;
 	}
 
 	int CurvePathLineTo(const FT_Vector* a_To, void* a_User)
 	{
-		CurvePath* path = (CurvePath*)a_User;
+		GlyphTarget* target = (GlyphTarget*)a_User;
 
-		path->LineTo(Fixed26Dot6::ToFloatVec2(a_To));
+		target->path->LineTo(GetCurvePosition(a_To, target));
 
 		return 0;
 	}
 
 	int CurvePathConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
 	{
-		CurvePath* path = (CurvePath*)a_User;
+		GlyphTarget* target = (GlyphTarget*)a_User;
 
-		path->ConicCurveTo(
-			Fixed26Dot6::ToFloatVec2(a_Control),
-			Fixed26Dot6::ToFloatVec2(a_To)
+		target->path->ConicCurveTo(
+			GetCurvePosition(a_Control, target),
+			GetCurvePosition(a_To, target)
 		);
 
 		return 0;
@@ -66,12 +80,12 @@ namespace ExLibris
 
 	int CurvePathCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
 	{
-		CurvePath* path = (CurvePath*)a_User;
+		GlyphTarget* target = (GlyphTarget*)a_User;
 
-		path->QuadraticCurveTo(
-			Fixed26Dot6::ToFloatVec2(a_ControlA),
-			Fixed26Dot6::ToFloatVec2(a_ControlB),
-			Fixed26Dot6::ToFloatVec2(a_To)
+		target->path->QuadraticCurveTo(
+			GetCurvePosition(a_ControlA, target),
+			GetCurvePosition(a_ControlB, target),
+			GetCurvePosition(a_To, target)
 		);
 
 		return 0;
@@ -182,7 +196,7 @@ namespace ExLibris
 
 				if (a_Options.outline)
 				{
-					_LoadOutline(m_Font->glyph, glyph);
+					_LoadOutline(m_Font->glyph, glyph, m_Font->size->metrics);
 				}
 
 				glyphs.push_back(glyph);
@@ -386,7 +400,7 @@ namespace ExLibris
 		return true;
 	}
 
-	bool FontFreetype::_LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const
+	bool FontFreetype::_LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Size_Metrics a_FontMetrics) const
 	{
 		if (a_Slot->outline.n_contours <= 0)
 		{
@@ -395,17 +409,20 @@ namespace ExLibris
 
 		FT_Error errors = 0;
 
-		FT_Matrix transform_flipped;
-		transform_flipped.xx = Fixed16Dot16::ToFixed(1.0f);
-		transform_flipped.xy = 0;
-		transform_flipped.yx = 0;
-		transform_flipped.yy = Fixed16Dot16::ToFixed(-1.0f);
-
-		FT_Outline_Transform(&a_Slot->outline, &transform_flipped);
-
 		a_Glyph->outline = new CurvePath;
 
-		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, a_Glyph->outline);
+		GlyphTarget target;
+		target.path = a_Glyph->outline;
+
+		errors = FT_Outline_Get_BBox(&a_Slot->outline, &target.bounding_box);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("FontFreetype::_LoadOutline", errors);
+
+			return false;
+		}
+
+		errors = FT_Outline_Decompose(&a_Slot->outline, &m_OutlineCallbacks, &target);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontFreetype::_LoadOutline", errors);

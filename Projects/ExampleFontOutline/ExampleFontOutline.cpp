@@ -54,11 +54,16 @@ public:
 		: m_DrawFilled(true)
 		, m_DrawOutline(true)
 		, m_Program(nullptr)
+		, m_Position(0.0f, 0.0f)
+		, m_Dimensions(0.0f, 0.0f)
 	{
 		m_CurveSettings.precision = 10;
 
 		m_LineOptions.quality = exl::LineMeshOptions::eQuality_Gapless;
 		m_LineOptions.thickness = 5.0f;
+
+		m_HelperGlyphs = new fw::DebugHelper;
+		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
 	}
 
 	~OutlineVisitor()
@@ -66,30 +71,37 @@ public:
 		_ClearMeshes();
 	}
 
+	void SetPosition(const glm::vec2& a_Position)
+	{
+		m_Position = a_Position;
+	}
+
 	void SetShaderProgram(fw::ShaderProgram* a_Program)
 	{
 		m_Program = a_Program;
 	}
 
-	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions)
+	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const exl::BoundingBox& a_BoundingBox)
 	{
 		m_Face = a_Face;
 		m_Dimensions = a_Dimensions;
 
 		_ClearMeshes();
+
+		m_HelperGlyphs->Clear();
 	}
 
-	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width)
+	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
 	{
-		m_LineOffset = a_Offset;
 	}
 
-	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance)
+	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
 		GlyphInstance* instance = new GlyphInstance;
+
+		m_HelperGlyphs->AddBox(a_BoundingBox.GetTranslated(m_Position));
 		
-		instance->position = m_LineOffset;
-		instance->position.x += a_X;
+		instance->position = a_BoundingBox.GetTopLeft();
 
 		std::map<unsigned int, MeshEntry*>::iterator mesh_found = m_MeshCache.find(a_Glyph->index);
 		if (mesh_found != m_MeshCache.end())
@@ -141,7 +153,7 @@ public:
 		m_GlyphMeshes.push_back(instance);
 	}
 
-	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance)
+	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
 	}
 
@@ -209,7 +221,7 @@ public:
 		{
 			GlyphInstance* instance = *instance_it;
 
-			glm::vec3 glyph_position(instance->position.x, instance->position.y, 0.0f);
+			glm::vec3 glyph_position = glm::vec3(m_Position + instance->position, 0.0f);
 
 			glm::mat4x4 glyph_matrix = glm::translate(mvp, glyph_position);
 			glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(glyph_matrix));
@@ -237,6 +249,8 @@ public:
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glUseProgram(0);
+
+		m_HelperGlyphs->Render(640, 480);
 	}
 
 private:
@@ -264,19 +278,18 @@ private:
 
 	const exl::FontFace* m_Face;
 	glm::vec2 m_Dimensions;
+	glm::vec2 m_Position;
 
-	glm::vec2 m_LineOffset;
+	exl::CurveSettings m_CurveSettings;
+	exl::LineMeshOptions m_LineOptions;
+
+	fw::ShaderProgram* m_Program;
 
 	struct MeshEntry
 	{
 		fw::MeshOpenGL* mesh_filled;
 		fw::MeshOpenGL* mesh_outline;
 	};
-
-	exl::CurveSettings m_CurveSettings;
-	exl::LineMeshOptions m_LineOptions;
-
-	fw::ShaderProgram* m_Program;
 
 	std::map<unsigned int, MeshEntry*> m_MeshCache;
 
@@ -292,6 +305,9 @@ private:
 
 	bool m_DrawOutline;
 	glm::vec4 m_ColorOutline;
+
+	fw::DebugHelper* m_HelperGlyphs;
+	bool m_HelperGlyphsVisible;
 
 }; // class OutlineVisitor
 
@@ -379,7 +395,6 @@ public:
 			MessageBoxA(0, e.what(), "Error while creating TextHelper", MB_OK);
 			return false;
 		}
-		_DrawInstructions();
 
 		Timer timer;
 
@@ -420,6 +435,7 @@ public:
 		m_OutlineVisitor->SetColorFilled(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetColorOutline(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetShaderProgram(m_ProgramTriangles);
+		m_OutlineVisitor->SetPosition(glm::vec2(100.0f, 100.0f));
 
 		m_TextLayout->Accept(*m_OutlineVisitor);
 
@@ -454,6 +470,17 @@ public:
 		modelview = glm::scale(modelview, glm::vec3(m_CameraZoom, m_CameraZoom, 1.0f));
 
 		m_OutlineVisitor->Render(projection, modelview);
+
+		m_DebugHelper->Clear();
+
+		glm::dvec2 mouse_position;
+		glfwGetCursorPos(GetWindow(), &mouse_position.x, &mouse_position.y);
+
+		char mouse_text[256] = { 0 };
+		sprintf(mouse_text, "Mouse position: (%.2f, %.2f)", mouse_position.x, mouse_position.y);
+		m_DebugHelper->AddText(mouse_text, glm::vec2(10.0f, 460.0f));
+
+		_DrawInstructions();
 
 		m_DebugHelper->Render(width, height);
 	}
@@ -676,8 +703,6 @@ private:
 
 	void _DrawInstructions()
 	{
-		m_DebugHelper->Clear();
-
 		std::stringstream text;
 
 		text
