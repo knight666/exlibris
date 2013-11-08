@@ -2,6 +2,7 @@
 
 #include "FontSystem.h"
 
+#include <BoundingBox.h>
 #include <FontFace.h>
 #include <Library.h>
 
@@ -137,6 +138,8 @@ namespace Framework
 		face->SetSize(12.0f);
 		face->SetLineHeight(16.0f);
 
+		ExLibris::BoundingBox glyph_bounding_box(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 12.0f));
+
 		for (unsigned int index = 32; index < 128; ++index)
 		{
 			ExLibris::Glyph* glyph = new ExLibris::Glyph;
@@ -145,6 +148,7 @@ namespace Framework
 
 			glyph->metrics = new ExLibris::GlyphMetrics;
 			glyph->metrics->advance = 8;
+			glyph->metrics->bounding_box = glyph_bounding_box;
 
 			glyph->bitmap = _DecodeBitmap(index - 32);
 
