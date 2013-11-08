@@ -55,7 +55,7 @@ namespace ExLibris
 		bool _LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Size_Metrics a_FontMetrics) const;
 		bool _LoadBitmapColor(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
 		bool _LoadBitmapMono(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
-		bool _LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
+		bool _LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Size_Metrics a_FontMetrics) const;
 
 	private:
 
