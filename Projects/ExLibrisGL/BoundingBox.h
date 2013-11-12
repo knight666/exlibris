@@ -104,6 +104,11 @@ namespace ExLibris
 		void Translate(const glm::vec2& a_Offset);
 		BoundingBox GetTranslated(const glm::vec2& a_Offset) const;
 
+		// Fitting
+
+		void ExpandToFit(const glm::vec2& a_Position);
+		BoundingBox GetExpandedToFit(const glm::vec2& a_Position) const;
+
 		// Intersection
 
 		bool IsIntersected(const BoundingBox& a_Other) const;

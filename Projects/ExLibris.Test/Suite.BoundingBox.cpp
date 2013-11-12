@@ -1598,3 +1598,75 @@ TEST(BoundingBox, GetUnitedInvalidRight)
 	EXPECT_VEC2_EQ(22.87f, 112.7f, united.GetMinimum());
 	EXPECT_VEC2_EQ(35.97f, 176.66f, united.GetMaximum());
 }
+
+TEST(BoundingBox, ExpandToFitMaximum)
+{
+	BoundingBox box(
+		glm::vec2(20.0f, 40.0f),
+		glm::vec2(120.0f, 80.0f)
+	);
+
+	box.ExpandToFit(glm::vec2(166.9f, 155.8f));
+
+	EXPECT_VEC2_EQ(20.0f, 40.0f, box.GetMinimum());
+	EXPECT_VEC2_EQ(166.9f, 155.8f, box.GetMaximum());
+}
+
+TEST(BoundingBox, ExpandToFitMinimum)
+{
+	BoundingBox box(
+		glm::vec2(56.98f, -18.24f),
+		glm::vec2(187.62f, 44.87f)
+	);
+
+	box.ExpandToFit(glm::vec2(28.7f, -29.8f));
+
+	EXPECT_VEC2_EQ(28.7f, -29.8f, box.GetMinimum());
+	EXPECT_VEC2_EQ(187.62f, 44.87f, box.GetMaximum());
+}
+
+TEST(BoundingBox, ExpandToFitInvalid)
+{
+	BoundingBox box;
+
+	box.ExpandToFit(glm::vec2(155.87f, 12.2f));
+
+	EXPECT_VEC2_EQ(155.87f, 12.2f, box.GetMinimum());
+	EXPECT_VEC2_EQ(155.87f, 12.2f, box.GetMaximum());
+}
+
+TEST(BoundingBox, GetExpandedToFitMaximum)
+{
+	BoundingBox box(
+		glm::vec2(54.7f, 12.98f),
+		glm::vec2(156.87f, 24.15f)
+	);
+
+	BoundingBox expanded = box.GetExpandedToFit(glm::vec2(245.8f, 34.7f));
+
+	EXPECT_VEC2_EQ(54.7f, 12.98f, expanded.GetMinimum());
+	EXPECT_VEC2_EQ(245.8f, 34.7f, expanded.GetMaximum());
+}
+
+TEST(BoundingBox, GetExpandedToFitMinimum)
+{
+	BoundingBox box(
+		glm::vec2(-57.87f, 17.23f),
+		glm::vec2(4.87f, 38.72f)
+	);
+
+	BoundingBox expanded = box.GetExpandedToFit(glm::vec2(-67.8f, -5.61f));
+
+	EXPECT_VEC2_EQ(-67.8f, -5.61f, expanded.GetMinimum());
+	EXPECT_VEC2_EQ(4.87f, 38.72f, expanded.GetMaximum());
+}
+
+TEST(BoundingBox, GetExpandedToFitInvalid)
+{
+	BoundingBox box;
+
+	BoundingBox expanded = box.GetExpandedToFit(glm::vec2(5.7f, 1.4f));
+
+	EXPECT_VEC2_EQ(5.7f, 1.4f, expanded.GetMinimum());
+	EXPECT_VEC2_EQ(5.7f, 1.4f, expanded.GetMaximum());
+}

@@ -426,6 +426,22 @@ namespace ExLibris
 		);
 	}
 
+	// Fitting
+
+	void BoundingBox::ExpandToFit(const glm::vec2& a_Position)
+	{
+		m_Minimum = glm::min(m_Minimum, a_Position);
+		m_Maximum = glm::max(m_Maximum, a_Position);
+	}
+	
+	BoundingBox BoundingBox::GetExpandedToFit(const glm::vec2& a_Position) const
+	{
+		return BoundingBox(
+			glm::min(m_Minimum, a_Position),
+			glm::max(m_Maximum, a_Position)
+		);
+	}
+
 	// Intersection
 
 	bool BoundingBox::IsIntersected(const BoundingBox& a_Other) const
