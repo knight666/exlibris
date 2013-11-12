@@ -71,6 +71,7 @@
     <ClCompile Include="Suite.CurvePath.cpp" />
     <ClCompile Include="Suite.Family.cpp" />
     <ClCompile Include="Suite.FreetypeErrors.cpp" />
+    <ClCompile Include="Suite.ShapeRasterizer.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
     <ClCompile Include="Suite.FontFace.cpp" />
     <ClCompile Include="Suite.FontLoading.cpp" />
