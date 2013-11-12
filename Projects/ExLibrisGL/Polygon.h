@@ -27,6 +27,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "BoundingBox.h"
+
 namespace ExLibris
 {
 
@@ -40,6 +42,8 @@ namespace ExLibris
 		bool IsPositionInside(const glm::vec2& a_Position) const;
 
 		bool Intersects(const Polygon& a_Other) const;
+
+		BoundingBox GetBoundingBox() const;
 	
 	public:
 
