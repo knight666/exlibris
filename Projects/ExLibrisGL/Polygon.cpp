@@ -86,4 +86,21 @@ namespace ExLibris
 		return false;
 	}
 
+	BoundingBox Polygon::GetBoundingBox() const
+	{
+		if (positions.size() == 0)
+		{
+			return BoundingBox();
+		}
+
+		BoundingBox bounds;
+
+		for (std::vector<glm::vec2>::const_iterator position_it = positions.begin(); position_it != positions.end(); ++position_it)
+		{
+			bounds.ExpandToFit(*position_it);
+		}
+
+		return bounds;
+	}
+
 }; // namespace ExLibris

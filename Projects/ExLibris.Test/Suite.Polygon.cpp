@@ -102,3 +102,62 @@ TEST(Polygon, IntersectsNoHit)
 	EXPECT_FALSE(p_left.Intersects(p_right));
 	EXPECT_FALSE(p_right.Intersects(p_left));
 }
+
+TEST(Polygon, BoundingBoxRectangle)
+{
+	Polygon p;
+	p.positions.push_back(glm::vec2(50.0f, 20.0f));
+	p.positions.push_back(glm::vec2(50.0f, 80.0f));
+	p.positions.push_back(glm::vec2(20.0f, 80.0f));
+	p.positions.push_back(glm::vec2(20.0f, 20.0f));
+
+	BoundingBox bounds = p.GetBoundingBox();
+
+	EXPECT_VEC2_EQ(20.0f, 20.0f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(50.0f, 80.0f, bounds.GetMaximum());
+}
+
+TEST(Polygon, BoundingBoxTriangle)
+{
+	Polygon p;
+	p.positions.push_back(glm::vec2(-33.3f, -33.3f));
+	p.positions.push_back(glm::vec2(-66.6f, 0.0f));
+	p.positions.push_back(glm::vec2(66.6f, 0.0f));
+
+	BoundingBox bounds = p.GetBoundingBox();
+
+	EXPECT_VEC2_EQ(-66.6f, -33.3f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(66.6f, -0.0f, bounds.GetMaximum());
+}
+
+TEST(Polygon, BoundingBoxLine)
+{
+	Polygon p;
+	p.positions.push_back(glm::vec2(-54.22f, 44.3f));
+	p.positions.push_back(glm::vec2(156.9f, -76.87f));
+
+	BoundingBox bounds = p.GetBoundingBox();
+
+	EXPECT_VEC2_EQ(-54.22f, -76.87f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(156.9f, 44.3f, bounds.GetMaximum());
+}
+
+TEST(Polygon, BoundingBoxPoint)
+{
+	Polygon p;
+	p.positions.push_back(glm::vec2(20.0f, 20.0f));
+
+	BoundingBox bounds = p.GetBoundingBox();
+
+	EXPECT_VEC2_EQ(20.0f, 20.0f, bounds.GetMinimum());
+	EXPECT_VEC2_EQ(20.0f, 20.0f, bounds.GetMaximum());
+}
+
+TEST(Polygon, BoundingBoxEmpty)
+{
+	Polygon p;
+
+	BoundingBox bounds = p.GetBoundingBox();
+
+	EXPECT_FALSE(bounds.IsValid());
+}
