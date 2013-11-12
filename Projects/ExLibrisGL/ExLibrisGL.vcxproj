@@ -74,6 +74,7 @@
   <ItemGroup>
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="FaceRequest.cpp" />
     <ClCompile Include="Family.cpp" />
     <ClCompile Include="FontFace.cpp" />
     <ClCompile Include="FontFreetype.cpp" />
@@ -100,6 +101,7 @@
     <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FaceOptions.h" />
+    <ClInclude Include="FaceRequest.h" />
     <ClInclude Include="Family.h" />
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
