@@ -12,6 +12,10 @@ TEST(FaceRequest, Construct)
 	EXPECT_FALSE(fr.HasFamilyName());
 	EXPECT_FLOAT_EQ(0.0f, fr.GetSize());
 	EXPECT_FALSE(fr.HasSize());
+	EXPECT_EQ(eWeight_Normal, fr.GetWeight());
+	EXPECT_FALSE(fr.HasWeight());
+	EXPECT_EQ(eStyle_None, fr.GetStyle());
+	EXPECT_FALSE(fr.HasStyle());
 }
 
 TEST(FaceRequest, FamilyName)
@@ -32,4 +36,24 @@ TEST(FaceRequest, Size)
 
 	EXPECT_FLOAT_EQ(16.0f, fr.GetSize());
 	EXPECT_TRUE(fr.HasSize());
+}
+
+TEST(FaceRequest, Weight)
+{
+	FaceRequest fr;
+
+	fr.SetWeight(eWeight_Bold);
+
+	EXPECT_EQ(eWeight_Bold, fr.GetWeight());
+	EXPECT_TRUE(fr.HasWeight());
+}
+
+TEST(FaceRequest, Style)
+{
+	FaceRequest fr;
+
+	fr.SetStyle(eStyle_Italicized);
+
+	EXPECT_EQ(eStyle_Italicized, fr.GetStyle());
+	EXPECT_TRUE(fr.HasStyle());
 }
