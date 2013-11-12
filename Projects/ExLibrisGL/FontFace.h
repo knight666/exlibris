@@ -30,6 +30,7 @@
 
 namespace ExLibris
 {
+	class Family;
 	class IFont;
 }
 
@@ -45,6 +46,8 @@ namespace ExLibris
 		~FontFace();
 	
 		const IFont* GetFont() const;
+
+		Family* GetFamily() const;
 
 		float GetSize() const;
 		void SetSize(float a_Size);
