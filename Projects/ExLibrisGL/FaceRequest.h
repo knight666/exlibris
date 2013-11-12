@@ -24,6 +24,9 @@
 
 #pragma once
 
+#include "Style.h"
+#include "Weight.h"
+
 namespace ExLibris
 {
 
@@ -41,6 +44,14 @@ namespace ExLibris
 		bool HasSize() const;
 		float GetSize() const;
 		void SetSize(float a_Size);
+
+		bool HasWeight() const;
+		Weight GetWeight() const;
+		void SetWeight(Weight a_Weight);
+
+		bool HasStyle() const;
+		Style GetStyle() const;
+		void SetStyle(Style a_Style);
 	
 	private:
 
@@ -49,6 +60,12 @@ namespace ExLibris
 
 		float m_Size;
 		bool m_HasSize;
+
+		Weight m_Weight;
+		bool m_HasWeight;
+
+		Style m_Style;
+		bool m_HasStyle;
 	
 	}; // class FaceRequest
 
