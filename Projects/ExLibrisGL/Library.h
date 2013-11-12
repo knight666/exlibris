@@ -24,11 +24,12 @@
 
 #pragma once
 
-#include <vector>
+#include "FaceRequest.h"
 
 namespace ExLibris
 {
 	class Family;
+	class FontFace;
 	class IFont;
 	class IFontLoader;
 }
@@ -53,6 +54,8 @@ namespace ExLibris
 		size_t GetFamilyCount() const;
 		Family* CreateFamily(const std::string& a_Name);
 		Family* FindFamily(const std::string& a_Name) const;
+
+		FontFace* RequestFace(const FaceRequest& a_Request);
 
 	private:
 

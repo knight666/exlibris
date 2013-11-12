@@ -55,6 +55,18 @@ namespace ExLibris
 		return m_Font;
 	}
 
+	Family* FontFace::GetFamily() const
+	{
+		if (m_Font != nullptr)
+		{
+			return m_Font->GetFamily();
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
 	float FontFace::GetSize() const
 	{
 		return m_Size;

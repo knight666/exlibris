@@ -26,6 +26,7 @@
 
 #include "Library.h"
 
+#include "Exception.h"
 #include "Family.h"
 #include "IFontLoader.h"
 
@@ -139,6 +140,73 @@ namespace ExLibris
 		{
 			return nullptr;
 		}
+	}
+
+	FontFace* Library::RequestFace(const FaceRequest& a_Request)
+	{
+		Family* family = nullptr;
+		if (a_Request.HasFamilyName())
+		{
+			family = FindFamily(a_Request.GetFamilyName());
+		}
+		else
+		{
+			family = FindFamily("System");
+		}
+
+		if (family == nullptr)
+		{
+			std::stringstream ss;
+			ss << "Could not find family named \"" << a_Request.GetFamilyName() << "\".";
+			EXL_THROW("Library::RequestFace", ss.str().c_str());
+
+			return nullptr;
+		}
+
+		Weight weight = eWeight_Normal;
+		if (a_Request.HasWeight())
+		{
+			weight = a_Request.GetWeight();
+		}
+
+		Style style = eStyle_None;
+		if (a_Request.HasStyle())
+		{
+			style = a_Request.GetStyle();
+		}
+
+		IFont* font = family->FindFont(weight, style);
+		if (font == nullptr)
+		{
+			std::stringstream ss;
+			ss << "Could not find font with specified weight and style.";
+			EXL_THROW("Library::RequestFace", ss.str().c_str());
+
+			return nullptr;
+		}
+
+		FaceOptions options;
+
+		if (a_Request.HasSize())
+		{
+			options.size = a_Request.GetSize();
+		}
+		else
+		{
+			options.size = 10.0f;
+		}
+
+		FontFace* face = font->CreateFace(options);
+		if (face == nullptr)
+		{
+			std::stringstream ss;
+			ss << "Could not create face of size " << options.size << ".";
+			EXL_THROW("Library::RequestFace", ss.str().c_str());
+
+			return nullptr;
+		}
+
+		return face;
 	}
 
 }; // namespace ExLibris
