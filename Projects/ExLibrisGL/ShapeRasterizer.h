@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "GlyphBitmap.h"
 #include "Polygon.h"
 
 namespace ExLibris
@@ -37,12 +38,16 @@ namespace ExLibris
 		ShapeRasterizer();
 		~ShapeRasterizer();
 	
+		void Clear();
 		void AddPolygon(const Polygon& a_Polygon);
 		size_t GetPolygonCount() const;
+
+		GlyphBitmap* Rasterize() const;
 
 	private:
 
 		std::vector<Polygon> m_Polygons;
+		BoundingBox m_Bounds;
 	
 	}; // class ShapeRasterizer
 

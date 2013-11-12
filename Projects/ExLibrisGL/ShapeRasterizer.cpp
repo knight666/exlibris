@@ -37,14 +37,39 @@ namespace ExLibris
 	{
 	}
 
+	void ShapeRasterizer::Clear()
+	{
+		m_Polygons.clear();
+
+		m_Bounds.Invalidate();
+	}
+
 	void ShapeRasterizer::AddPolygon(const Polygon& a_Polygon)
 	{
 		m_Polygons.push_back(a_Polygon);
+
+		m_Bounds.Unite(a_Polygon.GetBoundingBox());
 	}
 
 	size_t ShapeRasterizer::GetPolygonCount() const
 	{
 		return m_Polygons.size();
+	}
+
+	GlyphBitmap* ShapeRasterizer::Rasterize() const
+	{
+		GlyphBitmap* bitmap = new GlyphBitmap;
+
+		if (m_Bounds.IsValid())
+		{
+			bitmap->width = (unsigned int)m_Bounds.GetWidth();
+			bitmap->height = (unsigned int)m_Bounds.GetHeight();
+
+			bitmap->data = new unsigned char[bitmap->width * bitmap->height];
+			memset(bitmap->data, 0, bitmap->width * bitmap->height);
+		}
+
+		return bitmap;
 	}
 
 }; // namespace ExLibris
