@@ -1,12 +1,36 @@
-#include "FrameworkGL.PCH.h"
+/*
+ * This file is a part of the ExLibris project.
+ *
+ * Copyright (C) 2013 Quinten Lansu
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to deal 
+ * in the Software without restriction, including without limitation the rights 
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all 
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+ * SOFTWARE.
+ */
+
+#include "ExLibrisGL.PCH.h"
 
 #include "FontSystem.h"
 
-#include <BoundingBox.h>
-#include <FontFace.h>
-#include <Library.h>
+#include "BoundingBox.h"
+#include "FontFace.h"
+#include "Library.h"
 
-namespace Framework
+namespace ExLibris
 {
 
 	// encoded using systembuilder.py
@@ -132,21 +156,21 @@ namespace Framework
 		}
 	}
 
-	ExLibris::FontFace* FontSystem::CreateFace(const ExLibris::FaceOptions& a_Options)
+	FontFace* FontSystem::CreateFace(const FaceOptions& a_Options)
 	{
-		ExLibris::FontFace* face = new ExLibris::FontFace(this);
+		FontFace* face = new FontFace(this);
 		face->SetSize(12.0f);
 		face->SetLineHeight(16.0f);
 
-		ExLibris::BoundingBox glyph_bounding_box(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 12.0f));
+		BoundingBox glyph_bounding_box(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 12.0f));
 
 		for (unsigned int index = 32; index < 128; ++index)
 		{
-			ExLibris::Glyph* glyph = new ExLibris::Glyph;
+			Glyph* glyph = new Glyph;
 
 			glyph->index = index;
 
-			glyph->metrics = new ExLibris::GlyphMetrics;
+			glyph->metrics = new GlyphMetrics;
 			glyph->metrics->advance = 8;
 			glyph->metrics->bounding_box = glyph_bounding_box;
 
@@ -158,9 +182,9 @@ namespace Framework
 		return face;
 	}
 
-	ExLibris::GlyphBitmap* FontSystem::_DecodeBitmap(unsigned int a_Index) const
+	GlyphBitmap* FontSystem::_DecodeBitmap(unsigned int a_Index) const
 	{
-		ExLibris::GlyphBitmap* bitmap = new ExLibris::GlyphBitmap;
+		GlyphBitmap* bitmap = new GlyphBitmap;
 		bitmap->width = 8;
 		bitmap->height = 12;
 		bitmap->data = new unsigned char[bitmap->width * bitmap->height * 4];
@@ -193,4 +217,4 @@ namespace Framework
 		return bitmap;
 	}
 
-}; // namespace Framework
+}; // namespace ExLibris
