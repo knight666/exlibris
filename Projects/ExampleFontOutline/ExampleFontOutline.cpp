@@ -50,8 +50,9 @@ class OutlineVisitor
 
 public:
 
-	OutlineVisitor()
-		: m_DrawFilled(true)
+	OutlineVisitor(exl::Library* a_Library)
+		: m_Library(a_Library) 
+		, m_DrawFilled(true)
 		, m_DrawOutline(true)
 		, m_Program(nullptr)
 		, m_Position(0.0f, 0.0f)
@@ -62,13 +63,15 @@ public:
 		m_LineOptions.quality = exl::LineMeshOptions::eQuality_Gapless;
 		m_LineOptions.thickness = 5.0f;
 
-		m_HelperGlyphs = new fw::DebugHelper;
+		m_HelperGlyphs = new fw::DebugHelper(m_Library);
 		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
 	}
 
 	~OutlineVisitor()
 	{
 		_ClearMeshes();
+
+		delete m_HelperGlyphs;
 	}
 
 	void SetPosition(const glm::vec2& a_Position)
@@ -276,6 +279,7 @@ private:
 
 private:
 
+	exl::Library* m_Library;
 	const exl::FontFace* m_Face;
 	glm::vec2 m_Dimensions;
 	glm::vec2 m_Position;
@@ -388,7 +392,7 @@ public:
 
 		try
 		{
-			m_DebugHelper = new fw::DebugHelper;
+			m_DebugHelper = new fw::DebugHelper(m_Library);
 		}
 		catch (std::exception& e)
 		{
@@ -431,7 +435,7 @@ public:
 		m_TextLayout->SetFontFace(m_FontFace);
 		m_TextLayout->SetText("Vegetables on sale");
 
-		m_OutlineVisitor = new OutlineVisitor;
+		m_OutlineVisitor = new OutlineVisitor(m_Library);
 		m_OutlineVisitor->SetColorFilled(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetColorOutline(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetShaderProgram(m_ProgramTriangles);
