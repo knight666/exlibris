@@ -24,44 +24,49 @@
 
 #pragma once
 
-#include "FaceRequest.h"
-
-namespace ExLibris
-{
-	class Family;
-	class FontFace;
-	class IFont;
-	class IFontLoader;
-}
+#include "Style.h"
+#include "Weight.h"
 
 namespace ExLibris
 {
 
-	class Library
+	class FaceRequest
 	{
 	
 	public:
 	
-		Library();
-		~Library();
+		FaceRequest();
 
-		size_t GetLoaderCount() const;
-		void AddLoader(IFontLoader* a_Loader);
+		bool HasFamilyName() const;
+		const std::string& GetFamilyName() const;
+		void SetFamilyName(const std::string& a_Name);
 
-		IFont* LoadFont(const std::string& a_Path);
-		IFont* LoadFont(std::istream& a_Stream);
+		bool HasSize() const;
+		float GetSize() const;
+		void SetSize(float a_Size);
 
-		size_t GetFamilyCount() const;
-		Family* CreateFamily(const std::string& a_Name);
-		Family* FindFamily(const std::string& a_Name) const;
+		bool HasWeight() const;
+		Weight GetWeight() const;
+		void SetWeight(Weight a_Weight);
 
-		FontFace* RequestFace(const FaceRequest& a_Request);
-
+		bool HasStyle() const;
+		Style GetStyle() const;
+		void SetStyle(Style a_Style);
+	
 	private:
 
-		std::vector<IFontLoader*> m_Loaders;
-		std::map<std::string, Family*> m_Families;
+		std::string m_FamilyName;
+		bool m_HasFamilyName;
+
+		float m_Size;
+		bool m_HasSize;
+
+		Weight m_Weight;
+		bool m_HasWeight;
+
+		Style m_Style;
+		bool m_HasStyle;
 	
-	}; // class Library
+	}; // class FaceRequest
 
 }; // namespace ExLibris

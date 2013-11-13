@@ -69,6 +69,7 @@
     </ClCompile>
     <ClCompile Include="Suite.BoundingBox.cpp" />
     <ClCompile Include="Suite.CurvePath.cpp" />
+    <ClCompile Include="Suite.FaceRequest.cpp" />
     <ClCompile Include="Suite.Family.cpp" />
     <ClCompile Include="Suite.FreetypeErrors.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
