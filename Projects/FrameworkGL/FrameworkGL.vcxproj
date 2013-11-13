@@ -71,7 +71,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="FontSystem.h" />
     <ClInclude Include="FrameworkGL.PCH.h" />
     <ClInclude Include="IRenderCommand.h" />
     <ClInclude Include="MeshOpenGL.h" />
@@ -83,7 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="FontSystem.cpp" />
     <ClCompile Include="FrameworkGL.PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

@@ -10,12 +10,12 @@
 // ExLibris
 
 #include <FontFace.h>
+#include <FontSystem.h>
 #include <IFont.h>
 #include <TextLayout.h>
 
 // Framework
 
-#include "FontSystem.h"
 #include "ShaderProgram.h"
 
 namespace Framework
@@ -29,7 +29,7 @@ namespace Framework
 		, m_Color(1.0f, 1.0f, 1.0f, 1.0f)
 		, m_Thickness(1.0f)
 	{
-		m_Font = new FontSystem;
+		m_Font = new ExLibris::FontSystem;
 
 		ExLibris::FaceOptions options;
 		m_FontFace = m_Font->CreateFace(options);
