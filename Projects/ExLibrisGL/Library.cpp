@@ -28,6 +28,7 @@
 
 #include "Exception.h"
 #include "Family.h"
+#include "FontSystem.h"
 #include "IFontLoader.h"
 
 namespace ExLibris
@@ -35,6 +36,8 @@ namespace ExLibris
 
 	Library::Library()
 	{
+		Family* family = CreateFamily("System");
+		new FontSystem(family);
 	}
 	
 	Library::~Library()
