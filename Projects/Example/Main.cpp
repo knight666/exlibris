@@ -12,12 +12,13 @@
 // Framework
 
 #include <Application.h>
+#include <DebugHelper.h>
 
 namespace fw = Framework;
 
 // ExLibris
 
-#include <DebugHelper.h>
+#include <Library.h>
 
 namespace exl = ExLibris;
 
@@ -43,9 +44,11 @@ public:
 
 	bool Initialize()
 	{
+		m_Library = new exl::Library;
+
 		try
 		{
-			m_DebugHelper = new fw::DebugHelper;
+			m_DebugHelper = new fw::DebugHelper(m_Library);
 		}
 		catch (std::exception& e)
 		{
@@ -77,10 +80,12 @@ public:
 	void Destroy()
 	{
 		delete m_DebugHelper;
+		delete m_Library;
 	}
 
 private:
 
+	exl::Library* m_Library;
 	fw::DebugHelper* m_DebugHelper;
 
 }; // class Example

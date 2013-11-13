@@ -10,29 +10,29 @@
 // ExLibris
 
 #include <FontFace.h>
+#include <Library.h>
 #include <IFont.h>
 #include <TextLayout.h>
 
 // Framework
 
-#include "FontSystem.h"
 #include "ShaderProgram.h"
 
 namespace Framework
 {
 
-	DebugHelper::DebugHelper()
-		: m_Font(nullptr)
-		, m_FontFace(nullptr)
+	DebugHelper::DebugHelper(ExLibris::Library* a_Library)
+		: m_Library(a_Library)
+		, m_Font(nullptr)
 		, m_RenderStateText(nullptr)
 		, m_RenderStateLines(nullptr)
 		, m_Color(1.0f, 1.0f, 1.0f, 1.0f)
 		, m_Thickness(1.0f)
 	{
-		m_Font = new FontSystem;
+		ExLibris::FaceRequest request;
+		request.SetFamilyName("System");
 
-		ExLibris::FaceOptions options;
-		m_FontFace = m_Font->CreateFace(options);
+		m_Font = m_Library->RequestFace(request);
 
 		m_RenderStateText = RenderCommandText::CreateRenderState();
 		m_RenderStateLines = RenderCommandLines::CreateRenderState();
@@ -41,9 +41,6 @@ namespace Framework
 	DebugHelper::~DebugHelper()
 	{
 		Clear();
-
-		delete m_FontFace;
-		delete m_Font;
 
 		delete m_RenderStateLines->program;
 		delete m_RenderStateLines;
@@ -129,7 +126,7 @@ namespace Framework
 	
 	void DebugHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position)
 	{
-		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_FontFace);
+		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_Font);
 		command->SetText(a_Text);
 		command->SetPosition(a_Position);
 		command->SetColor(m_Color);

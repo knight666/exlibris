@@ -24,44 +24,39 @@
 
 #pragma once
 
-#include "FaceRequest.h"
+#include "IFont.h"
 
 namespace ExLibris
 {
-	class Family;
 	class FontFace;
-	class IFont;
-	class IFontLoader;
+	struct GlyphBitmap;
+	class Library;
 }
 
 namespace ExLibris
 {
 
-	class Library
+	class FontSystem
+		: public IFont
 	{
 	
 	public:
 	
-		Library();
-		~Library();
+		FontSystem(Family* a_Family);
+		~FontSystem();
+	
+		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
 
-		size_t GetLoaderCount() const;
-		void AddLoader(IFontLoader* a_Loader);
-
-		IFont* LoadFont(const std::string& a_Path);
-		IFont* LoadFont(std::istream& a_Stream);
-
-		size_t GetFamilyCount() const;
-		Family* CreateFamily(const std::string& a_Name);
-		Family* FindFamily(const std::string& a_Name) const;
-
-		FontFace* RequestFace(const FaceRequest& a_Request);
+		FontFace* CreateFace(const FaceOptions& a_Options);
 
 	private:
 
-		std::vector<IFontLoader*> m_Loaders;
-		std::map<std::string, Family*> m_Families;
+		GlyphBitmap* _DecodeBitmap(unsigned int a_Index) const;
+
+	private:
+
+		FontFace* m_Face;
 	
-	}; // class Library
+	}; // class FontSystem
 
 }; // namespace ExLibris
