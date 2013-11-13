@@ -137,11 +137,16 @@ namespace ExLibris
 
 	FontSystem::FontSystem(Family* a_Family)
 		: IFont(a_Family)
+		, m_Face(nullptr)
 	{
 	}
 	
 	FontSystem::~FontSystem()
 	{
+		if (m_Face != nullptr)
+		{
+			delete m_Face;
+		}
 	}
 
 	unsigned int FontSystem::GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const
@@ -158,28 +163,31 @@ namespace ExLibris
 
 	FontFace* FontSystem::CreateFace(const FaceOptions& a_Options)
 	{
-		FontFace* face = new FontFace(this);
-		face->SetSize(12.0f);
-		face->SetLineHeight(16.0f);
-
-		BoundingBox glyph_bounding_box(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 12.0f));
-
-		for (unsigned int index = 32; index < 128; ++index)
+		if (m_Face == nullptr)
 		{
-			Glyph* glyph = new Glyph;
+			m_Face = new FontFace(this);
+			m_Face->SetSize(12.0f);
+			m_Face->SetLineHeight(16.0f);
 
-			glyph->index = index;
+			BoundingBox glyph_bounding_box(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 12.0f));
 
-			glyph->metrics = new GlyphMetrics;
-			glyph->metrics->advance = 8;
-			glyph->metrics->bounding_box = glyph_bounding_box;
+			for (unsigned int index = 32; index < 128; ++index)
+			{
+				Glyph* glyph = new Glyph;
 
-			glyph->bitmap = _DecodeBitmap(index - 32);
+				glyph->index = index;
 
-			face->AddGlyph(glyph);
+				glyph->metrics = new GlyphMetrics;
+				glyph->metrics->advance = 8;
+				glyph->metrics->bounding_box = glyph_bounding_box;
+
+				glyph->bitmap = _DecodeBitmap(index - 32);
+
+				m_Face->AddGlyph(glyph);
+			}
 		}
 
-		return face;
+		return m_Face;
 	}
 
 	GlyphBitmap* FontSystem::_DecodeBitmap(unsigned int a_Index) const

@@ -2,7 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "BoundingBox.h"
+#include <BoundingBox.h>
+
 #include "RenderCommandLines.h"
 #include "RenderCommandText.h"
 
@@ -10,6 +11,7 @@ namespace ExLibris
 {
 	class FontFace;
 	class IFont;
+	class Library;
 }
 
 namespace Framework
@@ -20,7 +22,7 @@ namespace Framework
 	
 	public:
 	
-		DebugHelper();
+		DebugHelper(ExLibris::Library* a_Library);
 		~DebugHelper();
 	
 		void Clear();
@@ -39,8 +41,8 @@ namespace Framework
 
 	private:
 
-		ExLibris::IFont* m_Font;
-		ExLibris::FontFace* m_FontFace;
+		ExLibris::Library* m_Library;
+		ExLibris::FontFace* m_Font;
 
 		RenderCommandText::RenderState* m_RenderStateText;
 		RenderCommandLines::RenderState* m_RenderStateLines;

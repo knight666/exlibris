@@ -52,6 +52,10 @@ namespace ExLibris
 	private:
 
 		GlyphBitmap* _DecodeBitmap(unsigned int a_Index) const;
+
+	private:
+
+		FontFace* m_Face;
 	
 	}; // class FontSystem
 
