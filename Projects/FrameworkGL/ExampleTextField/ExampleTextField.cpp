@@ -528,6 +528,8 @@ public:
 
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
+		m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
 
 		try
 		{
@@ -539,16 +541,14 @@ public:
 			return false;
 		}
 
-		m_FaceOptions.size = 60.0f;
-
-		//m_Font = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		m_Font = m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
-
-		m_FontFace = m_Font->CreateFace(m_FaceOptions);
-
 		m_TextField = new TextField(m_Library, m_ProgramEffects);
-		m_TextField->SetFont(m_FontFace);
 		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
+		
+		m_Request.SetFamilyName("Mathilde");
+		m_Request.SetSize(60.0f);
+
+		m_FontFace = m_Library->RequestFace(m_Request);
+		m_TextField->SetFont(m_FontFace);
 
 		return true;
 	}
@@ -684,18 +684,18 @@ private:
 
 		case GLFW_KEY_UP:
 			{
-				m_FaceOptions.size -= 1.0f;
+				m_Request.SetSize(m_Request.GetSize() - 1.0f);
 
-				m_FontFace = m_Font->CreateFace(m_FaceOptions);
+				m_FontFace = m_Library->RequestFace(m_Request);
 				m_TextField->SetFont(m_FontFace);
 
 			} break;
 
 		case GLFW_KEY_DOWN:
 			{
-				m_FaceOptions.size += 1.0f;
+				m_Request.SetSize(m_Request.GetSize() + 1.0f);
 
-				m_FontFace = m_Font->CreateFace(m_FaceOptions);
+				m_FontFace = m_Library->RequestFace(m_Request);
 				m_TextField->SetFont(m_FontFace);
 
 			} break;
@@ -728,7 +728,7 @@ private:
 
 	exl::Library* m_Library;
 	exl::IFont* m_Font;
-	exl::FaceOptions m_FaceOptions;
+	exl::FaceRequest m_Request;
 	exl::FontFace* m_FontFace;
 	fw::DebugHelper* m_DebugHelper;
 
