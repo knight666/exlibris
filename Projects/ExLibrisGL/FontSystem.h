@@ -42,7 +42,7 @@ namespace ExLibris
 	
 	public:
 	
-		FontSystem();
+		FontSystem(Family* a_Family);
 		~FontSystem();
 	
 		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;

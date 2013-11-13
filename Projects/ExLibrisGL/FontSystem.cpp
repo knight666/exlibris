@@ -135,8 +135,8 @@ namespace ExLibris
 		0x7E424242, 0x42424242, 0x4242427E, /* invalid */
 	};
 
-	FontSystem::FontSystem()
-		: IFont(nullptr)
+	FontSystem::FontSystem(Family* a_Family)
+		: IFont(a_Family)
 	{
 	}
 	
