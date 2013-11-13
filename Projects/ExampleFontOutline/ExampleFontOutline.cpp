@@ -350,7 +350,6 @@ public:
 
 	ExampleFontOutline(int a_ArgumentCount, const char** a_Arguments)
 		: fw::Application(a_ArgumentCount, a_Arguments)
-		, m_OptionDrawLines(false)
 		, m_ProgramLines(nullptr)
 		, m_ProgramTriangles(nullptr)
 		, m_TextLayout(nullptr)
@@ -358,29 +357,20 @@ public:
 		, m_CameraZoom(1.0f)
 		, m_CameraZoomSpeed(0.0f)
 		, m_Library(nullptr)
-		, m_Font(nullptr)
-		, m_FontFace(nullptr)
+		, m_Face(nullptr)
 		, m_DebugHelper(nullptr)
+		, m_OptionDrawLines(false)
 	{
 	}
 
 	bool ParseCommandLine(int a_ArgumentCount, const char** a_Arguments)
 	{
-		m_FontPath = "Fonts/Roboto/Roboto-BoldItalic.ttf";
-		//m_FontPath = "Fonts/Mathilde/mathilde.otf";
-
 		return true;
 	}
 
 	bool Initialize()
 	{
 		_LoadShaders();
-
-		m_FaceOptions.size = 100.0f;
-		m_FaceOptions.bitmap_quality = exl::eBitmapQuality_None;
-
-		m_FontWeight = exl::eWeight_Normal;
-		m_FontStyle = exl::eStyle_None;
 
 		m_CurveSettings.precision = 10;
 
@@ -402,17 +392,12 @@ public:
 
 		Timer timer;
 
-		exl::IFont* font_regular = nullptr;
-		exl::IFont* font_bold = nullptr;
-		exl::IFont* font_italic = nullptr;
-		exl::IFont* font_bolditalic = nullptr;
-
 		timer.Start();
 		{
-			font_regular = m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-			font_bold = m_Library->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
-			font_italic = m_Library->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
-			font_bolditalic = m_Library->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
+			m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
+			m_Library->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
+			m_Library->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
+			m_Library->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
 		}
 		timer.End();
 
@@ -420,19 +405,19 @@ public:
 
 		timer.Start();
 		{
-			font_regular->CreateFace(m_FaceOptions);
-			font_bold->CreateFace(m_FaceOptions);
-			font_italic->CreateFace(m_FaceOptions);
-			font_bolditalic->CreateFace(m_FaceOptions);
+			m_Request.SetFamilyName("Roboto");
+			m_Request.SetSize(100.0f);
+			m_Request.SetWeight(exl::eWeight_Normal);
+			m_Request.SetStyle(exl::eStyle_None);
 
-			_LoadFontFace();
+			m_Face = m_Library->RequestFace(m_Request);
 		}
 		timer.End();
 
 		std::cout << "Creating face:    " << timer.GetMilliSeconds() << " ms." << std::endl;
 
 		m_TextLayout = new exl::TextLayout;
-		m_TextLayout->SetFontFace(m_FontFace);
+		m_TextLayout->SetFontFace(m_Face);
 		m_TextLayout->SetText("Vegetables on sale");
 
 		m_OutlineVisitor = new OutlineVisitor(m_Library);
@@ -558,18 +543,18 @@ private:
 			{
 				if (a_Modifiers & GLFW_MOD_CONTROL)
 				{
-					if (m_FontWeight == exl::eWeight_Normal)
+					if (m_Request.GetWeight() == exl::eWeight_Normal)
 					{
-						m_FontWeight = exl::eWeight_Bold;
+						m_Request.SetWeight(exl::eWeight_Bold);
 					}
 					else
 					{
-						m_FontWeight = exl::eWeight_Normal;
+						m_Request.SetWeight(exl::eWeight_Normal);
 					}
 
-					_LoadFontFace();
+					m_Face = m_Library->RequestFace(m_Request);
 					
-					m_TextLayout->SetFontFace(m_FontFace);
+					m_TextLayout->SetFontFace(m_Face);
 					m_TextLayout->Accept(*m_OutlineVisitor);
 				}
 
@@ -579,18 +564,18 @@ private:
 			{
 				if (a_Modifiers & GLFW_MOD_CONTROL)
 				{
-					if (m_FontStyle == exl::eStyle_None)
+					if (m_Request.GetStyle() == exl::eStyle_None)
 					{
-						m_FontStyle = exl::eStyle_Italicized;
+						m_Request.SetStyle(exl::eStyle_Italicized);
 					}
 					else
 					{
-						m_FontStyle = exl::eStyle_None;
+						m_Request.SetStyle(exl::eStyle_None);
 					}
 
-					_LoadFontFace();
+					m_Face = m_Library->RequestFace(m_Request);
 					
-					m_TextLayout->SetFontFace(m_FontFace);
+					m_TextLayout->SetFontFace(m_Face);
 					m_TextLayout->Accept(*m_OutlineVisitor);
 				}
 
@@ -755,34 +740,16 @@ private:
 		}
 	}
 
-	void _LoadFontFace()
-	{
-		exl::Family* family = m_Library->FindFamily("Roboto");
-		if (family != nullptr)
-		{
-			m_Font = family->FindFont(m_FontWeight, m_FontStyle);
-			m_FontFace = m_Font->CreateFace(m_FaceOptions);
-		}
-	}
-
 private:
 
-	bool m_OptionDrawLines;
-
-	std::string m_FontPath;
-	exl::FaceOptions m_FaceOptions;
-	exl::Weight m_FontWeight;
-	exl::Style m_FontStyle;
-
 	exl::Library* m_Library;
-	exl::IFont* m_Font;
-	exl::FontFace* m_FontFace;
+	exl::FontFace* m_Face;
+	exl::FaceRequest m_Request;
 	fw::DebugHelper* m_DebugHelper;
 
 	exl::TextLayout* m_TextLayout;
 	OutlineVisitor* m_OutlineVisitor;
 
-	exl::LineShape m_Shape;
 	exl::CurveSettings m_CurveSettings;
 	exl::LineMeshOptions m_MeshOptions;
 
@@ -793,6 +760,8 @@ private:
 	glm::vec3 m_CameraVelocity;
 	float m_CameraZoom;
 	float m_CameraZoomSpeed;
+
+	bool m_OptionDrawLines;
 
 }; // class ExampleFontOutline
 
