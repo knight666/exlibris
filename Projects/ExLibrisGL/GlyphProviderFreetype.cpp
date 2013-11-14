@@ -186,18 +186,34 @@ namespace ExLibris
 
 		// bounding box
 
-		FT_BBox bounding_box;
-		errors = FT_Outline_Get_BBox(&slot->outline, &bounding_box);
-		if (errors == FT_Err_Ok)
+		if (slot->format == FT_GLYPH_FORMAT_OUTLINE || slot->format == FT_GLYPH_FORMAT_COMPOSITE)
+		{
+			FT_BBox bounding_box;
+			errors = FT_Outline_Get_BBox(&slot->outline, &bounding_box);
+			if (errors == FT_Err_Ok)
+			{
+				metrics->bounding_box = BoundingBox(
+					glm::vec2(
+						Fixed26Dot6::ToFloat(bounding_box.xMin),
+						Fixed26Dot6::ToFloat(face_metrics.height - bounding_box.yMin)
+					),
+					glm::vec2(
+						Fixed26Dot6::ToFloat(bounding_box.xMax),
+						Fixed26Dot6::ToFloat(face_metrics.height - bounding_box.yMax)
+					)
+				);
+			}
+		}
+		else
 		{
 			metrics->bounding_box = BoundingBox(
 				glm::vec2(
-					Fixed26Dot6::ToFloat(bounding_box.xMin),
-					Fixed26Dot6::ToFloat(face_metrics.height - bounding_box.yMin)
+					(float)(slot->bitmap_left),
+					(float)(slot->bitmap.rows - slot->bitmap_top)
 				),
 				glm::vec2(
-					Fixed26Dot6::ToFloat(bounding_box.xMax),
-					Fixed26Dot6::ToFloat(face_metrics.height - bounding_box.yMax)
+					(float)(slot->bitmap_left + slot->bitmap.width),
+					(float)(slot->bitmap.rows - slot->bitmap_top + slot->bitmap_top)
 				)
 			);
 		}
@@ -267,7 +283,7 @@ namespace ExLibris
 
 	CurvePath* GlyphProviderFreetype::CreateOutline(float a_Size, int a_Codepoint)
 	{
-		if (!_SetSize(a_Size) || !_LoadGlyph(a_Codepoint))
+		if (!IsScalable() || !_SetSize(a_Size) || !_LoadGlyph(a_Codepoint))
 		{
 			return nullptr;
 		}
@@ -362,10 +378,20 @@ namespace ExLibris
 		FT_F26Dot6 requested_size = Fixed26Dot6::ToFixed(a_Size);
 		if (requested_size != m_SizeLoaded)
 		{
-			errors = FT_Set_Char_Size(m_Face, 0, requested_size, 0, 96);
+			if (IsScalable())
+			{
+				errors = FT_Set_Char_Size(m_Face, 0, requested_size, 0, 96);
+			}
+			else
+			{
+				FT_UInt pixel_size = (FT_UInt)a_Size;
+
+				errors = FT_Set_Pixel_Sizes(m_Face, pixel_size, pixel_size);
+			}
+
 			if (errors != FT_Err_Ok)
 			{
-				EXL_FT_THROW("FontProviderFreetype::SetSize", errors);
+				EXL_FT_THROW("FontProviderFreetype::_SetSize", errors);
 
 				return false;
 			}

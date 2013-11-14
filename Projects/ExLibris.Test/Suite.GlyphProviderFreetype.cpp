@@ -16,6 +16,11 @@ class GlyphProviderFreetypeContext
 
 public:
 
+	virtual std::string GetFontPath()
+	{
+		return "Fonts/Mathilde/Mathilde.otf";
+	}
+
 	void SetUp()
 	{
 		FT_Error errors = 0;
@@ -23,13 +28,14 @@ public:
 		errors = FT_Init_FreeType(&library_freetype);
 		ASSERT_EQ(FT_Err_Ok, errors);
 
-		std::fstream in_stream("Fonts/Mathilde/Mathilde.otf", std::ios::in | std::ios::binary);
+		std::fstream in_stream(GetFontPath(), std::ios::in | std::ios::binary);
+		ASSERT_TRUE(in_stream.is_open());
 
 		in_stream.seekg(0, std::ios_base::end);
 		std::streamoff font_file_size = in_stream.tellg();
-		in_stream.seekg(0, std::ios_base::beg);
-
 		ASSERT_GT(font_file_size, 0);
+
+		in_stream.seekg(0, std::ios_base::beg);
 
 		FT_Byte* font_file_data = new FT_Byte[(unsigned int)font_file_size];
 		in_stream.read((char*)font_file_data, font_file_size);
@@ -54,6 +60,8 @@ protected:
 
 	Library* library;
 	GlyphProviderFreetype* provider;
+
+	std::string font_path;
 
 	FT_Library library_freetype;
 
@@ -156,4 +164,75 @@ TEST_F(GlyphProviderFreetypeContext, CreateFace)
 	EXPECT_FLOAT_EQ(22.0f, face->GetLineHeight());
 	EXPECT_FLOAT_EQ(13.0f, face->GetAscent());
 	EXPECT_FLOAT_EQ(-10.0f, face->GetDescent());
+}
+
+class GlyphProviderFreetypeBitmapFontContext
+	: public GlyphProviderFreetypeContext
+{
+
+public:
+
+	std::string GetFontPath()
+	{
+		return "Fonts/00_starmap/00.fon";
+	}
+
+};
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, Construct)
+{
+	ASSERT_NE(nullptr, provider->GetFamily());
+	EXPECT_STREQ("00 Starmap", provider->GetFamily()->GetName().c_str());
+	EXPECT_FALSE(provider->HasKerning());
+	EXPECT_FALSE(provider->IsScalable());
+	EXPECT_EQ(eStyle_None, provider->GetStyle());
+	EXPECT_EQ(eWeight_Normal, provider->GetWeight());
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, SizeAvailable)
+{
+	EXPECT_TRUE(provider->IsSizeAvailable(8.0f));
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, SizeNotAvailable)
+{
+	EXPECT_FALSE(provider->IsSizeAvailable(32.3f));
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateMetrics)
+{
+	GlyphMetrics* metrics = provider->CreateMetrics(8.0f, (int)'Z');
+	ASSERT_NE(nullptr, metrics);
+
+	EXPECT_FLOAT_EQ(7.0f, metrics->advance);
+	EXPECT_VEC2_EQ(0.0f, -7.0f, metrics->offset);
+	EXPECT_VEC2_EQ(0.0f, 1.0f, metrics->bounding_box.GetMinimum());
+	EXPECT_VEC2_EQ(7.0f, 8.0f, metrics->bounding_box.GetMaximum());
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateMetricsNotFound)
+{
+	GlyphMetrics* metrics = provider->CreateMetrics(8.0f, 1444);
+	EXPECT_EQ(nullptr, metrics);
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateBitmap)
+{
+	GlyphBitmap* bitmap = provider->CreateBitmap(8.0f, (int)'@');
+	ASSERT_NE(nullptr, bitmap);
+
+	EXPECT_EQ(8, bitmap->width);
+	EXPECT_EQ(8, bitmap->height);
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateBitmapNotFound)
+{
+	GlyphBitmap* bitmap = provider->CreateBitmap(8.0f, 0x2000);
+	EXPECT_EQ(nullptr, bitmap);
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateOutline)
+{
+	CurvePath* outline = provider->CreateOutline(8.0f, (int)'7');
+	EXPECT_EQ(nullptr, outline);
 }
