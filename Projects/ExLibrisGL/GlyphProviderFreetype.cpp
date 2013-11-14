@@ -95,7 +95,7 @@ namespace ExLibris
 		: m_Face(a_Face)
 		, m_Buffer(a_Buffer)
 		, m_BufferSize(a_BufferSize)
-		, m_FaceSizeLoaded(0)
+		, m_SizeLoaded(0)
 		, m_GlyphLoaded(-1)
 	{
 		if (m_Face == nullptr || m_Buffer == nullptr)
@@ -126,9 +126,30 @@ namespace ExLibris
 		}
 	}
 
-	GlyphMetrics* GlyphProviderFreetype::CreateMetrics(const GlyphRequest& a_Request)
+	bool GlyphProviderFreetype::SetSize(float a_Size)
 	{
-		if (!_SetFaceSize(a_Request.size) || !_LoadGlyph(a_Request.codepoint))
+		FT_Error errors = 0;
+
+		FT_F26Dot6 requested_size = Fixed26Dot6::ToFixed(a_Size);
+		if (requested_size != m_SizeLoaded)
+		{
+			errors = FT_Set_Char_Size(m_Face, 0, requested_size, 0, 96);
+			if (errors != FT_Err_Ok)
+			{
+				EXL_FT_THROW("FontProviderFreetype::SetSize", errors);
+
+				return false;
+			}
+
+			m_SizeLoaded = requested_size;
+		}
+
+		return true;
+	}
+
+	GlyphMetrics* GlyphProviderFreetype::CreateMetrics(int a_Codepoint)
+	{
+		if (!_LoadGlyph(a_Codepoint))
 		{
 			return nullptr;
 		}
@@ -165,16 +186,16 @@ namespace ExLibris
 		return metrics;
 	}
 
-	bool GlyphProviderFreetype::TryGetKerningAdjustment(glm::vec2& a_Kerning, const GlyphRequest& a_Request, int a_CodepointNext)
+	bool GlyphProviderFreetype::TryGetKerningAdjustment(glm::vec2& a_Kerning, int a_CodepointCurrent, int a_CodepointNext)
 	{
-		if (!FT_HAS_KERNING(m_Face) || !_SetFaceSize(a_Request.size))
+		if (!FT_HAS_KERNING(m_Face))
 		{
 			return false;
 		}
 
 		FT_Error errors = 0;
 
-		FT_UInt index_current = FT_Get_Char_Index(m_Face, (FT_ULong)a_Request.codepoint);
+		FT_UInt index_current = FT_Get_Char_Index(m_Face, (FT_ULong)a_CodepointCurrent);
 		FT_UInt index_next = FT_Get_Char_Index(m_Face, (FT_ULong)a_CodepointNext);
 
 		if (index_current == 0 || index_next == 0)
@@ -195,9 +216,9 @@ namespace ExLibris
 		return true;
 	}
 
-	GlyphBitmap* GlyphProviderFreetype::CreateBitmap(const GlyphRequest& a_Request)
+	GlyphBitmap* GlyphProviderFreetype::CreateBitmap(int a_Codepoint)
 	{
-		if (!_SetFaceSize(a_Request.size) || !_LoadGlyph(a_Request.codepoint))
+		if (!_LoadGlyph(a_Codepoint))
 		{
 			return nullptr;
 		}
@@ -255,9 +276,9 @@ namespace ExLibris
 		return bitmap;
 	}
 
-	CurvePath* GlyphProviderFreetype::CreateOutline(const GlyphRequest& a_Request)
+	CurvePath* GlyphProviderFreetype::CreateOutline(int a_Codepoint)
 	{
-		if (!_SetFaceSize(a_Request.size) || !_LoadGlyph(a_Request.codepoint))
+		if (!_LoadGlyph(a_Codepoint))
 		{
 			return nullptr;
 		}
@@ -289,27 +310,6 @@ namespace ExLibris
 		}
 
 		return target.outline;
-	}
-
-	bool GlyphProviderFreetype::_SetFaceSize(float a_Size)
-	{
-		FT_Error errors = 0;
-
-		FT_F26Dot6 requested_size = Fixed26Dot6::ToFixed(a_Size);
-		if (requested_size != m_FaceSizeLoaded)
-		{
-			errors = FT_Set_Char_Size(m_Face, 0, requested_size, 0, 96);
-			if (errors != FT_Err_Ok)
-			{
-				EXL_FT_THROW("FontProviderFreetype::_SetFaceSize", errors);
-
-				return false;
-			}
-
-			m_FaceSizeLoaded = requested_size;
-		}
-
-		return true;
 	}
 
 	bool GlyphProviderFreetype::_LoadGlyph(int a_Codepoint)

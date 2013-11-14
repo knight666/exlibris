@@ -116,7 +116,6 @@
     <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
-    <ClInclude Include="GlyphRequest.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IFontLoader.h" />

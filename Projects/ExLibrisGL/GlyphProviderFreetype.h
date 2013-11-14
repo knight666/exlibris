@@ -33,23 +33,24 @@ namespace ExLibris
 	class GlyphProviderFreetype
 		: IGlyphProvider
 	{
-	
+
 	public:
-	
+
 		GlyphProviderFreetype(FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
 		~GlyphProviderFreetype();
+
+		bool SetSize(float a_Size);
 	
-		GlyphMetrics* CreateMetrics(const GlyphRequest& a_Request);
+		GlyphMetrics* CreateMetrics(int a_Codepoint);
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, const GlyphRequest& a_Request, int a_CodepointNext);
+		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, int a_CodepointCurrent, int a_CodepointNext);
 
-		GlyphBitmap* CreateBitmap(const GlyphRequest& a_Request);
+		GlyphBitmap* CreateBitmap(int a_Codepoint);
 
-		CurvePath* CreateOutline(const GlyphRequest& a_Request);
+		CurvePath* CreateOutline(int a_Codepoint);
 
 	private:
 
-		bool _SetFaceSize(float a_Size);
 		bool _LoadGlyph(int a_Codepoint);
 
 	private:
@@ -58,11 +59,11 @@ namespace ExLibris
 		FT_Byte* m_Buffer;
 		size_t m_BufferSize;
 
-		FT_F26Dot6 m_FaceSizeLoaded;
+		FT_F26Dot6 m_SizeLoaded;
 		FT_UInt m_GlyphLoaded;
 
 		FT_Outline_Funcs m_OutlineCallbacks;
-	
+
 	}; // class GlyphProviderFreetype
 
 }; // namespace ExLibris

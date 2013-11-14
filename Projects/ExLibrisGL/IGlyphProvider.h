@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include "GlyphRequest.h"
-
 namespace ExLibris
 {
 	class CurvePath;
@@ -44,14 +42,16 @@ namespace ExLibris
 		virtual ~IGlyphProvider()
 		{
 		}
+
+		virtual bool SetSize(float a_Size) = 0;
 	
-		virtual GlyphMetrics* CreateMetrics(const GlyphRequest& a_Request) = 0;
+		virtual GlyphMetrics* CreateMetrics(int a_Codepoint) = 0;
 
-		virtual bool TryGetKerningAdjustment(glm::vec2& a_Kerning, const GlyphRequest& a_Request, int a_CodepointNext) = 0;
+		virtual bool TryGetKerningAdjustment(glm::vec2& a_Kerning, int a_CodepointCurrent, int a_CodepointNext) = 0;
 
-		virtual GlyphBitmap* CreateBitmap(const GlyphRequest& a_Request) = 0;
+		virtual GlyphBitmap* CreateBitmap(int a_Codepoint) = 0;
 
-		virtual CurvePath* CreateOutline(const GlyphRequest& a_Request) = 0;
+		virtual CurvePath* CreateOutline(int a_Codepoint) = 0;
 	
 	}; // class IGlyphProvider
 
