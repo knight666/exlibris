@@ -1,7 +1,6 @@
 #include "ExLibris.Test.PCH.h"
 
 #include <Face.h>
-#include <GlyphProviderFreetype.h>
 #include <Library.h>
 
 #include "Mock.GlyphProvider.h"
