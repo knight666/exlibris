@@ -31,7 +31,7 @@ namespace ExLibris
 {
 
 	class GlyphProviderFreetype
-		: IGlyphProvider
+		: public IGlyphProvider
 	{
 
 	public:
