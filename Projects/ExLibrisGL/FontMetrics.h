@@ -24,45 +24,35 @@
 
 #pragma once
 
-#include "FontLoaderFreetype.h"
-#include "IGlyphProvider.h"
+#include "Style.h"
+#include "Weight.h"
+
+namespace ExLibris
+{
+	class Family;
+}
 
 namespace ExLibris
 {
 
-	class GlyphProviderFreetype
-		: IGlyphProvider
+	struct FontMetrics
 	{
 
-	public:
+		FontMetrics()
+			: family(nullptr)
+			, size(0.0f)
+			, line_height(0.0f)
+			, ascent(0.0f)
+			, descent(0.0f)
+		{
+		}
 
-		GlyphProviderFreetype(Library* a_Library, FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
-		~GlyphProviderFreetype();
-	
-		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint);
-		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint);
-		CurvePath* CreateOutline(float a_Size, int a_Codepoint);
+		Family* family;
+		float size;
+		float line_height;
+		float ascent;
+		float descent;
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext);
-
-		Face* CreateFace(float a_Size);
-
-	private:
-
-		bool _SetSize(float a_Size);
-		bool _LoadGlyph(int a_Codepoint);
-
-	private:
-
-		FT_Face m_Face;
-		FT_Byte* m_Buffer;
-		size_t m_BufferSize;
-
-		FT_F26Dot6 m_SizeLoaded;
-		FT_UInt m_GlyphLoaded;
-
-		FT_Outline_Funcs m_OutlineCallbacks;
-
-	}; // class GlyphProviderFreetype
+	};
 
 }; // namespace ExLibris

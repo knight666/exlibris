@@ -24,45 +24,41 @@
 
 #pragma once
 
-#include "FontLoaderFreetype.h"
 #include "IGlyphProvider.h"
 
 namespace ExLibris
 {
 
-	class GlyphProviderFreetype
-		: IGlyphProvider
+	class Face
 	{
-
-	public:
-
-		GlyphProviderFreetype(Library* a_Library, FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
-		~GlyphProviderFreetype();
 	
-		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint);
-		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint);
-		CurvePath* CreateOutline(float a_Size, int a_Codepoint);
+	public:
+	
+		Face(IGlyphProvider& a_Provider, const FontMetrics& a_Metrics);
+		~Face();
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext);
+		Family* GetFamily() const;
 
-		Face* CreateFace(float a_Size);
+		float GetSize() const;
+		float GetLineHeight() const;
+		float GetAscent() const;
+		float GetDescent() const;
+
+		GlyphMetrics* GetGlyphMetrics(int a_Codepoint);
+		GlyphBitmap* GetGlyphBitmap(int a_Codepoint);
+		CurvePath* GetGlyphOutline(int a_Codepoint);
+
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, int a_CodepointCurrent, int a_CodepointNext);
 
 	private:
 
-		bool _SetSize(float a_Size);
-		bool _LoadGlyph(int a_Codepoint);
+		IGlyphProvider& m_Provider;
+		FontMetrics m_Metrics;
 
-	private:
-
-		FT_Face m_Face;
-		FT_Byte* m_Buffer;
-		size_t m_BufferSize;
-
-		FT_F26Dot6 m_SizeLoaded;
-		FT_UInt m_GlyphLoaded;
-
-		FT_Outline_Funcs m_OutlineCallbacks;
-
-	}; // class GlyphProviderFreetype
+		std::map<int, GlyphMetrics*> m_GlyphMetrics;
+		std::map<int, GlyphBitmap*> m_GlyphBitmaps;
+		std::map<int, CurvePath*> m_GlyphOutlines;
+	
+	}; // class Face
 
 }; // namespace ExLibris

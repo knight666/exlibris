@@ -76,6 +76,7 @@
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FaceRequest.cpp" />
     <ClCompile Include="Family.cpp" />
+    <ClCompile Include="Face.cpp" />
     <ClCompile Include="FontFace.cpp" />
     <ClCompile Include="FontFreetype.cpp" />
     <ClCompile Include="FontLoaderFreetype.cpp" />
@@ -102,12 +103,14 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="Face.h" />
     <ClInclude Include="FaceOptions.h" />
     <ClInclude Include="FaceRequest.h" />
     <ClInclude Include="Family.h" />
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
+    <ClInclude Include="FontMetrics.h" />
     <ClInclude Include="GlyphProviderFreetype.h" />
     <ClInclude Include="FontSystem.h" />
     <ClInclude Include="FreetypeConversion.h" />
