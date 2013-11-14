@@ -23,7 +23,7 @@ public:
 		errors = FT_Init_FreeType(&library_freetype);
 		ASSERT_EQ(FT_Err_Ok, errors);
 
-		std::fstream in_stream("Fonts/Roboto/Roboto-Regular.ttf", std::ios::in | std::ios::binary);
+		std::fstream in_stream("Fonts/Mathilde/Mathilde.otf", std::ios::in | std::ios::binary);
 
 		in_stream.seekg(0, std::ios_base::end);
 		std::streamoff font_file_size = in_stream.tellg();
@@ -62,7 +62,8 @@ protected:
 TEST_F(GlyphProviderFreetypeContext, Construct)
 {
 	ASSERT_NE(nullptr, provider->GetFamily());
-	EXPECT_STREQ("Roboto", provider->GetFamily()->GetName().c_str());
+	EXPECT_STREQ("Mathilde", provider->GetFamily()->GetName().c_str());
+	EXPECT_TRUE(provider->HasKerning());
 	EXPECT_EQ(eStyle_None, provider->GetStyle());
 	EXPECT_EQ(eWeight_Normal, provider->GetWeight());
 }
@@ -72,10 +73,10 @@ TEST_F(GlyphProviderFreetypeContext, CreateMetrics)
 	GlyphMetrics* metrics = provider->CreateMetrics(24.0f, (int)'A');
 	ASSERT_NE(nullptr, metrics);
 
-	EXPECT_FLOAT_EQ(21.0f, metrics->advance);
-	EXPECT_VEC2_EQ(0.0f, -24.0f, metrics->offset);
-	EXPECT_VEC2_EQ(0.3125000f, 19.000000f, metrics->bounding_box.GetMinimum());
-	EXPECT_VEC2_EQ(20.406250f, 42.000000f, metrics->bounding_box.GetMaximum());
+	EXPECT_FLOAT_EQ(17.0f, metrics->advance);
+	EXPECT_VEC2_EQ(0.0f, -16.0f, metrics->offset);
+	EXPECT_VEC2_EQ(0.2187500f, 18.828125f, metrics->bounding_box.GetMinimum());
+	EXPECT_VEC2_EQ(23.515625f, 36.015625f, metrics->bounding_box.GetMaximum());
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateMetricsNotFound)
@@ -89,8 +90,8 @@ TEST_F(GlyphProviderFreetypeContext, CreateBitmap)
 	GlyphBitmap* bitmap = provider->CreateBitmap(18.0f, (int)'0');
 	ASSERT_NE(nullptr, bitmap);
 
-	EXPECT_EQ(12, bitmap->width);
-	EXPECT_EQ(17, bitmap->height);
+	EXPECT_EQ(6, bitmap->width);
+	EXPECT_EQ(8, bitmap->height);
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateBitmapNotFound)
@@ -104,12 +105,8 @@ TEST_F(GlyphProviderFreetypeContext, CreateOutline)
 	CurvePath* outline = provider->CreateOutline(12.0f, (int)'-');
 	ASSERT_NE(nullptr, outline);
 
-	EXPECT_EQ(5, outline->GetPositionCount());
-	EXPECT_VEC2_EQ(3.8281250f, 1.2031250f, outline->GetPosition(0));
-	EXPECT_VEC2_EQ(0.0000000f, 1.2031250f, outline->GetPosition(1));
-	EXPECT_VEC2_EQ(0.0000000f, 0.0000000f, outline->GetPosition(2));
-	EXPECT_VEC2_EQ(3.8281250f, 0.0000000f, outline->GetPosition(3));
-	EXPECT_VEC2_EQ(3.8281250f, 1.2031250f, outline->GetPosition(4));
+	EXPECT_EQ(23, outline->GetPositionCount());
+	EXPECT_VEC2_EQ(0.3281250f, 0.4531250f, outline->GetPosition(0));
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateOutlineNotFound)
@@ -118,14 +115,34 @@ TEST_F(GlyphProviderFreetypeContext, CreateOutlineNotFound)
 	EXPECT_EQ(nullptr, outline);
 }
 
+TEST_F(GlyphProviderFreetypeContext, GetKerningAdjustment)
+{
+	glm::vec2 adjustment;
+	EXPECT_TRUE(provider->TryGetKerningAdjustment(adjustment, 24.0f, (int)'D', (int)'a'));
+
+	EXPECT_VEC2_EQ(-1.0f, 0.0f, adjustment);
+}
+
+TEST_F(GlyphProviderFreetypeContext, GetKerningAdjustmentNone)
+{
+	glm::vec2 adjustment;
+	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 16.0f, (int)' ', (int)'!'));
+}
+
+TEST_F(GlyphProviderFreetypeContext, GetKerningAdjustmentNotFound)
+{
+	glm::vec2 adjustment;
+	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 55.0f, 0x2000, (int)'Q'));
+}
+
 TEST_F(GlyphProviderFreetypeContext, CreateFace)
 {
 	Face* face = provider->CreateFace(16.0f);
 
 	ASSERT_NE(nullptr, face->GetFamily());
-	EXPECT_STREQ("Roboto", face->GetFamily()->GetName().c_str());
+	EXPECT_STREQ("Mathilde", face->GetFamily()->GetName().c_str());
 	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
-	EXPECT_FLOAT_EQ(28.0f, face->GetLineHeight());
-	EXPECT_FLOAT_EQ(22.0f, face->GetAscent());
-	EXPECT_FLOAT_EQ(-6.0f, face->GetDescent());
+	EXPECT_FLOAT_EQ(22.0f, face->GetLineHeight());
+	EXPECT_FLOAT_EQ(13.0f, face->GetAscent());
+	EXPECT_FLOAT_EQ(-10.0f, face->GetDescent());
 }

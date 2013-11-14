@@ -38,12 +38,14 @@ namespace ExLibris
 
 		GlyphProviderFreetype(Library* a_Library, FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
 		~GlyphProviderFreetype();
-	
+
+		bool HasKerning() const;
+
 		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint);
 		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint);
 		CurvePath* CreateOutline(float a_Size, int a_Codepoint);
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext);
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext);
 
 		Face* CreateFace(float a_Size);
 

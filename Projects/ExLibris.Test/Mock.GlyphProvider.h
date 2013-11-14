@@ -22,6 +22,11 @@ namespace ExLibris
 			: IGlyphProvider(a_Library)
 		{
 		}
+
+		bool HasKerning() const
+		{
+			return true;
+		}
 	
 		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint)
 		{
@@ -84,7 +89,7 @@ namespace ExLibris
 			return outline;
 		}
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
 		{
 			if (
 				size_blacklist.find(a_Size) != size_blacklist.end() ||
@@ -95,8 +100,8 @@ namespace ExLibris
 				return nullptr;
 			}
 
-			a_Kerning.x = -1.5f;
-			a_Kerning.y = 5.6f;
+			a_Adjustment.x = -1.5f;
+			a_Adjustment.y = 5.6f;
 
 			return true;
 		}
