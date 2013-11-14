@@ -24,11 +24,18 @@
 
 #pragma once
 
+#include <glm/glm.hpp>
+
+#include "FontMetrics.h"
+
 namespace ExLibris
 {
 	class CurvePath;
+	class Family;
+	class Face;
 	struct GlyphBitmap;
 	struct GlyphMetrics;
+	class Library;
 }
 
 namespace ExLibris
@@ -39,12 +46,11 @@ namespace ExLibris
 	
 	public:
 	
-		IGlyphProvider()
-			: m_Weight(eWeight_Normal)
+		IGlyphProvider(Library* a_Library)
+			: m_Library(a_Library)
+			, m_Family(nullptr)
+			, m_Weight(eWeight_Normal)
 			, m_Style(eStyle_None)
-			, m_LineHeight(0.0f)
-			, m_Ascent(0.0f)
-			, m_Descent(0.0f)
 		{
 		}
 
@@ -53,6 +59,16 @@ namespace ExLibris
 		}
 
 	public:
+
+		Library* GetLibrary() const
+		{
+			return m_Library;
+		}
+
+		Family* GetFamily() const
+		{
+			return m_Family;
+		}
 
 		Weight GetWeight() const
 		{
@@ -64,40 +80,22 @@ namespace ExLibris
 			return m_Style;
 		}
 
-		float GetLineHeight() const
-		{
-			return m_LineHeight;
-		}
-
-		float GetAscent() const
-		{
-			return m_Ascent;
-		}
-
-		float GetDescent() const
-		{
-			return m_Descent;
-		}
-
 	public:
-
-		virtual bool SetSize(float a_Size) = 0;
 	
-		virtual GlyphMetrics* CreateMetrics(int a_Codepoint) = 0;
+		virtual GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint) = 0;
+		virtual GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint) = 0;
+		virtual CurvePath* CreateOutline(float a_Size, int a_Codepoint) = 0;
 
-		virtual bool TryGetKerningAdjustment(glm::vec2& a_Kerning, int a_CodepointCurrent, int a_CodepointNext) = 0;
+		virtual bool TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext) = 0;
 
-		virtual GlyphBitmap* CreateBitmap(int a_Codepoint) = 0;
-
-		virtual CurvePath* CreateOutline(int a_Codepoint) = 0;
+		virtual Face* CreateFace(float a_Size) = 0;
 
 	protected:
 
+		Library* m_Library;
+		Family* m_Family;
 		Weight m_Weight;
 		Style m_Style;
-		float m_LineHeight;
-		float m_Ascent;
-		float m_Descent;
 	
 	}; // class IGlyphProvider
 
