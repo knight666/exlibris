@@ -104,6 +104,9 @@ namespace ExLibris
 			return;
 		}
 
+		m_Weight = ((m_Face->style_flags & FT_STYLE_FLAG_BOLD) != 0) ? eWeight_Bold : eWeight_Normal;
+		m_Style = ((m_Face->style_flags & FT_STYLE_FLAG_ITALIC) != 0) ? eStyle_Italicized : eStyle_None;
+
 		m_OutlineCallbacks.move_to = &OutlineMoveTo;
 		m_OutlineCallbacks.line_to = &OutlineLineTo;
 		m_OutlineCallbacks.conic_to = &OutlineConicTo;
@@ -140,6 +143,10 @@ namespace ExLibris
 
 				return false;
 			}
+
+			m_LineHeight = Fixed26Dot6::ToFloat(m_Face->size->metrics.height);
+			m_Ascent = Fixed26Dot6::ToFloat(m_Face->size->metrics.ascender);
+			m_Descent = Fixed26Dot6::ToFloat(m_Face->size->metrics.descender);
 
 			m_SizeLoaded = requested_size;
 		}
