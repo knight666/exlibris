@@ -81,12 +81,14 @@ namespace ExLibris
 		}
 
 	public:
+
+		virtual bool HasKerning() const = 0;
 	
 		virtual GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint) = 0;
 		virtual GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint) = 0;
 		virtual CurvePath* CreateOutline(float a_Size, int a_Codepoint) = 0;
 
-		virtual bool TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext) = 0;
+		virtual bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext) = 0;
 
 		virtual Face* CreateFace(float a_Size) = 0;
 

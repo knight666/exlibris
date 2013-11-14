@@ -134,6 +134,11 @@ namespace ExLibris
 		}
 	}
 
+	bool GlyphProviderFreetype::HasKerning() const
+	{
+		return FT_HAS_KERNING(m_Face);
+	}
+
 	GlyphMetrics* GlyphProviderFreetype::CreateMetrics(float a_Size, int a_Codepoint)
 	{
 		if (!_SetSize(a_Size) || !_LoadGlyph(a_Codepoint))
@@ -269,9 +274,9 @@ namespace ExLibris
 		return target.outline;
 	}
 
-	bool GlyphProviderFreetype::TryGetKerningAdjustment(glm::vec2& a_Kerning, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
+	bool GlyphProviderFreetype::TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
 	{
-		if (!FT_HAS_KERNING(m_Face) || !_SetSize(a_Size))
+		if (!HasKerning() || !_SetSize(a_Size))
 		{
 			return false;
 		}
@@ -294,9 +299,16 @@ namespace ExLibris
 			return false;
 		}
 
-		a_Kerning = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
+		if (kerning_fixed.x != 0 || kerning_fixed.y != 0)
+		{
+			a_Adjustment = Fixed26Dot6::ToFloatVec2(&kerning_fixed);
 
-		return true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	Face* GlyphProviderFreetype::CreateFace(float a_Size)
