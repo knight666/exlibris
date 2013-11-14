@@ -24,30 +24,26 @@
 
 #pragma once
 
-#include "FontFreetype.h"
-#include "FreetypeErrors.h"
-#include "IFontLoader.h"
+#include "Style.h"
+#include "Weight.h"
 
 namespace ExLibris
 {
 
-	class FontLoaderFreetype
-		: public IFontLoader
+	struct GlyphRequest
 	{
-	
-	public:
-	
-		FontLoaderFreetype(Library* a_Library);
-		~FontLoaderFreetype();
+		GlyphRequest()
+			: codepoint(-1)
+			, size(0.0f)
+			, weight(eWeight_Normal)
+			, style(eStyle_None)
+		{
+		}
 
-		FT_Library GetFreetypeLibrary() const;
-
-		IFont* LoadFont(std::istream& a_Stream);
-	
-	private:
-
-		FT_Library m_FreetypeLibrary;
-	
-	}; // class FontLoaderFreetype
+		int codepoint;
+		float size;
+		Weight weight;
+		Style style;
+	};
 
 }; // namespace ExLibris
