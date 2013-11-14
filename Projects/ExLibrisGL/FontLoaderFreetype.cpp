@@ -37,7 +37,7 @@ namespace ExLibris
 	{
 		FT_Error errors = 0;
 		
-		errors = FT_Init_FreeType(&m_FTLibrary);
+		errors = FT_Init_FreeType(&m_FreetypeLibrary);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::FontLoaderFreetype", errors);
@@ -48,16 +48,16 @@ namespace ExLibris
 	{
 		FT_Error errors = 0;
 
-		errors = FT_Done_FreeType(m_FTLibrary);
+		errors = FT_Done_FreeType(m_FreetypeLibrary);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::~FontLoaderFreetype", errors);
 		}
 	}
 
-	FT_Library FontLoaderFreetype::GetLibrary() const
+	FT_Library FontLoaderFreetype::GetFreetypeLibrary() const
 	{
-		return m_FTLibrary;
+		return m_FreetypeLibrary;
 	}
 
 	IFont* FontLoaderFreetype::LoadFont(std::istream& a_Stream)
@@ -77,7 +77,7 @@ namespace ExLibris
 		FT_Error errors = 0;
 
 		FT_Face font_loaded = nullptr;
-		errors = FT_New_Memory_Face(m_FTLibrary, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
+		errors = FT_New_Memory_Face(m_FreetypeLibrary, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::LoadFont", errors);

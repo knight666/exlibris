@@ -24,30 +24,43 @@
 
 #pragma once
 
-#include "FontFreetype.h"
-#include "FreetypeErrors.h"
-#include "IFontLoader.h"
+#include "FontLoaderFreetype.h"
+#include "IGlyphProvider.h"
 
 namespace ExLibris
 {
 
-	class FontLoaderFreetype
-		: public IFontLoader
+	class GlyphProviderFreetype
+		: IGlyphProvider
 	{
 	
 	public:
 	
-		FontLoaderFreetype(Library* a_Library);
-		~FontLoaderFreetype();
-
-		FT_Library GetFreetypeLibrary() const;
-
-		IFont* LoadFont(std::istream& a_Stream);
+		GlyphProviderFreetype(FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
+		~GlyphProviderFreetype();
 	
+		GlyphMetrics* CreateMetrics(const GlyphRequest& a_Request);
+
+		bool TryGetKerningAdjustment(glm::vec2& a_Kerning, const GlyphRequest& a_Request, int a_CodepointNext);
+
+		GlyphBitmap* CreateBitmap(const GlyphRequest& a_Request);
+
+		CurvePath* CreateOutline(const GlyphRequest& a_Request);
+
 	private:
 
-		FT_Library m_FreetypeLibrary;
+		bool _SetFaceSize(float a_Size);
+		bool _LoadGlyph(int a_Codepoint);
+
+	private:
+
+		FT_Face m_Face;
+		FT_F26Dot6 m_FaceSizeLoaded;
+		FT_UInt m_GlyphLoaded;
+
+		FT_Byte* m_Buffer;
+		size_t m_BufferSize;
 	
-	}; // class FontLoaderFreetype
+	}; // class GlyphProviderFreetype
 
 }; // namespace ExLibris

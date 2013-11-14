@@ -24,30 +24,35 @@
 
 #pragma once
 
-#include "FontFreetype.h"
-#include "FreetypeErrors.h"
-#include "IFontLoader.h"
+#include "GlyphRequest.h"
+
+namespace ExLibris
+{
+	class CurvePath;
+	struct GlyphBitmap;
+	struct GlyphMetrics;
+}
 
 namespace ExLibris
 {
 
-	class FontLoaderFreetype
-		: public IFontLoader
+	class IGlyphProvider
 	{
 	
 	public:
 	
-		FontLoaderFreetype(Library* a_Library);
-		~FontLoaderFreetype();
-
-		FT_Library GetFreetypeLibrary() const;
-
-		IFont* LoadFont(std::istream& a_Stream);
+		virtual ~IGlyphProvider()
+		{
+		}
 	
-	private:
+		virtual GlyphMetrics* CreateMetrics(const GlyphRequest& a_Request) = 0;
 
-		FT_Library m_FreetypeLibrary;
+		virtual bool TryGetKerningAdjustment(glm::vec2& a_Kerning, const GlyphRequest& a_Request, int a_CodepointNext) = 0;
+
+		virtual GlyphBitmap* CreateBitmap(const GlyphRequest& a_Request) = 0;
+
+		virtual CurvePath* CreateOutline(const GlyphRequest& a_Request) = 0;
 	
-	}; // class FontLoaderFreetype
+	}; // class IGlyphProvider
 
 }; // namespace ExLibris

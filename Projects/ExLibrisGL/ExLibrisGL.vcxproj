@@ -83,6 +83,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GlyphProviderFreetype.cpp" />
     <ClCompile Include="FontSystem.cpp" />
     <ClCompile Include="FreetypeErrors.cpp" />
     <ClCompile Include="IFont.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="FontFace.h" />
     <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
+    <ClInclude Include="GlyphProviderFreetype.h" />
     <ClInclude Include="FontSystem.h" />
     <ClInclude Include="FreetypeConversion.h" />
     <ClInclude Include="FreetypeErrors.h" />
@@ -114,9 +116,11 @@
     <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
+    <ClInclude Include="GlyphRequest.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IFontLoader.h" />
+    <ClInclude Include="IGlyphProvider.h" />
     <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="Library.h" />
