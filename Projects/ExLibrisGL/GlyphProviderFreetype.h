@@ -55,11 +55,13 @@ namespace ExLibris
 	private:
 
 		FT_Face m_Face;
+		FT_Byte* m_Buffer;
+		size_t m_BufferSize;
+
 		FT_F26Dot6 m_FaceSizeLoaded;
 		FT_UInt m_GlyphLoaded;
 
-		FT_Byte* m_Buffer;
-		size_t m_BufferSize;
+		FT_Outline_Funcs m_OutlineCallbacks;
 	
 	}; // class GlyphProviderFreetype
 

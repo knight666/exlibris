@@ -27,10 +27,69 @@
 #include "GlyphProviderFreetype.h"
 
 #include "FreetypeConversion.h"
+#include "CurvePath.h"
+#include "GlyphBitmap.h"
 #include "GlyphMetrics.h"
 
 namespace ExLibris
 {
+
+	struct GlyphTarget
+	{
+		CurvePath* outline;
+		FT_BBox bounding_box;
+	};
+
+	inline glm::vec2 GetCurvePosition(const FT_Vector* a_Position, GlyphTarget* a_Target)
+	{
+		return glm::vec2(
+			Fixed26Dot6::ToFloat(a_Position->x - a_Target->bounding_box.xMin), 
+			Fixed26Dot6::ToFloat(a_Target->bounding_box.yMax - a_Position->y)
+		);
+	}
+
+	int OutlineMoveTo(const FT_Vector* a_To, void* a_User)
+	{
+		GlyphTarget* target = (GlyphTarget*)a_User;
+
+		target->outline->Move(GetCurvePosition(a_To, target));
+
+		return 0;
+	}
+
+	int OutlineLineTo(const FT_Vector* a_To, void* a_User)
+	{
+		GlyphTarget* target = (GlyphTarget*)a_User;
+
+		target->outline->LineTo(GetCurvePosition(a_To, target));
+
+		return 0;
+	}
+
+	int OutlineConicTo(const FT_Vector* a_Control, const FT_Vector* a_To, void* a_User)
+	{
+		GlyphTarget* target = (GlyphTarget*)a_User;
+
+		target->outline->ConicCurveTo(
+			GetCurvePosition(a_Control, target),
+			GetCurvePosition(a_To, target)
+		);
+
+		return 0;
+	}
+
+	int OutlineCubicTo(const FT_Vector* a_ControlA, const FT_Vector* a_ControlB, const FT_Vector* a_To, void* a_User)
+	{
+		GlyphTarget* target = (GlyphTarget*)a_User;
+
+		target->outline->QuadraticCurveTo(
+			GetCurvePosition(a_ControlA, target),
+			GetCurvePosition(a_ControlB, target),
+			GetCurvePosition(a_To, target)
+		);
+
+		return 0;
+	}
 
 	GlyphProviderFreetype::GlyphProviderFreetype(FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize)
 		: m_Face(a_Face)
@@ -39,6 +98,18 @@ namespace ExLibris
 		, m_FaceSizeLoaded(0)
 		, m_GlyphLoaded(-1)
 	{
+		if (m_Face == nullptr || m_Buffer == nullptr)
+		{
+			EXL_THROW("GlyphProviderFreetype::GlyphProviderFreetype", "Provider must have a valid face handle.");
+			return;
+		}
+
+		m_OutlineCallbacks.move_to = &OutlineMoveTo;
+		m_OutlineCallbacks.line_to = &OutlineLineTo;
+		m_OutlineCallbacks.conic_to = &OutlineConicTo;
+		m_OutlineCallbacks.cubic_to = &OutlineCubicTo;
+		m_OutlineCallbacks.shift = 0;
+		m_OutlineCallbacks.delta = 0;
 	}
 	
 	GlyphProviderFreetype::~GlyphProviderFreetype()
@@ -133,7 +204,55 @@ namespace ExLibris
 
 		FT_Error errors = 0;
 
-		return nullptr;
+		errors = FT_Render_Glyph(m_Face->glyph, FT_RENDER_MODE_NORMAL);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("GlyphProviderFreetype::CreateBitmap", errors);
+
+			return false;
+		}
+
+		FT_Bitmap& glyph_bitmap = m_Face->glyph->bitmap;
+
+		unsigned int bitmap_size = glyph_bitmap.width * glyph_bitmap.rows * 4;
+		if (bitmap_size == 0)
+		{
+			return false;
+		}
+
+		GlyphBitmap* bitmap = new GlyphBitmap;
+		bitmap->width = glyph_bitmap.width;
+		bitmap->height = glyph_bitmap.rows;
+		bitmap->data = new unsigned char[bitmap_size];
+
+		unsigned char* src_line = glyph_bitmap.buffer;
+		unsigned int src_pitch = glyph_bitmap.pitch;
+
+		unsigned char* dst_line = bitmap->data;
+		unsigned int dst_pitch = glyph_bitmap.width * 4;
+
+		for (int y = 0; y < glyph_bitmap.rows; ++y)
+		{
+			unsigned char* src = src_line;
+			unsigned char* dst = dst_line;
+
+			for (int x = 0; x < glyph_bitmap.width; ++x)
+			{
+				char value = *src;
+				dst[0] = value;
+				dst[1] = value;
+				dst[2] = value;
+				dst[3] = value;
+
+				dst += 4;
+				src++;
+			}
+
+			src_line += src_pitch;
+			dst_line += dst_pitch;
+		}
+
+		return bitmap;
 	}
 
 	CurvePath* GlyphProviderFreetype::CreateOutline(const GlyphRequest& a_Request)
@@ -143,9 +262,33 @@ namespace ExLibris
 			return nullptr;
 		}
 
+		if (m_Face->glyph->outline.n_contours <= 0)
+		{
+			return nullptr;
+		}
+
 		FT_Error errors = 0;
 
-		return nullptr;
+		GlyphTarget target;
+		target.outline = new CurvePath;
+
+		errors = FT_Outline_Get_BBox(&m_Face->glyph->outline, &target.bounding_box);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("GlyphProviderFreetype::CreateOutline", errors);
+
+			return nullptr;
+		}
+
+		errors = FT_Outline_Decompose(&m_Face->glyph->outline, &m_OutlineCallbacks, &target);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("GlyphProviderFreetype::CreateOutline", errors);
+
+			return nullptr;
+		}
+
+		return target.outline;
 	}
 
 	bool GlyphProviderFreetype::_SetFaceSize(float a_Size)
