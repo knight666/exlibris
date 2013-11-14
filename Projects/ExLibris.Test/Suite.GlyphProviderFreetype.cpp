@@ -64,8 +64,19 @@ TEST_F(GlyphProviderFreetypeContext, Construct)
 	ASSERT_NE(nullptr, provider->GetFamily());
 	EXPECT_STREQ("Mathilde", provider->GetFamily()->GetName().c_str());
 	EXPECT_TRUE(provider->HasKerning());
+	EXPECT_TRUE(provider->IsScalable());
 	EXPECT_EQ(eStyle_None, provider->GetStyle());
 	EXPECT_EQ(eWeight_Normal, provider->GetWeight());
+}
+
+TEST_F(GlyphProviderFreetypeContext, SizeAvailable)
+{
+	EXPECT_TRUE(provider->IsSizeAvailable(12.0f));
+}
+
+TEST_F(GlyphProviderFreetypeContext, SizeAvailableNegative)
+{
+	EXPECT_TRUE(provider->IsSizeAvailable(-33.9f));
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateMetrics)

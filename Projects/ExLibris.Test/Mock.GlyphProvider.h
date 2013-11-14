@@ -27,11 +27,21 @@ namespace ExLibris
 		{
 			return true;
 		}
-	
+
+		bool IsScalable() const
+		{
+			return true;
+		}
+
+		bool IsSizeAvailable(float a_Size) const
+		{
+			return (size_blacklist.find(a_Size) == size_blacklist.end());
+		}
+
 		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint)
 		{
 			if (
-				size_blacklist.find(a_Size) != size_blacklist.end() ||
+				!IsSizeAvailable(a_Size) ||
 				codepoint_blacklist.find(a_Codepoint) != codepoint_blacklist.end()
 			)
 			{
@@ -53,7 +63,7 @@ namespace ExLibris
 		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint)
 		{
 			if (
-				size_blacklist.find(a_Size) != size_blacklist.end() ||
+				!IsSizeAvailable(a_Size) ||
 				codepoint_blacklist.find(a_Codepoint) != codepoint_blacklist.end()
 			)
 			{
@@ -71,7 +81,7 @@ namespace ExLibris
 		CurvePath* CreateOutline(float a_Size, int a_Codepoint)
 		{
 			if (
-				size_blacklist.find(a_Size) != size_blacklist.end() ||
+				!IsSizeAvailable(a_Size) ||
 				codepoint_blacklist.find(a_Codepoint) != codepoint_blacklist.end()
 			)
 			{
@@ -92,7 +102,7 @@ namespace ExLibris
 		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
 		{
 			if (
-				size_blacklist.find(a_Size) != size_blacklist.end() ||
+				!IsSizeAvailable(a_Size) ||
 				codepoint_blacklist.find(a_CodepointCurrent) != codepoint_blacklist.end() ||
 				codepoint_blacklist.find(a_CodepointNext) != codepoint_blacklist.end()
 			)
