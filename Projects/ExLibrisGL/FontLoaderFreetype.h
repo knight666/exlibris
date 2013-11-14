@@ -43,6 +43,8 @@ namespace ExLibris
 		FT_Library GetFreetypeLibrary() const;
 
 		IFont* LoadFont(std::istream& a_Stream);
+
+		IGlyphProvider* LoadGlyphProvider(std::istream& a_Stream);
 	
 	private:
 

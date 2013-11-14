@@ -27,6 +27,7 @@
 #include "FontLoaderFreetype.h"
 
 #include "FreetypeErrors.h"
+#include "GlyphProviderFreetype.h"
 #include "Library.h"
 
 namespace ExLibris
@@ -110,6 +111,36 @@ namespace ExLibris
 		font->SetStyle(((font_loaded->style_flags & FT_STYLE_FLAG_ITALIC) != 0) ? eStyle_Italicized : eStyle_None);
 
 		return font;
+	}
+
+	IGlyphProvider* FontLoaderFreetype::LoadGlyphProvider(std::istream& a_Stream)
+	{
+		a_Stream.seekg(0, std::ios_base::end);
+		std::streamoff font_file_size = a_Stream.tellg();
+		a_Stream.seekg(0, std::ios_base::beg);
+
+		if (font_file_size <= 0)
+		{
+			return nullptr;
+		}
+
+		FT_Byte* font_file_data = new FT_Byte[(unsigned int)font_file_size];
+		a_Stream.read((char*)font_file_data, font_file_size);
+
+		FT_Error errors = 0;
+
+		FT_Face face_loaded = nullptr;
+		errors = FT_New_Memory_Face(m_FreetypeLibrary, font_file_data, (FT_Long)font_file_size, 0, &face_loaded);
+		if (errors != FT_Err_Ok)
+		{
+			EXL_FT_THROW("FontLoaderFreetype::LoadGlyphProvider", errors);
+
+			return nullptr;
+		}
+
+		GlyphProviderFreetype* provider = new GlyphProviderFreetype(m_Library, face_loaded, font_file_data, (size_t)font_file_size);
+
+		return provider;
 	}
 
 }; // namespace ExLibris
