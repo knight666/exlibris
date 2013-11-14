@@ -26,6 +26,10 @@
 
 #include "Face.h"
 
+#include "CurvePath.h"
+#include "GlyphBitmap.h"
+#include "GlyphMetrics.h"
+
 namespace ExLibris
 {
 
@@ -37,6 +41,35 @@ namespace ExLibris
 	
 	Face::~Face()
 	{
+		for (std::map<int, GlyphMetrics*>::iterator metrics_it = m_GlyphMetrics.begin(); metrics_it != m_GlyphMetrics.end(); ++metrics_it)
+		{
+			GlyphMetrics* metrics = metrics_it->second;
+			if (metrics != nullptr)
+			{
+				delete metrics;
+			}
+		}
+		m_GlyphMetrics.clear();
+
+		for (std::map<int, GlyphBitmap*>::iterator bitmap_it = m_GlyphBitmaps.begin(); bitmap_it != m_GlyphBitmaps.end(); ++bitmap_it)
+		{
+			GlyphBitmap* bitmap = bitmap_it->second;
+			if (bitmap != nullptr)
+			{
+				delete bitmap;
+			}
+		}
+		m_GlyphBitmaps.clear();
+
+		for (std::map<int, CurvePath*>::iterator outline_it = m_GlyphOutlines.begin(); outline_it != m_GlyphOutlines.end(); ++outline_it)
+		{
+			CurvePath* outline = outline_it->second;
+			if (outline != nullptr)
+			{
+				delete outline;
+			}
+		}
+		m_GlyphOutlines.clear();
 	}
 
 	Family* Face::GetFamily() const

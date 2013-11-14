@@ -136,7 +136,34 @@ namespace ExLibris
 
 	bool GlyphProviderFreetype::HasKerning() const
 	{
-		return FT_HAS_KERNING(m_Face);
+		return (FT_HAS_KERNING(m_Face) != 0);
+	}
+
+	bool GlyphProviderFreetype::IsScalable() const
+	{
+		return (FT_IS_SCALABLE(m_Face) != 0);
+	}
+
+	bool GlyphProviderFreetype::IsSizeAvailable(float a_Size) const
+	{
+		if (FT_HAS_FIXED_SIZES(m_Face) == 0)
+		{
+			return true;
+		}
+		else
+		{
+			FT_Pos requested_size = (FT_Pos)Fixed26Dot6::ToFixed(a_Size);
+
+			for (FT_Int i = 0; i < m_Face->num_fixed_sizes; ++i)
+			{
+				if (m_Face->available_sizes[i].y_ppem == requested_size)
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
 	}
 
 	GlyphMetrics* GlyphProviderFreetype::CreateMetrics(float a_Size, int a_Codepoint)

@@ -40,6 +40,8 @@ namespace ExLibris
 		~GlyphProviderFreetype();
 
 		bool HasKerning() const;
+		bool IsScalable() const;
+		bool IsSizeAvailable(float a_Size) const;
 
 		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint);
 		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint);

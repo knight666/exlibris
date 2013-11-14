@@ -83,6 +83,8 @@ namespace ExLibris
 	public:
 
 		virtual bool HasKerning() const = 0;
+		virtual bool IsScalable() const = 0;
+		virtual bool IsSizeAvailable(float a_Size) const = 0;
 	
 		virtual GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint) = 0;
 		virtual GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint) = 0;
