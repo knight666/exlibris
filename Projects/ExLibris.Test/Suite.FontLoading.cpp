@@ -44,7 +44,7 @@ TEST(FontLoaderFreetype, LoadFontFileNotFound)
 	EXPECT_EQ(nullptr, font_loaded);
 }
 
-class FaceContext
+class FontFaceContext
 	: public ::testing::Test
 {
 
@@ -76,13 +76,13 @@ protected:
 
 };
 
-TEST_F(FaceContext, LineHeight)
+TEST_F(FontFaceContext, LineHeight)
 {
 	EXPECT_FLOAT_EQ(24.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(42.0f, face->GetLineHeight());
 }
 
-TEST_F(FaceContext, FindGlyph)
+TEST_F(FontFaceContext, FindGlyph)
 {
 	Glyph* glyph = face->FindGlyph((unsigned int)'6');
 	ASSERT_NE(nullptr, glyph);
@@ -95,7 +95,7 @@ TEST_F(FaceContext, FindGlyph)
 	EXPECT_VEC2_EQ(16.859375f, 42.0f, glyph->metrics->bounding_box.GetMaximum());
 }
 
-TEST_F(FaceContext, FindGlyphOutline)
+TEST_F(FontFaceContext, FindGlyphOutline)
 {
 	Glyph* glyph = face->FindGlyph((unsigned int)'-');
 	ASSERT_NE(nullptr, glyph);
@@ -107,7 +107,7 @@ TEST_F(FaceContext, FindGlyphOutline)
 	EXPECT_VEC2_EQ(8.2031250f, -8.5937500f, glyph->outline->GetPosition(0));
 }
 
-TEST_F(FaceContext, FindGlyphNotFound)
+TEST_F(FontFaceContext, FindGlyphNotFound)
 {
 	Glyph* glyph = face->FindGlyph(0x777126);
 	ASSERT_EQ(nullptr, glyph);

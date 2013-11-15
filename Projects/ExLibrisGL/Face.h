@@ -44,8 +44,13 @@ namespace ExLibris
 		float GetAscent() const;
 		float GetDescent() const;
 
+		size_t GetGlyphMetricsLoaded() const;
 		GlyphMetrics* GetGlyphMetrics(int a_Codepoint);
+
+		size_t GetGlyphBitmapsLoaded() const;
 		GlyphBitmap* GetGlyphBitmap(int a_Codepoint);
+
+		size_t GetGlyphOutlinesLoaded() const;
 		CurvePath* GetGlyphOutline(int a_Codepoint);
 
 		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, int a_CodepointCurrent, int a_CodepointNext);
