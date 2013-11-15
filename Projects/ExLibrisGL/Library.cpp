@@ -30,6 +30,7 @@
 #include "Family.h"
 #include "FontSystem.h"
 #include "IFontLoader.h"
+#include "IGlyphProvider.h"
 
 namespace ExLibris
 {
@@ -109,6 +110,42 @@ namespace ExLibris
 		}
 
 		return nullptr;
+	}
+
+	bool Library::MapFontToFile(const std::string& a_Path) const
+	{
+		std::fstream file_stream(a_Path, std::ios::in | std::ios::binary);
+		if (!file_stream.is_open())
+		{
+			return false;
+		}
+
+		bool result = MapFontToStream(file_stream);
+
+		file_stream.close();
+
+		return result;
+	}
+
+	bool Library::MapFontToStream(std::istream& a_Stream) const
+	{
+		for (std::vector<IFontLoader*>::const_iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		{
+			IFontLoader* loader = *loader_it;
+
+			IGlyphProvider* provider = provider = loader->LoadGlyphProvider(a_Stream);
+			if (provider != nullptr)
+			{
+				if (provider->GetFamily() != nullptr)
+				{
+					provider->GetFamily()->AddGlyphProvider(provider);
+				}
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	size_t Library::GetFamilyCount() const

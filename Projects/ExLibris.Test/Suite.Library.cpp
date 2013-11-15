@@ -6,6 +6,7 @@
 #include <Library.h>
 
 #include "Mock.Font.h"
+#include "Mock.FontLoader.h"
 
 using namespace ExLibris;
 
@@ -92,7 +93,7 @@ TEST(Library, RequestFaceEmpty)
 
 	FontFace* face = lib->RequestFace(fr);
 	EXPECT_STREQ("System", face->GetFamily()->GetName().c_str());
-	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
+	EXPECT_FLOAT_EQ(12.0f, face->GetSize());
 }
 
 TEST(Library, RequestFaceFamilyNotFound)
@@ -128,4 +129,49 @@ TEST(Library, RequestFaceFontNotFound)
 	}, Exception);
 
 	EXPECT_EQ(nullptr, face);
+}
+
+class LibraryFontMappingContext
+	: public ::testing::Test
+{
+
+public:
+
+	void SetUp()
+	{
+		library = new Library;
+
+		loader = new MockFontLoader(library);
+		library->AddLoader(loader);
+	}
+
+	void TearDown()
+	{
+		delete library;
+	}
+
+protected:
+
+	Library* library;
+	MockFontLoader* loader;
+
+};
+
+TEST_F(LibraryFontMappingContext, MapFontAndFindFamily)
+{
+	std::stringstream ss;
+	EXPECT_TRUE(library->MapFontToStream(ss));
+
+	Family* fam = library->FindFamily("MockFamily");
+	ASSERT_NE(nullptr, fam);
+
+	EXPECT_EQ(1, fam->GetGlyphProviderCount());
+}
+
+TEST_F(LibraryFontMappingContext, FailedToMapFont)
+{
+	loader->stream_not_valid = true;
+
+	std::stringstream ss;
+	EXPECT_FALSE(library->MapFontToStream(ss));
 }
