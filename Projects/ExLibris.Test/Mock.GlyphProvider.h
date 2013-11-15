@@ -23,6 +23,16 @@ namespace ExLibris
 		{
 		}
 
+		void SetWeight(Weight a_Weight)
+		{
+			m_Weight = a_Weight;
+		}
+
+		void SetStyle(Style a_Style)
+		{
+			m_Style = a_Style;
+		}
+
 		bool HasKerning() const
 		{
 			return true;

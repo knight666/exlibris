@@ -7,6 +7,58 @@
 
 using namespace ExLibris;
 
+TEST(GlyphProvider, GetMatchScoreBestMatch)
+{
+	Library* library = new Library;
+
+	MockGlyphProvider* provider = new MockGlyphProvider(library);
+	provider->SetWeight(eWeight_Bold);
+	provider->SetStyle(eStyle_None);
+
+	EXPECT_EQ(110, provider->GetMatchScore(16.0f, eWeight_Bold, eStyle_None));
+}
+
+TEST(GlyphProvider, GetMatchScoreSizeNotAvailable)
+{
+	Library* library = new Library;
+
+	MockGlyphProvider* provider = new MockGlyphProvider(library);
+	provider->size_blacklist.insert(25.0f);
+
+	EXPECT_EQ(-1, provider->GetMatchScore(25.0f, eWeight_Normal, eStyle_None));
+}
+
+TEST(GlyphProvider, GetMatchScoreIncorrectWeight)
+{
+	Library* library = new Library;
+
+	MockGlyphProvider* provider = new MockGlyphProvider(library);
+	provider->SetWeight(eWeight_Bold);
+
+	EXPECT_EQ(10, provider->GetMatchScore(55.2f, eWeight_Normal, eStyle_None));
+}
+
+TEST(GlyphProvider, GetMatchScoreIncorrectStyle)
+{
+	Library* library = new Library;
+
+	MockGlyphProvider* provider = new MockGlyphProvider(library);
+	provider->SetStyle(eStyle_Italicized);
+
+	EXPECT_EQ(100, provider->GetMatchScore(17.87f, eWeight_Normal, eStyle_None));
+}
+
+TEST(GlyphProvider, GetMatchScoreIncorrectWeightAndStyle)
+{
+	Library* library = new Library;
+
+	MockGlyphProvider* provider = new MockGlyphProvider(library);
+	provider->SetWeight(eWeight_Normal);
+	provider->SetStyle(eStyle_Italicized);
+
+	EXPECT_EQ(0, provider->GetMatchScore(12.33f, eWeight_Bold, eStyle_None));
+}
+
 TEST(GlyphProvider, CreateMetrics)
 {
 	Library* library = new Library;
