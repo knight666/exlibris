@@ -87,6 +87,7 @@
     <ClCompile Include="GlyphProviderFreetype.cpp" />
     <ClCompile Include="FontSystem.cpp" />
     <ClCompile Include="FreetypeErrors.cpp" />
+    <ClCompile Include="GlyphProviderSystem.cpp" />
     <ClCompile Include="IFont.cpp" />
     <ClCompile Include="CurvePath.cpp" />
     <ClCompile Include="Library.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
+    <ClInclude Include="GlyphProviderSystem.h" />
     <ClInclude Include="IFont.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IFontLoader.h" />
