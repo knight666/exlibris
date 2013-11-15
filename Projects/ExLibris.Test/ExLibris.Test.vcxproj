@@ -75,6 +75,7 @@
     <ClCompile Include="Suite.FreetypeErrors.cpp" />
     <ClCompile Include="Suite.GlyphProvider.cpp" />
     <ClCompile Include="Suite.GlyphProviderFreetype.cpp" />
+    <ClCompile Include="Suite.GlyphProviderSystem.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
     <ClCompile Include="Suite.FontFace.cpp" />
     <ClCompile Include="Suite.FontLoading.cpp" />

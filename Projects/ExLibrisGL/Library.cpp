@@ -29,6 +29,7 @@
 #include "Exception.h"
 #include "Family.h"
 #include "FontSystem.h"
+#include "GlyphProviderSystem.h"
 #include "IFontLoader.h"
 #include "IGlyphProvider.h"
 
@@ -39,6 +40,8 @@ namespace ExLibris
 	{
 		Family* family = CreateFamily("System");
 		new FontSystem(family);
+
+		family->AddGlyphProvider(new GlyphProviderSystem(this));
 	}
 	
 	Library::~Library()

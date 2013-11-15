@@ -160,6 +160,8 @@ TEST_F(GlyphProviderFreetypeContext, CreateFace)
 
 	ASSERT_NE(nullptr, face->GetFamily());
 	EXPECT_STREQ("Mathilde", face->GetFamily()->GetName().c_str());
+	EXPECT_EQ(eWeight_Normal, face->GetWeight());
+	EXPECT_EQ(eStyle_None, face->GetStyle());
 	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(22.0f, face->GetLineHeight());
 	EXPECT_FLOAT_EQ(13.0f, face->GetAscent());
