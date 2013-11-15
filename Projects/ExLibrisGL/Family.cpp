@@ -26,6 +26,8 @@
 
 #include "Family.h"
 
+#include "IGlyphProvider.h"
+
 namespace ExLibris
 {
 
@@ -42,6 +44,12 @@ namespace ExLibris
 			delete *font_it;
 		}
 		m_Fonts.clear();
+
+		for (std::set<IGlyphProvider*>::iterator provider_it = m_GlyphProviders.begin(); provider_it != m_GlyphProviders.end(); ++provider_it)
+		{
+			delete *provider_it;
+		}
+		m_GlyphProviders.clear();
 	}
 
 	Library* Family::GetLibrary() const
@@ -93,6 +101,45 @@ namespace ExLibris
 			if (score == 2)
 			{
 				break;
+			}
+		}
+
+		return match;
+	}
+
+	size_t Family::GetGlyphProviderCount() const
+	{
+		return m_GlyphProviders.size();
+	}
+
+	void Family::AddGlyphProvider(IGlyphProvider* a_Provider)
+	{
+		if (a_Provider == nullptr)
+		{
+			return;
+		}
+
+		std::set<IGlyphProvider*>::iterator found = m_GlyphProviders.find(a_Provider);
+		if (found == m_GlyphProviders.end())
+		{
+			m_GlyphProviders.insert(a_Provider);
+		}
+	}
+
+	IGlyphProvider* Family::FindGlyphProvider(float a_Size, Weight a_Weight, Style a_Style) const
+	{
+		IGlyphProvider* match = nullptr;
+		int score_highest = -1;
+
+		for (std::set<IGlyphProvider*>::const_iterator provider_it = m_GlyphProviders.begin(); provider_it != m_GlyphProviders.end(); ++provider_it)
+		{
+			IGlyphProvider* provider = *provider_it;
+
+			int score = provider->GetMatchScore(a_Size, a_Weight, a_Style);
+			if (score >= score_highest)
+			{
+				match = provider;
+				score_highest = score;
 			}
 		}
 
