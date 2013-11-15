@@ -547,7 +547,7 @@ public:
 		m_Request.SetFamilyName("Mathilde");
 		m_Request.SetSize(60.0f);
 
-		m_FontFace = m_Library->RequestFace(m_Request);
+		m_FontFace = m_Library->RequestFontFace(m_Request);
 		m_TextField->SetFont(m_FontFace);
 
 		return true;
@@ -686,7 +686,7 @@ private:
 			{
 				m_Request.SetSize(m_Request.GetSize() - 1.0f);
 
-				m_FontFace = m_Library->RequestFace(m_Request);
+				m_FontFace = m_Library->RequestFontFace(m_Request);
 				m_TextField->SetFont(m_FontFace);
 
 			} break;
@@ -695,7 +695,7 @@ private:
 			{
 				m_Request.SetSize(m_Request.GetSize() + 1.0f);
 
-				m_FontFace = m_Library->RequestFace(m_Request);
+				m_FontFace = m_Library->RequestFontFace(m_Request);
 				m_TextField->SetFont(m_FontFace);
 
 			} break;

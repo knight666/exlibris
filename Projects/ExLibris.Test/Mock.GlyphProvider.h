@@ -138,6 +138,9 @@ namespace ExLibris
 			}
 
 			FontMetrics metrics;
+			metrics.family = m_Family;
+			metrics.weight = m_Weight;
+			metrics.style = m_Style;
 			metrics.size = a_Size;
 			metrics.line_height = a_Size * 1.5f;
 			metrics.ascent = a_Size / 2.0f;

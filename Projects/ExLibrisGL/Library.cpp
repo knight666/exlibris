@@ -182,7 +182,7 @@ namespace ExLibris
 		}
 	}
 
-	FontFace* Library::RequestFace(const FaceRequest& a_Request)
+	FontFace* Library::RequestFontFace(const FaceRequest& a_Request)
 	{
 		Family* family = nullptr;
 		if (a_Request.HasFamilyName())
@@ -198,7 +198,7 @@ namespace ExLibris
 		{
 			std::stringstream ss;
 			ss << "Could not find family named \"" << a_Request.GetFamilyName() << "\".";
-			EXL_THROW("Library::RequestFace", ss.str().c_str());
+			EXL_THROW("Library::RequestFontFace", ss.str().c_str());
 
 			return nullptr;
 		}
@@ -220,7 +220,7 @@ namespace ExLibris
 		{
 			std::stringstream ss;
 			ss << "Could not find font with specified weight and style.";
-			EXL_THROW("Library::RequestFace", ss.str().c_str());
+			EXL_THROW("Library::RequestFontFace", ss.str().c_str());
 
 			return nullptr;
 		}
@@ -241,12 +241,69 @@ namespace ExLibris
 		{
 			std::stringstream ss;
 			ss << "Could not create face of size " << options.size << ".";
-			EXL_THROW("Library::RequestFace", ss.str().c_str());
+			EXL_THROW("Library::RequestFontFace", ss.str().c_str());
 
 			return nullptr;
 		}
 
 		return face;
+	}
+
+	Face* Library::RequestFace(const FaceRequest& a_Request)
+	{
+		Family* family = nullptr;
+		if (a_Request.HasFamilyName())
+		{
+			family = FindFamily(a_Request.GetFamilyName());
+
+			if (family == nullptr)
+			{
+				std::stringstream ss;
+				ss << "Could not find family named \"" << a_Request.GetFamilyName() << "\".";
+				EXL_THROW("Library::RequestFace", ss.str().c_str());
+
+				return nullptr;
+			}
+		}
+		else
+		{
+			family = FindFamily("System");
+
+			if (family == nullptr)
+			{
+				std::stringstream ss;
+				ss << "Could not find system font family.";
+				EXL_THROW("Library::RequestFace", ss.str().c_str());
+
+				return nullptr;
+			}
+		}
+
+		Weight weight = eWeight_Normal;
+		if (a_Request.HasWeight())
+		{
+			weight = a_Request.GetWeight();
+		}
+
+		Style style = eStyle_None;
+		if (a_Request.HasStyle())
+		{
+			style = a_Request.GetStyle();
+		}
+
+		float size = 10.0f;
+		if (a_Request.HasSize())
+		{
+			size = a_Request.GetSize();
+		}
+
+		IGlyphProvider* provider = family->FindGlyphProvider(size, weight, style);
+		if (provider == nullptr)
+		{
+			return nullptr;
+		}
+
+		return provider->CreateFace(size);
 	}
 
 }; // namespace ExLibris

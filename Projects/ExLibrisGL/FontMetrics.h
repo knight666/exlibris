@@ -40,6 +40,8 @@ namespace ExLibris
 
 		FontMetrics()
 			: family(nullptr)
+			, weight(eWeight_Normal)
+			, style(eStyle_None)
 			, size(0.0f)
 			, line_height(0.0f)
 			, ascent(0.0f)
@@ -48,6 +50,8 @@ namespace ExLibris
 		}
 
 		Family* family;
+		Weight weight;
+		Style style;
 		float size;
 		float line_height;
 		float ascent;

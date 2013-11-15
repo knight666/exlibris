@@ -39,6 +39,10 @@ namespace ExLibris
 
 		Family* GetFamily() const;
 
+		Weight GetWeight() const;
+
+		Style GetStyle() const;
+
 		float GetSize() const;
 		float GetLineHeight() const;
 		float GetAscent() const;

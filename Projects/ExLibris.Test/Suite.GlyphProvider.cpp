@@ -1,6 +1,7 @@
 #include "ExLibris.Test.PCH.h"
 
 #include <Face.h>
+#include <Family.h>
 #include <Library.h>
 
 #include "Mock.GlyphProvider.h"
@@ -209,7 +210,8 @@ TEST(GlyphProvider, CreateFace)
 	Face* face = provider->CreateFace(66.0f);
 	ASSERT_NE(nullptr, face);
 
-	EXPECT_EQ(nullptr, face->GetFamily());
+	ASSERT_NE(nullptr, face->GetFamily());
+	EXPECT_STREQ("MockFamily", face->GetFamily()->GetName().c_str());
 	EXPECT_FLOAT_EQ(66.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(66.0f * 1.5f, face->GetLineHeight());
 	EXPECT_FLOAT_EQ(66.0f / 2.0f, face->GetAscent());

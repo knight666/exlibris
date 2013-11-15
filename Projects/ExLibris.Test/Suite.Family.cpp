@@ -236,7 +236,7 @@ TEST(Family, FindGlyphProviderMatchWeightButNotStyle)
 	fam->AddGlyphProvider(provider_second);
 
 	IGlyphProvider* found = fam->FindGlyphProvider(55.68f, eWeight_Bold, eStyle_Italicized);
-	EXPECT_EQ(provider_second, found);
+	EXPECT_EQ(provider_first, found);
 }
 
 TEST(Family, FindGlyphProviderMatchStyleButNotWeight)

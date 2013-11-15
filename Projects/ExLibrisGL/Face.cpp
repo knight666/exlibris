@@ -77,6 +77,16 @@ namespace ExLibris
 		return m_Metrics.family;
 	}
 
+	Weight Face::GetWeight() const
+	{
+		return m_Metrics.weight;
+	}
+
+	Style Face::GetStyle() const
+	{
+		return m_Metrics.style;
+	}
+
 	float Face::GetSize() const
 	{
 		return m_Metrics.size;

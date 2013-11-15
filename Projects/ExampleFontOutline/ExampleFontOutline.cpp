@@ -410,7 +410,7 @@ public:
 			m_Request.SetWeight(exl::eWeight_Normal);
 			m_Request.SetStyle(exl::eStyle_None);
 
-			m_Face = m_Library->RequestFace(m_Request);
+			m_Face = m_Library->RequestFontFace(m_Request);
 		}
 		timer.End();
 
@@ -552,7 +552,7 @@ private:
 						m_Request.SetWeight(exl::eWeight_Normal);
 					}
 
-					m_Face = m_Library->RequestFace(m_Request);
+					m_Face = m_Library->RequestFontFace(m_Request);
 					
 					m_TextLayout->SetFontFace(m_Face);
 					m_TextLayout->Accept(*m_OutlineVisitor);
@@ -573,7 +573,7 @@ private:
 						m_Request.SetStyle(exl::eStyle_None);
 					}
 
-					m_Face = m_Library->RequestFace(m_Request);
+					m_Face = m_Library->RequestFontFace(m_Request);
 					
 					m_TextLayout->SetFontFace(m_Face);
 					m_TextLayout->Accept(*m_OutlineVisitor);
