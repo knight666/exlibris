@@ -97,6 +97,11 @@ namespace ExLibris
 		return m_Metrics.descent;
 	}
 
+	size_t Face::GetGlyphMetricsLoaded() const
+	{
+		return m_GlyphMetrics.size();
+	}
+
 	GlyphMetrics* Face::GetGlyphMetrics(int a_Codepoint)
 	{
 		std::map<int, GlyphMetrics*>::iterator found = m_GlyphMetrics.find(a_Codepoint);
@@ -114,6 +119,11 @@ namespace ExLibris
 		}
 	}
 
+	size_t Face::GetGlyphBitmapsLoaded() const
+	{
+		return m_GlyphBitmaps.size();
+	}
+
 	GlyphBitmap* Face::GetGlyphBitmap(int a_Codepoint)
 	{
 		std::map<int, GlyphBitmap*>::iterator found = m_GlyphBitmaps.find(a_Codepoint);
@@ -129,6 +139,11 @@ namespace ExLibris
 
 			return bitmap;
 		}
+	}
+
+	size_t Face::GetGlyphOutlinesLoaded() const
+	{
+		return m_GlyphOutlines.size();
 	}
 
 	CurvePath* Face::GetGlyphOutline(int a_Codepoint)
