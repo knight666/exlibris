@@ -21,6 +21,10 @@ namespace ExLibris
 		MockGlyphProvider(Library* a_Library)
 			: IGlyphProvider(a_Library)
 		{
+			if (m_Library != nullptr)
+			{
+				m_Family = m_Library->CreateFamily("MockFamily");
+			}
 		}
 
 		void SetWeight(Weight a_Weight)

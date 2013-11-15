@@ -32,6 +32,7 @@ namespace ExLibris
 	class FontFace;
 	class IFont;
 	class IFontLoader;
+	class IGlyphProvider;
 }
 
 namespace ExLibris
@@ -50,6 +51,9 @@ namespace ExLibris
 
 		IFont* LoadFont(const std::string& a_Path);
 		IFont* LoadFont(std::istream& a_Stream);
+
+		bool MapFontToFile(const std::string& a_Path) const;
+		bool MapFontToStream(std::istream& a_Stream) const;
 
 		size_t GetFamilyCount() const;
 		Family* CreateFamily(const std::string& a_Name);

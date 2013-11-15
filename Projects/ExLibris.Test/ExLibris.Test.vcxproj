@@ -89,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="ExLibris.Test.PCH.h" />
     <ClInclude Include="Mock.Font.h" />
+    <ClInclude Include="Mock.FontLoader.h" />
     <ClInclude Include="Mock.GlyphProvider.h" />
     <ClInclude Include="Mock.MeshVisitor.h" />
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
