@@ -90,7 +90,7 @@ TEST_F(FontFaceContext, FindGlyph)
 	EXPECT_EQ(25, glyph->index);
 	ASSERT_NE(nullptr, glyph->metrics);
 	EXPECT_FLOAT_EQ(18.0f, glyph->metrics->advance);
-	EXPECT_VEC2_EQ(2.0f, 19.0f, glyph->metrics->offset);
+	EXPECT_VEC2_EQ(2.0f, -24.0f, glyph->metrics->offset);
 	EXPECT_VEC2_EQ(2.0625000f, 19.0f, glyph->metrics->bounding_box.GetMinimum());
 	EXPECT_VEC2_EQ(16.859375f, 42.0f, glyph->metrics->bounding_box.GetMaximum());
 }
@@ -104,7 +104,7 @@ TEST_F(FontFaceContext, FindGlyphOutline)
 	EXPECT_EQ(5, glyph->outline->GetCommandCount());
 
 	EXPECT_EQ(5, glyph->outline->GetPositionCount());
-	EXPECT_VEC2_EQ(8.2031250f, -8.5937500f, glyph->outline->GetPosition(0));
+	EXPECT_VEC2_EQ(7.65625f, 2.40625f, glyph->outline->GetPosition(0));
 }
 
 TEST_F(FontFaceContext, FindGlyphNotFound)

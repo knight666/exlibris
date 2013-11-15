@@ -28,6 +28,7 @@
 
 namespace ExLibris
 {
+	class Face;
 	class Family;
 	class FontFace;
 	class IFont;
@@ -59,7 +60,9 @@ namespace ExLibris
 		Family* CreateFamily(const std::string& a_Name);
 		Family* FindFamily(const std::string& a_Name) const;
 
-		FontFace* RequestFace(const FaceRequest& a_Request);
+		FontFace* RequestFontFace(const FaceRequest& a_Request);
+
+		Face* RequestFace(const FaceRequest& a_Request);
 
 	private:
 

@@ -69,7 +69,7 @@ TEST(Library, FindFamilyNotFound)
 	ASSERT_EQ(nullptr, fam);
 }
 
-TEST(Library, RequestFace)
+TEST(Library, RequestFontFace)
 {
 	Library* lib = new Library;
 
@@ -80,18 +80,18 @@ TEST(Library, RequestFace)
 	fr.SetFamilyName("Roboto");
 	fr.SetSize(16.0f);
 
-	FontFace* face = lib->RequestFace(fr);
+	FontFace* face = lib->RequestFontFace(fr);
 	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
 	EXPECT_STREQ("Roboto", face->GetFamily()->GetName().c_str());
 }
 
-TEST(Library, RequestFaceEmpty)
+TEST(Library, RequestFontFaceEmpty)
 {
 	Library* lib = new Library;
 
 	FaceRequest fr;
 
-	FontFace* face = lib->RequestFace(fr);
+	FontFace* face = lib->RequestFontFace(fr);
 	EXPECT_STREQ("System", face->GetFamily()->GetName().c_str());
 	EXPECT_FLOAT_EQ(12.0f, face->GetSize());
 }
@@ -106,7 +106,7 @@ TEST(Library, RequestFaceFamilyNotFound)
 	FontFace* face = nullptr;
 	
 	EXPECT_THROW({
-		face = lib->RequestFace(fr);
+		face = lib->RequestFontFace(fr);
 	}, Exception);
 
 	EXPECT_EQ(nullptr, face);
@@ -125,7 +125,7 @@ TEST(Library, RequestFaceFontNotFound)
 	FontFace* face = nullptr;
 	
 	EXPECT_THROW({
-		face = lib->RequestFace(fr);
+		face = lib->RequestFontFace(fr);
 	}, Exception);
 
 	EXPECT_EQ(nullptr, face);
@@ -174,4 +174,38 @@ TEST_F(LibraryFontMappingContext, FailedToMapFont)
 
 	std::stringstream ss;
 	EXPECT_FALSE(library->MapFontToStream(ss));
+}
+
+TEST_F(LibraryFontMappingContext, RequestFace)
+{
+	std::stringstream ss;
+	EXPECT_TRUE(library->MapFontToStream(ss));
+
+	FaceRequest fr;
+	fr.SetFamilyName("MockFamily");
+	fr.SetSize(16.0f);
+	fr.SetWeight(eWeight_Normal);
+	fr.SetStyle(eStyle_None);
+
+	Face* face = library->RequestFace(fr);
+
+	ASSERT_NE(nullptr, face->GetFamily());
+	EXPECT_STREQ("MockFamily", face->GetFamily()->GetName().c_str());
+	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
+	EXPECT_FLOAT_EQ(16.0f * 1.5f, face->GetLineHeight());
+	EXPECT_FLOAT_EQ(16.0f / 2.0f, face->GetAscent());
+	EXPECT_FLOAT_EQ(-(16.0f / 3.0f), face->GetDescent());
+}
+
+TEST_F(LibraryFontMappingContext, RequestFaceFamilyNotFound)
+{
+	std::stringstream ss;
+	EXPECT_TRUE(library->MapFontToStream(ss));
+
+	FaceRequest fr;
+	fr.SetFamilyName("AwesomeBro");
+
+	EXPECT_THROW({
+		Face* face = library->RequestFace(fr);
+	}, Exception);
 }

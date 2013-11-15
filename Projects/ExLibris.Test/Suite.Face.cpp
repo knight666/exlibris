@@ -47,6 +47,8 @@ TEST_F(FaceContext, Construct)
 {
 	ASSERT_NE(nullptr, face->GetFamily());
 	EXPECT_STREQ("MockFamily", face->GetFamily()->GetName().c_str());
+	EXPECT_EQ(eWeight_Normal, face->GetWeight());
+	EXPECT_EQ(eStyle_None, face->GetStyle());
 	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
 	EXPECT_FLOAT_EQ(18.0f, face->GetLineHeight());
 	EXPECT_FLOAT_EQ(12.0f, face->GetAscent());

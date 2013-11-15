@@ -32,7 +32,7 @@ namespace Framework
 		ExLibris::FaceRequest request;
 		request.SetFamilyName("System");
 
-		m_Font = m_Library->RequestFace(request);
+		m_Font = m_Library->RequestFontFace(request);
 
 		m_RenderStateText = RenderCommandText::CreateRenderState();
 		m_RenderStateLines = RenderCommandLines::CreateRenderState();

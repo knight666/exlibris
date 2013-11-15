@@ -363,6 +363,8 @@ namespace ExLibris
 
 		FontMetrics metrics;
 		metrics.family = m_Family;
+		metrics.weight = m_Weight;
+		metrics.style = m_Style;
 		metrics.size = a_Size;
 		metrics.line_height = Fixed26Dot6::ToFloat(m_Face->size->metrics.height);
 		metrics.ascent = Fixed26Dot6::ToFloat(m_Face->size->metrics.ascender);
