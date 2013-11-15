@@ -80,6 +80,27 @@ namespace ExLibris
 			return m_Style;
 		}
 
+		int GetMatchScore(float a_Size, Weight a_Weight, Style a_Style) const
+		{
+			if (!IsSizeAvailable(a_Size))
+			{
+				return -1;
+			}
+
+			int score = 0;
+
+			if (GetStyle() == a_Style)
+			{
+				score += 10;
+			}
+			if (GetWeight() == a_Weight)
+			{
+				score += 100;
+			}
+
+			return score;
+		}
+
 	public:
 
 		virtual bool HasKerning() const = 0;
