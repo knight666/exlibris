@@ -532,6 +532,7 @@ public:
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 		m_Library->MapFontToFile("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Library->MapFontToFile("Fonts/00_starmap/00.fon");
 
 		try
 		{
@@ -546,8 +547,8 @@ public:
 		m_TextField = new TextField(m_Library, m_ProgramEffects);
 		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
 		
-		m_Request.SetFamilyName("Roboto");
-		m_Request.SetSize(16.0f);
+		m_Request.SetFamilyName("00 Starmap");
+		m_Request.SetSize(8.0f);
 
 		m_Face = m_Library->RequestFace(m_Request);
 		m_TextField->SetFont(m_Face);

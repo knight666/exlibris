@@ -242,15 +242,15 @@ namespace ExLibris
 		{
 			EXL_FT_THROW("GlyphProviderFreetype::CreateBitmap", errors);
 
-			return false;
+			return nullptr;
 		}
 
 		FT_Bitmap& glyph_bitmap = m_Face->glyph->bitmap;
-
+	
 		unsigned int bitmap_size = glyph_bitmap.width * glyph_bitmap.rows * 4;
 		if (bitmap_size == 0)
 		{
-			return false;
+			return nullptr;
 		}
 
 		GlyphBitmap* bitmap = new GlyphBitmap;
@@ -264,25 +264,67 @@ namespace ExLibris
 		unsigned char* dst_line = bitmap->data;
 		unsigned int dst_pitch = glyph_bitmap.width * 4;
 
-		for (int y = 0; y < glyph_bitmap.rows; ++y)
+		if (glyph_bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
 		{
-			unsigned char* src = src_line;
-			unsigned char* dst = dst_line;
-
-			for (int x = 0; x < glyph_bitmap.width; ++x)
+			for (int y = 0; y < glyph_bitmap.rows; ++y)
 			{
-				char value = *src;
-				dst[0] = value;
-				dst[1] = value;
-				dst[2] = value;
-				dst[3] = value;
+				unsigned char* src = src_line;
+				unsigned char* dst = dst_line;
 
-				dst += 4;
-				src++;
+				for (int x = 0; x < glyph_bitmap.width; ++x)
+				{
+					char value = *src;
+					dst[0] = value;
+					dst[1] = value;
+					dst[2] = value;
+					dst[3] = value;
+
+					dst += 4;
+					src++;
+				}
+
+				src_line += src_pitch;
+				dst_line += dst_pitch;
 			}
+		}
+		else if (glyph_bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+		{
+			for (int y = 0; y < glyph_bitmap.rows; ++y)
+			{
+				int mask = 0x80;
 
-			src_line += src_pitch;
-			dst_line += dst_pitch;
+				unsigned char* src = src_line;
+				unsigned char* dst = dst_line;
+
+				for (int x = 0; x < glyph_bitmap.width; ++x)
+				{
+					char value = ((*src & mask) == mask) ? 0xFF : 0x00;
+					dst[0] = value;
+					dst[1] = value;
+					dst[2] = value;
+					dst[3] = value;
+
+					dst += 4;
+
+					mask >>= 1;
+					if (mask <= 0)
+					{
+						mask = 0x80;
+						src++;
+					}
+				}
+
+				src_line += src_pitch;
+				dst_line += dst_pitch;
+			}
+		}
+		else
+		{
+			std::stringstream ss;
+			ss << "Unhandled bitmap type: " << glyph_bitmap.pixel_mode << std::endl;
+			EXL_THROW("GlyphProviderFreetype::CreateBitmap", ss.str().c_str());
+
+			return nullptr;
 		}
 
 		return bitmap;
