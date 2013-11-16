@@ -62,7 +62,7 @@ namespace ExLibris
 
 		FontFace* RequestFontFace(const FaceRequest& a_Request);
 
-		Face* RequestFace(const FaceRequest& a_Request);
+		Face* RequestFace(const FaceRequest& a_Request) const;
 
 	private:
 

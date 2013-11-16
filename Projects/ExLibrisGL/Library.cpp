@@ -252,7 +252,7 @@ namespace ExLibris
 		return face;
 	}
 
-	Face* Library::RequestFace(const FaceRequest& a_Request)
+	Face* Library::RequestFace(const FaceRequest& a_Request) const
 	{
 		Family* family = nullptr;
 		if (a_Request.HasFamilyName())
@@ -271,15 +271,6 @@ namespace ExLibris
 		else
 		{
 			family = FindFamily("System");
-
-			if (family == nullptr)
-			{
-				std::stringstream ss;
-				ss << "Could not find system font family.";
-				EXL_THROW("Library::RequestFace", ss.str().c_str());
-
-				return nullptr;
-			}
 		}
 
 		Weight weight = eWeight_Normal;
