@@ -52,7 +52,7 @@ namespace ExLibris
 		TextCharacter()
 			: type(eType_End)
 			, identifier(0)
-			, glyph(nullptr)
+			, metrics(nullptr)
 			, x(0.0f)
 			, advance(0.0f)
 		{
@@ -60,7 +60,7 @@ namespace ExLibris
 
 		Type type;
 		unsigned int identifier;
-		const Glyph* glyph;
+		GlyphMetrics* metrics;
 		float x;
 		float advance;
 		BoundingBox bounding_box;
