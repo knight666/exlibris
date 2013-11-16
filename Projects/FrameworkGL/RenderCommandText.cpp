@@ -157,7 +157,7 @@ namespace Framework
 		m_RenderCorrection.y = -m_Font->GetAscender();
 
 		m_Layout = new ExLibris::TextLayout;
-		m_Layout->SetFontFace(m_Font);
+		//m_Layout->SetFontFace(m_Font);
 	}
 	
 	RenderCommandText::~RenderCommandText()
