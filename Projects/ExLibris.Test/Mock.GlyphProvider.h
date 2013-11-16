@@ -52,12 +52,21 @@ namespace ExLibris
 			return (size_blacklist.find(a_Size) == size_blacklist.end());
 		}
 
-		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint)
+		unsigned int GetIndexForCodepoint(int a_CodepointUtf32)
 		{
-			if (
-				!IsSizeAvailable(a_Size) ||
-				codepoint_blacklist.find(a_Codepoint) != codepoint_blacklist.end()
-			)
+			if (codepoint_blacklist.find(a_CodepointUtf32) != codepoint_blacklist.end())
+			{
+				return EXL_INVALID_INDEX;
+			}
+			else
+			{
+				return (unsigned int)a_CodepointUtf32;
+			}
+		}
+
+		GlyphMetrics* CreateMetrics(float a_Size, unsigned int a_Index)
+		{
+			if (EXL_IS_INDEX_INVALID(a_Index) || !IsSizeAvailable(a_Size))
 			{
 				return nullptr;
 			}
@@ -74,12 +83,9 @@ namespace ExLibris
 			return metrics;
 		}
 
-		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint)
+		GlyphBitmap* CreateBitmap(float a_Size, unsigned int a_Index)
 		{
-			if (
-				!IsSizeAvailable(a_Size) ||
-				codepoint_blacklist.find(a_Codepoint) != codepoint_blacklist.end()
-			)
+			if (EXL_IS_INDEX_INVALID(a_Index) || !IsSizeAvailable(a_Size))
 			{
 				return nullptr;
 			}
@@ -92,12 +98,9 @@ namespace ExLibris
 			return bitmap;
 		}
 
-		CurvePath* CreateOutline(float a_Size, int a_Codepoint)
+		CurvePath* CreateOutline(float a_Size, unsigned int a_Index)
 		{
-			if (
-				!IsSizeAvailable(a_Size) ||
-				codepoint_blacklist.find(a_Codepoint) != codepoint_blacklist.end()
-			)
+			if (EXL_IS_INDEX_INVALID(a_Index) || !IsSizeAvailable(a_Size))
 			{
 				return nullptr;
 			}
@@ -113,13 +116,9 @@ namespace ExLibris
 			return outline;
 		}
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext)
 		{
-			if (
-				!IsSizeAvailable(a_Size) ||
-				codepoint_blacklist.find(a_CodepointCurrent) != codepoint_blacklist.end() ||
-				codepoint_blacklist.find(a_CodepointNext) != codepoint_blacklist.end()
-			)
+			if (EXL_IS_INDEX_INVALID(a_IndexCurrent) || EXL_IS_INDEX_INVALID(a_IndexNext) || !IsSizeAvailable(a_Size))
 			{
 				return nullptr;
 			}

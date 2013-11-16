@@ -52,9 +52,30 @@ TEST_F(GlyphProviderSystemContext, SizeAvailable)
 	EXPECT_TRUE(provider->IsSizeAvailable(136.551f));
 }
 
+TEST_F(GlyphProviderSystemContext, GetIndexForCodepoint)
+{
+	unsigned int index = provider->GetIndexForCodepoint((int)'H');
+	EXPECT_EQ((int)'H' - 32, index);
+}
+
+TEST_F(GlyphProviderSystemContext, GetIndexForCodepointOutOfLowerBounds)
+{
+	unsigned int index = provider->GetIndexForCodepoint(14);
+	EXPECT_EQ(95, index);
+}
+
+TEST_F(GlyphProviderSystemContext, GetIndexForCodepointOutOfUpperBounds)
+{
+	unsigned int index = provider->GetIndexForCodepoint(215);
+	EXPECT_EQ(95, index);
+}
+
 TEST_F(GlyphProviderSystemContext, CreateMetrics)
 {
-	GlyphMetrics* metrics = provider->CreateMetrics(12.0f, (int)'&');
+	unsigned int index = provider->GetIndexForCodepoint((int)'&');
+	EXPECT_INDEX_VALID(index);
+
+	GlyphMetrics* metrics = provider->CreateMetrics(12.0f, index);
 	ASSERT_NE(nullptr, metrics);
 
 	EXPECT_FLOAT_EQ(8.0f, metrics->advance);
@@ -76,7 +97,10 @@ TEST_F(GlyphProviderSystemContext, CreateMetricsNotFound)
 
 TEST_F(GlyphProviderSystemContext, CreateBitmap)
 {
-	GlyphBitmap* bitmap = provider->CreateBitmap(24.0f, 87);
+	unsigned int index = provider->GetIndexForCodepoint(87);
+	EXPECT_INDEX_VALID(index);
+
+	GlyphBitmap* bitmap = provider->CreateBitmap(24.0f, index);
 	ASSERT_NE(nullptr, bitmap);
 
 	EXPECT_EQ(8, bitmap->width);
@@ -94,14 +118,23 @@ TEST_F(GlyphProviderSystemContext, CreateBitmapNotFound)
 
 TEST_F(GlyphProviderSystemContext, CreateOutline)
 {
-	CurvePath* outline = provider->CreateOutline(6.78f, 117);
+	unsigned int index = provider->GetIndexForCodepoint(117);
+	EXPECT_INDEX_VALID(index);
+
+	CurvePath* outline = provider->CreateOutline(6.78f, index);
 	ASSERT_EQ(nullptr, outline);
 }
 
 TEST_F(GlyphProviderSystemContext, GetKerningAdjustment)
 {
+	unsigned int index_current = provider->GetIndexForCodepoint(117);
+	EXPECT_INDEX_VALID(index_current);
+
+	unsigned int index_next = provider->GetIndexForCodepoint(45);
+	EXPECT_INDEX_VALID(index_next);
+
 	glm::vec2 adjustment;
-	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 43.1f, 117, 45));
+	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 43.1f, index_current, index_next));
 }
 
 TEST_F(GlyphProviderSystemContext, CreateFace)

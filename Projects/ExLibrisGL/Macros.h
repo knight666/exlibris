@@ -24,51 +24,7 @@
 
 #pragma once
 
-#include "FontLoaderFreetype.h"
-#include "IGlyphProvider.h"
+// Glyph indices
 
-namespace ExLibris
-{
-
-	class GlyphProviderFreetype
-		: public IGlyphProvider
-	{
-
-	public:
-
-		GlyphProviderFreetype(Library* a_Library, FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
-		~GlyphProviderFreetype();
-
-		bool HasKerning() const;
-		bool IsScalable() const;
-		bool IsSizeAvailable(float a_Size) const;
-
-		unsigned int GetIndexForCodepoint(int a_CodepointUtf32);
-
-		GlyphMetrics* CreateMetrics(float a_Size, unsigned int a_Index);
-		GlyphBitmap* CreateBitmap(float a_Size, unsigned int a_Index);
-		CurvePath* CreateOutline(float a_Size, unsigned int a_Index);
-
-		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext);
-
-		Face* CreateFace(float a_Size);
-
-	private:
-
-		bool _SetSize(float a_Size);
-		bool _LoadGlyph(unsigned int a_Index);
-
-	private:
-
-		FT_Face m_Face;
-		FT_Byte* m_Buffer;
-		size_t m_BufferSize;
-
-		FT_F26Dot6 m_SizeLoaded;
-		FT_UInt m_GlyphLoaded;
-
-		FT_Outline_Funcs m_OutlineCallbacks;
-
-	}; // class GlyphProviderFreetype
-
-}; // namespace ExLibris
+#define EXL_INVALID_INDEX             0x7FFFFFFF
+#define EXL_IS_INDEX_INVALID(_index)  ((_index) == EXL_INVALID_INDEX)
