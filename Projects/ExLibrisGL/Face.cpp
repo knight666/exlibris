@@ -121,8 +121,14 @@ namespace ExLibris
 		}
 		else
 		{
-			GlyphMetrics* metrics = m_Provider.CreateMetrics(m_Metrics.size, a_Codepoint);
-			
+			GlyphMetrics* metrics = nullptr;
+
+			unsigned int index = m_Provider.GetIndexForCodepoint(a_Codepoint);
+			if (index != EXL_INVALID_INDEX)
+			{
+				metrics = m_Provider.CreateMetrics(m_Metrics.size, index);
+			}
+
 			m_GlyphMetrics.insert(std::make_pair(a_Codepoint, metrics));
 
 			return metrics;
@@ -143,7 +149,13 @@ namespace ExLibris
 		}
 		else
 		{
-			GlyphBitmap* bitmap = m_Provider.CreateBitmap(m_Metrics.size, a_Codepoint);
+			GlyphBitmap* bitmap = nullptr;
+
+			unsigned int index = m_Provider.GetIndexForCodepoint(a_Codepoint);
+			if (index != EXL_INVALID_INDEX)
+			{
+				bitmap = m_Provider.CreateBitmap(m_Metrics.size, index);
+			}
 
 			m_GlyphBitmaps.insert(std::make_pair(a_Codepoint, bitmap));
 
@@ -165,7 +177,13 @@ namespace ExLibris
 		}
 		else
 		{
-			CurvePath* outline = m_Provider.CreateOutline(m_Metrics.size, a_Codepoint);
+			CurvePath* outline = nullptr;
+			
+			unsigned int index = m_Provider.GetIndexForCodepoint(a_Codepoint);
+			if (index != EXL_INVALID_INDEX)
+			{
+				outline = m_Provider.CreateOutline(m_Metrics.size, index);
+			}
 
 			m_GlyphOutlines.insert(std::make_pair(a_Codepoint, outline));
 
@@ -175,7 +193,15 @@ namespace ExLibris
 
 	bool Face::TryGetKerningAdjustment(glm::vec2& a_Adjustment, int a_CodepointCurrent, int a_CodepointNext)
 	{
-		return m_Provider.TryGetKerningAdjustment(a_Adjustment, m_Metrics.size, a_CodepointCurrent, a_CodepointNext);
+		unsigned int index_current = m_Provider.GetIndexForCodepoint(a_CodepointCurrent);
+		unsigned int index_next = m_Provider.GetIndexForCodepoint(a_CodepointNext);
+
+		if (EXL_IS_INDEX_INVALID(index_current) || EXL_IS_INDEX_INVALID(index_next))
+		{
+			return false;
+		}
+
+		return m_Provider.TryGetKerningAdjustment(a_Adjustment, m_Metrics.size, index_current, index_next);
 	}
 
 }; // namespace ExLibris

@@ -166,9 +166,16 @@ namespace ExLibris
 		}
 	}
 
-	GlyphMetrics* GlyphProviderFreetype::CreateMetrics(float a_Size, int a_Codepoint)
+	unsigned int GlyphProviderFreetype::GetIndexForCodepoint(int a_CodepointUtf32)
 	{
-		if (!_SetSize(a_Size) || !_LoadGlyph(a_Codepoint))
+		unsigned int index = (unsigned int)FT_Get_Char_Index(m_Face, (FT_ULong)a_CodepointUtf32);
+		
+		return ((index == 0) ? EXL_INVALID_INDEX : index);
+	}
+
+	GlyphMetrics* GlyphProviderFreetype::CreateMetrics(float a_Size, unsigned int a_Index)
+	{
+		if (EXL_IS_INDEX_INVALID(a_Index) || !_SetSize(a_Size) || !_LoadGlyph(a_Index))
 		{
 			return nullptr;
 		}
@@ -221,9 +228,9 @@ namespace ExLibris
 		return metrics;
 	}
 
-	GlyphBitmap* GlyphProviderFreetype::CreateBitmap(float a_Size, int a_Codepoint)
+	GlyphBitmap* GlyphProviderFreetype::CreateBitmap(float a_Size, unsigned int a_Index)
 	{
-		if (!_SetSize(a_Size) || !_LoadGlyph(a_Codepoint))
+		if (EXL_IS_INDEX_INVALID(a_Index) || !_SetSize(a_Size) || !_LoadGlyph(a_Index))
 		{
 			return nullptr;
 		}
@@ -281,9 +288,9 @@ namespace ExLibris
 		return bitmap;
 	}
 
-	CurvePath* GlyphProviderFreetype::CreateOutline(float a_Size, int a_Codepoint)
+	CurvePath* GlyphProviderFreetype::CreateOutline(float a_Size, unsigned int a_Index)
 	{
-		if (!IsScalable() || !_SetSize(a_Size) || !_LoadGlyph(a_Codepoint))
+		if (EXL_IS_INDEX_INVALID(a_Index) || !IsScalable() || !_SetSize(a_Size) || !_LoadGlyph(a_Index))
 		{
 			return nullptr;
 		}
@@ -317,26 +324,24 @@ namespace ExLibris
 		return target.outline;
 	}
 
-	bool GlyphProviderFreetype::TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
+	bool GlyphProviderFreetype::TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext)
 	{
-		if (!HasKerning() || !_SetSize(a_Size))
+		if (EXL_IS_INDEX_INVALID(a_IndexCurrent) || EXL_IS_INDEX_INVALID(a_IndexNext) || !HasKerning() || !_SetSize(a_Size))
 		{
 			return false;
 		}
 
 		FT_Error errors = 0;
 
-		FT_UInt index_current = FT_Get_Char_Index(m_Face, (FT_ULong)a_CodepointCurrent);
-		FT_UInt index_next = FT_Get_Char_Index(m_Face, (FT_ULong)a_CodepointNext);
-
-		if (index_current == 0 || index_next == 0)
-		{
-			return false;
-		}
-
 		FT_Vector kerning_fixed;
 
-		errors = FT_Get_Kerning(m_Face, index_current, index_next, FT_KERNING_DEFAULT, &kerning_fixed);
+		errors = FT_Get_Kerning(
+			m_Face,
+			(FT_UInt)a_IndexCurrent,
+			(FT_UInt)a_IndexNext,
+			FT_KERNING_DEFAULT,
+			&kerning_fixed
+		);
 		if (errors != FT_Err_Ok)
 		{
 			return false;
@@ -404,19 +409,13 @@ namespace ExLibris
 		return true;
 	}
 
-	bool GlyphProviderFreetype::_LoadGlyph(int a_Codepoint)
+	bool GlyphProviderFreetype::_LoadGlyph(unsigned int a_Index)
 	{
 		FT_Error errors = 0;
 
-		FT_UInt requested_index = FT_Get_Char_Index(m_Face, (FT_ULong)a_Codepoint);
-		if (requested_index == 0)
+		if (a_Index != m_GlyphLoaded)
 		{
-			return false;
-		}
-
-		if (requested_index != m_GlyphLoaded)
-		{
-			errors = FT_Load_Glyph(m_Face, requested_index, FT_LOAD_DEFAULT);
+			errors = FT_Load_Glyph(m_Face, (FT_UInt)a_Index, FT_LOAD_DEFAULT);
 			if (errors != FT_Err_Ok)
 			{
 				EXL_FT_THROW("FontProviderFreetype::_LoadGlyph", errors);
@@ -424,7 +423,7 @@ namespace ExLibris
 				return false;
 			}
 
-			m_GlyphLoaded = requested_index;
+			m_GlyphLoaded = (FT_UInt)a_Index;
 		}
 
 		return true;

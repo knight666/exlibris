@@ -165,7 +165,19 @@ namespace ExLibris
 		return true;
 	}
 
-	GlyphMetrics* GlyphProviderSystem::CreateMetrics(float a_Size, int a_Codepoint)
+	unsigned int GlyphProviderSystem::GetIndexForCodepoint(int a_CodepointUtf32)
+	{
+		if (a_CodepointUtf32 < 32 || a_CodepointUtf32 > 127)
+		{
+			return 95;
+		}
+		else
+		{
+			return (unsigned int)(a_CodepointUtf32 - 32);
+		}
+	}
+
+	GlyphMetrics* GlyphProviderSystem::CreateMetrics(float a_Size, unsigned int a_Index)
 	{
 		GlyphMetrics* metrics = new GlyphMetrics;
 		metrics->advance = 8.0f;
@@ -177,18 +189,21 @@ namespace ExLibris
 		return metrics;
 	}
 
-	GlyphBitmap* GlyphProviderSystem::CreateBitmap(float a_Size, int a_Codepoint)
+	GlyphBitmap* GlyphProviderSystem::CreateBitmap(float a_Size, unsigned int a_Index)
 	{
-		int bitmap_index = _GetIndexFromCodepoint(a_Codepoint) - 32;
+		if (a_Index > 95)
+		{
+			a_Index = 95;
+		}
 
 		GlyphBitmap* bitmap = new GlyphBitmap;
 		bitmap->width = 8;
 		bitmap->height = 12;
 		bitmap->data = new unsigned char[bitmap->width * bitmap->height * 4];
 
-		unsigned int encoded_upper  = s_GlyphBitmapsEncoded[bitmap_index * 3];
-		unsigned int encoded_middle = s_GlyphBitmapsEncoded[bitmap_index * 3 + 1];
-		unsigned int encoded_lower  = s_GlyphBitmapsEncoded[bitmap_index * 3 + 2];
+		unsigned int encoded_upper  = s_GlyphBitmapsEncoded[a_Index * 3];
+		unsigned int encoded_middle = s_GlyphBitmapsEncoded[a_Index * 3 + 1];
+		unsigned int encoded_lower  = s_GlyphBitmapsEncoded[a_Index * 3 + 2];
 
 		unsigned int dst_pitch = bitmap->width * 4;
 		unsigned int* dst_upper  = (unsigned int*)(bitmap->data);
@@ -214,12 +229,12 @@ namespace ExLibris
 		return bitmap;
 	}
 
-	CurvePath* GlyphProviderSystem::CreateOutline(float a_Size, int a_Codepoint)
+	CurvePath* GlyphProviderSystem::CreateOutline(float a_Size, unsigned int a_Index)
 	{
 		return nullptr;
 	}
 
-	bool GlyphProviderSystem::TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext)
+	bool GlyphProviderSystem::TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext)
 	{
 		return false;
 	}
@@ -237,18 +252,5 @@ namespace ExLibris
 
 		return new Face(*this, metrics);
 	}
-
-	int GlyphProviderSystem::_GetIndexFromCodepoint(int a_CodepointUtf32)
-	{
-		if (a_CodepointUtf32 < 32 || a_CodepointUtf32 > 127)
-		{
-			return 127;
-		}
-		else
-		{
-			return a_CodepointUtf32;
-		}
-	}
-
 
 }; // namespace ExLibris

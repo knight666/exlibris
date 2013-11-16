@@ -37,16 +37,18 @@ namespace ExLibris
 	
 		GlyphProviderSystem(Library* a_Library);
 		~GlyphProviderSystem();
-	
+
 		bool HasKerning() const;
 		bool IsScalable() const;
 		bool IsSizeAvailable(float a_Size) const;
 
-		GlyphMetrics* CreateMetrics(float a_Size, int a_Codepoint);
-		GlyphBitmap* CreateBitmap(float a_Size, int a_Codepoint);
-		CurvePath* CreateOutline(float a_Size, int a_Codepoint);
+		unsigned int GetIndexForCodepoint(int a_CodepointUtf32);
 
-		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, int a_CodepointCurrent, int a_CodepointNext);
+		GlyphMetrics* CreateMetrics(float a_Size, unsigned int a_Index);
+		GlyphBitmap* CreateBitmap(float a_Size, unsigned int a_Index);
+		CurvePath* CreateOutline(float a_Size, unsigned int a_Index);
+
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext);
 
 		Face* CreateFace(float a_Size);
 

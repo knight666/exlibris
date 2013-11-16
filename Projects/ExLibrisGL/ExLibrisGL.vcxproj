@@ -131,6 +131,7 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineMeshOptions.h" />
     <ClInclude Include="LineShape.h" />
+    <ClInclude Include="Macros.h" />
     <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />

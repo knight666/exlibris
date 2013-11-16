@@ -61,8 +61,6 @@ protected:
 	Library* library;
 	GlyphProviderFreetype* provider;
 
-	std::string font_path;
-
 	FT_Library library_freetype;
 
 };
@@ -87,9 +85,24 @@ TEST_F(GlyphProviderFreetypeContext, SizeAvailableNegative)
 	EXPECT_TRUE(provider->IsSizeAvailable(-33.9f));
 }
 
+TEST_F(GlyphProviderFreetypeContext, GetIndexForCodepoint)
+{
+	unsigned int index = provider->GetIndexForCodepoint((int)'y');
+	EXPECT_INDEX_VALID(index);
+}
+
+TEST_F(GlyphProviderFreetypeContext, GetIndexForCodepointNotFound)
+{
+	unsigned int index = provider->GetIndexForCodepoint(3300);
+	EXPECT_INDEX_INVALID(index);
+}
+
 TEST_F(GlyphProviderFreetypeContext, CreateMetrics)
 {
-	GlyphMetrics* metrics = provider->CreateMetrics(24.0f, (int)'A');
+	unsigned int index = provider->GetIndexForCodepoint((int)'A');
+	EXPECT_INDEX_VALID(index);
+
+	GlyphMetrics* metrics = provider->CreateMetrics(24.0f, index);
 	ASSERT_NE(nullptr, metrics);
 
 	EXPECT_FLOAT_EQ(17.0f, metrics->advance);
@@ -100,13 +113,19 @@ TEST_F(GlyphProviderFreetypeContext, CreateMetrics)
 
 TEST_F(GlyphProviderFreetypeContext, CreateMetricsNotFound)
 {
-	GlyphMetrics* metrics = provider->CreateMetrics(16.7f, 0x0200);
+	unsigned int index = provider->GetIndexForCodepoint(0x0200);
+	EXPECT_INDEX_INVALID(index);
+
+	GlyphMetrics* metrics = provider->CreateMetrics(16.7f, index);
 	EXPECT_EQ(nullptr, metrics);
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateBitmap)
 {
-	GlyphBitmap* bitmap = provider->CreateBitmap(18.0f, (int)'0');
+	unsigned int index = provider->GetIndexForCodepoint((int)'0');
+	EXPECT_INDEX_VALID(index);
+
+	GlyphBitmap* bitmap = provider->CreateBitmap(18.0f, index);
 	ASSERT_NE(nullptr, bitmap);
 
 	EXPECT_EQ(6, bitmap->width);
@@ -115,13 +134,19 @@ TEST_F(GlyphProviderFreetypeContext, CreateBitmap)
 
 TEST_F(GlyphProviderFreetypeContext, CreateBitmapNotFound)
 {
-	GlyphBitmap* bitmap = provider->CreateBitmap(44.2f, 0x03FF);
+	unsigned int index = provider->GetIndexForCodepoint(0x03FF);
+	EXPECT_INDEX_INVALID(index);
+
+	GlyphBitmap* bitmap = provider->CreateBitmap(44.2f, index);
 	EXPECT_EQ(nullptr, bitmap);
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateOutline)
 {
-	CurvePath* outline = provider->CreateOutline(12.0f, (int)'-');
+	unsigned int index = provider->GetIndexForCodepoint((int)'-');
+	EXPECT_INDEX_VALID(index);
+
+	CurvePath* outline = provider->CreateOutline(12.0f, index);
 	ASSERT_NE(nullptr, outline);
 
 	EXPECT_EQ(23, outline->GetPositionCount());
@@ -130,28 +155,49 @@ TEST_F(GlyphProviderFreetypeContext, CreateOutline)
 
 TEST_F(GlyphProviderFreetypeContext, CreateOutlineNotFound)
 {
-	CurvePath* outline = provider->CreateOutline(24.6f, 0x1FFF);
+	unsigned int index = provider->GetIndexForCodepoint(0x1FFF);
+	EXPECT_INDEX_INVALID(index);
+
+	CurvePath* outline = provider->CreateOutline(24.6f, index);
 	EXPECT_EQ(nullptr, outline);
 }
 
 TEST_F(GlyphProviderFreetypeContext, GetKerningAdjustment)
 {
+	unsigned int index_current = provider->GetIndexForCodepoint((int)'D');
+	EXPECT_INDEX_VALID(index_current);
+
+	unsigned int index_next = provider->GetIndexForCodepoint((int)'a');
+	EXPECT_INDEX_VALID(index_next);
+
 	glm::vec2 adjustment;
-	EXPECT_TRUE(provider->TryGetKerningAdjustment(adjustment, 24.0f, (int)'D', (int)'a'));
+	EXPECT_TRUE(provider->TryGetKerningAdjustment(adjustment, 24.0f, index_current, index_next));
 
 	EXPECT_VEC2_EQ(-1.0f, 0.0f, adjustment);
 }
 
 TEST_F(GlyphProviderFreetypeContext, GetKerningAdjustmentNone)
 {
+	unsigned int index_current = provider->GetIndexForCodepoint((int)' ');
+	EXPECT_INDEX_VALID(index_current);
+
+	unsigned int index_next = provider->GetIndexForCodepoint((int)'!');
+	EXPECT_INDEX_VALID(index_next);
+
 	glm::vec2 adjustment;
-	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 16.0f, (int)' ', (int)'!'));
+	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 16.0f, index_current, index_next));
 }
 
 TEST_F(GlyphProviderFreetypeContext, GetKerningAdjustmentNotFound)
 {
+	unsigned int index_current = provider->GetIndexForCodepoint(0x2000);
+	EXPECT_INDEX_INVALID(index_current);
+
+	unsigned int index_next = provider->GetIndexForCodepoint((int)'Q');
+	EXPECT_INDEX_VALID(index_next);
+
 	glm::vec2 adjustment;
-	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 55.0f, 0x2000, (int)'Q'));
+	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 55.0f, index_current, index_next));
 }
 
 TEST_F(GlyphProviderFreetypeContext, CreateFace)
@@ -201,9 +247,24 @@ TEST_F(GlyphProviderFreetypeBitmapFontContext, SizeNotAvailable)
 	EXPECT_FALSE(provider->IsSizeAvailable(32.3f));
 }
 
+TEST_F(GlyphProviderFreetypeBitmapFontContext, GetIndexForCodepoint)
+{
+	unsigned int index = provider->GetIndexForCodepoint(56);
+	EXPECT_INDEX_VALID(index);
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, GetIndexForCodepointNotFound)
+{
+	unsigned int index = provider->GetIndexForCodepoint(0x889);
+	EXPECT_INDEX_INVALID(index);
+}
+
 TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateMetrics)
 {
-	GlyphMetrics* metrics = provider->CreateMetrics(8.0f, (int)'Z');
+	unsigned int index = provider->GetIndexForCodepoint((int)'Z');
+	EXPECT_INDEX_VALID(index);
+
+	GlyphMetrics* metrics = provider->CreateMetrics(8.0f, index);
 	ASSERT_NE(nullptr, metrics);
 
 	EXPECT_FLOAT_EQ(7.0f, metrics->advance);
@@ -214,13 +275,19 @@ TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateMetrics)
 
 TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateMetricsNotFound)
 {
-	GlyphMetrics* metrics = provider->CreateMetrics(8.0f, 1444);
+	unsigned int index = provider->GetIndexForCodepoint(1444);
+	EXPECT_INDEX_INVALID(index);
+
+	GlyphMetrics* metrics = provider->CreateMetrics(8.0f, index);
 	EXPECT_EQ(nullptr, metrics);
 }
 
 TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateBitmap)
 {
-	GlyphBitmap* bitmap = provider->CreateBitmap(8.0f, (int)'@');
+	unsigned int index = provider->GetIndexForCodepoint((int)'@');
+	EXPECT_INDEX_VALID(index);
+
+	GlyphBitmap* bitmap = provider->CreateBitmap(8.0f, index);
 	ASSERT_NE(nullptr, bitmap);
 
 	EXPECT_EQ(8, bitmap->width);
@@ -229,12 +296,30 @@ TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateBitmap)
 
 TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateBitmapNotFound)
 {
-	GlyphBitmap* bitmap = provider->CreateBitmap(8.0f, 0x2000);
+	unsigned int index = provider->GetIndexForCodepoint(0x2000);
+	EXPECT_INDEX_INVALID(index);
+
+	GlyphBitmap* bitmap = provider->CreateBitmap(8.0f, index);
 	EXPECT_EQ(nullptr, bitmap);
 }
 
 TEST_F(GlyphProviderFreetypeBitmapFontContext, CreateOutline)
 {
-	CurvePath* outline = provider->CreateOutline(8.0f, (int)'7');
+	unsigned int index = provider->GetIndexForCodepoint((int)'7');
+	EXPECT_INDEX_VALID(index);
+
+	CurvePath* outline = provider->CreateOutline(8.0f, index);
 	EXPECT_EQ(nullptr, outline);
+}
+
+TEST_F(GlyphProviderFreetypeBitmapFontContext, GetKerningAdjustment)
+{
+	unsigned int index_current = provider->GetIndexForCodepoint(125);
+	EXPECT_INDEX_VALID(index_current);
+
+	unsigned int index_next = provider->GetIndexForCodepoint(44);
+	EXPECT_INDEX_VALID(index_next);
+
+	glm::vec2 adjustment;
+	EXPECT_FALSE(provider->TryGetKerningAdjustment(adjustment, 8.0f, index_current, index_next));
 }
