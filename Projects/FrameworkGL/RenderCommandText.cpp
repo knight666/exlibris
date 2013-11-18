@@ -284,7 +284,7 @@ namespace Framework
 	{
 		glm::vec2 texture_position = a_Character->bounding_box.GetMinimum() + m_TextureCorrection;
 
-		ExLibris::GlyphBitmap* bitmap = m_Face->GetGlyphBitmap(a_Character->identifier);
+		ExLibris::GlyphBitmap* bitmap = m_Face->CreateBitmap(a_Character->identifier);
 		if (bitmap == nullptr)
 		{
 			return;

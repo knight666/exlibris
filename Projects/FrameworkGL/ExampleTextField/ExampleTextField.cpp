@@ -411,7 +411,7 @@ private:
 	{
 		glm::vec2 texture_position = a_Character->bounding_box.GetMinimum() + m_TextureCorrection;
 
-		exl::GlyphBitmap* bitmap = m_Font->GetGlyphBitmap(a_Character->identifier);
+		exl::GlyphBitmap* bitmap = m_Font->CreateBitmap(a_Character->identifier);
 		if (bitmap != nullptr)
 		{
 			unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
