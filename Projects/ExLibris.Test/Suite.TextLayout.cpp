@@ -604,7 +604,7 @@ TEST(TextLayout, AcceptVisitorOneGlyph)
 	EXPECT_EQ(63, visitor.lines[0]->width);
 
 	ASSERT_EQ(1, visitor.glyphs.size());
-	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[0]->metrics);
 	EXPECT_FLOAT_EQ(0.0f, visitor.glyphs[0]->x);
 	EXPECT_FLOAT_EQ(63.0f, visitor.glyphs[0]->advance);
 }
@@ -624,13 +624,13 @@ TEST(TextLayout, AcceptVisitorFixedFontText)
 	EXPECT_EQ(189, visitor.lines[0]->width);
 
 	ASSERT_EQ(3, visitor.glyphs.size());
-	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[0]->metrics);
 	EXPECT_FLOAT_EQ(0.0f, visitor.glyphs[0]->x);
 	EXPECT_FLOAT_EQ(63.0f, visitor.glyphs[0]->advance);
-	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[1]->metrics);
 	EXPECT_FLOAT_EQ(63.0f, visitor.glyphs[1]->x);
 	EXPECT_FLOAT_EQ(63.0f, visitor.glyphs[1]->advance);
-	EXPECT_TRUE(visitor.glyphs[2]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[2]->metrics);
 	EXPECT_FLOAT_EQ(126.0f, visitor.glyphs[2]->x);
 	EXPECT_FLOAT_EQ(63.0f, visitor.glyphs[2]->advance);
 }
@@ -650,13 +650,13 @@ TEST(TextLayout, AcceptVisitorDynamicFontText)
 	EXPECT_EQ(GetTextGlyphWidth("ACK"), visitor.lines[0]->width);
 
 	ASSERT_EQ(3, visitor.glyphs.size());
-	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[0]->metrics);
 	EXPECT_FLOAT_EQ(0.0f, visitor.glyphs[0]->x);
 	EXPECT_FLOAT_EQ(65.0f, visitor.glyphs[0]->advance);
-	EXPECT_TRUE(visitor.glyphs[1]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[1]->metrics);
 	EXPECT_FLOAT_EQ(65.0f, visitor.glyphs[1]->x);
 	EXPECT_FLOAT_EQ(67.0f, visitor.glyphs[1]->advance);
-	EXPECT_TRUE(visitor.glyphs[2]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[2]->metrics);
 	EXPECT_FLOAT_EQ(132.0f, visitor.glyphs[2]->x);
 	EXPECT_FLOAT_EQ(75.0f, visitor.glyphs[2]->advance);
 }
@@ -676,16 +676,16 @@ TEST(TextLayout, AcceptVisitorKerningFontText)
 	EXPECT_FLOAT_EQ(10.0f + 0.0f + 10.0f + 0.0f + 10.0f + -4.0f + 10.0f, visitor.lines[0]->width);
 
 	ASSERT_EQ(4, visitor.glyphs.size());
-	EXPECT_TRUE(visitor.glyphs[0]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[0]->metrics);
 	EXPECT_FLOAT_EQ(0.0f, visitor.glyphs[0]->x);
 	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[0]->advance);
-	EXPECT_TRUE(visitor.glyphs[1]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[1]->metrics);
 	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[1]->x);
 	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[1]->advance);
-	EXPECT_TRUE(visitor.glyphs[2]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[2]->metrics);
 	EXPECT_FLOAT_EQ(20.0f, visitor.glyphs[2]->x);
 	EXPECT_FLOAT_EQ(6.0f, visitor.glyphs[2]->advance);
-	EXPECT_TRUE(visitor.glyphs[3]->glyph != nullptr);
+	EXPECT_NE(nullptr, visitor.glyphs[3]->metrics);
 	EXPECT_FLOAT_EQ(26.0f, visitor.glyphs[3]->x);
 	EXPECT_FLOAT_EQ(10.0f, visitor.glyphs[3]->advance);
 }
