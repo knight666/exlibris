@@ -37,10 +37,6 @@ namespace ExLibris
 		, m_Weight(eWeight_Normal)
 		, m_Style(eStyle_None)
 	{
-		if (m_Family != nullptr)
-		{
-			m_Family->AddFont(this);
-		}
 	}
 	
 	IFont::~IFont()

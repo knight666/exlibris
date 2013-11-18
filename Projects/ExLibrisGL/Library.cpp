@@ -218,7 +218,7 @@ namespace ExLibris
 			style = a_Request.GetStyle();
 		}
 
-		IFont* font = family->FindFont(weight, style);
+		IFont* font = nullptr; //family->FindFont(weight, style);
 		if (font == nullptr)
 		{
 			std::stringstream ss;
