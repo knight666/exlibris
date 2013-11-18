@@ -9,22 +9,14 @@ using namespace ExLibris;
 
 // helper functions
 
-#define TEST_GLYPH_ADD(_glyph) { \
-	Glyph* glyph = new Glyph; \
-	glyph->index = (unsigned int)_glyph; \
-	glyph->metrics = new GlyphMetrics; \
-	glyph->metrics->advance = (float)_glyph; \
-	face->AddGlyph(glyph); \
-}
-
-#define TEST_ADD_PROVIDER_GLYPH(_glyph) { \
+#define TEST_ADD_METRICS(_glyph) { \
 	provider->use_glyph_metrics = true; \
 	GlyphMetrics metrics; \
 	metrics.advance = (float)_glyph; \
 	provider->glyph_metrics.insert(std::make_pair(_glyph, metrics)); \
 }
 
-#define TEST_ADD_PROVIDER_KERNINGPAIR(_current, _next, _adjustment) { \
+#define TEST_ADD_KERNINGPAIR(_current, _next, _adjustment) { \
 	provider->use_kerning_pairs = true; \
 	MockGlyphProvider::KerningPair pair; \
 	pair.index_left = _current; \
@@ -40,7 +32,7 @@ Face* CreateFixedWidthFace()
 	provider->use_font_metrics = true;
 	provider->font_metrics.line_height = 20.0f;
 
-	TEST_ADD_PROVIDER_GLYPH('?');
+	TEST_ADD_METRICS('?');
 
 	return provider->CreateFace(20.0f);
 }
@@ -52,33 +44,33 @@ Face* CreateDynamicWidthFace()
 	provider->use_font_metrics = true;
 	provider->font_metrics.line_height = 20.0f;
 
-	TEST_ADD_PROVIDER_GLYPH('A');
-	TEST_ADD_PROVIDER_GLYPH('B');
-	TEST_ADD_PROVIDER_GLYPH('C');
-	TEST_ADD_PROVIDER_GLYPH('D');
-	TEST_ADD_PROVIDER_GLYPH('E');
-	TEST_ADD_PROVIDER_GLYPH('F');
-	TEST_ADD_PROVIDER_GLYPH('G');
-	TEST_ADD_PROVIDER_GLYPH('H');
-	TEST_ADD_PROVIDER_GLYPH('I');
-	TEST_ADD_PROVIDER_GLYPH('J');
-	TEST_ADD_PROVIDER_GLYPH('K');
-	TEST_ADD_PROVIDER_GLYPH('L');
-	TEST_ADD_PROVIDER_GLYPH('M');
-	TEST_ADD_PROVIDER_GLYPH('N');
-	TEST_ADD_PROVIDER_GLYPH('O');
-	TEST_ADD_PROVIDER_GLYPH('P');
-	TEST_ADD_PROVIDER_GLYPH('Q');
-	TEST_ADD_PROVIDER_GLYPH('R');
-	TEST_ADD_PROVIDER_GLYPH('S');
-	TEST_ADD_PROVIDER_GLYPH('T');
-	TEST_ADD_PROVIDER_GLYPH('U');
-	TEST_ADD_PROVIDER_GLYPH('V');
-	TEST_ADD_PROVIDER_GLYPH('W');
-	TEST_ADD_PROVIDER_GLYPH('X');
-	TEST_ADD_PROVIDER_GLYPH('Y');
-	TEST_ADD_PROVIDER_GLYPH('Z');
-	TEST_ADD_PROVIDER_GLYPH(' ');
+	TEST_ADD_METRICS('A');
+	TEST_ADD_METRICS('B');
+	TEST_ADD_METRICS('C');
+	TEST_ADD_METRICS('D');
+	TEST_ADD_METRICS('E');
+	TEST_ADD_METRICS('F');
+	TEST_ADD_METRICS('G');
+	TEST_ADD_METRICS('H');
+	TEST_ADD_METRICS('I');
+	TEST_ADD_METRICS('J');
+	TEST_ADD_METRICS('K');
+	TEST_ADD_METRICS('L');
+	TEST_ADD_METRICS('M');
+	TEST_ADD_METRICS('N');
+	TEST_ADD_METRICS('O');
+	TEST_ADD_METRICS('P');
+	TEST_ADD_METRICS('Q');
+	TEST_ADD_METRICS('R');
+	TEST_ADD_METRICS('S');
+	TEST_ADD_METRICS('T');
+	TEST_ADD_METRICS('U');
+	TEST_ADD_METRICS('V');
+	TEST_ADD_METRICS('W');
+	TEST_ADD_METRICS('X');
+	TEST_ADD_METRICS('Y');
+	TEST_ADD_METRICS('Z');
+	TEST_ADD_METRICS(' ');
 
 	return provider->CreateFace(20.0f);
 }
@@ -90,13 +82,13 @@ Face* CreateKerningFace()
 	provider->use_font_metrics = true;
 	provider->font_metrics.line_height = 20.0f;
 
-	TEST_ADD_PROVIDER_GLYPH('x');
-	TEST_ADD_PROVIDER_GLYPH('y');
-	TEST_ADD_PROVIDER_GLYPH('z');
+	TEST_ADD_METRICS('x');
+	TEST_ADD_METRICS('y');
+	TEST_ADD_METRICS('z');
 
-	TEST_ADD_PROVIDER_KERNINGPAIR('x', 'x', glm::vec2(2.0f, 0.0f));
-	TEST_ADD_PROVIDER_KERNINGPAIR('x', 'y', glm::vec2(-4.0f, 0.0f));
-	TEST_ADD_PROVIDER_KERNINGPAIR('y', 'x', glm::vec2(5.0f, 0.0f));
+	TEST_ADD_KERNINGPAIR('x', 'x', glm::vec2(2.0f, 0.0f));
+	TEST_ADD_KERNINGPAIR('x', 'y', glm::vec2(-4.0f, 0.0f));
+	TEST_ADD_KERNINGPAIR('y', 'x', glm::vec2(5.0f, 0.0f));
 
 	return provider->CreateFace(20.0f);
 }
