@@ -2,7 +2,6 @@
 
 #include <TextLayout.h>
 
-#include "Mock.Font.h"
 #include "Mock.GlyphProvider.h"
 #include "Mock.TextLayoutVisitor.h"
 
