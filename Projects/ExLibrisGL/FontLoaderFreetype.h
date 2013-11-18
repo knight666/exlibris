@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include "FontFreetype.h"
 #include "FreetypeErrors.h"
 #include "IFontLoader.h"
 
@@ -41,8 +40,6 @@ namespace ExLibris
 		~FontLoaderFreetype();
 
 		FT_Library GetFreetypeLibrary() const;
-
-		IFont* LoadFont(std::istream& a_Stream);
 
 		IGlyphProvider* LoadGlyphProvider(std::istream& a_Stream);
 	
