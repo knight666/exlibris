@@ -27,7 +27,6 @@
 #include "IFont.h"
 
 #include "Family.h"
-#include "FontFace.h"
 
 namespace ExLibris
 {

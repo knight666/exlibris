@@ -31,7 +31,6 @@
 namespace ExLibris
 {
 	class Family;
-	class FontFace;
 }
 
 namespace ExLibris
@@ -54,8 +53,6 @@ namespace ExLibris
 		void SetStyle(Style a_Style);
 
 		virtual unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const = 0;
-
-		virtual FontFace* CreateFace(const FaceOptions& a_Options) = 0;
 
 	protected:
 
