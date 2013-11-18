@@ -25,7 +25,7 @@
 #pragma once
 
 #include "Alignment.h"
-#include "FontFace.h"
+#include "Face.h"
 #include "ITextLayoutVisitor.h"
 #include "SizePolicy.h"
 #include "TextCharacter.h"
@@ -49,9 +49,9 @@ namespace ExLibris
 	
 		TextLayout();
 		~TextLayout();
-	
-		FontFace* GetFontFace() const;
-		void SetFontFace(FontFace* a_Face);
+
+		Face* GetFace() const;
+		void SetFace(Face* a_Face);
 
 		const std::string& GetText() const;
 		void SetText(const std::string& a_Text);
@@ -69,6 +69,8 @@ namespace ExLibris
 
 		const glm::vec2& GetDimensions() const;
 
+		const BoundingBox& GetBoundingBox() const;
+
 		void Layout();
 
 		std::vector<TextLine*> GetLines() const;
@@ -77,7 +79,7 @@ namespace ExLibris
 
 	private:
 
-		std::vector<unsigned int> _AsciiToUtf32(const std::string& a_Text);
+		std::vector<int> _AsciiToUtf32(const std::string& a_Text);
 		void _ConvertTextToGlyphs();
 		void _ConvertGlyphsToLines();
 		void _WordWrappingNone(bool a_WidthFixed, bool a_HeightFixed);
@@ -90,13 +92,14 @@ namespace ExLibris
 
 	private:
 
-		FontFace* m_Face;
+		Face* m_Face;
 		std::string m_Text;
 
 		std::vector<TextCharacter*> m_Glyphs;
 		bool m_GlyphsDirty;
 
 		TextCharacter* m_GlyphSpace;
+		GlyphMetrics* m_MetricsSpace;
 
 		std::vector<TextLine*> m_Lines;
 		TextLine* m_LineCurrent;

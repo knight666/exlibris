@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include <set>
-
-#include "IFont.h"
+#include "Style.h"
+#include "Weight.h"
 
 namespace ExLibris
 {
+	class IGlyphProvider;
 	class Library;
 };
 
@@ -48,16 +48,15 @@ namespace ExLibris
 
 		const std::string& GetName() const;
 
-		size_t GetFontCount() const;
-
-		void AddFont(IFont* a_Font);
-		IFont* FindFont(Weight a_Weight, Style a_Style) const;
+		size_t GetGlyphProviderCount() const;
+		void AddGlyphProvider(IGlyphProvider* a_Provider);
+		IGlyphProvider* FindGlyphProvider(float a_Size, Weight a_Weight, Style a_Style) const;
 
 	private:
 
 		Library* m_Library;
 		std::string m_Name;
-		std::set<IFont*> m_Fonts;
+		std::set<IGlyphProvider*> m_GlyphProviders;
 	
 	}; // class Family
 

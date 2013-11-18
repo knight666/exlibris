@@ -76,16 +76,15 @@
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FaceRequest.cpp" />
     <ClCompile Include="Family.cpp" />
-    <ClCompile Include="FontFace.cpp" />
-    <ClCompile Include="FontFreetype.cpp" />
+    <ClCompile Include="Face.cpp" />
     <ClCompile Include="FontLoaderFreetype.cpp" />
     <ClCompile Include="ExLibrisGL.PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="FontSystem.cpp" />
+    <ClCompile Include="GlyphProviderFreetype.cpp" />
     <ClCompile Include="FreetypeErrors.cpp" />
-    <ClCompile Include="IFont.cpp" />
+    <ClCompile Include="GlyphProviderSystem.cpp" />
     <ClCompile Include="CurvePath.cpp" />
     <ClCompile Include="Library.cpp" />
     <ClCompile Include="Line.cpp" />
@@ -101,28 +100,29 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="CurveSettings.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="Face.h" />
     <ClInclude Include="FaceOptions.h" />
     <ClInclude Include="FaceRequest.h" />
     <ClInclude Include="Family.h" />
-    <ClInclude Include="FontFace.h" />
-    <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
-    <ClInclude Include="FontSystem.h" />
+    <ClInclude Include="FontMetrics.h" />
+    <ClInclude Include="GlyphProviderFreetype.h" />
     <ClInclude Include="FreetypeConversion.h" />
     <ClInclude Include="FreetypeErrors.h" />
-    <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />
-    <ClInclude Include="IFont.h" />
+    <ClInclude Include="GlyphProviderSystem.h" />
     <ClInclude Include="CurvePath.h" />
     <ClInclude Include="IFontLoader.h" />
+    <ClInclude Include="IGlyphProvider.h" />
     <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="Library.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineMeshOptions.h" />
     <ClInclude Include="LineShape.h" />
+    <ClInclude Include="Macros.h" />
     <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />

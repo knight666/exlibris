@@ -69,11 +69,14 @@
     </ClCompile>
     <ClCompile Include="Suite.BoundingBox.cpp" />
     <ClCompile Include="Suite.CurvePath.cpp" />
+    <ClCompile Include="Suite.Face.cpp" />
     <ClCompile Include="Suite.FaceRequest.cpp" />
     <ClCompile Include="Suite.Family.cpp" />
     <ClCompile Include="Suite.FreetypeErrors.cpp" />
+    <ClCompile Include="Suite.GlyphProvider.cpp" />
+    <ClCompile Include="Suite.GlyphProviderFreetype.cpp" />
+    <ClCompile Include="Suite.GlyphProviderSystem.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
-    <ClCompile Include="Suite.FontFace.cpp" />
     <ClCompile Include="Suite.FontLoading.cpp" />
     <ClCompile Include="Suite.Library.cpp" />
     <ClCompile Include="Suite.Line.cpp" />
@@ -85,7 +88,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExLibris.Test.PCH.h" />
-    <ClInclude Include="Mock.Font.h" />
+    <ClInclude Include="Mock.FontLoader.h" />
+    <ClInclude Include="Mock.GlyphProvider.h" />
     <ClInclude Include="Mock.MeshVisitor.h" />
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
   </ItemGroup>

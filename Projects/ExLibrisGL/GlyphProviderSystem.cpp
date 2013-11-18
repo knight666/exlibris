@@ -24,10 +24,12 @@
 
 #include "ExLibrisGL.PCH.h"
 
-#include "FontSystem.h"
+#include "GlyphProviderSystem.h"
 
-#include "BoundingBox.h"
-#include "FontFace.h"
+#include "CurvePath.h"
+#include "Face.h"
+#include "GlyphBitmap.h"
+#include "GlyphMetrics.h"
 #include "Library.h"
 
 namespace ExLibris
@@ -135,63 +137,65 @@ namespace ExLibris
 		0x7E424242, 0x42424242, 0x4242427E, /* invalid */
 	};
 
-	FontSystem::FontSystem(Family* a_Family)
-		: IFont(a_Family)
-		, m_Face(nullptr)
+	GlyphProviderSystem::GlyphProviderSystem(Library* a_Library)
+		: IGlyphProvider(a_Library)
 	{
-	}
-	
-	FontSystem::~FontSystem()
-	{
-		if (m_Face != nullptr)
+		if (m_Library != nullptr)
 		{
-			delete m_Face;
+			m_Family = m_Library->CreateFamily("System");
 		}
 	}
+	
+	GlyphProviderSystem::~GlyphProviderSystem()
+	{
+	}
 
-	unsigned int FontSystem::GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const
+	bool GlyphProviderSystem::HasKerning() const
+	{
+		return false;
+	}
+
+	bool GlyphProviderSystem::IsScalable() const
+	{
+		return false;
+	}
+
+	bool GlyphProviderSystem::IsSizeAvailable(float a_Size) const
+	{
+		return true;
+	}
+
+	unsigned int GlyphProviderSystem::GetIndexForCodepoint(int a_CodepointUtf32)
 	{
 		if (a_CodepointUtf32 < 32 || a_CodepointUtf32 > 127)
 		{
-			return 127;
+			return 95;
 		}
 		else
 		{
-			return a_CodepointUtf32;
+			return (unsigned int)(a_CodepointUtf32 - 32);
 		}
 	}
 
-	FontFace* FontSystem::CreateFace(const FaceOptions& a_Options)
+	GlyphMetrics* GlyphProviderSystem::CreateMetrics(float a_Size, unsigned int a_Index)
 	{
-		if (m_Face == nullptr)
+		GlyphMetrics* metrics = new GlyphMetrics;
+		metrics->advance = 8.0f;
+		metrics->bounding_box = BoundingBox(
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(8.0f, 12.0f)
+		);
+
+		return metrics;
+	}
+
+	GlyphBitmap* GlyphProviderSystem::CreateBitmap(float a_Size, unsigned int a_Index)
+	{
+		if (a_Index > 95)
 		{
-			m_Face = new FontFace(this);
-			m_Face->SetSize(12.0f);
-			m_Face->SetLineHeight(16.0f);
-
-			BoundingBox glyph_bounding_box(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 12.0f));
-
-			for (unsigned int index = 32; index < 128; ++index)
-			{
-				Glyph* glyph = new Glyph;
-
-				glyph->index = index;
-
-				glyph->metrics = new GlyphMetrics;
-				glyph->metrics->advance = 8;
-				glyph->metrics->bounding_box = glyph_bounding_box;
-
-				glyph->bitmap = _DecodeBitmap(index - 32);
-
-				m_Face->AddGlyph(glyph);
-			}
+			a_Index = 95;
 		}
 
-		return m_Face;
-	}
-
-	GlyphBitmap* FontSystem::_DecodeBitmap(unsigned int a_Index) const
-	{
 		GlyphBitmap* bitmap = new GlyphBitmap;
 		bitmap->width = 8;
 		bitmap->height = 12;
@@ -223,6 +227,30 @@ namespace ExLibris
 		}
 
 		return bitmap;
+	}
+
+	CurvePath* GlyphProviderSystem::CreateOutline(float a_Size, unsigned int a_Index)
+	{
+		return nullptr;
+	}
+
+	bool GlyphProviderSystem::TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext)
+	{
+		return false;
+	}
+
+	Face* GlyphProviderSystem::CreateFace(float a_Size)
+	{
+		FontMetrics metrics;
+		metrics.family = m_Family;
+		metrics.weight = m_Weight;
+		metrics.style = m_Style;
+		metrics.size = 12.0f;
+		metrics.line_height = 16.0f;
+		metrics.ascent = 0.0f;
+		metrics.descent = 0.0f;
+
+		return new Face(*this, metrics);
 	}
 
 }; // namespace ExLibris

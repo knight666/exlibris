@@ -24,59 +24,38 @@
 
 #pragma once
 
-#include <map>
-
-#include "Glyph.h"
-
-namespace ExLibris
-{
-	class Family;
-	class IFont;
-}
+#include "IGlyphProvider.h"
 
 namespace ExLibris
 {
 
-	class FontFace
+	class GlyphProviderSystem
+		: public IGlyphProvider
 	{
 	
 	public:
 	
-		FontFace(const IFont* a_Font);
-		~FontFace();
-	
-		const IFont* GetFont() const;
+		GlyphProviderSystem(Library* a_Library);
+		~GlyphProviderSystem();
 
-		Family* GetFamily() const;
+		bool HasKerning() const;
+		bool IsScalable() const;
+		bool IsSizeAvailable(float a_Size) const;
 
-		float GetSize() const;
-		void SetSize(float a_Size);
+		unsigned int GetIndexForCodepoint(int a_CodepointUtf32);
 
-		float GetLineHeight() const;
-		void SetLineHeight(float a_LineHeight);
+		GlyphMetrics* CreateMetrics(float a_Size, unsigned int a_Index);
+		GlyphBitmap* CreateBitmap(float a_Size, unsigned int a_Index);
+		CurvePath* CreateOutline(float a_Size, unsigned int a_Index);
 
-		float GetAscender() const;
-		void SetAscender(float a_Ascender);
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext);
 
-		float GetDescender() const;
-		void SetDescender(float a_Descender);
-
-		size_t GetGlyphCount() const;
-
-		bool AddGlyph(Glyph* a_Glyph);
-		Glyph* FindGlyph(unsigned int a_CodepointUtf32) const;
-
-		bool TryGetKerning(Glyph* a_Left, Glyph* a_Right, glm::vec2& a_Target) const;
+		Face* CreateFace(float a_Size);
 
 	private:
 
-		const IFont* m_Font;
-		float m_Size;
-		float m_LineHeight;
-		float m_Ascender;
-		float m_Descender;
-		std::map<unsigned int, Glyph*> m_Glyphs;
+		int _GetIndexFromCodepoint(int a_CodepointUtf32);
 	
-	}; // class FontFace
+	}; // class GlyphProviderSystem
 
 }; // namespace ExLibris

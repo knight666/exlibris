@@ -9,9 +9,8 @@
 
 // ExLibris
 
-#include <FontFace.h>
+#include <Face.h>
 #include <Library.h>
-#include <IFont.h>
 #include <TextLayout.h>
 
 // Framework
@@ -23,7 +22,7 @@ namespace Framework
 
 	DebugHelper::DebugHelper(ExLibris::Library* a_Library)
 		: m_Library(a_Library)
-		, m_Font(nullptr)
+		, m_Face(nullptr)
 		, m_RenderStateText(nullptr)
 		, m_RenderStateLines(nullptr)
 		, m_Color(1.0f, 1.0f, 1.0f, 1.0f)
@@ -32,7 +31,7 @@ namespace Framework
 		ExLibris::FaceRequest request;
 		request.SetFamilyName("System");
 
-		m_Font = m_Library->RequestFace(request);
+		m_Face = m_Library->RequestFace(request);
 
 		m_RenderStateText = RenderCommandText::CreateRenderState();
 		m_RenderStateLines = RenderCommandLines::CreateRenderState();
@@ -50,6 +49,8 @@ namespace Framework
 		glDeleteBuffers(1, &m_RenderStateText->element_buffer);
 		glDeleteVertexArrays(1, &m_RenderStateText->vertex_attribute_buffer);
 		delete m_RenderStateText;
+
+		delete m_Face;
 	}
 
 	void DebugHelper::SetColor(const glm::vec4& a_Color)
@@ -126,7 +127,7 @@ namespace Framework
 	
 	void DebugHelper::AddText(const std::string& a_Text, const glm::vec2& a_Position)
 	{
-		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_Font);
+		RenderCommandText* command = new RenderCommandText(m_RenderStateText, m_Face);
 		command->SetText(a_Text);
 		command->SetPosition(a_Position);
 		command->SetColor(m_Color);

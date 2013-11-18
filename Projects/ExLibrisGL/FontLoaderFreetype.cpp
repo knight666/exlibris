@@ -27,6 +27,7 @@
 #include "FontLoaderFreetype.h"
 
 #include "FreetypeErrors.h"
+#include "GlyphProviderFreetype.h"
 #include "Library.h"
 
 namespace ExLibris
@@ -37,7 +38,7 @@ namespace ExLibris
 	{
 		FT_Error errors = 0;
 		
-		errors = FT_Init_FreeType(&m_FTLibrary);
+		errors = FT_Init_FreeType(&m_FreetypeLibrary);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::FontLoaderFreetype", errors);
@@ -48,19 +49,19 @@ namespace ExLibris
 	{
 		FT_Error errors = 0;
 
-		errors = FT_Done_FreeType(m_FTLibrary);
+		errors = FT_Done_FreeType(m_FreetypeLibrary);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::~FontLoaderFreetype", errors);
 		}
 	}
 
-	FT_Library FontLoaderFreetype::GetLibrary() const
+	FT_Library FontLoaderFreetype::GetFreetypeLibrary() const
 	{
-		return m_FTLibrary;
+		return m_FreetypeLibrary;
 	}
 
-	IFont* FontLoaderFreetype::LoadFont(std::istream& a_Stream)
+	IGlyphProvider* FontLoaderFreetype::LoadGlyphProvider(std::istream& a_Stream)
 	{
 		a_Stream.seekg(0, std::ios_base::end);
 		std::streamoff font_file_size = a_Stream.tellg();
@@ -76,40 +77,18 @@ namespace ExLibris
 
 		FT_Error errors = 0;
 
-		FT_Face font_loaded = nullptr;
-		errors = FT_New_Memory_Face(m_FTLibrary, font_file_data, (FT_Long)font_file_size, 0, &font_loaded);
+		FT_Face face_loaded = nullptr;
+		errors = FT_New_Memory_Face(m_FreetypeLibrary, font_file_data, (FT_Long)font_file_size, 0, &face_loaded);
 		if (errors != FT_Err_Ok)
 		{
-			EXL_FT_THROW("FontLoaderFreetype::LoadFont", errors);
+			EXL_FT_THROW("FontLoaderFreetype::LoadGlyphProvider", errors);
 
 			return nullptr;
 		}
 
-		errors = FT_Select_Charmap(font_loaded, FT_ENCODING_UNICODE);
-		if (errors != FT_Err_Ok)
-		{
-			EXL_FT_THROW("FontLoaderFreetype::LoadFont", errors);
+		GlyphProviderFreetype* provider = new GlyphProviderFreetype(m_Library, face_loaded, font_file_data, (size_t)font_file_size);
 
-			return nullptr;
-		}
-
-		if (font_loaded->charmap == nullptr)
-		{
-			EXL_THROW("FontLoaderFreetype::LoadFont", "Font does not have a unicode charmap.");
-
-			return nullptr;
-		}
-
-		Family* family = m_Library->CreateFamily(font_loaded->family_name);
-
-		FontFreetype* font = new FontFreetype(family);
-
-		font->SetFontData(font_loaded, font_file_data, (size_t)font_file_size);
-
-		font->SetWeight(((font_loaded->style_flags & FT_STYLE_FLAG_BOLD) != 0) ? eWeight_Bold : eWeight_Normal);
-		font->SetStyle(((font_loaded->style_flags & FT_STYLE_FLAG_ITALIC) != 0) ? eStyle_Italicized : eStyle_None);
-
-		return font;
+		return provider;
 	}
 
 }; // namespace ExLibris

@@ -26,6 +26,8 @@
 
 #include "Family.h"
 
+#include "IGlyphProvider.h"
+
 namespace ExLibris
 {
 
@@ -37,11 +39,11 @@ namespace ExLibris
 	
 	Family::~Family()
 	{
-		for (std::set<IFont*>::iterator font_it = m_Fonts.begin(); font_it != m_Fonts.end(); ++font_it)
+		for (std::set<IGlyphProvider*>::iterator provider_it = m_GlyphProviders.begin(); provider_it != m_GlyphProviders.end(); ++provider_it)
 		{
-			delete *font_it;
+			delete *provider_it;
 		}
-		m_Fonts.clear();
+		m_GlyphProviders.clear();
 	}
 
 	Library* Family::GetLibrary() const
@@ -54,45 +56,39 @@ namespace ExLibris
 		return m_Name;
 	}
 
-	size_t Family::GetFontCount() const
+	size_t Family::GetGlyphProviderCount() const
 	{
-		return m_Fonts.size();
+		return m_GlyphProviders.size();
 	}
 
-	void Family::AddFont(IFont* a_Font)
+	void Family::AddGlyphProvider(IGlyphProvider* a_Provider)
 	{
-		std::set<IFont*>::iterator found = m_Fonts.find(a_Font);
-		if (found == m_Fonts.end())
+		if (a_Provider == nullptr)
 		{
-			m_Fonts.insert(a_Font);
+			return;
+		}
+
+		std::set<IGlyphProvider*>::iterator found = m_GlyphProviders.find(a_Provider);
+		if (found == m_GlyphProviders.end())
+		{
+			m_GlyphProviders.insert(a_Provider);
 		}
 	}
 
-	IFont* Family::FindFont(Weight a_Weight, Style a_Style) const
+	IGlyphProvider* Family::FindGlyphProvider(float a_Size, Weight a_Weight, Style a_Style) const
 	{
-		IFont* match = nullptr;
+		IGlyphProvider* match = nullptr;
+		int score_highest = -1;
 
-		for (std::set<IFont*>::const_iterator font_it = m_Fonts.begin(); font_it != m_Fonts.end(); ++font_it)
+		for (std::set<IGlyphProvider*>::const_iterator provider_it = m_GlyphProviders.begin(); provider_it != m_GlyphProviders.end(); ++provider_it)
 		{
-			IFont* font = *font_it;
+			IGlyphProvider* provider = *provider_it;
 
-			int score = 0;
-
-			if (font->GetStyle() == a_Style)
+			int score = provider->GetMatchScore(a_Size, a_Weight, a_Style);
+			if (score >= score_highest)
 			{
-				match = font;
-				score++;
-			}
-
-			if (font->GetWeight() == a_Weight)
-			{
-				match = font;
-				score++;
-			}
-
-			if (score == 2)
-			{
-				break;
+				match = provider;
+				score_highest = score;
 			}
 		}
 

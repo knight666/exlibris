@@ -9,8 +9,8 @@
 
 // ExLibris
 
-#include <FontFace.h>
-#include <IFont.h>
+#include <Face.h>
+#include <GlyphBitmap.h>
 #include <TextLayout.h>
 
 // Framework
@@ -143,9 +143,9 @@ namespace Framework
 		return state;
 	}
 
-	RenderCommandText::RenderCommandText(RenderState* a_State, ExLibris::FontFace* a_Face)
+	RenderCommandText::RenderCommandText(RenderState* a_State, ExLibris::Face* a_Face)
 		: m_State(a_State)
-		, m_Font(a_Face)
+		, m_Face(a_Face)
 		, m_Layout(nullptr)
 		, m_Texture(0)
 		, m_TextureWidth(0)
@@ -154,10 +154,8 @@ namespace Framework
 		, m_TextureData(nullptr)
 		, m_TexturePadding(2, 2)
 	{
-		m_RenderCorrection.y = -m_Font->GetAscender();
-
 		m_Layout = new ExLibris::TextLayout;
-		m_Layout->SetFontFace(m_Font);
+		m_Layout->SetFace(m_Face);
 	}
 	
 	RenderCommandText::~RenderCommandText()
@@ -187,9 +185,9 @@ namespace Framework
 
 	void RenderCommandText::Batch()
 	{
-		m_Layout->Accept(*this);
+		_BuildTexture();
 
-		glm::vec2 screen_position = m_Position + m_RenderCorrection + m_LineCorrection;
+		glm::vec2 screen_position = m_Position + m_RenderCorrection;
 
 		m_MatrixModelview = glm::mat4x4();
 		m_MatrixModelview = glm::translate(m_MatrixModelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
@@ -201,13 +199,14 @@ namespace Framework
 		glUseProgram(m_State->program->GetHandle());
 
 		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_Texture);
+
 		glUniform1i(m_State->uniform_texture0, 0);
 
 		glBindVertexArray(m_State->vertex_attribute_buffer);
 
 		glUniform4fv(m_State->uniform_textcolor, 1, glm::value_ptr(m_Color));
 
-		glBindTexture(GL_TEXTURE_2D, m_Texture);
 		glUniform2fv(m_State->uniform_texturedimensions, 1, glm::value_ptr(m_TextureDimensions));
 
 		glm::mat4x4 mvp = a_Projection * m_MatrixModelview;
@@ -216,11 +215,16 @@ namespace Framework
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
-	void RenderCommandText::VisitTextBegin(const ExLibris::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
+	void RenderCommandText::_BuildTexture()
 	{
-		m_TextureWidth = (unsigned int)a_Dimensions.x + (m_TexturePadding.x * 2);
+		m_Layout->Layout();
+
+		ExLibris::BoundingBox bounds = m_Layout->GetBoundingBox();
+		glm::vec2 dimensions = bounds.GetDimensions();
+
+		m_TextureWidth = (unsigned int)dimensions.x + (m_TexturePadding.x * 2);
 		m_TexturePitch = m_TextureWidth * 4;
-		m_TextureHeight = (unsigned int)a_Dimensions.y + (m_TexturePadding.y * 2);
+		m_TextureHeight = (unsigned int)dimensions.y + (m_TexturePadding.y * 2);
 
 		m_TextureDimensions.x = (float)m_TextureWidth;
 		m_TextureDimensions.y = (float)m_TextureHeight;
@@ -239,40 +243,54 @@ namespace Framework
 			}
 		}
 
-		m_RenderCorrection.x = (float)(-m_TexturePadding.x);
-		m_RenderCorrection.y = (float)(-m_TexturePadding.y) - a_Face->GetAscender();
-	}
+		m_TextureCorrection = -bounds.GetMinimum() + glm::vec2(m_TexturePadding);
+		m_RenderCorrection = -m_TextureCorrection;
 
-	void RenderCommandText::VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const ExLibris::BoundingBox& a_BoundingBox)
-	{
-		m_LineOffset = a_Offset;
-		m_LineOffset.y += m_Font->GetDescender();
+		const std::vector<ExLibris::TextLine*>& lines = m_Layout->GetLines();
 
-		m_CursorPosition = a_Offset;
-
-		m_LineCorrection.x = 0.0f;
-		m_LineCorrection.y = 0.0f;
-	}
-
-	void RenderCommandText::VisitTextCharacter(const ExLibris::Glyph* a_Glyph, float a_X, float a_Advance, const ExLibris::BoundingBox& a_BoundingBox)
-	{
-		ExLibris::GlyphMetrics* metrics = a_Glyph->metrics;
-		ExLibris::GlyphBitmap* bitmap = a_Glyph->bitmap;
-
-		m_CursorPosition.x = a_X + a_Advance;
-
-		glm::vec2 offset = m_LineOffset + metrics->offset;
-		offset.x += a_X;
-
-		m_RenderCorrection.x = std::min(m_RenderCorrection.x, offset.x);
-
-		if (offset.x < 0.0f)
+		for (std::vector<ExLibris::TextLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
 		{
-			m_LineCorrection.x = fabs(offset.x);
-			offset.x = 0.0f;
+			ExLibris::TextLine* line = *line_it;
+
+			for (std::vector<ExLibris::TextCharacter*>::const_iterator char_it = line->characters.begin(); char_it != line->characters.end(); ++char_it)
+			{
+				ExLibris::TextCharacter* character = *char_it;
+
+				if (character->type == ExLibris::TextCharacter::eType_Character)
+				{
+					_AddCharacterToTexture(character);
+				}
+			}
 		}
 
-		unsigned char* dst = m_TextureData + (((unsigned int)offset.y + m_TexturePadding.y) * m_TexturePitch) + ((unsigned int)(offset.x + m_TexturePadding.x) * 4);
+		glGenTextures(1, &m_Texture);
+		glBindTexture(GL_TEXTURE_2D, m_Texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGBA,
+			m_TextureWidth, m_TextureHeight,
+			0,
+			GL_BGRA, GL_UNSIGNED_BYTE, m_TextureData
+		);
+
+		delete [] m_TextureData;
+		m_TextureData = nullptr;
+	}
+
+	void RenderCommandText::_AddCharacterToTexture(ExLibris::TextCharacter* a_Character)
+	{
+		glm::vec2 texture_position = a_Character->bounding_box.GetMinimum() + m_TextureCorrection;
+
+		ExLibris::GlyphBitmap* bitmap = m_Face->CreateBitmap(a_Character->identifier);
+		if (bitmap == nullptr)
+		{
+			return;
+		}
+
+		unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
 		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
 		unsigned int src_pitch = bitmap->width * 4;
@@ -310,40 +328,9 @@ namespace Framework
 				}
 
 				dst += m_TexturePitch;
+				src += src_pitch;
 			}
-
-			src += src_pitch;
 		}
-	}
-
-	void RenderCommandText::VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const ExLibris::BoundingBox& a_BoundingBox)
-	{
-		m_CursorPosition.x = a_X + a_Advance;
-	}
-
-	void RenderCommandText::VisitTextLineEnd()
-	{
-	}
-
-	void RenderCommandText::VisitTextEnd()
-	{
-		glGenTextures(1, &m_Texture);
-		glBindTexture(GL_TEXTURE_2D, m_Texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGBA,
-			m_TextureWidth, m_TextureHeight,
-			0,
-			GL_BGRA, GL_UNSIGNED_BYTE, m_TextureData
-		);
-
-		delete [] m_TextureData;
-		m_TextureData = nullptr;
-
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 }; // namespace Framework
