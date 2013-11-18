@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include "IFont.h"
+#include "Style.h"
+#include "Weight.h"
 
 namespace ExLibris
 {

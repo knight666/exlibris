@@ -27,8 +27,8 @@
 #include "Library.h"
 
 #include "Exception.h"
+#include "FaceOptions.h"
 #include "Family.h"
-#include "FontSystem.h"
 #include "GlyphProviderSystem.h"
 #include "IFontLoader.h"
 #include "IGlyphProvider.h"
@@ -39,8 +39,6 @@ namespace ExLibris
 	Library::Library()
 	{
 		Family* family = CreateFamily("System");
-		new FontSystem(family);
-
 		family->AddGlyphProvider(new GlyphProviderSystem(this));
 	}
 	
@@ -77,42 +75,6 @@ namespace ExLibris
 		}
 
 		m_Loaders.push_back(a_Loader);
-	}
-
-	IFont* Library::LoadFont(const std::string& a_Path)
-	{
-		std::fstream file_stream(a_Path, std::ios::in | std::ios::binary);
-		if (!file_stream.is_open())
-		{
-			return nullptr;
-		}
-
-		IFont* result = LoadFont(file_stream);
-
-		file_stream.close();
-
-		return result;
-	}
-
-	IFont* Library::LoadFont(std::istream& a_Stream)
-	{
-		if (m_Loaders.size() == 0)
-		{
-			return nullptr;
-		}
-
-		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
-		{
-			IFontLoader* loader = *loader_it;
-
-			IFont* loaded = loader->LoadFont(a_Stream);
-			if (loaded != nullptr)
-			{
-				return loaded;
-			}
-		}
-
-		return nullptr;
 	}
 
 	bool Library::MapFontToFile(const std::string& a_Path) const
@@ -239,17 +201,7 @@ namespace ExLibris
 			options.size = 10.0f;
 		}
 
-		FontFace* face = font->CreateFace(options);
-		if (face == nullptr)
-		{
-			std::stringstream ss;
-			ss << "Could not create face of size " << options.size << ".";
-			EXL_THROW("Library::RequestFontFace", ss.str().c_str());
-
-			return nullptr;
-		}
-
-		return face;
+		return nullptr;
 	}
 
 	Face* Library::RequestFace(const FaceRequest& a_Request) const
