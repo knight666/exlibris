@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -14,7 +15,6 @@
 
 #include <Application.h>
 #include <DebugHelper.h>
-#include <FontSystem.h>
 #include <MeshOpenGL.h>
 #include <ShaderProgram.h>
 
@@ -34,6 +34,7 @@ namespace fw = Framework;
 
 #include <CurveSettings.h>
 #include <Family.h>
+#include <Face.h>
 #include <FontFace.h>
 #include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
@@ -52,6 +53,7 @@ public:
 
 	OutlineVisitor(exl::Library* a_Library)
 		: m_Library(a_Library) 
+		, m_Face(nullptr)
 		, m_DrawFilled(true)
 		, m_DrawOutline(true)
 		, m_Program(nullptr)
@@ -84,14 +86,41 @@ public:
 		m_Program = a_Program;
 	}
 
+	void BuildMeshes(exl::TextLayout* a_Layout)
+	{
+		if (m_Face != a_Layout->GetFace())
+		{
+			_ClearMeshes();
+
+			m_Face = a_Layout->GetFace();
+		}
+
+		const std::vector<ExLibris::TextLine*>& lines = a_Layout->GetLines();
+
+		for (std::vector<ExLibris::TextLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
+		{
+			ExLibris::TextLine* line = *line_it;
+
+			for (std::vector<ExLibris::TextCharacter*>::const_iterator char_it = line->characters.begin(); char_it != line->characters.end(); ++char_it)
+			{
+				ExLibris::TextCharacter* character = *char_it;
+
+				if (character->type == ExLibris::TextCharacter::eType_Character)
+				{
+					_AddMeshesForCharacter(character);
+				}
+			}
+		}
+	}
+
 	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const exl::BoundingBox& a_BoundingBox)
 	{
-		m_Face = a_Face;
+		/*m_Face = a_Face;
 		m_Dimensions = a_Dimensions;
 
 		_ClearMeshes();
 
-		m_HelperGlyphs->Clear();
+		m_HelperGlyphs->Clear();*/
 	}
 
 	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
@@ -100,7 +129,7 @@ public:
 
 	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
 	{
-		GlyphInstance* instance = new GlyphInstance;
+		/*GlyphInstance* instance = new GlyphInstance;
 
 		m_HelperGlyphs->AddBox(a_BoundingBox.GetTranslated(m_Position));
 		
@@ -153,7 +182,7 @@ public:
 			m_MeshCache.insert(std::make_pair(a_Glyph->index, instance->meshes));
 		}
 
-		m_GlyphMeshes.push_back(instance);
+		m_GlyphMeshes.push_back(instance);*/
 	}
 
 	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
@@ -258,6 +287,68 @@ public:
 
 private:
 
+	void _AddMeshesForCharacter(exl::TextCharacter* a_Character)
+	{
+		GlyphInstance* instance = new GlyphInstance;
+
+		instance->position = a_Character->bounding_box.GetTopLeft();
+
+		std::map<unsigned int, MeshEntry*>::iterator mesh_found = m_MeshCache.find(a_Character->identifier);
+		if (mesh_found != m_MeshCache.end())
+		{
+			instance->meshes = mesh_found->second;
+		}
+		else
+		{
+			instance->meshes = new MeshEntry;
+			instance->meshes->mesh_filled = new fw::MeshOpenGL();
+			instance->meshes->mesh_outline = new fw::MeshOpenGL();
+
+			exl::CurvePath* outline = m_Face->CreateOutline(a_Character->identifier);
+			if (outline == nullptr)
+			{
+				return;
+			}
+
+			std::vector<exl::Polygon> polygons = outline->BuildPolygons(m_CurveSettings);
+			if (polygons.size() > 0)
+			{
+				exl::LineShape shape;
+
+				for (std::vector<exl::Polygon>::iterator poly_it = polygons.begin(); poly_it != polygons.end(); ++poly_it)
+				{
+					shape.AddPolygon(*poly_it);
+				}
+
+				exl::MeshBuilder* builder_filled = shape.BuildFilledMesh();
+				if (builder_filled != nullptr && builder_filled->GetVertexCount() > 0)
+				{
+					builder_filled->Accept(*instance->meshes->mesh_filled);
+				}
+
+				if (builder_filled != nullptr)
+				{
+					delete builder_filled;
+				}
+
+				exl::MeshBuilder* builder_outline = shape.BuildOutlineMesh(m_LineOptions);
+				if (builder_outline != nullptr && builder_outline->GetVertexCount() > 0)
+				{
+					builder_outline->Accept(*instance->meshes->mesh_outline);
+				}
+
+				if (builder_outline != nullptr)
+				{
+					delete builder_outline;
+				}
+			}
+
+			m_MeshCache.insert(std::make_pair(a_Character->identifier, instance->meshes));
+		}
+
+		m_GlyphMeshes.push_back(instance);
+	}
+
 	void _ClearMeshes() 
 	{
 		for (std::map<unsigned int, MeshEntry*>::iterator entry_it = m_MeshCache.begin(); entry_it != m_MeshCache.end(); ++entry_it)
@@ -280,7 +371,7 @@ private:
 private:
 
 	exl::Library* m_Library;
-	const exl::FontFace* m_Face;
+	exl::Face* m_Face;
 	glm::vec2 m_Dimensions;
 	glm::vec2 m_Position;
 
@@ -394,10 +485,10 @@ public:
 
 		timer.Start();
 		{
-			m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-			m_Library->LoadFont("Fonts/Roboto/Roboto-Bold.ttf");
-			m_Library->LoadFont("Fonts/Roboto/Roboto-Italic.ttf");
-			m_Library->LoadFont("Fonts/Roboto/Roboto-BoldItalic.ttf");
+			m_Library->MapFontToFile("Fonts/Roboto/Roboto-Regular.ttf");
+			m_Library->MapFontToFile("Fonts/Roboto/Roboto-Bold.ttf");
+			m_Library->MapFontToFile("Fonts/Roboto/Roboto-Italic.ttf");
+			m_Library->MapFontToFile("Fonts/Roboto/Roboto-BoldItalic.ttf");
 		}
 		timer.End();
 
@@ -410,23 +501,23 @@ public:
 			m_Request.SetWeight(exl::eWeight_Normal);
 			m_Request.SetStyle(exl::eStyle_None);
 
-			m_Face = m_Library->RequestFontFace(m_Request);
+			m_Face = m_Library->RequestFace(m_Request);
 		}
 		timer.End();
 
 		std::cout << "Creating face:    " << timer.GetMilliSeconds() << " ms." << std::endl;
 
 		m_TextLayout = new exl::TextLayout;
-		m_TextLayout->SetFontFace(m_Face);
+		m_TextLayout->SetFace(m_Face);
 		m_TextLayout->SetText("Vegetables on sale");
+		m_TextLayout->Layout();
 
 		m_OutlineVisitor = new OutlineVisitor(m_Library);
 		m_OutlineVisitor->SetColorFilled(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetColorOutline(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
 		m_OutlineVisitor->SetShaderProgram(m_ProgramTriangles);
 		m_OutlineVisitor->SetPosition(glm::vec2(100.0f, 100.0f));
-
-		m_TextLayout->Accept(*m_OutlineVisitor);
+		m_OutlineVisitor->BuildMeshes(m_TextLayout);
 
 		return true;
 	}
@@ -489,6 +580,7 @@ public:
 		delete m_DebugHelper;
 		delete m_TextLayout;
 		delete m_OutlineVisitor;
+		delete m_Face;
 		delete m_Library;
 	}
 
@@ -552,10 +644,11 @@ private:
 						m_Request.SetWeight(exl::eWeight_Normal);
 					}
 
-					m_Face = m_Library->RequestFontFace(m_Request);
-					
-					m_TextLayout->SetFontFace(m_Face);
-					m_TextLayout->Accept(*m_OutlineVisitor);
+					m_Face = m_Library->RequestFace(m_Request);
+
+					m_TextLayout->SetFace(m_Face);
+					m_TextLayout->Layout();
+					m_OutlineVisitor->BuildMeshes(m_TextLayout);
 				}
 
 			} break;
@@ -573,10 +666,11 @@ private:
 						m_Request.SetStyle(exl::eStyle_None);
 					}
 
-					m_Face = m_Library->RequestFontFace(m_Request);
+					m_Face = m_Library->RequestFace(m_Request);
 					
-					m_TextLayout->SetFontFace(m_Face);
-					m_TextLayout->Accept(*m_OutlineVisitor);
+					m_TextLayout->SetFace(m_Face);
+					m_TextLayout->Layout();
+					m_OutlineVisitor->BuildMeshes(m_TextLayout);
 				}
 
 			} break;
@@ -640,7 +734,7 @@ private:
 				}
 
 				m_OutlineVisitor->SetLineOptions(m_MeshOptions);
-				m_TextLayout->Accept(*m_OutlineVisitor);
+				m_OutlineVisitor->BuildMeshes(m_TextLayout);
 
 			} break;
 
@@ -649,7 +743,7 @@ private:
 				m_CurveSettings.precision -= 5;
 
 				m_OutlineVisitor->SetCurveSettings(m_CurveSettings);
-				m_TextLayout->Accept(*m_OutlineVisitor);
+				m_OutlineVisitor->BuildMeshes(m_TextLayout);
 
 			} break;
 
@@ -658,7 +752,7 @@ private:
 				m_CurveSettings.precision += 5;
 
 				m_OutlineVisitor->SetCurveSettings(m_CurveSettings);
-				m_TextLayout->Accept(*m_OutlineVisitor);
+				m_OutlineVisitor->BuildMeshes(m_TextLayout);
 
 			} break;
 
@@ -743,7 +837,7 @@ private:
 private:
 
 	exl::Library* m_Library;
-	exl::FontFace* m_Face;
+	exl::Face* m_Face;
 	exl::FaceRequest m_Request;
 	fw::DebugHelper* m_DebugHelper;
 
