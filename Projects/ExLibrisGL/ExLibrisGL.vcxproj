@@ -109,7 +109,6 @@
     <ClInclude Include="GlyphProviderFreetype.h" />
     <ClInclude Include="FreetypeConversion.h" />
     <ClInclude Include="FreetypeErrors.h" />
-    <ClInclude Include="Glyph.h" />
     <ClInclude Include="GlyphBitmap.h" />
     <ClInclude Include="GlyphMetrics.h" />
     <ClInclude Include="ExLibrisGL.PCH.h" />

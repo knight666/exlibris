@@ -236,9 +236,9 @@ namespace ExLibris
 		}
 
 		const int codepoint_space = 0x20;
-		const int codepoint_tab = (int)'\t';
-		const int codepoint_carriage_return = (int)'\r';
-		const int codepoint_new_line = (int)'\n';
+		const int codepoint_tab = 0x09;
+		const int codepoint_carriage_return = 0x0D;
+		const int codepoint_new_line = 0x0A;
 
 		for (std::vector<int>::const_iterator char_it = text_utf32.begin(); char_it != text_utf32.end(); ++char_it)
 		{
@@ -286,7 +286,6 @@ namespace ExLibris
 			}
 
 			bool glyph_valid = false;
-			const Glyph* glyph_current = nullptr;
 			GlyphMetrics* metrics_current = nullptr;
 			float glyph_advance = 0.0f;
 
