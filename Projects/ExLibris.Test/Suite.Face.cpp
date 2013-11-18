@@ -119,35 +119,35 @@ TEST_F(FaceContext, GetGlyphBitmapNotFound)
 	EXPECT_EQ(1, face->GetGlyphBitmapsLoaded());
 }
 
-TEST_F(FaceContext, GetGlyphOutline)
+TEST_F(FaceContext, CreateOutline)
 {
-	CurvePath* outline = face->GetGlyphOutline(125);
+	CurvePath* outline = face->CreateOutline(125);
 	ASSERT_NE(nullptr, outline);
 
-	EXPECT_EQ(1, face->GetGlyphOutlinesLoaded());
+	EXPECT_EQ(1, face->GetOutlinesLoaded());
 
 	EXPECT_EQ(5, outline->GetCommandCount());
 	EXPECT_EQ(5, outline->GetPositionCount());
 }
 
-TEST_F(FaceContext, GetGlyphOutlineTwice)
+TEST_F(FaceContext, CreateOutlineTwice)
 {
-	CurvePath* outline = face->GetGlyphOutline((int)'m');
-	CurvePath* outline_again = face->GetGlyphOutline((int)'m');
+	CurvePath* outline = face->CreateOutline((int)'m');
+	CurvePath* outline_again = face->CreateOutline((int)'m');
 
 	EXPECT_EQ(outline_again, outline);
 
-	EXPECT_EQ(1, face->GetGlyphOutlinesLoaded());
+	EXPECT_EQ(1, face->GetOutlinesLoaded());
 }
 
-TEST_F(FaceContext, GetGlyphOutlineNotFound)
+TEST_F(FaceContext, CreateOutlineNotFound)
 {
 	provider->codepoint_blacklist.insert(72718);
 
-	CurvePath* outline = face->GetGlyphOutline(72718);
+	CurvePath* outline = face->CreateOutline(72718);
 	EXPECT_EQ(nullptr, outline);
 
-	EXPECT_EQ(1, face->GetGlyphOutlinesLoaded());
+	EXPECT_EQ(1, face->GetOutlinesLoaded());
 }
 
 TEST_F(FaceContext, GetKerningAdjustment)

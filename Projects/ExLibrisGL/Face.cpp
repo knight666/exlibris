@@ -163,12 +163,12 @@ namespace ExLibris
 		}
 	}
 
-	size_t Face::GetGlyphOutlinesLoaded() const
+	size_t Face::GetOutlinesLoaded() const
 	{
 		return m_GlyphOutlines.size();
 	}
 
-	CurvePath* Face::GetGlyphOutline(int a_Codepoint)
+	CurvePath* Face::CreateOutline(int a_Codepoint)
 	{
 		std::map<int, CurvePath*>::iterator found = m_GlyphOutlines.find(a_Codepoint);
 		if (found != m_GlyphOutlines.end())
