@@ -1,12 +1,11 @@
 #pragma once
 
-#include <ITextLayoutVisitor.h>
-
 #include "IRenderCommand.h"
 
 namespace ExLibris
 {
-	class FontFace;
+	class Face;
+	struct TextCharacter;
 	class TextLayout;
 }
 
@@ -20,7 +19,6 @@ namespace Framework
 
 	class RenderCommandText
 		: public IRenderCommand
-		, public ExLibris::ITextLayoutVisitor
 	{
 
 	public:
@@ -43,7 +41,7 @@ namespace Framework
 	
 	public:
 	
-		RenderCommandText(RenderState* a_State, ExLibris::FontFace* a_Face);
+		RenderCommandText(RenderState* a_State, ExLibris::Face* a_Face);
 		~RenderCommandText();
 
 		void SetText(const std::string& a_Text);
@@ -56,20 +54,16 @@ namespace Framework
 
 		void Render(const glm::mat4x4& a_Projection) const;
 
-	public:
+	private:
 
-		void VisitTextBegin(const ExLibris::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox);
-		void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const ExLibris::BoundingBox& a_BoundingBox);
-		void VisitTextCharacter(const ExLibris::Glyph* a_Glyph, float a_X, float a_Advance, const ExLibris::BoundingBox& a_BoundingBox);
-		void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const ExLibris::BoundingBox& a_BoundingBox);
-		void VisitTextLineEnd();
-		void VisitTextEnd();
+		void _BuildTexture();
+		void _AddCharacterToTexture(ExLibris::TextCharacter* a_Character);
 
 	private:
 
 		RenderState* m_State;
 
-		ExLibris::FontFace* m_Font;
+		ExLibris::Face* m_Face;
 		ExLibris::TextLayout* m_Layout;
 
 		glm::vec2 m_Position;
@@ -77,11 +71,8 @@ namespace Framework
 
 		glm::vec4 m_Color;
 
-		glm::vec2 m_LineOffset;
-		glm::vec2 m_LineCorrection;
+		glm::vec2 m_TextureCorrection;
 		glm::vec2 m_RenderCorrection;
-
-		glm::vec2 m_CursorPosition;
 
 		GLuint m_Texture;
 		unsigned int m_TextureWidth;
