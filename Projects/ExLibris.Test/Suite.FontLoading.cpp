@@ -2,7 +2,6 @@
 
 #include <Exception.h>
 #include <Family.h>
-#include <FontFace.h>
 #include <FontLoaderFreetype.h>
 #include <IGlyphProvider.h>
 #include <Library.h>
