@@ -42,7 +42,7 @@ namespace Framework
 	private:
 
 		ExLibris::Library* m_Library;
-		ExLibris::FontFace* m_Font;
+		ExLibris::Face* m_Face;
 
 		RenderCommandText::RenderState* m_RenderStateText;
 		RenderCommandLines::RenderState* m_RenderStateLines;
