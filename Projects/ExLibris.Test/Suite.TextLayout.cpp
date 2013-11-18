@@ -4,6 +4,7 @@
 #include <TextLayout.h>
 
 #include "Mock.Font.h"
+#include "Mock.GlyphProvider.h"
 #include "Mock.TextLayoutVisitor.h"
 
 using namespace ExLibris;
@@ -18,88 +19,88 @@ using namespace ExLibris;
 	face->AddGlyph(glyph); \
 }
 
-FontFace* CreateFixedWidthFontFace()
-{
-	MockFont* font = new MockFont(nullptr);
-
-	FontFace* face = new FontFace(font);
-	face->SetLineHeight(20.0f);
-
-	TEST_GLYPH_ADD('?');
-
-	return face;
+#define TEST_ADD_PROVIDER_GLYPH(_glyph) { \
+	provider->use_glyph_metrics = true; \
+	GlyphMetrics metrics; \
+	metrics.advance = (float)_glyph; \
+	provider->glyph_metrics.insert(std::make_pair(_glyph, metrics)); \
 }
 
-FontFace* CreateDynamicWidthFontFace()
-{
-	MockFont* font = new MockFont(nullptr);
-
-	FontFace* face = new FontFace(font);
-	face->SetLineHeight(20.0f);
-
-	TEST_GLYPH_ADD('A');
-	TEST_GLYPH_ADD('B');
-	TEST_GLYPH_ADD('C');
-	TEST_GLYPH_ADD('D');
-	TEST_GLYPH_ADD('E');
-	TEST_GLYPH_ADD('F');
-	TEST_GLYPH_ADD('G');
-	TEST_GLYPH_ADD('H');
-	TEST_GLYPH_ADD('I');
-	TEST_GLYPH_ADD('J');
-	TEST_GLYPH_ADD('K');
-	TEST_GLYPH_ADD('L');
-	TEST_GLYPH_ADD('M');
-	TEST_GLYPH_ADD('N');
-	TEST_GLYPH_ADD('O');
-	TEST_GLYPH_ADD('P');
-	TEST_GLYPH_ADD('Q');
-	TEST_GLYPH_ADD('R');
-	TEST_GLYPH_ADD('S');
-	TEST_GLYPH_ADD('T');
-	TEST_GLYPH_ADD('U');
-	TEST_GLYPH_ADD('V');
-	TEST_GLYPH_ADD('W');
-	TEST_GLYPH_ADD('X');
-	TEST_GLYPH_ADD('Y');
-	TEST_GLYPH_ADD('Z');
-	TEST_GLYPH_ADD(' ');
-
-	return face;
+#define TEST_ADD_PROVIDER_KERNINGPAIR(_current, _next, _adjustment) { \
+	provider->use_kerning_pairs = true; \
+	MockGlyphProvider::KerningPair pair; \
+	pair.index_left = _current; \
+	pair.index_right = _next; \
+	pair.adjustment = _adjustment; \
+	provider->kerning_pairs.push_back(pair); \
 }
 
-FontFace* CreateKerningFontFace()
+Face* CreateFixedWidthFontFace()
 {
-	MockFont* font = new MockFont(nullptr);
+	MockGlyphProvider* provider = new MockGlyphProvider(nullptr);
 
-	FontFace* face = new FontFace(font);
-	face->SetLineHeight(20.0f);
+	provider->use_font_metrics = true;
+	provider->font_metrics.line_height = 20.0f;
 
-	Glyph* glyph_x = new Glyph();
-	glyph_x->index = (unsigned int)'x';
-	glyph_x->metrics = new GlyphMetrics;
-	glyph_x->metrics->advance = 10.0f;
+	TEST_ADD_PROVIDER_GLYPH('?');
 
-	Glyph* glyph_y = new Glyph();
-	glyph_y->index = (unsigned int)'y';
-	glyph_y->metrics = new GlyphMetrics;
-	glyph_y->metrics->advance = 10.0f;
+	return provider->CreateFace(20.0f);
+}
 
-	Glyph* glyph_z = new Glyph();
-	glyph_z->index = (unsigned int)'z';
-	glyph_z->metrics = new GlyphMetrics;
-	glyph_z->metrics->advance = 10.0f;
+Face* CreateDynamicWidthFontFace()
+{
+	MockGlyphProvider* provider = new MockGlyphProvider(nullptr);
 
-	glyph_x->kernings.insert(std::make_pair((unsigned int)'x', 2));
-	glyph_x->kernings.insert(std::make_pair((unsigned int)'y', -4));
+	provider->use_font_metrics = true;
+	provider->font_metrics.line_height = 20.0f;
 
-	glyph_y->kernings.insert(std::make_pair((unsigned int)'x', 5));
+	TEST_ADD_PROVIDER_GLYPH('A');
+	TEST_ADD_PROVIDER_GLYPH('B');
+	TEST_ADD_PROVIDER_GLYPH('C');
+	TEST_ADD_PROVIDER_GLYPH('D');
+	TEST_ADD_PROVIDER_GLYPH('E');
+	TEST_ADD_PROVIDER_GLYPH('F');
+	TEST_ADD_PROVIDER_GLYPH('G');
+	TEST_ADD_PROVIDER_GLYPH('H');
+	TEST_ADD_PROVIDER_GLYPH('I');
+	TEST_ADD_PROVIDER_GLYPH('J');
+	TEST_ADD_PROVIDER_GLYPH('K');
+	TEST_ADD_PROVIDER_GLYPH('L');
+	TEST_ADD_PROVIDER_GLYPH('M');
+	TEST_ADD_PROVIDER_GLYPH('N');
+	TEST_ADD_PROVIDER_GLYPH('O');
+	TEST_ADD_PROVIDER_GLYPH('P');
+	TEST_ADD_PROVIDER_GLYPH('Q');
+	TEST_ADD_PROVIDER_GLYPH('R');
+	TEST_ADD_PROVIDER_GLYPH('S');
+	TEST_ADD_PROVIDER_GLYPH('T');
+	TEST_ADD_PROVIDER_GLYPH('U');
+	TEST_ADD_PROVIDER_GLYPH('V');
+	TEST_ADD_PROVIDER_GLYPH('W');
+	TEST_ADD_PROVIDER_GLYPH('X');
+	TEST_ADD_PROVIDER_GLYPH('Y');
+	TEST_ADD_PROVIDER_GLYPH('Z');
+	TEST_ADD_PROVIDER_GLYPH(' ');
 
-	face->AddGlyph(glyph_x);
-	face->AddGlyph(glyph_y);
-	face->AddGlyph(glyph_z);
+	return provider->CreateFace(20.0f);
+}
 
-	return face;
+Face* CreateKerningFontFace()
+{
+	MockGlyphProvider* provider = new MockGlyphProvider(nullptr);
+
+	provider->use_font_metrics = true;
+	provider->font_metrics.line_height = 20.0f;
+
+	TEST_ADD_PROVIDER_GLYPH('x');
+	TEST_ADD_PROVIDER_GLYPH('y');
+	TEST_ADD_PROVIDER_GLYPH('z');
+
+	TEST_ADD_PROVIDER_KERNINGPAIR('x', 'x', glm::vec2(2.0f, 0.0f));
+	TEST_ADD_PROVIDER_KERNINGPAIR('x', 'y', glm::vec2(-4.0f, 0.0f));
+	TEST_ADD_PROVIDER_KERNINGPAIR('y', 'x', glm::vec2(5.0f, 0.0f));
+
+	return provider->CreateFace(20.0f);
 }
 
 int GetTextGlyphWidth(const std::string& a_Text)
@@ -122,7 +123,7 @@ TEST(TextLayout, Construct)
 
 	layout.Layout();
 
-	EXPECT_EQ(nullptr, layout.GetFontFace());
+	EXPECT_EQ(nullptr, layout.GetFace());
 	EXPECT_EQ(0, layout.GetText().length());
 	EXPECT_FLOAT_EQ(0.0f, layout.GetDimensions().x);
 	EXPECT_FLOAT_EQ(0.0f, layout.GetDimensions().y);
@@ -130,14 +131,16 @@ TEST(TextLayout, Construct)
 	EXPECT_FLOAT_EQ(0.0f, layout.GetSizeHint().y);
 }
 
-TEST(TextLayout, SetFontFace)
+TEST(TextLayout, SetFace)
 {
 	TextLayout layout;
 
-	FontFace font(nullptr);
-	layout.SetFontFace(&font);
+	MockGlyphProvider provider(nullptr);
+	Face* face = provider.CreateFace(0.0f);
 
-	EXPECT_EQ(&font, layout.GetFontFace());
+	layout.SetFace(face);
+
+	EXPECT_EQ(face, layout.GetFace());
 }
 
 TEST(TextLayout, SetText)
@@ -166,8 +169,6 @@ TEST(TextLayout, SetSizeHint)
 TEST(TextLayout, DimensionsEmpty)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
-
 	layout.Layout();
 
 	EXPECT_FLOAT_EQ(0.0f, layout.GetDimensions().x);
@@ -177,7 +178,7 @@ TEST(TextLayout, DimensionsEmpty)
 TEST(TextLayout, DimensionsGlyphsUnknown)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 
 	layout.SetText("Unknown glyphs.");
 
@@ -190,7 +191,7 @@ TEST(TextLayout, DimensionsGlyphsUnknown)
 TEST(TextLayout, DimensionsFixed)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 
 	layout.SetText("??????");
 
@@ -215,7 +216,7 @@ TEST(TextLayout, DimensionsFixedTextBeforeFont)
 
 	layout.SetText("???");
 
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 
 	layout.Layout();
 
@@ -235,7 +236,7 @@ TEST(TextLayout, DimensionsFixedTextBeforeFont)
 TEST(TextLayout, DimensionsFixedResize)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 
 	layout.SetText("????????");
 	layout.SetText("??");
@@ -258,7 +259,7 @@ TEST(TextLayout, DimensionsFixedResize)
 TEST(TextLayout, DimensionsDynamic)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("HAPPY");
 
@@ -283,7 +284,7 @@ TEST(TextLayout, DimensionsDynamicTextBeforeFont)
 
 	layout.SetText("HOTDOGGITY");
 
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.Layout();
 
@@ -303,7 +304,7 @@ TEST(TextLayout, DimensionsDynamicTextBeforeFont)
 TEST(TextLayout, DimensionsDynamicResize)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("MAGNIFICENT");
 	layout.SetText("RIDICULOUS");
@@ -325,10 +326,10 @@ TEST(TextLayout, DimensionsDynamicResize)
 
 TEST(TextLayout, DimensionsKerning)
 {
-	FontFace* face = CreateKerningFontFace();
+	Face* face = CreateKerningFontFace();
 
 	TextLayout layout;
-	layout.SetFontFace(face);
+	layout.SetFace(face);
 
 	layout.SetText("zxy");
 
@@ -339,10 +340,10 @@ TEST(TextLayout, DimensionsKerning)
 
 TEST(TextLayout, DimensionsNoKerning)
 {
-	FontFace* face = CreateKerningFontFace();
+	Face* face = CreateKerningFontFace();
 
 	TextLayout layout;
-	layout.SetFontFace(face);
+	layout.SetFace(face);
 
 	layout.SetText("zzzzz");
 
@@ -354,7 +355,7 @@ TEST(TextLayout, DimensionsNoKerning)
 TEST(TextLayout, DimensionsNewLine)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("GOODNESS ME \nANOTHER LINE");
 
@@ -378,7 +379,7 @@ TEST(TextLayout, DimensionsNewLine)
 TEST(TextLayout, DimensionsDoubleNewLine)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("NEUTRAL\n\nREVERSE");
 
@@ -404,7 +405,7 @@ TEST(TextLayout, DimensionsDoubleNewLine)
 TEST(TextLayout, DimensionsCarriageReturn)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BALL\rDOG");
 
@@ -428,7 +429,7 @@ TEST(TextLayout, DimensionsCarriageReturn)
 TEST(TextLayout, DimensionsDoubleCarriageReturn)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING US THE GIRL\r\rAND WIPE AWAY THE DEBT");
 
@@ -454,7 +455,7 @@ TEST(TextLayout, DimensionsDoubleCarriageReturn)
 TEST(TextLayout, DimensionsUnixNewLine)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("AND WHAT IS THIS\r\nOH WHAT A TREAT");
 
@@ -478,7 +479,7 @@ TEST(TextLayout, DimensionsUnixNewLine)
 TEST(TextLayout, DimensionsTripleUnixNewLine)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("TRAIN\r\nWILL DEPART FROM PLATFORM\r\n\r\n\r\nUNKNOWN");
 
@@ -508,7 +509,7 @@ TEST(TextLayout, DimensionsTripleUnixNewLine)
 TEST(TextLayout, DimensionsMixedNewLineTypes)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("CONNECT\r\nTO MY\nFACE");
 
@@ -533,10 +534,10 @@ TEST(TextLayout, DimensionsMixedNewLineTypes)
 
 TEST(TextLayout, DimensionsKerningNewLine)
 {
-	FontFace* face = CreateKerningFontFace();
+	Face* face = CreateKerningFontFace();
 
 	TextLayout layout;
-	layout.SetFontFace(face);
+	layout.SetFace(face);
 
 	layout.SetText("yzyx\nxxyyz");
 
@@ -567,7 +568,7 @@ TEST(TextLayout, AcceptVisitorFont)
 	MockTextLayoutVisitor visitor;
 
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 
 	layout.Accept(visitor);
 
@@ -593,7 +594,7 @@ TEST(TextLayout, AcceptVisitorOneGlyph)
 	MockTextLayoutVisitor visitor;
 
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 	layout.SetText("?");
 
 	layout.Accept(visitor);
@@ -613,7 +614,7 @@ TEST(TextLayout, AcceptVisitorFixedFontText)
 	MockTextLayoutVisitor visitor;
 
 	TextLayout layout;
-	layout.SetFontFace(CreateFixedWidthFontFace());
+	layout.SetFace(CreateFixedWidthFontFace());
 	layout.SetText("???");
 
 	layout.Accept(visitor);
@@ -639,7 +640,7 @@ TEST(TextLayout, AcceptVisitorDynamicFontText)
 	MockTextLayoutVisitor visitor;
 
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 	layout.SetText("ACK");
 
 	layout.Accept(visitor);
@@ -665,7 +666,7 @@ TEST(TextLayout, AcceptVisitorKerningFontText)
 	MockTextLayoutVisitor visitor;
 
 	TextLayout layout;
-	layout.SetFontFace(CreateKerningFontFace());
+	layout.SetFace(CreateKerningFontFace());
 	layout.SetText("zzxy");
 
 	layout.Accept(visitor);
@@ -692,7 +693,7 @@ TEST(TextLayout, AcceptVisitorKerningFontText)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalIgnore)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("THIS IS YOUR CAPTAIN SPEAKING");
 
@@ -719,7 +720,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalIgnore)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixed)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("CRASH LANDINGS ARE NOT PART OF THIS EXERCISE");
 
@@ -746,7 +747,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixed)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooSmall)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING ME YOUR FINEST GREEN WOMEN");
 
@@ -771,7 +772,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooSmall)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooLarge)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("WHY BUILD ONE\nWHEN YOU CAN BUILD\nONE MILLION DEATH RAYS");
 
@@ -801,7 +802,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedTooLarge)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedNegative)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRACE FOR IMPACT WITH FROZEN MEATBALL");
 
@@ -826,7 +827,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalFixedNegative)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpanding)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("ENTERPRISE");
 
@@ -853,7 +854,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpanding)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingTwoLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BEAM ME UP\nTECHNICIAN GUY");
 
@@ -882,7 +883,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingTwoLines)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingNegative)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("TAKE ME TO VENICE\nI WANT TO SEE THE BOATS");
 
@@ -911,7 +912,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMinimumExpandingNegative)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximum)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("TO SPACE AND BEYOND\nMY MOTHERS BASEMENT");
 
@@ -940,7 +941,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximum)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumThreeLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("YOUR PLANS CAN BE FOILED\nSIMPLY BY APPLYING SOME\nORDINARY TINFOIL");
 
@@ -969,7 +970,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumThreeLines)
 TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumNegative)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("SUCK ON MY\nTOOTSIE ROLL");
 
@@ -992,7 +993,7 @@ TEST(TextLayout, LimitsHorizontalIgnoreVerticalMaximumNegative)
 TEST(TextLayout, LimitsHorizontalFixed)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING ME A BANANA");
 
@@ -1016,7 +1017,7 @@ TEST(TextLayout, LimitsHorizontalFixed)
 TEST(TextLayout, LimitsHorizontalFixedTooSmall)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("MY GOD IT EVEN HAS A WATERMARK");
 
@@ -1040,7 +1041,7 @@ TEST(TextLayout, LimitsHorizontalFixedTooSmall)
 TEST(TextLayout, LimitsHorizontalFixedTooLarge)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING ON THE NEWSPAPERS");
 
@@ -1064,7 +1065,7 @@ TEST(TextLayout, LimitsHorizontalFixedTooLarge)
 TEST(TextLayout, LimitsHorizontalFixedNegative)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("TRULY A FEAST ON YOUR EYEBALLS");
 
@@ -1087,7 +1088,7 @@ TEST(TextLayout, LimitsHorizontalFixedNegative)
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnore)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("FINE I WILL GET MY OWN STARSHIP");
 
@@ -1114,7 +1115,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnore)
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnoreExpandToMinimum)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("SET PHASERS TO AWESOME");
 
@@ -1141,7 +1142,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalIgnoreExpandToMinimum)
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMinimumExpanding)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING YOUR OWN\nPARTY HAT");
 
@@ -1170,7 +1171,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMinimumExpanding)
 TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMaximum)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING YOUR OWN\nPARTY HAT");
 
@@ -1199,7 +1200,7 @@ TEST(TextLayout, LimitsHorizontalMinimumExpandingVerticalMaximum)
 TEST(TextLayout, LimitsHorizontalMaximumVerticalIgnore)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("SUCK MY FRUITY PIE");
 
@@ -1230,7 +1231,7 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalIgnore)
 TEST(TextLayout, LimitsHorizontalMaximumVerticalMinimumExpanding)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("DRIVE YOUR AUNT OFF A CLIFF");
 
@@ -1261,7 +1262,7 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalMinimumExpanding)
 TEST(TextLayout, LimitsHorizontalMaximumVerticalMaximum)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("SINK INTO THE DEEPEST OCEAN");
 
@@ -1290,7 +1291,7 @@ TEST(TextLayout, LimitsHorizontalMaximumVerticalMaximum)
 TEST(TextLayout, LayoutVerticalTop)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("JEWEL OF MY CROWN");
 
@@ -1310,7 +1311,7 @@ TEST(TextLayout, LayoutVerticalTop)
 TEST(TextLayout, LayoutVerticalTopTallBox)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING YOUR OWN LASERS");
 
@@ -1334,7 +1335,7 @@ TEST(TextLayout, LayoutVerticalTopTallBox)
 TEST(TextLayout, LayoutVerticalTopTallBoxTwoLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("THE SASS IS ALMOST\nPALPATABLE");
 
@@ -1360,7 +1361,7 @@ TEST(TextLayout, LayoutVerticalTopTallBoxTwoLines)
 TEST(TextLayout, LayoutVerticalMiddle)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING HER UP TO LUDRICOUS SPEED");
 
@@ -1380,7 +1381,7 @@ TEST(TextLayout, LayoutVerticalMiddle)
 TEST(TextLayout, LayoutVerticalMiddleTallBox)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("DO ANDROIDS DREAM OF ELECTRIC KEBAB");
 
@@ -1404,7 +1405,7 @@ TEST(TextLayout, LayoutVerticalMiddleTallBox)
 TEST(TextLayout, LayoutVerticalMiddleTallBoxThreeLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("THERE ARE\nFIVE LIGHTS\nNO WAIT");
 
@@ -1432,7 +1433,7 @@ TEST(TextLayout, LayoutVerticalMiddleTallBoxThreeLines)
 TEST(TextLayout, LayoutVerticalBottom)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("DODGE THAT ASTEROID PLEASE");
 
@@ -1452,7 +1453,7 @@ TEST(TextLayout, LayoutVerticalBottom)
 TEST(TextLayout, LayoutVerticalBottomTallBox)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("WHAT IS IT WITH YOU AND ROMULAN ALE");
 
@@ -1476,7 +1477,7 @@ TEST(TextLayout, LayoutVerticalBottomTallBox)
 TEST(TextLayout, LayoutVerticalBottomTallBoxTwoLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("YOU ARE GOING TO BE FINE\nYOU STILL HAVE MOST OF YOUR VITAL ORGANS");
 
@@ -1502,7 +1503,7 @@ TEST(TextLayout, LayoutVerticalBottomTallBoxTwoLines)
 TEST(TextLayout, LayoutHorizontalLeft)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("LUNCH HOUR I REPEAT LUNCH HOUR");
 
@@ -1522,7 +1523,7 @@ TEST(TextLayout, LayoutHorizontalLeft)
 TEST(TextLayout, LayoutHorizontalLeftWideBox)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("ANOTHER DAY ANOTHER RAVIOLI SANDWICH");
 
@@ -1546,7 +1547,7 @@ TEST(TextLayout, LayoutHorizontalLeftWideBox)
 TEST(TextLayout, LayoutHorizontalLeftWideBoxTwoLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("WE ARE OUT OF MAYONAISSE\nFIGURES");
 
@@ -1572,7 +1573,7 @@ TEST(TextLayout, LayoutHorizontalLeftWideBoxTwoLines)
 TEST(TextLayout, LayoutHorizontalMiddle)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING YOUR KID TO WORK THEY SAID");
 
@@ -1592,7 +1593,7 @@ TEST(TextLayout, LayoutHorizontalMiddle)
 TEST(TextLayout, LayoutHorizontalMiddleWideBox)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("SHE WONT GET SNAPPED IN HALF BY A SEA MONSTER THEY SAID");
 
@@ -1616,7 +1617,7 @@ TEST(TextLayout, LayoutHorizontalMiddleWideBox)
 TEST(TextLayout, LayoutHorizontalMiddleWideBoxTwoLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("OH IM SURE WE CAN PUT THE PIECES BACK TOGETHER\nIF WE CAN FIND ENOUGH PIECES THAT IS");
 
@@ -1642,7 +1643,7 @@ TEST(TextLayout, LayoutHorizontalMiddleWideBoxTwoLines)
 TEST(TextLayout, LayoutHorizontalRight)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("THIS MONSTER IS NOT GOING BACK IN ITS BOX");
 
@@ -1662,7 +1663,7 @@ TEST(TextLayout, LayoutHorizontalRight)
 TEST(TextLayout, LayoutHorizontalRightWideBox)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("OUR NEW NEIGHBOUR HAS TOO MANY TENTACLES");
 
@@ -1686,7 +1687,7 @@ TEST(TextLayout, LayoutHorizontalRightWideBox)
 TEST(TextLayout, LayoutHorizontalRightWideBoxTwoLines)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BRING THE SPAGHETTI\nAND FIGHT IT OUT LIKE MEN");
 
@@ -1712,7 +1713,7 @@ TEST(TextLayout, LayoutHorizontalRightWideBoxTwoLines)
 TEST(TextLayout, WordWrappingSpaces)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("BANANA BANANA      BANANA BANANA BANANA");
 
@@ -1735,7 +1736,7 @@ TEST(TextLayout, WordWrappingSpaces)
 TEST(TextLayout, WordWrappingSentence)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("THERE ARE NO WORDS AMONG THE STARS");
 
@@ -1758,7 +1759,7 @@ TEST(TextLayout, WordWrappingSentence)
 TEST(TextLayout, WordWrappingLongWord)
 {
 	TextLayout layout;
-	layout.SetFontFace(CreateDynamicWidthFontFace());
+	layout.SetFace(CreateDynamicWidthFontFace());
 
 	layout.SetText("RIOOLWATERZUIVERINGSINSTALLATIESYSTEEM");
 
