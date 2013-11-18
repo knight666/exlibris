@@ -2,6 +2,8 @@
 
 #include "TextLayout.h"
 
+#include "GlyphMetrics.h"
+
 namespace ExLibris
 {
 

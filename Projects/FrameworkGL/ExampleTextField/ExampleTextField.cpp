@@ -25,9 +25,8 @@ namespace fw = Framework;
 
 // ExLibris
 
-#include <FontFace.h>
-#include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
+#include <GlyphBitmap.h>
 #include <Library.h>
 #include <TextLayout.h>
 
@@ -735,7 +734,6 @@ private:
 private:
 
 	exl::Library* m_Library;
-	exl::IFont* m_Font;
 	exl::FaceRequest m_Request;
 	exl::Face* m_Face;
 	fw::DebugHelper* m_DebugHelper;

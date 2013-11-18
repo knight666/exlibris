@@ -10,7 +10,7 @@
 // ExLibris
 
 #include <Face.h>
-#include <IFont.h>
+#include <GlyphBitmap.h>
 #include <TextLayout.h>
 
 // Framework

@@ -9,8 +9,7 @@
 
 namespace ExLibris
 {
-	class FontFace;
-	class IFont;
+	class Face;
 	class Library;
 }
 

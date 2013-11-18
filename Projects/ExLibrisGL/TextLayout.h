@@ -26,7 +26,6 @@
 
 #include "Alignment.h"
 #include "Face.h"
-#include "FontFace.h"
 #include "ITextLayoutVisitor.h"
 #include "SizePolicy.h"
 #include "TextCharacter.h"

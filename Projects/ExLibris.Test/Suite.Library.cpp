@@ -2,7 +2,6 @@
 
 #include <Exception.h>
 #include <Family.h>
-#include <FontFace.h>
 #include <Library.h>
 
 #include "Mock.Font.h"

@@ -9,9 +9,8 @@
 
 // ExLibris
 
-#include <FontFace.h>
+#include <Face.h>
 #include <Library.h>
-#include <IFont.h>
 #include <TextLayout.h>
 
 // Framework
