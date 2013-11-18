@@ -272,6 +272,8 @@ public:
 
 		const std::vector<exl::TextLine*>& lines = m_Layout->GetLines();
 
+		glm::vec2 cursor_position = m_Position;
+
 		for (std::vector<exl::TextLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
 		{
 			exl::TextLine* line = *line_it;
@@ -279,11 +281,12 @@ public:
 			exl::BoundingBox box = line->bounding_box.GetTranslated(m_Position);
 			m_HelperLines->AddBox(box);
 
+			m_CursorPosition = cursor_position;
+			m_CursorPosition.y -= m_Font->GetAscent();
+
 			for (std::vector<exl::TextCharacter*>::const_iterator char_it = line->characters.begin(); char_it != line->characters.end(); ++char_it)
 			{
 				exl::TextCharacter* character = *char_it;
-
-				m_CursorPosition.x = character->x + character->advance;
 
 				exl::BoundingBox box = character->bounding_box.GetTranslated(m_Position);
 				m_HelperGlyphs->AddBox(box);
@@ -292,7 +295,11 @@ public:
 				{
 					_AddCharacterToTexture(character);
 				}
+
+				m_CursorPosition.x += character->advance;
 			}
+
+			cursor_position.y += m_Font->GetLineHeight();
 		}
 
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
@@ -365,13 +372,11 @@ public:
 		{
 			glDisable(GL_DEPTH_TEST);
 
-			glm::vec2 cursor_position = screen_position + m_CursorPosition;
-
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(glm::value_ptr(projection));
 
 			glm::mat4x4 modelview_cursor;
-			modelview_cursor = glm::translate(modelview_cursor, glm::vec3(cursor_position.x, cursor_position.y, 0.0f));
+			modelview_cursor = glm::translate(modelview_cursor, glm::vec3(m_CursorPosition, 0.0f));
 			modelview_cursor = glm::scale(modelview_cursor, glm::vec3(1.0f, m_Font->GetLineHeight(), 1.0f));
 
 			glMatrixMode(GL_MODELVIEW);
@@ -546,8 +551,9 @@ public:
 		m_TextField = new TextField(m_Library, m_ProgramEffects);
 		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
 		
-		m_Request.SetFamilyName("00 Starmap");
-		m_Request.SetSize(8.0f);
+		//m_Request.SetFamilyName("00 Starmap");
+		m_Request.SetFamilyName("Roboto");
+		m_Request.SetSize(24.0f);
 
 		m_Face = m_Library->RequestFace(m_Request);
 		m_TextField->SetFont(m_Face);
