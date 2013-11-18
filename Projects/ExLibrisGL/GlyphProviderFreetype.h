@@ -22,54 +22,53 @@
  * SOFTWARE.
  */
 
-#include "ExLibrisGL.PCH.h"
+#pragma once
 
-#include "IFont.h"
-
-#include "Family.h"
-#include "FontFace.h"
+#include "FontLoaderFreetype.h"
+#include "IGlyphProvider.h"
 
 namespace ExLibris
 {
 
-	IFont::IFont(Family* a_Family)
-		: m_Family(a_Family)
-		, m_Weight(eWeight_Normal)
-		, m_Style(eStyle_None)
+	class GlyphProviderFreetype
+		: public IGlyphProvider
 	{
-		if (m_Family != nullptr)
-		{
-			m_Family->AddFont(this);
-		}
-	}
-	
-	IFont::~IFont()
-	{
-	}
 
-	Family* IFont::GetFamily() const
-	{
-		return m_Family;
-	}
+	public:
 
-	Weight IFont::GetWeight() const
-	{
-		return m_Weight;
-	}
+		GlyphProviderFreetype(Library* a_Library, FT_Face a_Face, FT_Byte* a_Buffer, size_t a_BufferSize);
+		~GlyphProviderFreetype();
 
-	void IFont::SetWeight(Weight a_Weight)
-	{
-		m_Weight = a_Weight;
-	}
+		bool HasKerning() const;
+		bool IsScalable() const;
+		bool IsSizeAvailable(float a_Size) const;
 
-	Style IFont::GetStyle() const
-	{
-		return m_Style;
-	}
+		unsigned int GetIndexForCodepoint(int a_CodepointUtf32);
 
-	void IFont::SetStyle(Style a_Style)
-	{
-		m_Style = a_Style;
-	}
+		GlyphMetrics* CreateMetrics(float a_Size, unsigned int a_Index);
+		GlyphBitmap* CreateBitmap(float a_Size, unsigned int a_Index);
+		CurvePath* CreateOutline(float a_Size, unsigned int a_Index);
+
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, float a_Size, unsigned int a_IndexCurrent, unsigned int a_IndexNext);
+
+		Face* CreateFace(float a_Size);
+
+	private:
+
+		bool _SetSize(float a_Size);
+		bool _LoadGlyph(unsigned int a_Index);
+
+	private:
+
+		FT_Face m_Face;
+		FT_Byte* m_Buffer;
+		size_t m_BufferSize;
+
+		FT_F26Dot6 m_SizeLoaded;
+		FT_UInt m_GlyphLoaded;
+
+		FT_Outline_Funcs m_OutlineCallbacks;
+
+	}; // class GlyphProviderFreetype
 
 }; // namespace ExLibris

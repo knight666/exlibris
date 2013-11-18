@@ -24,53 +24,50 @@
 
 #pragma once
 
-#include "CurvePath.h"
-#include "GlyphBitmap.h"
-#include "GlyphMetrics.h"
+#include "IGlyphProvider.h"
 
 namespace ExLibris
 {
 
-	struct Glyph
+	class Face
 	{
-
-		Glyph()
-			: index(0)
-			, metrics(nullptr)
-			, bitmap(nullptr)
-			, outline(nullptr)
-		{
-		}
-
-		~Glyph()
-		{
-			if (metrics != nullptr)
-			{
-				delete metrics;
-				metrics = nullptr;
-			}
-			
-			if (bitmap != nullptr)
-			{
-				delete bitmap;
-				bitmap = nullptr;
-			}
-
-			if (outline != nullptr)
-			{
-				delete outline;
-				outline = nullptr;
-			}
-		}
-
-	public:
-
-		unsigned int index;
-		GlyphMetrics* metrics;
-		GlyphBitmap* bitmap;
-		CurvePath* outline;
-		std::map<unsigned int, glm::vec2> kernings;
 	
-	}; // struct Glyph
+	public:
+	
+		Face(IGlyphProvider& a_Provider, const FontMetrics& a_Metrics);
+		~Face();
+
+		Family* GetFamily() const;
+
+		Weight GetWeight() const;
+
+		Style GetStyle() const;
+
+		float GetSize() const;
+		float GetLineHeight() const;
+		float GetAscent() const;
+		float GetDescent() const;
+
+		size_t GetMetricsLoaded() const;
+		GlyphMetrics* CreateMetrics(int a_Codepoint);
+
+		size_t GetBitmapsLoaded() const;
+		GlyphBitmap* CreateBitmap(int a_Codepoint);
+
+		size_t GetOutlinesLoaded() const;
+		CurvePath* CreateOutline(int a_Codepoint);
+
+		bool TryGetKerningAdjustment(glm::vec2& a_Adjustment, int a_CodepointCurrent, int a_CodepointNext);
+
+	private:
+
+		IGlyphProvider& m_Provider;
+		FontMetrics m_Metrics;
+
+		std::map<int, GlyphMetrics*> m_GlyphMetrics;
+		std::map<int, GlyphBitmap*> m_GlyphBitmaps;
+		std::map<int, CurvePath*> m_GlyphOutlines;
+	
+	}; // class Face
 
 }; // namespace ExLibris

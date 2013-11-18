@@ -25,16 +25,14 @@ namespace fw = Framework;
 
 // ExLibris
 
-#include <FontFace.h>
-#include <FontFreetype.h>
 #include <FontLoaderFreetype.h>
+#include <GlyphBitmap.h>
 #include <Library.h>
 #include <TextLayout.h>
 
 namespace exl = ExLibris;
 
 class TextField
-	: public exl::ITextLayoutVisitor
 {
 
 private:
@@ -190,14 +188,14 @@ public:
 		glBindVertexArray(0);
 	}
 
-	void SetFont(exl::FontFace* a_Font)
+	void SetFont(exl::Face* a_Font)
 	{
 		m_Font = a_Font;
-		m_Layout->SetFontFace(m_Font);
+		m_Layout->SetFace(m_Font);
 
-		m_RenderCorrection.y = -m_Font->GetAscender();
+		m_RenderCorrection.y = -m_Font->GetAscent();
 
-		m_Layout->Accept(*this);
+		BuildTexture();
 	}
 
 	void SetPosition(const glm::vec2& a_Position)
@@ -210,7 +208,7 @@ public:
 		m_Text.push_back((char)a_Character);
 
 		m_Layout->SetText(m_Text);
-		m_Layout->Accept(*this);
+		BuildTexture();
 	}
 
 	void PopCharacter()
@@ -220,8 +218,95 @@ public:
 			m_Text.pop_back();
 
 			m_Layout->SetText(m_Text);
-			m_Layout->Accept(*this);
+			BuildTexture();
 		}
+	}
+
+	void BuildTexture()
+	{
+		m_Layout->Layout();
+
+		exl::BoundingBox bounds = m_Layout->GetBoundingBox();
+		glm::vec2 dimensions = bounds.GetDimensions();
+
+		// texture must be padded in order to support effects like glow and shadows
+
+		m_TextureWidth = (unsigned int)dimensions.x + (m_TexturePadding.x * 2);
+		m_TexturePitch = m_TextureWidth * 4;
+		m_TextureHeight = (unsigned int)dimensions.y + (m_TexturePadding.y * 2);
+
+		m_TextureDimensions.x = (float)m_TextureWidth;
+		m_TextureDimensions.y = (float)m_TextureHeight;
+
+		m_TextureData = new unsigned char[m_TexturePitch * m_TextureHeight];
+
+		unsigned int clear_color = 0x00000000;
+
+		for (unsigned int y = 0; y < m_TextureHeight; ++y)
+		{
+			unsigned int* dst = (unsigned int*)(m_TextureData + y * m_TexturePitch);
+
+			for (unsigned int x = 0; x < m_TextureWidth; ++x)
+			{
+				*dst++ = clear_color;
+			}
+		}
+
+		m_TextureCorrection = -bounds.GetMinimum() + glm::vec2(m_TexturePadding);
+		m_RenderCorrection = -m_TextureCorrection;
+
+		m_HelperLayout->Clear();
+		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+		m_HelperLines->Clear();
+		m_HelperLines->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		m_HelperGlyphs->Clear();
+		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+
+		m_HelperBitmaps->Clear();
+		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+		exl::BoundingBox box = bounds.GetTranslated(m_Position);
+		m_HelperLayout->AddBox(box);
+
+		const std::vector<exl::TextLine*>& lines = m_Layout->GetLines();
+
+		for (std::vector<exl::TextLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
+		{
+			exl::TextLine* line = *line_it;
+
+			exl::BoundingBox box = line->bounding_box.GetTranslated(m_Position);
+			m_HelperLines->AddBox(box);
+
+			for (std::vector<exl::TextCharacter*>::const_iterator char_it = line->characters.begin(); char_it != line->characters.end(); ++char_it)
+			{
+				exl::TextCharacter* character = *char_it;
+
+				m_CursorPosition.x = character->x + character->advance;
+
+				exl::BoundingBox box = character->bounding_box.GetTranslated(m_Position);
+				m_HelperGlyphs->AddBox(box);
+
+				if (character->type == exl::TextCharacter::eType_Character)
+				{
+					_AddCharacterToTexture(character);
+				}
+			}
+		}
+
+		glBindTexture(GL_TEXTURE_2D, m_Texture);
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGBA,
+			m_TextureWidth, m_TextureHeight,
+			0,
+			GL_BGRA, GL_UNSIGNED_BYTE, m_TextureData
+		);
+
+		delete [] m_TextureData;
+		m_TextureData = nullptr;
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void Update(float a_DeltaTime)
@@ -322,138 +407,55 @@ public:
 
 private:
 
-	void VisitTextBegin(const exl::FontFace* a_Face, const glm::vec2& a_Dimensions, const ExLibris::BoundingBox& a_BoundingBox)
+	void _AddCharacterToTexture(exl::TextCharacter* a_Character)
 	{
-		glm::vec2 dimensions = a_BoundingBox.GetDimensions();
+		glm::vec2 texture_position = a_Character->bounding_box.GetMinimum() + m_TextureCorrection;
 
-		// texture must be padded in order to support effects like glow and shadows
-
-		m_TextureWidth = (unsigned int)dimensions.x + (m_TexturePadding.x * 2);
-		m_TexturePitch = m_TextureWidth * 4;
-		m_TextureHeight = (unsigned int)dimensions.y + (m_TexturePadding.y * 2);
-
-		m_TextureDimensions.x = (float)m_TextureWidth;
-		m_TextureDimensions.y = (float)m_TextureHeight;
-
-		m_TextureData = new unsigned char[m_TexturePitch * m_TextureHeight];
-
-		unsigned int clear_color = 0x00000000;
-
-		for (unsigned int y = 0; y < m_TextureHeight; ++y)
+		exl::GlyphBitmap* bitmap = m_Font->CreateBitmap(a_Character->identifier);
+		if (bitmap != nullptr)
 		{
-			unsigned int* dst = (unsigned int*)(m_TextureData + y * m_TexturePitch);
+			unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
+			unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
 
-			for (unsigned int x = 0; x < m_TextureWidth; ++x)
+			unsigned int src_pitch = bitmap->width * 4;
+			unsigned char* src = bitmap->data;
+
+			for (unsigned int y = 0; y < bitmap->height; ++y)
 			{
-				*dst++ = clear_color;
-			}
-		}
-
-		m_TextureCorrection = -a_BoundingBox.GetMinimum() + glm::vec2(m_TexturePadding);
-		m_RenderCorrection = -m_TextureCorrection;
-
-		m_HelperLayout->Clear();
-		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-		m_HelperLines->Clear();
-		m_HelperLines->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-		m_HelperGlyphs->Clear();
-		m_HelperGlyphs->SetColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
-
-		m_HelperBitmaps->Clear();
-		m_HelperBitmaps->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-
-		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
-		m_HelperLayout->AddBox(box);
-	}
-
-	void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const exl::BoundingBox& a_BoundingBox)
-	{
-		m_CursorPosition = a_Offset;
-
-		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
-		m_HelperLines->AddBox(box);
-	}
-
-	void VisitTextCharacter(const exl::Glyph* a_Glyph, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
-	{
-		exl::GlyphMetrics* metrics = a_Glyph->metrics;
-		exl::GlyphBitmap* bitmap = a_Glyph->bitmap;
-
-		m_CursorPosition.x = a_X + a_Advance;
-
-		glm::vec2 texture_position = a_BoundingBox.GetMinimum() + m_TextureCorrection;
-
-		exl::BoundingBox box = a_BoundingBox.GetTranslated(m_Position);
-		m_HelperGlyphs->AddBox(box);
-
-		unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
-		unsigned char* dst_end = m_TextureData + m_TexturePitch * m_TextureHeight;
-
-		unsigned int src_pitch = bitmap->width * 4;
-		unsigned char* src = bitmap->data;
-
-		for (unsigned int y = 0; y < bitmap->height; ++y)
-		{
-			if (dst >= m_TextureData && dst + src_pitch < dst_end)
-			{
-				unsigned int* dst_line = (unsigned int*)dst;
-				unsigned int* src_line = (unsigned int*)src;
-
-				for (unsigned int x = 0; x < bitmap->width; ++x)
+				if (dst >= m_TextureData && dst + src_pitch < dst_end)
 				{
-					unsigned int src_a = (*src_line & 0x000000FF);
-					unsigned int src_r = (*src_line & 0x0000FF00) >> 8;
-					unsigned int src_g = (*src_line & 0x00FF0000) >> 16;
-					unsigned int src_b = (*src_line & 0xFF000000) >> 24;
+					unsigned int* dst_line = (unsigned int*)dst;
+					unsigned int* src_line = (unsigned int*)src;
 
-					unsigned int dst_a = (*dst_line & 0x000000FF);
-					unsigned int dst_r = (*dst_line & 0x0000FF00) >> 8;
-					unsigned int dst_g = (*dst_line & 0x00FF0000) >> 16;
-					unsigned int dst_b = (*dst_line & 0xFF000000) >> 24;
+					for (unsigned int x = 0; x < bitmap->width; ++x)
+					{
+						unsigned int src_a = (*src_line & 0x000000FF);
+						unsigned int src_r = (*src_line & 0x0000FF00) >> 8;
+						unsigned int src_g = (*src_line & 0x00FF0000) >> 16;
+						unsigned int src_b = (*src_line & 0xFF000000) >> 24;
 
-					unsigned int rgba =
-						((((src_a * src_a) + (dst_a * (255 - src_a))) >> 8) & 0x000000FF) |
-						((((src_r * src_a) + (dst_r * (255 - src_a))) >> 8) & 0x000000FF) << 8 |
-						((((src_g * src_a) + (dst_g * (255 - src_a))) >> 8) & 0x000000FF) << 16 |
-						((((src_b * src_a) + (dst_b * (255 - src_a))) >> 8) & 0x000000FF) << 24;
+						unsigned int dst_a = (*dst_line & 0x000000FF);
+						unsigned int dst_r = (*dst_line & 0x0000FF00) >> 8;
+						unsigned int dst_g = (*dst_line & 0x00FF0000) >> 16;
+						unsigned int dst_b = (*dst_line & 0xFF000000) >> 24;
 
-					*dst_line = rgba;
+						unsigned int rgba =
+							((((src_a * src_a) + (dst_a * (255 - src_a))) >> 8) & 0x000000FF) |
+							((((src_r * src_a) + (dst_r * (255 - src_a))) >> 8) & 0x000000FF) << 8 |
+							((((src_g * src_a) + (dst_g * (255 - src_a))) >> 8) & 0x000000FF) << 16 |
+							((((src_b * src_a) + (dst_b * (255 - src_a))) >> 8) & 0x000000FF) << 24;
 
-					++dst_line;
-					++src_line;
+						*dst_line = rgba;
+
+						++dst_line;
+						++src_line;
+					}
+
+					dst += m_TexturePitch;
+					src += src_pitch;
 				}
-			
-				dst += m_TexturePitch;
-				src += src_pitch;
 			}
 		}
-	}
-
-	void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const exl::BoundingBox& a_BoundingBox)
-	{
-		m_CursorPosition.x = a_X + a_Advance;
-	}
-
-	void VisitTextLineEnd()
-	{
-	}
-
-	void VisitTextEnd()
-	{
-		glBindTexture(GL_TEXTURE_2D, m_Texture);
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGBA,
-			m_TextureWidth, m_TextureHeight,
-			0,
-			GL_BGRA, GL_UNSIGNED_BYTE, m_TextureData
-		);
-
-		delete [] m_TextureData;
-		m_TextureData = nullptr;
-
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 private:
@@ -470,7 +472,7 @@ private:
 	bool m_HelperBitmapsVisible;
 
 	glm::vec2 m_Position;
-	exl::FontFace* m_Font;
+	exl::Face* m_Font;
 	exl::TextLayout* m_Layout;
 	std::string m_Text;
 
@@ -506,7 +508,7 @@ public:
 		: fw::Application(a_ArgumentCount, a_Arguments)
 		, m_Library(nullptr)
 		, m_TextField(nullptr)
-		, m_FontFace(nullptr)
+		, m_Face(nullptr)
 		, m_ProgramEffects(nullptr)
 		, m_UseShadow(false)
 		, m_UseGlow(false)
@@ -528,8 +530,8 @@ public:
 
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
-		m_Library->LoadFont("Fonts/Roboto/Roboto-Regular.ttf");
-		m_Library->LoadFont("Fonts/Mathilde/mathilde.otf");
+		m_Library->MapFontToFile("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Library->MapFontToFile("Fonts/00_starmap/00.fon");
 
 		try
 		{
@@ -544,11 +546,11 @@ public:
 		m_TextField = new TextField(m_Library, m_ProgramEffects);
 		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
 		
-		m_Request.SetFamilyName("Mathilde");
-		m_Request.SetSize(60.0f);
+		m_Request.SetFamilyName("00 Starmap");
+		m_Request.SetSize(8.0f);
 
-		m_FontFace = m_Library->RequestFace(m_Request);
-		m_TextField->SetFont(m_FontFace);
+		m_Face = m_Library->RequestFace(m_Request);
+		m_TextField->SetFont(m_Face);
 
 		return true;
 	}
@@ -590,6 +592,11 @@ public:
 
 	void Destroy()
 	{
+		if (m_Face != nullptr)
+		{
+			delete m_Face;
+		}
+
 		delete m_DebugHelper;
 
 		if (m_TextField != nullptr)
@@ -686,8 +693,8 @@ private:
 			{
 				m_Request.SetSize(m_Request.GetSize() - 1.0f);
 
-				m_FontFace = m_Library->RequestFace(m_Request);
-				m_TextField->SetFont(m_FontFace);
+				m_Face = m_Library->RequestFace(m_Request);
+				m_TextField->SetFont(m_Face);
 
 			} break;
 
@@ -695,8 +702,8 @@ private:
 			{
 				m_Request.SetSize(m_Request.GetSize() + 1.0f);
 
-				m_FontFace = m_Library->RequestFace(m_Request);
-				m_TextField->SetFont(m_FontFace);
+				m_Face = m_Library->RequestFace(m_Request);
+				m_TextField->SetFont(m_Face);
 
 			} break;
 
@@ -727,9 +734,8 @@ private:
 private:
 
 	exl::Library* m_Library;
-	exl::IFont* m_Font;
 	exl::FaceRequest m_Request;
-	exl::FontFace* m_FontFace;
+	exl::Face* m_Face;
 	fw::DebugHelper* m_DebugHelper;
 
 	TextField* m_TextField;

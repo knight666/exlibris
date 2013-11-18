@@ -31,42 +31,42 @@ namespace ExLibris
 			}
 		}
 	
-		void VisitTextBegin(const FontFace* a_Face, const glm::vec2& a_Dimensions, const BoundingBox& a_BoundingBox)
+		void VisitTextBegin(const Face* a_Face, const BoundingBox& a_BoundingBox)
 		{
 			face = a_Face;
-			dimensions = a_Dimensions;
+			dimensions = a_BoundingBox.GetDimensions();
 		}
 
-		void VisitTextLineBegin(size_t a_GlyphCount, const glm::vec2& a_Offset, float a_Width, const BoundingBox& a_BoundingBox)
+		void VisitTextLineBegin(const TextLine* a_Line)
 		{
 			line_current = new VisitLine;
-			line_current->glyph_count = a_GlyphCount;
-			line_current->offset = a_Offset;
-			line_current->width = a_Width;
+			line_current->glyph_count = a_Line->characters.size();
+			line_current->offset = a_Line->position;
+			line_current->width = a_Line->dimensions.x;
 
 			lines.push_back(line_current);
 		}
 
-		void VisitTextCharacter(const Glyph* a_Glyph, float a_X, float a_Advance, const BoundingBox& a_BoundingBox)
+		void VisitTextCharacter(const TextCharacter* a_Character)
 		{
 			VisitGlyph* glyph = new VisitGlyph;
-			glyph->glyph = a_Glyph;
-			glyph->x = a_X;
-			glyph->advance = a_Advance;
+			glyph->metrics = a_Character->metrics;
+			glyph->x = a_Character->x;
+			glyph->advance = a_Character->advance;
 
-			line_current->text.push_back((wchar_t)a_Glyph->index);
+			line_current->text.push_back((wchar_t)a_Character->identifier);
 
 			glyphs.push_back(glyph);
 		}
 
-		void VisitTextWhitespace(unsigned int a_Identifier, float a_X, float a_Advance, const BoundingBox& a_BoundingBox)
+		void VisitTextWhitespace(const TextCharacter* a_Character)
 		{
 			VisitGlyph* glyph = new VisitGlyph;
-			glyph->glyph = nullptr;
-			glyph->x = a_X;
-			glyph->advance = a_Advance;
+			glyph->metrics = a_Character->metrics;
+			glyph->x = a_Character->x;
+			glyph->advance = a_Character->advance;
 
-			line_current->text.push_back((wchar_t)a_Identifier);
+			line_current->text.push_back((wchar_t)a_Character->identifier);
 
 			glyphs.push_back(glyph);
 		}
@@ -81,7 +81,7 @@ namespace ExLibris
 
 	public:
 
-		const FontFace* face;
+		const Face* face;
 		glm::vec2 dimensions;
 
 		struct VisitLine
@@ -97,7 +97,7 @@ namespace ExLibris
 
 		struct VisitGlyph
 		{
-			const Glyph* glyph;
+			const GlyphMetrics* metrics;
 			float x;
 			float advance;
 		};

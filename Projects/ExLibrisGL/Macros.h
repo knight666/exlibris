@@ -24,39 +24,7 @@
 
 #pragma once
 
-#include "IFont.h"
+// Glyph indices
 
-namespace ExLibris
-{
-	class FontFace;
-	struct GlyphBitmap;
-	class Library;
-}
-
-namespace ExLibris
-{
-
-	class FontSystem
-		: public IFont
-	{
-	
-	public:
-	
-		FontSystem(Family* a_Family);
-		~FontSystem();
-	
-		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
-
-		FontFace* CreateFace(const FaceOptions& a_Options);
-
-	private:
-
-		GlyphBitmap* _DecodeBitmap(unsigned int a_Index) const;
-
-	private:
-
-		FontFace* m_Face;
-	
-	}; // class FontSystem
-
-}; // namespace ExLibris
+#define EXL_INVALID_INDEX             0x7FFFFFFF
+#define EXL_IS_INDEX_INVALID(_index)  ((_index) == EXL_INVALID_INDEX)

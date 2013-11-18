@@ -2,139 +2,150 @@
 
 #include <Family.h>
 
-#include "Mock.Font.h"
+#include "Mock.GlyphProvider.h"
 
 using namespace ExLibris;
 
-TEST(Family, AddFont)
+TEST(Family, Construct)
 {
 	Family* fam = new Family(nullptr, "Kittykat");
 
-	MockFont* font = new MockFont(fam);
-	fam->AddFont(font);
-
-	EXPECT_EQ(1, fam->GetFontCount());
+	EXPECT_STREQ("Kittykat", fam->GetName().c_str());
+	EXPECT_EQ(0, fam->GetGlyphProviderCount());
 }
 
-TEST(Family, AddFontTwice)
+TEST(Family, AddGlyphProvider)
 {
-	Family* fam = new Family(nullptr, "Bangers 'N Mash");
+	Family* fam = new Family(nullptr, "Headphone");
 
-	MockFont* font = new MockFont(fam);
-	fam->AddFont(font);
-	fam->AddFont(font);
+	MockGlyphProvider* provider = new MockGlyphProvider(nullptr);
+	fam->AddGlyphProvider(provider);
 
-	EXPECT_EQ(1, fam->GetFontCount());
+	EXPECT_EQ(1, fam->GetGlyphProviderCount());
 }
 
-TEST(Family, FindFont)
+TEST(Family, AddGlyphProviderTwice)
 {
-	Family* fam = new Family(nullptr, "Veranda");
+	Family* fam = new Family(nullptr, "Britain's Finest");
 
-	MockFont* font = new MockFont(fam);
-	font->SetWeight(eWeight_Bold);
-	font->SetStyle(eStyle_None);
+	MockGlyphProvider* provider = new MockGlyphProvider(nullptr);
+	fam->AddGlyphProvider(provider);
+	fam->AddGlyphProvider(provider);
 
-	fam->AddFont(font);
-
-	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_None);
-	EXPECT_EQ(font, font_found);
+	EXPECT_EQ(1, fam->GetGlyphProviderCount());
 }
 
-TEST(Family, FindFontMatchWeight)
+TEST(Family, AddGlyphProviderNull)
 {
-	Family* fam = new Family(nullptr, "Droned");
+	Family* fam = new Family(nullptr, "Tweedy");
 
-	MockFont* font = new MockFont(fam);
-	font->SetWeight(eWeight_Bold);
-	font->SetStyle(eStyle_Italicized);
+	MockGlyphProvider* provider = nullptr;
+	fam->AddGlyphProvider(provider);
 
-	fam->AddFont(font);
-
-	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_None);
-	EXPECT_EQ(font, font_found);
+	EXPECT_EQ(0, fam->GetGlyphProviderCount());
 }
 
-TEST(Family, FindFontMatchStyle)
+TEST(Family, FindGlyphProvider)
 {
-	Family* fam = new Family(nullptr, "BigBoned");
+	Family* fam = new Family(nullptr, "Bananaband");
 
-	MockFont* font = new MockFont(fam);
-	font->SetWeight(eWeight_Bold);
-	font->SetStyle(eStyle_Italicized);
+	MockGlyphProvider* provider = new MockGlyphProvider(nullptr);
+	provider->SetWeight(eWeight_Bold);
+	provider->SetStyle(eStyle_Italicized);
 
-	fam->AddFont(font);
+	fam->AddGlyphProvider(provider);
 
-	IFont* font_found = fam->FindFont(eWeight_Normal, eStyle_Italicized);
-	EXPECT_EQ(font, font_found);
+	IGlyphProvider* found = fam->FindGlyphProvider(16.0f, eWeight_Bold, eStyle_Italicized);
+	EXPECT_EQ(provider, found);
 }
 
-TEST(Family, FindFontBestMatchWeight)
+TEST(Family, FindGlyphProviderMatchWeight)
 {
-	Family* fam = new Family(nullptr, "Racketeer");
+	Family* fam = new Family(nullptr, "PuppetShow");
 
-	MockFont* font_first = new MockFont(fam);
-	font_first->SetWeight(eWeight_Normal);
-	font_first->SetStyle(eStyle_None);
-	fam->AddFont(font_first);
+	MockGlyphProvider* provider_first = new MockGlyphProvider(nullptr);
+	provider_first->SetWeight(eWeight_Bold);
+	provider_first->SetStyle(eStyle_None);
+	fam->AddGlyphProvider(provider_first);
 
-	MockFont* font_second = new MockFont(fam);
-	font_second->SetWeight(eWeight_Bold);
-	font_second->SetStyle(eStyle_None);
-	fam->AddFont(font_second);
+	MockGlyphProvider* provider_second = new MockGlyphProvider(nullptr);
+	provider_second->SetWeight(eWeight_Normal);
+	provider_second->SetStyle(eStyle_None);
+	fam->AddGlyphProvider(provider_second);
 
-	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_None);
-	EXPECT_EQ(font_second, font_found);
+	IGlyphProvider* found = fam->FindGlyphProvider(48.0f, eWeight_Bold, eStyle_None);
+	EXPECT_EQ(provider_first, found);
 }
 
-TEST(Family, FindFontBestMatchStyle)
+TEST(Family, FindGlyphProviderMatchStyle)
 {
-	Family* fam = new Family(nullptr, "Hairy Head");
+	Family* fam = new Family(nullptr, "FieldConsole");
 
-	MockFont* font_first = new MockFont(fam);
-	font_first->SetWeight(eWeight_Normal);
-	font_first->SetStyle(eStyle_Italicized);
-	fam->AddFont(font_first);
+	MockGlyphProvider* provider_first = new MockGlyphProvider(nullptr);
+	provider_first->SetWeight(eWeight_Normal);
+	provider_first->SetStyle(eStyle_None);
+	fam->AddGlyphProvider(provider_first);
 
-	MockFont* font_second = new MockFont(fam);
-	font_second->SetWeight(eWeight_Normal);
-	font_second->SetStyle(eStyle_None);
-	fam->AddFont(font_second);
+	MockGlyphProvider* provider_second = new MockGlyphProvider(nullptr);
+	provider_second->SetWeight(eWeight_Normal);
+	provider_second->SetStyle(eStyle_Italicized);
+	fam->AddGlyphProvider(provider_second);
 
-	IFont* font_found = fam->FindFont(eWeight_Normal, eStyle_Italicized);
-	EXPECT_EQ(font_first, font_found);
+	IGlyphProvider* found = fam->FindGlyphProvider(22.4f, eWeight_Normal, eStyle_Italicized);
+	EXPECT_EQ(provider_second, found);
 }
 
-TEST(Family, FindFontPartialMatch)
+TEST(Family, FindGlyphProviderMatchWeightButNotStyle)
 {
-	Family* fam = new Family(nullptr, "Ringading");
+	Family* fam = new Family(nullptr, "Grafixor");
 
-	MockFont* font = new MockFont(fam);
-	font->SetWeight(eWeight_Bold);
-	font->SetStyle(eStyle_None);
-	fam->AddFont(font);
+	MockGlyphProvider* provider_first = new MockGlyphProvider(nullptr);
+	provider_first->SetWeight(eWeight_Bold);
+	provider_first->SetStyle(eStyle_None);
+	fam->AddGlyphProvider(provider_first);
 
-	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_Italicized);
-	EXPECT_EQ(font, font_found);
+	MockGlyphProvider* provider_second = new MockGlyphProvider(nullptr);
+	provider_second->SetWeight(eWeight_Normal);
+	provider_second->SetStyle(eStyle_Italicized);
+	fam->AddGlyphProvider(provider_second);
+
+	IGlyphProvider* found = fam->FindGlyphProvider(55.68f, eWeight_Bold, eStyle_Italicized);
+	EXPECT_EQ(provider_first, found);
 }
 
-TEST(Family, FindFontNoMatch)
+TEST(Family, FindGlyphProviderMatchStyleButNotWeight)
 {
-	Family* fam = new Family(nullptr, "Destroyer of Cookies");
+	Family* fam = new Family(nullptr, "Megabonus");
 
-	MockFont* font = new MockFont(fam);
-	font->SetWeight(eWeight_Normal);
-	font->SetStyle(eStyle_None);
-	fam->AddFont(font);
+	MockGlyphProvider* provider_first = new MockGlyphProvider(nullptr);
+	provider_first->SetWeight(eWeight_Normal);
+	provider_first->SetStyle(eStyle_Italicized);
+	fam->AddGlyphProvider(provider_first);
 
-	IFont* font_found = fam->FindFont(eWeight_Bold, eStyle_Italicized);
-	EXPECT_EQ(nullptr, font_found);
+	MockGlyphProvider* provider_second = new MockGlyphProvider(nullptr);
+	provider_second->SetWeight(eWeight_Bold);
+	provider_second->SetStyle(eStyle_None);
+	fam->AddGlyphProvider(provider_second);
+
+	IGlyphProvider* found = fam->FindGlyphProvider(14.5f, eWeight_Normal, eStyle_None);
+	EXPECT_EQ(provider_first, found);
 }
 
-TEST(Family, FindFontEmpty)
+TEST(Family, FindGlyphProviderMatchSizeNotAvailable)
 {
-	Family* fam = new Family(nullptr, "Teacup");
+	Family* fam = new Family(nullptr, "Paperthin");
 
-	IFont* font_found = fam->FindFont(eWeight_Normal, eStyle_Italicized);
-	EXPECT_EQ(nullptr, font_found);
+	MockGlyphProvider* provider_first = new MockGlyphProvider(nullptr);
+	provider_first->size_blacklist.insert(18.2f);
+	provider_first->SetWeight(eWeight_Normal);
+	provider_first->SetStyle(eStyle_Italicized);
+	fam->AddGlyphProvider(provider_first);
+
+	MockGlyphProvider* provider_second = new MockGlyphProvider(nullptr);
+	provider_second->SetWeight(eWeight_Bold);
+	provider_second->SetStyle(eStyle_None);
+	fam->AddGlyphProvider(provider_second);
+
+	IGlyphProvider* found = fam->FindGlyphProvider(18.2f, eWeight_Normal, eStyle_Italicized);
+	EXPECT_EQ(provider_second, found);
 }

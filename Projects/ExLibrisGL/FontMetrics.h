@@ -24,49 +24,39 @@
 
 #pragma once
 
-#include "FreetypeErrors.h"
-#include "IFont.h"
+#include "Style.h"
+#include "Weight.h"
 
 namespace ExLibris
 {
-	struct Glyph;
+	class Family;
 }
 
 namespace ExLibris
 {
 
-	class FontFreetype
-		: public IFont
+	struct FontMetrics
 	{
-	
-	public:
-	
-		FontFreetype(Family* a_Family);
-		~FontFreetype();
 
-		unsigned int GetIndexFromCodepoint(unsigned int a_CodepointUtf32) const;
+		FontMetrics()
+			: family(nullptr)
+			, weight(eWeight_Normal)
+			, style(eStyle_None)
+			, size(0.0f)
+			, line_height(0.0f)
+			, ascent(0.0f)
+			, descent(0.0f)
+		{
+		}
 
-		void SetFontData(FT_Face a_Font, FT_Byte* a_Buffer, size_t a_BufferSize);
+		Family* family;
+		Weight weight;
+		Style style;
+		float size;
+		float line_height;
+		float ascent;
+		float descent;
 
-		FontFace* CreateFace(const FaceOptions& a_Options);
-
-	private:
-
-		bool _LoadMetrics(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Size_Metrics a_FontMetrics) const;
-		bool _LoadBitmapColor(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
-		bool _LoadBitmapMono(FT_GlyphSlot a_Slot, Glyph* a_Glyph) const;
-		bool _LoadOutline(FT_GlyphSlot a_Slot, Glyph* a_Glyph, FT_Size_Metrics a_FontMetrics) const;
-
-	private:
-
-		FT_Face m_Font;
-		FT_Byte* m_Buffer;
-		size_t m_BufferSize;
-
-		FT_Outline_Funcs m_OutlineCallbacks;
-
-		std::map<float, FontFace*> m_Faces;
-	
-	}; // class FontFreetype
+	};
 
 }; // namespace ExLibris

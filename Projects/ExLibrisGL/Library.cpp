@@ -27,9 +27,11 @@
 #include "Library.h"
 
 #include "Exception.h"
+#include "FaceOptions.h"
 #include "Family.h"
-#include "FontSystem.h"
+#include "GlyphProviderSystem.h"
 #include "IFontLoader.h"
+#include "IGlyphProvider.h"
 
 namespace ExLibris
 {
@@ -37,7 +39,7 @@ namespace ExLibris
 	Library::Library()
 	{
 		Family* family = CreateFamily("System");
-		new FontSystem(family);
+		family->AddGlyphProvider(new GlyphProviderSystem(this));
 	}
 	
 	Library::~Library()
@@ -75,40 +77,40 @@ namespace ExLibris
 		m_Loaders.push_back(a_Loader);
 	}
 
-	IFont* Library::LoadFont(const std::string& a_Path)
+	bool Library::MapFontToFile(const std::string& a_Path) const
 	{
 		std::fstream file_stream(a_Path, std::ios::in | std::ios::binary);
 		if (!file_stream.is_open())
 		{
-			return nullptr;
+			return false;
 		}
 
-		IFont* result = LoadFont(file_stream);
+		bool result = MapFontToStream(file_stream);
 
 		file_stream.close();
 
 		return result;
 	}
 
-	IFont* Library::LoadFont(std::istream& a_Stream)
+	bool Library::MapFontToStream(std::istream& a_Stream) const
 	{
-		if (m_Loaders.size() == 0)
-		{
-			return nullptr;
-		}
-
-		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		for (std::vector<IFontLoader*>::const_iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
 		{
 			IFontLoader* loader = *loader_it;
 
-			IFont* loaded = loader->LoadFont(a_Stream);
-			if (loaded != nullptr)
+			IGlyphProvider* provider = provider = loader->LoadGlyphProvider(a_Stream);
+			if (provider != nullptr)
 			{
-				return loaded;
+				if (provider->GetFamily() != nullptr)
+				{
+					provider->GetFamily()->AddGlyphProvider(provider);
+				}
+
+				return true;
 			}
 		}
 
-		return nullptr;
+		return false;
 	}
 
 	size_t Library::GetFamilyCount() const
@@ -145,25 +147,25 @@ namespace ExLibris
 		}
 	}
 
-	FontFace* Library::RequestFace(const FaceRequest& a_Request)
+	Face* Library::RequestFace(const FaceRequest& a_Request) const
 	{
 		Family* family = nullptr;
 		if (a_Request.HasFamilyName())
 		{
 			family = FindFamily(a_Request.GetFamilyName());
+
+			if (family == nullptr)
+			{
+				std::stringstream ss;
+				ss << "Could not find family named \"" << a_Request.GetFamilyName() << "\".";
+				EXL_THROW("Library::RequestFace", ss.str().c_str());
+
+				return nullptr;
+			}
 		}
 		else
 		{
 			family = FindFamily("System");
-		}
-
-		if (family == nullptr)
-		{
-			std::stringstream ss;
-			ss << "Could not find family named \"" << a_Request.GetFamilyName() << "\".";
-			EXL_THROW("Library::RequestFace", ss.str().c_str());
-
-			return nullptr;
 		}
 
 		Weight weight = eWeight_Normal;
@@ -178,38 +180,19 @@ namespace ExLibris
 			style = a_Request.GetStyle();
 		}
 
-		IFont* font = family->FindFont(weight, style);
-		if (font == nullptr)
-		{
-			std::stringstream ss;
-			ss << "Could not find font with specified weight and style.";
-			EXL_THROW("Library::RequestFace", ss.str().c_str());
-
-			return nullptr;
-		}
-
-		FaceOptions options;
-
+		float size = 10.0f;
 		if (a_Request.HasSize())
 		{
-			options.size = a_Request.GetSize();
-		}
-		else
-		{
-			options.size = 10.0f;
+			size = a_Request.GetSize();
 		}
 
-		FontFace* face = font->CreateFace(options);
-		if (face == nullptr)
+		IGlyphProvider* provider = family->FindGlyphProvider(size, weight, style);
+		if (provider == nullptr)
 		{
-			std::stringstream ss;
-			ss << "Could not create face of size " << options.size << ".";
-			EXL_THROW("Library::RequestFace", ss.str().c_str());
-
 			return nullptr;
 		}
 
-		return face;
+		return provider->CreateFace(size);
 	}
 
 }; // namespace ExLibris
