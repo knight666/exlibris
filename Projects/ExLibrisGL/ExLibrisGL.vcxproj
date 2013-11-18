@@ -85,7 +85,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="GlyphProviderFreetype.cpp" />
-    <ClCompile Include="FontSystem.cpp" />
     <ClCompile Include="FreetypeErrors.cpp" />
     <ClCompile Include="GlyphProviderSystem.cpp" />
     <ClCompile Include="IFont.cpp" />
@@ -113,7 +112,6 @@
     <ClInclude Include="FontLoaderFreetype.h" />
     <ClInclude Include="FontMetrics.h" />
     <ClInclude Include="GlyphProviderFreetype.h" />
-    <ClInclude Include="FontSystem.h" />
     <ClInclude Include="FreetypeConversion.h" />
     <ClInclude Include="FreetypeErrors.h" />
     <ClInclude Include="Glyph.h" />
