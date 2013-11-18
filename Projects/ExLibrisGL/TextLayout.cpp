@@ -182,13 +182,13 @@ namespace ExLibris
 	{
 		Layout();
 
-		/*a_Visitor.VisitTextBegin(m_FontFace, m_Dimensions, m_BoundingBox);
+		a_Visitor.VisitTextBegin(m_Face, m_BoundingBox);
 
 		for (std::vector<TextLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
 		{
 			TextLine* line = *line_it;
 
-			a_Visitor.VisitTextLineBegin(line->characters.size(), line->position, line->dimensions.x, line->bounding_box);
+			a_Visitor.VisitTextLineBegin(line);
 
 			for (std::vector<TextCharacter*>::iterator glyph_it = line->characters.begin(); glyph_it != line->characters.end(); ++glyph_it)
 			{
@@ -196,18 +196,18 @@ namespace ExLibris
 
 				if (glyph->type == TextCharacter::eType_Character)
 				{
-					a_Visitor.VisitTextCharacter(glyph->glyph, glyph->x, glyph->advance, glyph->bounding_box);
+					a_Visitor.VisitTextCharacter(glyph);
 				}
 				else if (glyph->type == TextCharacter::eType_Whitespace)
 				{
-					a_Visitor.VisitTextWhitespace(glyph->identifier, glyph->x, glyph->advance, glyph->bounding_box);
+					a_Visitor.VisitTextWhitespace(glyph);
 				}
 			}
 
 			a_Visitor.VisitTextLineEnd();
 		}
 
-		a_Visitor.VisitTextEnd();*/
+		a_Visitor.VisitTextEnd();
 	}
 
 	std::vector<int> TextLayout::_AsciiToUtf32(const std::string& a_Text)
@@ -232,11 +232,6 @@ namespace ExLibris
 		{
 			char_next_it = text_utf32.begin() + 1;
 		}
-
-		/*unsigned int char_space = (unsigned int)' ';
-		unsigned int char_tab = (unsigned int)'\t';
-		unsigned int char_carriage_return = (unsigned int)'\r';
-		unsigned int char_new_line = (unsigned int)'\n';*/
 
 		const int codepoint_space = 0x20;
 		const int codepoint_tab = (int)'\t';
