@@ -69,68 +69,6 @@ TEST(Library, FindFamilyNotFound)
 	ASSERT_EQ(nullptr, fam);
 }
 
-TEST(Library, RequestFontFace)
-{
-	Library* lib = new Library;
-
-	Family* fam = lib->CreateFamily("Roboto");
-	MockFont* fnt = new MockFont(fam);
-
-	FaceRequest fr;
-	fr.SetFamilyName("Roboto");
-	fr.SetSize(16.0f);
-
-	FontFace* face = lib->RequestFontFace(fr);
-	EXPECT_FLOAT_EQ(16.0f, face->GetSize());
-	EXPECT_STREQ("Roboto", face->GetFamily()->GetName().c_str());
-}
-
-TEST(Library, RequestFontFaceEmpty)
-{
-	Library* lib = new Library;
-
-	FaceRequest fr;
-
-	FontFace* face = lib->RequestFontFace(fr);
-	EXPECT_STREQ("System", face->GetFamily()->GetName().c_str());
-	EXPECT_FLOAT_EQ(12.0f, face->GetSize());
-}
-
-TEST(Library, RequestFaceFamilyNotFound)
-{
-	Library* lib = new Library;
-
-	FaceRequest fr;
-	fr.SetFamilyName("Comic Sans MS");
-
-	FontFace* face = nullptr;
-	
-	EXPECT_THROW({
-		face = lib->RequestFontFace(fr);
-	}, Exception);
-
-	EXPECT_EQ(nullptr, face);
-}
-
-TEST(Library, RequestFaceFontNotFound)
-{
-	Library* lib = new Library;
-
-	Family* fam = lib->CreateFamily("Gravity");
-
-	FaceRequest fr;
-	fr.SetFamilyName("Gravity");
-	fr.SetWeight(eWeight_Bold);
-
-	FontFace* face = nullptr;
-	
-	EXPECT_THROW({
-		face = lib->RequestFontFace(fr);
-	}, Exception);
-
-	EXPECT_EQ(nullptr, face);
-}
-
 TEST(Library, MapFontAndFindFamily)
 {
 	Library* library = new Library;
