@@ -32,6 +32,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <CurvePath.h>
 #include <CurveSettings.h>
 #include <Family.h>
 #include <Face.h>
