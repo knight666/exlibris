@@ -299,28 +299,33 @@ namespace ExLibris
 			case TextCharacter::eType_Character:
 				{
 					metrics_current = m_Face->GetGlyphMetrics(codepoint);
-					
-					if (next_char_valid)
-					{
-						glm::vec2 adjustment;
-						if (m_Face->TryGetKerningAdjustment(adjustment, codepoint, *char_next_it))
-						{
-							glyph_advance += adjustment.x;
-						}
-					}
 
-					glyph_identifier = codepoint;
-					glyph_advance = metrics_current->advance;
-					glyph_valid = true;
+					glyph_valid = (metrics_current != nullptr);
+					if (glyph_valid)
+					{
+						if (next_char_valid)
+						{
+							glm::vec2 adjustment;
+							if (m_Face->TryGetKerningAdjustment(adjustment, codepoint, *char_next_it))
+							{
+								glyph_advance += adjustment.x;
+							}
+						}
+
+						glyph_identifier = codepoint;
+						glyph_advance = metrics_current->advance;
+					}
 
 				} break;
 
 			case TextCharacter::eType_Whitespace:
 				{
-					glyph_valid = true;
-
-					metrics_current = m_MetricsSpace;
-					glyph_advance = m_MetricsSpace->advance * whitespace_count;
+					glyph_valid = (m_MetricsSpace != nullptr);
+					if (glyph_valid)
+					{
+						metrics_current = m_MetricsSpace;
+						glyph_advance = m_MetricsSpace->advance * whitespace_count;
+					}
 
 				} break;
 
