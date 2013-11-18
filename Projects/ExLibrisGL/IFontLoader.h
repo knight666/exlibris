@@ -26,7 +26,6 @@
 
 namespace ExLibris
 {
-	class IFont;
 	class IGlyphProvider;
 	class Library;
 }
@@ -47,8 +46,6 @@ namespace ExLibris
 		virtual ~IFontLoader()
 		{
 		}
-
-		virtual IFont* LoadFont(std::istream& a_Stream) = 0;
 
 		virtual IGlyphProvider* LoadGlyphProvider(std::istream& a_Stream) = 0;
 
