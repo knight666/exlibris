@@ -107,12 +107,12 @@ namespace ExLibris
 		return m_Metrics.descent;
 	}
 
-	size_t Face::GetGlyphMetricsLoaded() const
+	size_t Face::GetMetricsLoaded() const
 	{
 		return m_GlyphMetrics.size();
 	}
 
-	GlyphMetrics* Face::GetGlyphMetrics(int a_Codepoint)
+	GlyphMetrics* Face::CreateMetrics(int a_Codepoint)
 	{
 		std::map<int, GlyphMetrics*>::iterator found = m_GlyphMetrics.find(a_Codepoint);
 		if (found != m_GlyphMetrics.end())
@@ -135,12 +135,12 @@ namespace ExLibris
 		}
 	}
 
-	size_t Face::GetGlyphBitmapsLoaded() const
+	size_t Face::GetBitmapsLoaded() const
 	{
 		return m_GlyphBitmaps.size();
 	}
 
-	GlyphBitmap* Face::GetGlyphBitmap(int a_Codepoint)
+	GlyphBitmap* Face::CreateBitmap(int a_Codepoint)
 	{
 		std::map<int, GlyphBitmap*>::iterator found = m_GlyphBitmaps.find(a_Codepoint);
 		if (found != m_GlyphBitmaps.end())

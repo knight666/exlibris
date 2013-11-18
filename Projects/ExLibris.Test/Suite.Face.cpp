@@ -55,12 +55,12 @@ TEST_F(FaceContext, Construct)
 	EXPECT_FLOAT_EQ(-4.0f, face->GetDescent());
 }
 
-TEST_F(FaceContext, GetGlyphMetrics)
+TEST_F(FaceContext, CreateMetrics)
 {
-	GlyphMetrics* metrics = face->GetGlyphMetrics((int)'P');
+	GlyphMetrics* metrics = face->CreateMetrics((int)'P');
 	ASSERT_NE(nullptr, metrics);
 
-	EXPECT_EQ(1, face->GetGlyphMetricsLoaded());
+	EXPECT_EQ(1, face->GetMetricsLoaded());
 
 	EXPECT_VEC2_EQ(4.0f, 8.0f, metrics->offset);
 	EXPECT_FLOAT_EQ(12.0f, metrics->advance);
@@ -68,55 +68,55 @@ TEST_F(FaceContext, GetGlyphMetrics)
 	EXPECT_VEC2_EQ(10.0f, 10.0f, metrics->bounding_box.GetMaximum());
 }
 
-TEST_F(FaceContext, GetGlyphMetricsTwice)
+TEST_F(FaceContext, CreateMetricsTwice)
 {
-	GlyphMetrics* metrics = face->GetGlyphMetrics(0x219);
-	GlyphMetrics* metrics_again = face->GetGlyphMetrics(0x219);
+	GlyphMetrics* metrics = face->CreateMetrics(0x219);
+	GlyphMetrics* metrics_again = face->CreateMetrics(0x219);
 
 	EXPECT_EQ(metrics_again, metrics);
 
-	EXPECT_EQ(1, face->GetGlyphMetricsLoaded());
+	EXPECT_EQ(1, face->GetMetricsLoaded());
 }
 
-TEST_F(FaceContext, GetGlyphMetricsNotFound)
+TEST_F(FaceContext, CreateMetricsNotFound)
 {
 	provider->codepoint_blacklist.insert(0x45);
 
-	GlyphMetrics* metrics = face->GetGlyphMetrics(0x45);
+	GlyphMetrics* metrics = face->CreateMetrics(0x45);
 	EXPECT_EQ(nullptr, metrics);
 
-	EXPECT_EQ(1, face->GetGlyphMetricsLoaded());
+	EXPECT_EQ(1, face->GetMetricsLoaded());
 }
 
-TEST_F(FaceContext, GetGlyphBitmap)
+TEST_F(FaceContext, CreateBitmap)
 {
-	GlyphBitmap* bitmap = face->GetGlyphBitmap(0x999);
+	GlyphBitmap* bitmap = face->CreateBitmap(0x999);
 	ASSERT_NE(nullptr, bitmap);
 
-	EXPECT_EQ(1, face->GetGlyphBitmapsLoaded());
+	EXPECT_EQ(1, face->GetBitmapsLoaded());
 
 	EXPECT_EQ(8, bitmap->width);
 	EXPECT_EQ(8, bitmap->height);
 }
 
-TEST_F(FaceContext, GetGlyphBitmapTwice)
+TEST_F(FaceContext, CreateBitmapTwice)
 {
-	GlyphBitmap* bitmap = face->GetGlyphBitmap(32);
-	GlyphBitmap* bitmap_again = face->GetGlyphBitmap(32);
+	GlyphBitmap* bitmap = face->CreateBitmap(32);
+	GlyphBitmap* bitmap_again = face->CreateBitmap(32);
 
 	EXPECT_EQ(bitmap_again, bitmap);
 
-	EXPECT_EQ(1, face->GetGlyphBitmapsLoaded());
+	EXPECT_EQ(1, face->GetBitmapsLoaded());
 }
 
-TEST_F(FaceContext, GetGlyphBitmapNotFound)
+TEST_F(FaceContext, CreateBitmapNotFound)
 {
 	provider->codepoint_blacklist.insert(788);
 
-	GlyphBitmap* bitmap = face->GetGlyphBitmap(788);
+	GlyphBitmap* bitmap = face->CreateBitmap(788);
 	EXPECT_EQ(nullptr, bitmap);
 
-	EXPECT_EQ(1, face->GetGlyphBitmapsLoaded());
+	EXPECT_EQ(1, face->GetBitmapsLoaded());
 }
 
 TEST_F(FaceContext, CreateOutline)

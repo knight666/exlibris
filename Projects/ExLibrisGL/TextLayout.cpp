@@ -51,7 +51,7 @@ namespace ExLibris
 	{
 		m_Face = a_Face;
 
-		m_MetricsSpace = m_Face->GetGlyphMetrics(0x20);
+		m_MetricsSpace = m_Face->CreateMetrics(0x20);
 
 		m_GlyphsDirty = true;
 	}
@@ -294,7 +294,7 @@ namespace ExLibris
 
 			case TextCharacter::eType_Character:
 				{
-					metrics_current = m_Face->GetGlyphMetrics(codepoint);
+					metrics_current = m_Face->CreateMetrics(codepoint);
 
 					glyph_valid = (metrics_current != nullptr);
 					if (glyph_valid)

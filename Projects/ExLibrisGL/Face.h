@@ -48,11 +48,11 @@ namespace ExLibris
 		float GetAscent() const;
 		float GetDescent() const;
 
-		size_t GetGlyphMetricsLoaded() const;
-		GlyphMetrics* GetGlyphMetrics(int a_Codepoint);
+		size_t GetMetricsLoaded() const;
+		GlyphMetrics* CreateMetrics(int a_Codepoint);
 
-		size_t GetGlyphBitmapsLoaded() const;
-		GlyphBitmap* GetGlyphBitmap(int a_Codepoint);
+		size_t GetBitmapsLoaded() const;
+		GlyphBitmap* CreateBitmap(int a_Codepoint);
 
 		size_t GetOutlinesLoaded() const;
 		CurvePath* CreateOutline(int a_Codepoint);
