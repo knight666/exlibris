@@ -78,7 +78,6 @@
     <ClCompile Include="Family.cpp" />
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="FontFace.cpp" />
-    <ClCompile Include="FontFreetype.cpp" />
     <ClCompile Include="FontLoaderFreetype.cpp" />
     <ClCompile Include="ExLibrisGL.PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -108,7 +107,6 @@
     <ClInclude Include="FaceRequest.h" />
     <ClInclude Include="Family.h" />
     <ClInclude Include="FontFace.h" />
-    <ClInclude Include="FontFreetype.h" />
     <ClInclude Include="FontLoaderFreetype.h" />
     <ClInclude Include="FontMetrics.h" />
     <ClInclude Include="GlyphProviderFreetype.h" />
