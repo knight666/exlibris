@@ -95,20 +95,22 @@ namespace ExLibris
 
 	bool Tokenizer::ReadToken()
 	{
+		m_TokenCurrent.text.clear();
+
+		m_TokenCurrent.column = m_Column;
+		m_TokenCurrent.line = m_Line;
+
 		if (!IsNextTokenAvailable())
 		{
+			m_TokenCurrent.type = Token::eType_End;
+
 			return false;
 		}
 
 		// determine token type
 
 		m_TokenCurrent.type = _GetTypeForCharacter(m_CharacterCurrent);
-
-		m_TokenCurrent.text.clear();
 		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
-
-		m_TokenCurrent.column = m_Column;
-		m_TokenCurrent.line = m_Line;
 
 		// read only one symbol
 
@@ -141,14 +143,10 @@ namespace ExLibris
 	bool Tokenizer::_TryReadCharacter()
 	{
 		m_CharacterCurrent = m_Stream->get();
-		bool result = (m_CharacterCurrent != -1);
 
-		if (result)
-		{
-			m_Column++;
-		}
+		m_Column++;
 
-		return result;
+		return (m_CharacterCurrent != -1);
 	}
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)

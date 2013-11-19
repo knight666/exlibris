@@ -13,6 +13,15 @@ using namespace ExLibris;
 	EXPECT_EQ(_line, t.line); \
 }
 
+#define EXPECT_END_TOKEN(_column, _line) { \
+	EXPECT_FALSE(tk.ReadToken()); \
+	const Token& t = tk.GetCurrentToken(); \
+	EXPECT_EQ(Token::eType_End, t.type); \
+	EXPECT_STREQ("", t.text.c_str()); \
+	EXPECT_EQ(_column, t.column); \
+	EXPECT_EQ(_line, t.line); \
+}
+
 TEST(Tokenizer, Construct)
 {
 	std::stringstream ss;
@@ -72,6 +81,13 @@ TEST(Tokenizer, SetInputNoDataAvailable)
 	EXPECT_FALSE(tk.IsNextTokenAvailable());
 }
 
+TEST(Tokenizer, ReadEmpty)
+{
+	Tokenizer tk(nullptr);
+
+	EXPECT_END_TOKEN(1, 1);
+}
+
 TEST(Tokenizer, ReadString)
 {
 	std::stringstream ss;
@@ -80,6 +96,7 @@ TEST(Tokenizer, ReadString)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_String, "Teacup", 1, 1);
+	EXPECT_END_TOKEN(7, 1);
 }
 
 TEST(Tokenizer, ReadWhitespace)
@@ -90,6 +107,7 @@ TEST(Tokenizer, ReadWhitespace)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Whitespace, "    \t   \t   ", 1, 1);
+	EXPECT_END_TOKEN(13, 1);
 }
 
 TEST(Tokenizer, ReadSentence)
@@ -106,6 +124,7 @@ TEST(Tokenizer, ReadSentence)
 	EXPECT_TOKEN(Token::eType_String, "a", 10, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
 	EXPECT_TOKEN(Token::eType_String, "bomb", 12, 1);
+	EXPECT_END_TOKEN(16, 1);
 }
 
 TEST(Tokenizer, ReadSymbols)
@@ -147,6 +166,7 @@ TEST(Tokenizer, ReadSymbols)
 	EXPECT_TOKEN(Token::eType_Symbol, "|", 30, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "}", 31, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "~", 32, 1);
+	EXPECT_END_TOKEN(33, 1);
 }
 
 TEST(Tokenizer, ReadEncapsulatedSentence)
@@ -171,4 +191,5 @@ TEST(Tokenizer, ReadEncapsulatedSentence)
 	EXPECT_TOKEN(Token::eType_String, "think", 21, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, ".", 26, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "\"", 27, 1);
+	EXPECT_END_TOKEN(28, 1);
 }
