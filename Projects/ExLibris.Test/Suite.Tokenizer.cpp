@@ -107,3 +107,68 @@ TEST(Tokenizer, ReadSentence)
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
 	EXPECT_TOKEN(Token::eType_String, "bomb", 12, 1);
 }
+
+TEST(Tokenizer, ReadSymbols)
+{
+	std::stringstream ss;
+	ss << "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "!", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "\"", 2, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "#", 3, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "$", 4, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "%", 5, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "&", 6, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "'", 7, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "(", 8, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ")", 9, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "*", 10, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "+", 11, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ",", 12, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "-", 13, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 14, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "/", 15, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ":", 16, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ";", 17, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "<", 18, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "=", 19, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ">", 20, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "?", 21, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "@", 22, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "[", 23, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "\\", 24, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "]", 25, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "^", 26, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "_", 27, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "`", 28, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "{", 29, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "|", 30, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "}", 31, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "~", 32, 1);
+}
+
+TEST(Tokenizer, ReadEncapsulatedSentence)
+{
+	std::stringstream ss;
+	ss << "\"This is a drill, I think.\"";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "\"", 1, 1);
+	EXPECT_TOKEN(Token::eType_String, "This", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 6, 1);
+	EXPECT_TOKEN(Token::eType_String, "is", 7, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
+	EXPECT_TOKEN(Token::eType_String, "a", 10, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
+	EXPECT_TOKEN(Token::eType_String, "drill", 12, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ",", 17, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 18, 1);
+	EXPECT_TOKEN(Token::eType_String, "I", 19, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 20, 1);
+	EXPECT_TOKEN(Token::eType_String, "think", 21, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 26, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "\"", 27, 1);
+}

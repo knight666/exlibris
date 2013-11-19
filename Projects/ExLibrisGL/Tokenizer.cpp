@@ -29,28 +29,29 @@
 namespace ExLibris
 {
 
-	class CharacterTypeWhitespace
-	{
 
-	public:
+#define TYPE_CLASS_NAME(_name) CharacterType##_name
+#define TYPE_CLASS(_name, ...) \
+	class TYPE_CLASS_NAME(_name) { \
+		public: \
+			static inline bool IsKnown(int a_Character) { \
+				static const int identifiers[] = { __VA_ARGS__ }; \
+				static const int identifiers_size = sizeof(identifiers) / sizeof(int); \
+				for (int i = 0; i < identifiers_size; ++i) { \
+					if (a_Character == identifiers[i]) { return true; } \
+				} \
+				return false; \
+			} \
+	} \
 
-		static inline bool IsKnown(int a_Character)
-		{
-			static const int identifiers[] = { ' ', '\t' };
-			static const int identifiers_size = sizeof(identifiers) / sizeof(int);
-
-			for (int i = 0; i < identifiers_size; ++i)
-			{
-				if (a_Character == identifiers[i])
-				{
-					return true;
-				}
-			}
-			
-			return false;
-		}
-
-	};
+	TYPE_CLASS(Symbol, 
+		'!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', 
+		',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', 
+		'[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'
+	);
+	TYPE_CLASS(Whitespace,
+		' ', '\t'
+	);
 
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(nullptr)
@@ -109,6 +110,15 @@ namespace ExLibris
 		m_TokenCurrent.column = m_Column;
 		m_TokenCurrent.line = m_Line;
 
+		// read only one symbol
+
+		if (m_TokenCurrent.type == Token::eType_Symbol)
+		{
+			_TryReadCharacter();
+
+			return true;
+		}
+
 		while (1)
 		{
 			if (!_TryReadCharacter())
@@ -148,6 +158,10 @@ namespace ExLibris
 		if (_IsCharacterOfType<CharacterTypeWhitespace>(a_Character))
 		{
 			found_type = Token::eType_Whitespace;
+		}
+		else if (_IsCharacterOfType<CharacterTypeSymbol>(a_Character))
+		{
+			found_type = Token::eType_Symbol;
 		}
 
 		return found_type;
