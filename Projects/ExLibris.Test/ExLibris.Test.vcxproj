@@ -84,6 +84,7 @@
     <ClCompile Include="Suite.MeshBuilder.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
+    <ClCompile Include="Suite.Tokenizer.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>

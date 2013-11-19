@@ -93,6 +93,7 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="TextLayout.cpp" />
+    <ClCompile Include="Tokenizer.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +132,8 @@
     <ClInclude Include="TextCharacter.h" />
     <ClInclude Include="TextLayout.h" />
     <ClInclude Include="TextLine.h" />
+    <ClInclude Include="Token.h" />
+    <ClInclude Include="Tokenizer.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
     <ClInclude Include="TriangleOrientation.h" />
