@@ -4,6 +4,15 @@
 
 using namespace ExLibris;
 
+#define EXPECT_TOKEN(_type, _text, _column, _line) { \
+	EXPECT_TRUE(tk.ReadToken()); \
+	const Token& t = tk.GetCurrentToken(); \
+	EXPECT_EQ(_type, t.type); \
+	EXPECT_STREQ(_text, t.text.c_str()); \
+	EXPECT_EQ(_column, t.column); \
+	EXPECT_EQ(_line, t.line); \
+}
+
 TEST(Tokenizer, Construct)
 {
 	std::stringstream ss;
@@ -70,14 +79,7 @@ TEST(Tokenizer, ReadString)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TRUE(tk.ReadToken());
-
-	const Token& t = tk.GetCurrentToken();
-
-	EXPECT_EQ(Token::eType_String, t.type);
-	EXPECT_STREQ("Teacup", t.text.c_str());
-	EXPECT_EQ(0, t.column);
-	EXPECT_EQ(0, t.line);
+	EXPECT_TOKEN(Token::eType_String, "Teacup", 1, 1);
 }
 
 TEST(Tokenizer, ReadWhitespace)
@@ -87,14 +89,7 @@ TEST(Tokenizer, ReadWhitespace)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TRUE(tk.ReadToken());
-
-	const Token& t = tk.GetCurrentToken();
-
-	EXPECT_EQ(Token::eType_Whitespace, t.type);
-	EXPECT_STREQ("    \t   \t   ", t.text.c_str());
-	EXPECT_EQ(0, t.column);
-	EXPECT_EQ(0, t.line);
+	EXPECT_TOKEN(Token::eType_Whitespace, "    \t   \t   ", 1, 1);
 }
 
 TEST(Tokenizer, ReadSentence)
@@ -104,40 +99,11 @@ TEST(Tokenizer, ReadSentence)
 
 	Tokenizer tk(&ss);
 
-	const Token* t = nullptr;
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_String, t->type);
-	EXPECT_STREQ("Mary", t->text.c_str());
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_Whitespace, t->type);
-	EXPECT_STREQ(" ", t->text.c_str());
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_String, t->type);
-	EXPECT_STREQ("had", t->text.c_str());
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_Whitespace, t->type);
-	EXPECT_STREQ(" ", t->text.c_str());
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_String, t->type);
-	EXPECT_STREQ("a", t->text.c_str());
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_Whitespace, t->type);
-	EXPECT_STREQ(" ", t->text.c_str());
-
-	EXPECT_TRUE(tk.ReadToken());
-	t = &tk.GetCurrentToken();
-	EXPECT_EQ(Token::eType_String, t->type);
-	EXPECT_STREQ("bomb", t->text.c_str());
+	EXPECT_TOKEN(Token::eType_String, "Mary", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 5, 1);
+	EXPECT_TOKEN(Token::eType_String, "had", 6, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
+	EXPECT_TOKEN(Token::eType_String, "a", 10, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
+	EXPECT_TOKEN(Token::eType_String, "bomb", 12, 1);
 }
