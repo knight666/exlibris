@@ -34,16 +34,21 @@ namespace ExLibris
 	
 	public:
 	
-		Tokenizer(std::istream* a_Stream);
+		Tokenizer(std::basic_istream<char>* a_Stream);
 		~Tokenizer();
 
-		bool IsNextTokenAvailable() const;
+		void SetInput(std::basic_istream<char>* a_Stream);
 
-		void SetInput(std::istream* a_Stream);
+		const Token& GetCurrentToken() const;
+
+		bool IsNextTokenAvailable() const;
+		bool ReadToken();
 
 	private:
 
-		std::istream* m_Stream;
+		std::basic_istream<char>* m_Stream;
+
+		Token m_TokenCurrent;
 	
 	}; // class Tokenizer
 
