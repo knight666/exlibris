@@ -34,6 +34,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleTextField", "Project
 		{BBC4F8F8-9B70-4A49-89F8-B8B669D26E80} = {BBC4F8F8-9B70-4A49-89F8-B8B669D26E80}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleFaceSelection", "Projects\ExampleFaceSelection\ExampleFaceSelection.vcxproj", "{395A7C55-094C-4F83-8A04-0B6DAF86BFBC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7C129A70-911A-49AF-9B93-D23C6A55E5D6} = {7C129A70-911A-49AF-9B93-D23C6A55E5D6}
+		{BBC4F8F8-9B70-4A49-89F8-B8B669D26E80} = {BBC4F8F8-9B70-4A49-89F8-B8B669D26E80}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -68,6 +74,10 @@ Global
 		{13BA6A40-ABA9-4D34-AA17-F56EB0E40967}.Debug|Win32.Build.0 = Debug|Win32
 		{13BA6A40-ABA9-4D34-AA17-F56EB0E40967}.Release|Win32.ActiveCfg = Release|Win32
 		{13BA6A40-ABA9-4D34-AA17-F56EB0E40967}.Release|Win32.Build.0 = Release|Win32
+		{395A7C55-094C-4F83-8A04-0B6DAF86BFBC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{395A7C55-094C-4F83-8A04-0B6DAF86BFBC}.Debug|Win32.Build.0 = Debug|Win32
+		{395A7C55-094C-4F83-8A04-0B6DAF86BFBC}.Release|Win32.ActiveCfg = Release|Win32
+		{395A7C55-094C-4F83-8A04-0B6DAF86BFBC}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
