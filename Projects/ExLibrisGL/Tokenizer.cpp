@@ -29,7 +29,7 @@
 namespace ExLibris
 {
 
-	Tokenizer::Tokenizer(std::istream* a_Stream)
+	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(a_Stream)
 	{
 	}
@@ -38,14 +38,46 @@ namespace ExLibris
 	{
 	}
 
+	void Tokenizer::SetInput(std::basic_istream<char>* a_Stream)
+	{
+		m_Stream = a_Stream;
+	}
+
+	const Token& Tokenizer::GetCurrentToken() const
+	{
+		return m_TokenCurrent;
+	}
+
 	bool Tokenizer::IsNextTokenAvailable() const
 	{
 		return (m_Stream != nullptr && !m_Stream->eof());
 	}
 
-	void Tokenizer::SetInput(std::istream* a_Stream)
+	bool Tokenizer::ReadToken()
 	{
-		m_Stream = a_Stream;
+		if (!IsNextTokenAvailable())
+		{
+			return false;
+		}
+
+		m_TokenCurrent.text.clear();
+
+		while (1)
+		{
+			int byte = m_Stream->get();
+			if (byte < 0)
+			{
+				break;
+			}
+
+			m_TokenCurrent.text.push_back((char)byte);
+		}
+
+		m_TokenCurrent.type = Token::eType_String;
+		m_TokenCurrent.column = 0;
+		m_TokenCurrent.line = 0;
+
+		return true;
 	}
 
 }; // namespace ExLibris"

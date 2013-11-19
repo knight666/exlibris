@@ -62,3 +62,20 @@ TEST(Tokenizer, SetInputNoDataAvailable)
 
 	EXPECT_FALSE(tk.IsNextTokenAvailable());
 }
+
+TEST(Tokenizer, ReadTokenString)
+{
+	std::stringstream ss;
+	ss << "Teacup";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TRUE(tk.ReadToken());
+
+	const Token& t = tk.GetCurrentToken();
+
+	EXPECT_EQ(Token::eType_String, t.type);
+	EXPECT_STREQ("Teacup", t.text.c_str());
+	EXPECT_EQ(0, t.column);
+	EXPECT_EQ(0, t.line);
+}
