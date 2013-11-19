@@ -36,6 +36,7 @@ namespace ExLibris
 		{
 			eType_Start,
 			eType_String,
+			eType_Whitespace,
 			eType_End
 		};
 

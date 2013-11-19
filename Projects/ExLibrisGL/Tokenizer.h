@@ -46,10 +46,26 @@ namespace ExLibris
 
 	private:
 
+		bool _TryReadCharacter();
+
+		template<typename CharacterType>
+		bool _IsCharacterOfType(int a_Character);
+
+		Token::Type _GetTypeForCharacter(int a_Character);
+
+	private:
+
 		std::basic_istream<char>* m_Stream;
 
 		Token m_TokenCurrent;
+		int m_CharacterCurrent;
 	
 	}; // class Tokenizer
+
+	template<typename CharacterType>
+	inline bool Tokenizer::_IsCharacterOfType(int a_Character)
+	{
+		return (CharacterType::IsKnown(a_Character));
+	}
 
 }; // namespace ExLibris

@@ -63,7 +63,7 @@ TEST(Tokenizer, SetInputNoDataAvailable)
 	EXPECT_FALSE(tk.IsNextTokenAvailable());
 }
 
-TEST(Tokenizer, ReadTokenString)
+TEST(Tokenizer, ReadString)
 {
 	std::stringstream ss;
 	ss << "Teacup";
@@ -78,4 +78,66 @@ TEST(Tokenizer, ReadTokenString)
 	EXPECT_STREQ("Teacup", t.text.c_str());
 	EXPECT_EQ(0, t.column);
 	EXPECT_EQ(0, t.line);
+}
+
+TEST(Tokenizer, ReadWhitespace)
+{
+	std::stringstream ss;
+	ss << "    \t   \t   ";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TRUE(tk.ReadToken());
+
+	const Token& t = tk.GetCurrentToken();
+
+	EXPECT_EQ(Token::eType_Whitespace, t.type);
+	EXPECT_STREQ("    \t   \t   ", t.text.c_str());
+	EXPECT_EQ(0, t.column);
+	EXPECT_EQ(0, t.line);
+}
+
+TEST(Tokenizer, ReadSentence)
+{
+	std::stringstream ss;
+	ss << "Mary had a bomb";
+
+	Tokenizer tk(&ss);
+
+	const Token* t = nullptr;
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_String, t->type);
+	EXPECT_STREQ("Mary", t->text.c_str());
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_Whitespace, t->type);
+	EXPECT_STREQ(" ", t->text.c_str());
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_String, t->type);
+	EXPECT_STREQ("had", t->text.c_str());
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_Whitespace, t->type);
+	EXPECT_STREQ(" ", t->text.c_str());
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_String, t->type);
+	EXPECT_STREQ("a", t->text.c_str());
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_Whitespace, t->type);
+	EXPECT_STREQ(" ", t->text.c_str());
+
+	EXPECT_TRUE(tk.ReadToken());
+	t = &tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_String, t->type);
+	EXPECT_STREQ("bomb", t->text.c_str());
 }

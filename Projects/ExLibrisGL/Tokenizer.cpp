@@ -29,9 +29,34 @@
 namespace ExLibris
 {
 
-	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
-		: m_Stream(a_Stream)
+	class CharacterTypeWhitespace
 	{
+
+	public:
+
+		static inline bool IsKnown(int a_Character)
+		{
+			static const int identifiers[] = { ' ', '\t' };
+			static const int identifiers_size = sizeof(identifiers) / sizeof(int);
+
+			for (int i = 0; i < identifiers_size; ++i)
+			{
+				if (a_Character == identifiers[i])
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
+
+	};
+
+	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
+		: m_Stream(nullptr)
+		, m_CharacterCurrent(-1)
+	{
+		SetInput(a_Stream);
 	}
 	
 	Tokenizer::~Tokenizer()
@@ -41,6 +66,15 @@ namespace ExLibris
 	void Tokenizer::SetInput(std::basic_istream<char>* a_Stream)
 	{
 		m_Stream = a_Stream;
+
+		if (m_Stream != nullptr)
+		{
+			m_CharacterCurrent = m_Stream->get();
+		}
+		else
+		{
+			m_CharacterCurrent = -1;
+		}
 	}
 
 	const Token& Tokenizer::GetCurrentToken() const
@@ -50,7 +84,7 @@ namespace ExLibris
 
 	bool Tokenizer::IsNextTokenAvailable() const
 	{
-		return (m_Stream != nullptr && !m_Stream->eof());
+		return (m_Stream != nullptr && !m_Stream->eof() && m_CharacterCurrent != -1);
 	}
 
 	bool Tokenizer::ReadToken()
@@ -60,24 +94,52 @@ namespace ExLibris
 			return false;
 		}
 
+		// determine token type
+
+		m_TokenCurrent.type = _GetTypeForCharacter(m_CharacterCurrent);
 		m_TokenCurrent.text.clear();
+
+		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
 
 		while (1)
 		{
-			int byte = m_Stream->get();
-			if (byte < 0)
+			if (!_TryReadCharacter())
 			{
 				break;
 			}
 
-			m_TokenCurrent.text.push_back((char)byte);
+			Token::Type token_type_found = _GetTypeForCharacter(m_CharacterCurrent);
+			if (token_type_found != m_TokenCurrent.type)
+			{
+				break;
+			}
+
+			m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
 		}
 
-		m_TokenCurrent.type = Token::eType_String;
 		m_TokenCurrent.column = 0;
 		m_TokenCurrent.line = 0;
 
 		return true;
+	}
+
+	bool Tokenizer::_TryReadCharacter()
+	{
+		m_CharacterCurrent = m_Stream->get();
+		return (m_CharacterCurrent != -1);
+	}
+
+
+	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
+	{
+		Token::Type found_type = Token::eType_String;
+
+		if (_IsCharacterOfType<CharacterTypeWhitespace>(a_Character))
+		{
+			found_type = Token::eType_Whitespace;
+		}
+
+		return found_type;
 	}
 
 }; // namespace ExLibris"
