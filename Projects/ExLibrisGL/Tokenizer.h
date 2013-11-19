@@ -58,7 +58,10 @@ namespace ExLibris
 		std::basic_istream<char>* m_Stream;
 
 		Token m_TokenCurrent;
+
 		int m_CharacterCurrent;
+		int m_Column;
+		int m_Line;
 	
 	}; // class Tokenizer
 

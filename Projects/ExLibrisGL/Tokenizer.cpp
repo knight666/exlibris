@@ -55,6 +55,8 @@ namespace ExLibris
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(nullptr)
 		, m_CharacterCurrent(-1)
+		, m_Column(0)
+		, m_Line(0)
 	{
 		SetInput(a_Stream);
 	}
@@ -66,6 +68,9 @@ namespace ExLibris
 	void Tokenizer::SetInput(std::basic_istream<char>* a_Stream)
 	{
 		m_Stream = a_Stream;
+
+		m_Column = 1;
+		m_Line = 1;
 
 		if (m_Stream != nullptr)
 		{
@@ -97,9 +102,12 @@ namespace ExLibris
 		// determine token type
 
 		m_TokenCurrent.type = _GetTypeForCharacter(m_CharacterCurrent);
-		m_TokenCurrent.text.clear();
 
+		m_TokenCurrent.text.clear();
 		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
+
+		m_TokenCurrent.column = m_Column;
+		m_TokenCurrent.line = m_Line;
 
 		while (1)
 		{
@@ -117,18 +125,21 @@ namespace ExLibris
 			m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
 		}
 
-		m_TokenCurrent.column = 0;
-		m_TokenCurrent.line = 0;
-
 		return true;
 	}
 
 	bool Tokenizer::_TryReadCharacter()
 	{
 		m_CharacterCurrent = m_Stream->get();
-		return (m_CharacterCurrent != -1);
-	}
+		bool result = (m_CharacterCurrent != -1);
 
+		if (result)
+		{
+			m_Column++;
+		}
+
+		return result;
+	}
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
 	{
