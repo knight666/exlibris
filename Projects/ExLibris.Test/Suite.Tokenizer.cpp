@@ -193,3 +193,18 @@ TEST(Tokenizer, ReadEncapsulatedSentence)
 	EXPECT_TOKEN(Token::eType_Symbol, "\"", 27, 1);
 	EXPECT_END_TOKEN(28, 1);
 }
+
+TEST(Tokenizer, ReadNewLine)
+{
+	std::stringstream ss;
+	ss << "THIS\nIS\r\nMEGABUNNY";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_String, "THIS", 1, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\n", 5, 1);
+	EXPECT_TOKEN(Token::eType_String, "IS", 1, 2);
+	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 3, 2);
+	EXPECT_TOKEN(Token::eType_String, "MEGABUNNY", 1, 3);
+	EXPECT_END_TOKEN(10, 3);
+}

@@ -52,6 +52,9 @@ namespace ExLibris
 	TYPE_CLASS(Whitespace,
 		' ', '\t'
 	);
+	TYPE_CLASS(NewLine,
+		'\r', '\n'
+	);
 
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(nullptr)
@@ -128,6 +131,15 @@ namespace ExLibris
 
 			} break;
 
+		case Token::eType_NewLine:
+			{
+				result = _ReadOneOrMore();
+
+				m_Column = 1;
+				m_Line++;
+
+			} break;
+
 		case Token::eType_String:
 			{
 				result = _ReadOneOrMore();
@@ -183,6 +195,10 @@ namespace ExLibris
 		if (_IsCharacterOfType<CharacterTypeWhitespace>(a_Character))
 		{
 			found_type = Token::eType_Whitespace;
+		}
+		else if (_IsCharacterOfType<CharacterTypeNewLine>(a_Character))
+		{
+			found_type = Token::eType_NewLine;
 		}
 		else if (_IsCharacterOfType<CharacterTypeSymbol>(a_Character))
 		{
