@@ -140,7 +140,7 @@ namespace ExLibris
 
 			} break;
 
-		case Token::eType_String:
+		case Token::eType_Text:
 			{
 				result = _ReadOneOrMore();
 
@@ -190,7 +190,7 @@ namespace ExLibris
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
 	{
-		Token::Type found_type = Token::eType_String;
+		Token::Type found_type = Token::eType_Text;
 
 		if (_IsCharacterOfType<CharacterTypeWhitespace>(a_Character))
 		{

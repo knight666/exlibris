@@ -35,7 +35,7 @@ namespace ExLibris
 		enum Type
 		{
 			eType_Start,
-			eType_String,
+			eType_Text,
 			eType_Whitespace,
 			eType_NewLine,
 			eType_Symbol,

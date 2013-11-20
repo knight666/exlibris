@@ -88,14 +88,14 @@ TEST(Tokenizer, ReadEmpty)
 	EXPECT_END_TOKEN(1, 1);
 }
 
-TEST(Tokenizer, ReadString)
+TEST(Tokenizer, ReadText)
 {
 	std::stringstream ss;
 	ss << "Teacup";
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_String, "Teacup", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Teacup", 1, 1);
 	EXPECT_END_TOKEN(7, 1);
 }
 
@@ -117,13 +117,13 @@ TEST(Tokenizer, ReadSentence)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_String, "Mary", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Mary", 1, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 5, 1);
-	EXPECT_TOKEN(Token::eType_String, "had", 6, 1);
+	EXPECT_TOKEN(Token::eType_Text, "had", 6, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
-	EXPECT_TOKEN(Token::eType_String, "a", 10, 1);
+	EXPECT_TOKEN(Token::eType_Text, "a", 10, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
-	EXPECT_TOKEN(Token::eType_String, "bomb", 12, 1);
+	EXPECT_TOKEN(Token::eType_Text, "bomb", 12, 1);
 	EXPECT_END_TOKEN(16, 1);
 }
 
@@ -177,18 +177,18 @@ TEST(Tokenizer, ReadEncapsulatedSentence)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Symbol, "\"", 1, 1);
-	EXPECT_TOKEN(Token::eType_String, "This", 2, 1);
+	EXPECT_TOKEN(Token::eType_Text, "This", 2, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 6, 1);
-	EXPECT_TOKEN(Token::eType_String, "is", 7, 1);
+	EXPECT_TOKEN(Token::eType_Text, "is", 7, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
-	EXPECT_TOKEN(Token::eType_String, "a", 10, 1);
+	EXPECT_TOKEN(Token::eType_Text, "a", 10, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
-	EXPECT_TOKEN(Token::eType_String, "drill", 12, 1);
+	EXPECT_TOKEN(Token::eType_Text, "drill", 12, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, ",", 17, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 18, 1);
-	EXPECT_TOKEN(Token::eType_String, "I", 19, 1);
+	EXPECT_TOKEN(Token::eType_Text, "I", 19, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 20, 1);
-	EXPECT_TOKEN(Token::eType_String, "think", 21, 1);
+	EXPECT_TOKEN(Token::eType_Text, "think", 21, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, ".", 26, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "\"", 27, 1);
 	EXPECT_END_TOKEN(28, 1);
@@ -201,10 +201,10 @@ TEST(Tokenizer, ReadNewLine)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_String, "THIS", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "THIS", 1, 1);
 	EXPECT_TOKEN(Token::eType_NewLine, "\n", 5, 1);
-	EXPECT_TOKEN(Token::eType_String, "IS", 1, 2);
+	EXPECT_TOKEN(Token::eType_Text, "IS", 1, 2);
 	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 3, 2);
-	EXPECT_TOKEN(Token::eType_String, "MEGABUNNY", 1, 3);
+	EXPECT_TOKEN(Token::eType_Text, "MEGABUNNY", 1, 3);
 	EXPECT_END_TOKEN(10, 3);
 }
