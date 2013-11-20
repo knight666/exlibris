@@ -48,6 +48,9 @@ namespace ExLibris
 
 		bool _TryReadCharacter();
 
+		bool _ReadOne();
+		bool _ReadOneOrMore();
+
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
 

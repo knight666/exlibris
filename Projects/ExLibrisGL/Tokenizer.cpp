@@ -107,20 +107,56 @@ namespace ExLibris
 			return false;
 		}
 
-		// determine token type
-
 		m_TokenCurrent.type = _GetTypeForCharacter(m_CharacterCurrent);
+
 		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
 
-		// read only one symbol
+		bool result = false;
 
-		if (m_TokenCurrent.type == Token::eType_Symbol)
+		switch (m_TokenCurrent.type)
 		{
-			_TryReadCharacter();
 
-			return true;
+		case Token::eType_Symbol:
+			{
+				result = _ReadOne();
+
+			} break;
+
+		case Token::eType_Whitespace:
+			{
+				result = _ReadOneOrMore();
+
+			} break;
+
+		case Token::eType_String:
+			{
+				result = _ReadOneOrMore();
+
+			} break;
+
 		}
 
+		return result;
+	}
+
+	bool Tokenizer::_TryReadCharacter()
+	{
+		m_CharacterCurrent = m_Stream->get();
+
+		m_Column++;
+
+		return (m_CharacterCurrent != -1);
+	}
+
+	bool Tokenizer::_ReadOne()
+	{
+		_TryReadCharacter();
+
+		return true;
+	}
+
+	bool Tokenizer::_ReadOneOrMore()
+	{
 		while (1)
 		{
 			if (!_TryReadCharacter())
@@ -138,15 +174,6 @@ namespace ExLibris
 		}
 
 		return true;
-	}
-
-	bool Tokenizer::_TryReadCharacter()
-	{
-		m_CharacterCurrent = m_Stream->get();
-
-		m_Column++;
-
-		return (m_CharacterCurrent != -1);
 	}
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
