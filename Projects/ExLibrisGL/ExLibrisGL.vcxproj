@@ -93,6 +93,7 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="TextLayout.cpp" />
+    <ClCompile Include="TextLayoutCharacter.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +118,7 @@
     <ClInclude Include="IFontLoader.h" />
     <ClInclude Include="IGlyphProvider.h" />
     <ClInclude Include="IMeshVisitor.h" />
+    <ClInclude Include="ITextLayoutElement.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="Library.h" />
     <ClInclude Include="Line.h" />
@@ -130,6 +132,7 @@
     <ClInclude Include="Style.h" />
     <ClInclude Include="TextCharacter.h" />
     <ClInclude Include="TextLayout.h" />
+    <ClInclude Include="TextLayoutCharacter.h" />
     <ClInclude Include="TextLine.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
