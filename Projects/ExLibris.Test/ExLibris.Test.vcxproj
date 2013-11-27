@@ -85,6 +85,7 @@
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.TextLayoutCharacter.cpp" />
+    <ClCompile Include="Suite.TextLayoutSection.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>

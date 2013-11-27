@@ -32,9 +32,9 @@
 namespace ExLibris
 {
 
-	TextLayoutCharacter::TextLayoutCharacter(Face* a_Face, unsigned int a_GlyphIndex, GlyphMetrics* a_Metrics)
+	TextLayoutCharacter::TextLayoutCharacter(Face* a_Face, int a_Codepoint, GlyphMetrics* a_Metrics)
 		: m_Face(a_Face)
-		, m_GlyphIndex(a_GlyphIndex)
+		, m_Codepoint(a_Codepoint)
 		, m_Metrics(a_Metrics)
 		, m_Position(0.0f, 0.0f)
 		, m_Adjustment(0.0f, 0.0f)
@@ -45,9 +45,34 @@ namespace ExLibris
 	{
 	}
 
+	Face* TextLayoutCharacter::GetFace() const
+	{
+		return m_Face;
+	}
+
+	int TextLayoutCharacter::GetCodepoint() const
+	{
+		return m_Codepoint;
+	}
+
+	GlyphMetrics* TextLayoutCharacter::GetMetrics() const
+	{
+		return m_Metrics;
+	}
+	
+	const glm::vec2& TextLayoutCharacter::GetPosition() const
+	{
+		return m_Position;
+	}
+
 	void TextLayoutCharacter::SetPosition(const glm::vec2& a_Position)
 	{
 		m_Position = a_Position;
+	}
+
+	const glm::vec2& TextLayoutCharacter::GetKerningAdjustment() const
+	{
+		return m_Adjustment;
 	}
 
 	void TextLayoutCharacter::SetKerningAdjustment(const glm::vec2& a_Adjustment)

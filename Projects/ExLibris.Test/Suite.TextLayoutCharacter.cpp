@@ -14,6 +14,8 @@ TEST(TextLayoutCharacter, Construct)
 
 	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'A', face->CreateMetrics('A'));
 
+	EXPECT_EQ(face, character->GetFace());
+	EXPECT_EQ('A', character->GetCodepoint());
 	EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetLayoutGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetLayoutGeometry().GetDimensions());
 	EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetElementGeometry().GetTopLeft());
