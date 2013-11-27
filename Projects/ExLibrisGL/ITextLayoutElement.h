@@ -43,14 +43,14 @@ namespace ExLibris
 
 		virtual ~ITextLayoutElement()
 		{
+			for (std::vector<ITextLayoutElement*>::iterator child_it = m_Children.begin(); child_it != m_Children.end(); ++child_it)
+			{
+				delete *child_it;
+			}
+			m_Children.clear();
 		}
 	
 	public:
-
-		const glm::mat3x3& GetLocalTransform() const
-		{
-			return m_TransformLocal;
-		}
 
 		const BoundingBox& GetElementGeometry() const
 		{
@@ -60,6 +60,11 @@ namespace ExLibris
 		const BoundingBox& GetLayoutGeometry() const
 		{
 			return m_LayoutGeometry;
+		}
+
+		size_t GetChildrenCount() const
+		{
+			return m_Children.size();
 		}
 
 		void AddChild(ITextLayoutElement* a_Child)
@@ -108,8 +113,6 @@ namespace ExLibris
 
 		BoundingBox m_ElementGeometry;
 		BoundingBox m_LayoutGeometry;
-		glm::mat3x3 m_TransformLocal;
-		glm::mat3x3 m_TransformGlobal;
 	
 	}; // class ITextLayoutElement
 

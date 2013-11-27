@@ -28,31 +28,23 @@
 
 namespace ExLibris
 {
-	struct GlyphMetrics;
+	class TextLayoutCharacter;
 }
 
 namespace ExLibris
 {
 
-	class TextLayoutCharacter
+	class TextLayoutSection
 		: public ITextLayoutElement
 
 	{
 	
 	public:
 	
-		TextLayoutCharacter(Face* a_Face, int a_Codepoint, GlyphMetrics* a_Metrics);
-		~TextLayoutCharacter();
+		TextLayoutSection(Face* a_Face);
+		~TextLayoutSection();
 
-		Face* GetFace() const;
-		int GetCodepoint() const;
-		GlyphMetrics* GetMetrics() const;
-	
-		const glm::vec2& GetPosition() const;
-		void SetPosition(const glm::vec2& a_Position);
-
-		const glm::vec2& GetKerningAdjustment() const;
-		void SetKerningAdjustment(const glm::vec2& a_Adjustment);
+		TextLayoutCharacter* AddCharacter(int a_Codepoint);
 
 	private:
 
@@ -62,12 +54,9 @@ namespace ExLibris
 	private:
 
 		Face* m_Face;
-		int m_Codepoint;
-		GlyphMetrics* m_Metrics;
-		glm::vec2 m_Position;
-		glm::vec2 m_Adjustment;
-
+		glm::vec2 m_Cursor;
+		TextLayoutCharacter* m_CharacterPrevious;
 	
-	}; // class TextLayoutCharacter
+	}; // class TextLayoutSection
 
 }; // namespace ExLibris
