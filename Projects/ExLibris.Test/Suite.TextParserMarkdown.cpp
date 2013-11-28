@@ -409,3 +409,134 @@ TEST(TextParserMarkdown, ReadBoldItalicAndBoldCodepoint)
 		EXPECT_EQ(eStyle_None, token.style);
 	}
 }
+
+TEST(TextParserMarkdown, Escape)
+{
+	TextParserMarkdown parser("\\");
+
+	EXPECT_FALSE(parser.ReadToken());
+}
+
+TEST(TextParserMarkdown, EscapeAndSlash)
+{
+	TextParserMarkdown parser("\\\\");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('\\', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+}
+
+TEST(TextParserMarkdown, EscapeFiveSlashes)
+{
+	TextParserMarkdown parser("\\\\\\\\\\");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('\\', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('\\', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+
+	EXPECT_FALSE(parser.ReadToken());
+}
+
+TEST(TextParserMarkdown, EscapeItalic)
+{
+	TextParserMarkdown parser("\\*");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('*', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+}
+
+TEST(TextParserMarkdown, EscapeItalicAndReadItalic)
+{
+	TextParserMarkdown parser("\\**");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('*', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ(0, token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(eStyle_Italicized, token.style);
+	}
+}
+
+TEST(TextParserMarkdown, EscapeItalicAndReadBold)
+{
+	TextParserMarkdown parser("\\***");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('*', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ(0, token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(eWeight_Bold, token.weight);
+	}
+}
+
+TEST(TextParserMarkdown, EscapeItalicStar)
+{
+	TextParserMarkdown parser("*\\**");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ(0, token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(eStyle_Italicized, token.style);
+	}
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ('*', token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	}
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
+
+		EXPECT_EQ(0, token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(eStyle_None, token.style);
+	}
+}

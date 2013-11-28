@@ -31,6 +31,7 @@ namespace ExLibris
 
 	TextParserMarkdown::TextParserMarkdown(const std::string& a_Text)
 		: m_Text(a_Text)
+		, m_EscapeCharacter(false)
 	{
 		m_TextCursor = m_Text.begin();
 	}
@@ -52,18 +53,44 @@ namespace ExLibris
 		switch (m_CodepointCurrent)
 		{
 
-		case '*':
+		case '\\':
 			{
-				if (_NextCodepoint() == '*')
+				if (m_EscapeCharacter)
 				{
-					m_TextCursor++;
+					m_Token.codepoint = m_CodepointCurrent;
 
-					_ToggleBold();
+					m_EscapeCharacter = false;
 				}
 				else
 				{
-					_ToggleItalic();
+					m_EscapeCharacter = true;
+
+					return ReadToken();
 				}
+
+			} break;
+
+		case '*':
+			{
+				if (m_EscapeCharacter)
+				{
+					m_Token.codepoint = m_CodepointCurrent;
+				}
+				else
+				{
+					if (_NextCodepoint() == '*')
+					{
+						m_TextCursor++;
+
+						_ToggleBold();
+					}
+					else
+					{
+						_ToggleItalic();
+					}
+				}
+
+				m_EscapeCharacter = false;
 
 			} break;
 
