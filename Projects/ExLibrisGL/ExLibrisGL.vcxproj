@@ -96,6 +96,7 @@
     <ClCompile Include="TextLayoutCharacter.cpp" />
     <ClCompile Include="TextLayoutParagraph.cpp" />
     <ClCompile Include="TextLayoutSection.cpp" />
+    <ClCompile Include="TextParserMarkdown.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +139,7 @@
     <ClInclude Include="TextLayoutParagraph.h" />
     <ClInclude Include="TextLine.h" />
     <ClInclude Include="TextLayoutSection.h" />
+    <ClInclude Include="TextParserMarkdown.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
     <ClInclude Include="TriangleOrientation.h" />
