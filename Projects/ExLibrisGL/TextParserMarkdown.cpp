@@ -29,15 +29,24 @@
 namespace ExLibris
 {
 
-	TextParserMarkdown::TextParserMarkdown(const std::string& a_Text)
-		: m_Text(a_Text)
-		, m_EscapeCharacter(false)
+	TextParserMarkdown::TextParserMarkdown()
+		: m_EscapeCharacter(false)
 	{
-		m_TextCursor = m_Text.begin();
 	}
 	
 	TextParserMarkdown::~TextParserMarkdown()
 	{
+	}
+
+	void TextParserMarkdown::SetInput(const std::string& a_Text)
+	{
+		m_Text = a_Text;
+		m_TextCursor = m_Text.begin();
+
+		m_EscapeCharacter = false;
+
+		TextToken clear;
+		m_Token = clear;
 	}
 
 	bool TextParserMarkdown::ReadToken()

@@ -6,7 +6,7 @@ using namespace ExLibris;
 
 TEST(TextParserMarkdown, Construct)
 {
-	TextParserMarkdown parser("");
+	TextParserMarkdown parser;
 
 	const TextToken& token = parser.GetToken();
 
@@ -22,7 +22,8 @@ TEST(TextParserMarkdown, Construct)
 
 TEST(TextParserMarkdown, ReadCodepoint)
 {
-	TextParserMarkdown parser("k");
+	TextParserMarkdown parser;
+	parser.SetInput("k");
 
 	EXPECT_TRUE(parser.ReadToken());
 
@@ -33,7 +34,8 @@ TEST(TextParserMarkdown, ReadCodepoint)
 
 TEST(TextParserMarkdown, ReadThreeCodepoints)
 {
-	TextParserMarkdown parser("Bug");
+	TextParserMarkdown parser;
+	parser.SetInput("Bug");
 
 	EXPECT_TRUE(parser.ReadToken());
 	EXPECT_TRUE(parser.ReadToken());
@@ -46,7 +48,8 @@ TEST(TextParserMarkdown, ReadThreeCodepoints)
 
 TEST(TextParserMarkdown, ReadCodepointEmpty)
 {
-	TextParserMarkdown parser("");
+	TextParserMarkdown parser;
+	parser.SetInput("");
 
 	EXPECT_FALSE(parser.ReadToken());
 
@@ -57,20 +60,23 @@ TEST(TextParserMarkdown, ReadCodepointEmpty)
 
 TEST(TextParserMarkdown, ReadItalic)
 {
-	TextParserMarkdown parser("*");
+	TextParserMarkdown parser;
+	parser.SetInput("*");
 
 	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextToken& token = parser.GetToken();
 
-	const TextToken& token = parser.GetToken();
-
-	EXPECT_EQ(0, token.codepoint);
-	EXPECT_EQ(TextToken::eChanged_Style, token.changes);
-	EXPECT_EQ(eStyle_Italicized, token.style);
+		EXPECT_EQ(0, token.codepoint);
+		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(eStyle_Italicized, token.style);
+	}
 }
 
 TEST(TextParserMarkdown, ReadItalicCodepoint)
 {
-	TextParserMarkdown parser("*i");
+	TextParserMarkdown parser;
+	parser.SetInput("*i");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -93,7 +99,8 @@ TEST(TextParserMarkdown, ReadItalicCodepoint)
 
 TEST(TextParserMarkdown, ReadNormalAndItalicCodepoint)
 {
-	TextParserMarkdown parser("8*7");
+	TextParserMarkdown parser;
+	parser.SetInput("8*7");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -125,7 +132,8 @@ TEST(TextParserMarkdown, ReadNormalAndItalicCodepoint)
 
 TEST(TextParserMarkdown, ReadItalicAndNormalCodepoint)
 {
-	TextParserMarkdown parser("*H*M");
+	TextParserMarkdown parser;
+	parser.SetInput("*H*M");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -166,7 +174,8 @@ TEST(TextParserMarkdown, ReadItalicAndNormalCodepoint)
 
 TEST(TextParserMarkdown, ReadBold)
 {
-	TextParserMarkdown parser("**");
+	TextParserMarkdown parser;
+	parser.SetInput("**");
 
 	EXPECT_TRUE(parser.ReadToken());
 
@@ -179,7 +188,8 @@ TEST(TextParserMarkdown, ReadBold)
 
 TEST(TextParserMarkdown, ReadBoldCodepoint)
 {
-	TextParserMarkdown parser("**b");
+	TextParserMarkdown parser;
+	parser.SetInput("**b");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -202,7 +212,8 @@ TEST(TextParserMarkdown, ReadBoldCodepoint)
 
 TEST(TextParserMarkdown, ReadNormalAndBoldCodepoint)
 {
-	TextParserMarkdown parser("a**z");
+	TextParserMarkdown parser;
+	parser.SetInput("a**z");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -234,7 +245,8 @@ TEST(TextParserMarkdown, ReadNormalAndBoldCodepoint)
 
 TEST(TextParserMarkdown, ReadBoldAndNormalCodepoint)
 {
-	TextParserMarkdown parser("**p**r");
+	TextParserMarkdown parser;
+	parser.SetInput("**p**r");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -275,7 +287,8 @@ TEST(TextParserMarkdown, ReadBoldAndNormalCodepoint)
 
 TEST(TextParserMarkdown, ReadBoldItalicCodepoint)
 {
-	TextParserMarkdown parser("***S");
+	TextParserMarkdown parser;
+	parser.SetInput("***S");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -308,7 +321,8 @@ TEST(TextParserMarkdown, ReadBoldItalicCodepoint)
 
 TEST(TextParserMarkdown, ReadBoldItalicAndItalicCodepoint)
 {
-	TextParserMarkdown parser("***V**k");
+	TextParserMarkdown parser;
+	parser.SetInput("***V**k");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -360,7 +374,8 @@ TEST(TextParserMarkdown, ReadBoldItalicAndItalicCodepoint)
 
 TEST(TextParserMarkdown, ReadBoldItalicAndBoldCodepoint)
 {
-	TextParserMarkdown parser("***1*2");
+	TextParserMarkdown parser;
+	parser.SetInput("***1*2");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -412,14 +427,16 @@ TEST(TextParserMarkdown, ReadBoldItalicAndBoldCodepoint)
 
 TEST(TextParserMarkdown, Escape)
 {
-	TextParserMarkdown parser("\\");
+	TextParserMarkdown parser;
+	parser.SetInput("\\");
 
 	EXPECT_FALSE(parser.ReadToken());
 }
 
 TEST(TextParserMarkdown, EscapeAndSlash)
 {
-	TextParserMarkdown parser("\\\\");
+	TextParserMarkdown parser;
+	parser.SetInput("\\\\");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -432,7 +449,8 @@ TEST(TextParserMarkdown, EscapeAndSlash)
 
 TEST(TextParserMarkdown, EscapeFiveSlashes)
 {
-	TextParserMarkdown parser("\\\\\\\\\\");
+	TextParserMarkdown parser;
+	parser.SetInput("\\\\\\\\\\");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -455,7 +473,8 @@ TEST(TextParserMarkdown, EscapeFiveSlashes)
 
 TEST(TextParserMarkdown, EscapeItalic)
 {
-	TextParserMarkdown parser("\\*");
+	TextParserMarkdown parser;
+	parser.SetInput("\\*");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -468,7 +487,8 @@ TEST(TextParserMarkdown, EscapeItalic)
 
 TEST(TextParserMarkdown, EscapeItalicAndReadItalic)
 {
-	TextParserMarkdown parser("\\**");
+	TextParserMarkdown parser;
+	parser.SetInput("\\**");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -490,7 +510,8 @@ TEST(TextParserMarkdown, EscapeItalicAndReadItalic)
 
 TEST(TextParserMarkdown, EscapeItalicAndReadBold)
 {
-	TextParserMarkdown parser("\\***");
+	TextParserMarkdown parser;
+	parser.SetInput("\\***");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
@@ -512,7 +533,8 @@ TEST(TextParserMarkdown, EscapeItalicAndReadBold)
 
 TEST(TextParserMarkdown, EscapeItalicStar)
 {
-	TextParserMarkdown parser("*\\**");
+	TextParserMarkdown parser;
+	parser.SetInput("*\\**");
 
 	EXPECT_TRUE(parser.ReadToken());
 	{

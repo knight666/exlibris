@@ -76,8 +76,10 @@ namespace ExLibris
 
 	public:
 	
-		TextParserMarkdown(const std::string& a_Text);
+		TextParserMarkdown();
 		~TextParserMarkdown();
+
+		void SetInput(const std::string& a_Text);
 
 		bool ReadToken();
 
