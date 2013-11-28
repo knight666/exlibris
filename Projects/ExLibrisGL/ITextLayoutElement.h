@@ -72,6 +72,16 @@ namespace ExLibris
 			m_Children.push_back(a_Child);
 		}
 
+		ITextLayoutElement* GetChildAtIndex(size_t a_Index) const
+		{
+			if (a_Index >= m_Children.size())
+			{
+				return nullptr;
+			}
+
+			return m_Children[a_Index];
+		}
+
 		void CalculateGeometry()
 		{
 			m_ElementGeometry.Invalidate();
