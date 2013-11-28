@@ -55,7 +55,7 @@ namespace ExLibris
 
 		Face* m_Face;
 		glm::vec2 m_Cursor;
-		TextLayoutCharacter* m_CharacterPrevious;
+		TextLayoutCharacter* m_CharacterCurrent;
 	
 	}; // class TextLayoutSection
 

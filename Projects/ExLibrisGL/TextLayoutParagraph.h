@@ -22,58 +22,40 @@
  * SOFTWARE.
  */
 
-#include "ExLibrisGL.PCH.h"
+#pragma once
 
-#include "TextLayoutSection.h"
+#include "ITextLayoutElement.h"
 
-#include "Face.h"
-#include "GlyphMetrics.h"
-#include "TextLayoutCharacter.h"
+namespace ExLibris
+{
+	class Face;
+	class TextLayoutSection;
+}
 
 namespace ExLibris
 {
 
-	TextLayoutSection::TextLayoutSection(Face* a_Face)
-		: m_Face(a_Face)
-		, m_Cursor(0.0f, 0.0f)
-		, m_CharacterCurrent(nullptr)
+	class TextLayoutParagraph
+		: public ITextLayoutElement
 	{
-	}
 	
-	TextLayoutSection::~TextLayoutSection()
-	{
-	}
+	public:
+	
+		TextLayoutParagraph(Face* a_Face);
+		~TextLayoutParagraph();
+	
+		void AddCharacter(int a_Codepoint);
 
-	TextLayoutCharacter* TextLayoutSection::AddCharacter(int a_Codepoint)
-	{
-		GlyphMetrics* metrics = m_Face->CreateMetrics(a_Codepoint);
+	private:
 
-		TextLayoutCharacter* character = new TextLayoutCharacter(m_Face, a_Codepoint, metrics);
-		character->SetPosition(m_Cursor);
-		AddChild(character);
+		void OnGeometryCalculated();
+		void OnAccepted(ITextLayoutVisitor& a_Visitor);
 
-		m_Cursor.x += metrics->advance;
+	private:
 
-		if (m_CharacterCurrent != nullptr)
-		{
-			glm::vec2 adjustment;
-			if (m_Face->TryGetKerningAdjustment(adjustment, m_CharacterCurrent->GetCodepoint(), a_Codepoint))
-			{
-				character->SetKerningAdjustment(adjustment);
-			}
-		}
-
-		m_CharacterCurrent = character;
-
-		return character;
-	}
-
-	void TextLayoutSection::OnGeometryCalculated()
-	{
-	}
-
-	void TextLayoutSection::OnAccepted(ITextLayoutVisitor& a_Visitor)
-	{
-	}
+		Face* m_Face;
+		TextLayoutSection* m_SectionCurrent;
+	
+	}; // class TextLayoutParagraph
 
 }; // namespace ExLibris
