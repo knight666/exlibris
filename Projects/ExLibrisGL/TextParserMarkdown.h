@@ -97,6 +97,8 @@ namespace ExLibris
 		int m_CodepointCurrent;
 		TextToken m_Token;
 
+		bool m_EscapeCharacter;
+	
 	}; // class TextParserMarkdown
 
 }; // namespace ExLibris
