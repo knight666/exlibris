@@ -95,6 +95,7 @@
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TextLayoutCharacter.cpp" />
     <ClCompile Include="TextLayoutDocument.cpp" />
+    <ClCompile Include="TextLayoutLine.cpp" />
     <ClCompile Include="TextLayoutParagraph.cpp" />
     <ClCompile Include="TextLayoutSection.cpp" />
     <ClCompile Include="TextParserMarkdown.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="TextLayout.h" />
     <ClInclude Include="TextLayoutCharacter.h" />
     <ClInclude Include="TextLayoutDocument.h" />
+    <ClInclude Include="TextLayoutLine.h" />
     <ClInclude Include="TextLayoutParagraph.h" />
     <ClInclude Include="TextLine.h" />
     <ClInclude Include="TextLayoutSection.h" />

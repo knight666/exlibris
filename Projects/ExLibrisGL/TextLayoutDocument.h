@@ -32,6 +32,7 @@ namespace ExLibris
 	class Face;
 	class Library;
 	class TextLayoutCharacter;
+	class TextLayoutLine;
 	class TextLayoutSection;
 	class TextParserMarkdown;
 }
@@ -44,6 +45,16 @@ namespace ExLibris
 	{
 
 	private:
+
+		struct Section;
+		struct CharacterCollection;
+
+		struct Character
+		{
+			int codepoint;
+			Section* section;
+			CharacterCollection* collection;
+		};
 
 		struct Section
 		{
@@ -64,12 +75,16 @@ namespace ExLibris
 			Type type;
 			std::vector<int> codepoints;
 			std::vector<Section*> sections;
+			Character* character_first;
+			Character* character_last;
 		};
 	
 	public:
 	
 		TextLayoutDocument(Library* a_Library);
 		~TextLayoutDocument();
+
+		const std::vector<TextLayoutLine*>& GetLines() const;
 
 		void SetDefaultFamily(const std::string& a_FamilyName);
 		void SetDefaultSize(float a_Size);
@@ -92,6 +107,9 @@ namespace ExLibris
 
 		void _ChangeFace();
 
+		void _AddCharacter(int a_Codepoint);
+		void _ClearCharacters();
+
 		void _AddSection();
 		void _ClearSections();
 
@@ -107,6 +125,11 @@ namespace ExLibris
 		FaceRequest m_Request;
 		Face* m_FaceCurrent;
 		bool m_FaceDirty;
+
+		std::vector<Character*> m_Characters;
+
+		std::vector<TextLayoutLine*> m_Lines;
+		TextLayoutLine* m_LineCurrent;
 
 		std::vector<CharacterCollection*> m_Collections;
 		CharacterCollection* m_CollectionCurrent;
