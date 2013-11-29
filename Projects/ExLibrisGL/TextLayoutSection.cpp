@@ -44,6 +44,11 @@ namespace ExLibris
 	{
 	}
 
+	void TextLayoutSection::SetFace(Face* a_Face)
+	{
+		m_Face = a_Face;
+	}
+
 	TextLayoutCharacter* TextLayoutSection::AddCharacter(int a_Codepoint)
 	{
 		GlyphMetrics* metrics = m_Face->CreateMetrics(a_Codepoint);

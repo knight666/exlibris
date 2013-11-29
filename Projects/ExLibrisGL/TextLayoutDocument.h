@@ -24,29 +24,60 @@
 
 #pragma once
 
+#include "FaceRequest.h"
 #include "ITextLayoutElement.h"
 
 namespace ExLibris
 {
-	class TextLayoutCharacter;
+	class Face;
+	class Library;
+	class TextParserMarkdown;
+	class TextLayoutSection;
 }
 
 namespace ExLibris
 {
 
-	class TextLayoutSection
+	class TextLayoutDocument
 		: public ITextLayoutElement
-
 	{
+
+	private:
+
+		struct Section
+		{
+			Face* face;
+			std::vector<int> codepoints;
+		};
+
+		struct CharacterCollection
+		{
+			enum Type
+			{
+				eType_Whitespace,
+				eType_Characters,
+				eType_Newline,
+				eType_End
+			};
+
+			Type type;
+			std::vector<int> codepoints;
+			std::vector<Section*> sections;
+		};
 	
 	public:
 	
-		TextLayoutSection(Face* a_Face);
-		~TextLayoutSection();
+		TextLayoutDocument(Library* a_Library);
+		~TextLayoutDocument();
 
-		void SetFace(Face* a_Face);
+		void SetDefaultFamily(const std::string& a_FamilyName);
+		void SetDefaultSize(float a_Size);
+	
+		void SetParser(TextParserMarkdown* a_Parser);
 
-		TextLayoutCharacter* AddCharacter(int a_Codepoint);
+		void SetText(const std::string& a_Text);
+
+		void Layout();
 
 	private:
 
@@ -55,10 +86,32 @@ namespace ExLibris
 
 	private:
 
-		Face* m_Face;
-		glm::vec2 m_Cursor;
-		TextLayoutCharacter* m_CharacterCurrent;
+		void _ParseTextToGlyphs();
+
+		void _ChangeFace();
+
+		void _AddSection();
+		void _ClearSections();
+
+		void _AddCollection(CharacterCollection::Type a_Type);
+		void _ClearCollections();
+
+	private:
+
+		Library* m_Library;
+		TextParserMarkdown* m_Parser;
+		std::string m_Text;
+
+		FaceRequest m_Request;
+		Face* m_FaceCurrent;
+		bool m_FaceDirty;
+
+		std::vector<CharacterCollection*> m_Collections;
+		CharacterCollection* m_CollectionCurrent;
+
+		std::vector<Section*> m_Sections;
+		Section* m_SectionCurrent;
 	
-	}; // class TextLayoutSection
+	}; // class TextLayoutDocument
 
 }; // namespace ExLibris

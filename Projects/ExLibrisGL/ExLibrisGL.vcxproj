@@ -94,6 +94,7 @@
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TextLayoutCharacter.cpp" />
+    <ClCompile Include="TextLayoutDocument.cpp" />
     <ClCompile Include="TextLayoutParagraph.cpp" />
     <ClCompile Include="TextLayoutSection.cpp" />
     <ClCompile Include="TextParserMarkdown.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="TextCharacter.h" />
     <ClInclude Include="TextLayout.h" />
     <ClInclude Include="TextLayoutCharacter.h" />
+    <ClInclude Include="TextLayoutDocument.h" />
     <ClInclude Include="TextLayoutParagraph.h" />
     <ClInclude Include="TextLine.h" />
     <ClInclude Include="TextLayoutSection.h" />
