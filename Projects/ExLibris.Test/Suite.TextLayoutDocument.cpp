@@ -2,7 +2,9 @@
 
 #include <FontLoaderFreetype.h>
 #include <Library.h>
+#include <TextLayoutCharacter.h>
 #include <TextLayoutDocument.h>
+#include <TextLayoutLine.h>
 #include <TextParserMarkdown.h>
 
 using namespace ExLibris;
@@ -22,6 +24,19 @@ TEST(TextLayoutDocument, ParseText)
 	document.SetText("I'm on a *motorized* vehicle.");
 
 	document.Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document.GetLines();
+	for (std::vector<TextLayoutLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
+	{
+		TextLayoutLine* line = *line_it;
+
+		for (size_t index = 0; index < line->GetChildrenCount(); ++index)
+		{
+			TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(index));
+
+			int i = 0;
+		}
+	}
 
 	int i = 0;
 }
