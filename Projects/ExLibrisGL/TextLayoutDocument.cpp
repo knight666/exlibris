@@ -26,7 +26,10 @@
 
 #include "TextLayoutDocument.h"
 
+#include "Face.h"
+#include "GlyphMetrics.h"
 #include "Library.h"
+#include "TextLayoutCharacter.h"
 #include "TextLayoutSection.h"
 #include "TextParserMarkdown.h"
 
@@ -84,8 +87,12 @@ namespace ExLibris
 	{
 		if (m_Parser != nullptr)
 		{
-			_ParseTextToGlyphs();
+			_ParseTextToCollections();
 		}
+
+		_LayoutGlyphs();
+
+		CalculateGeometry();
 
 		int i = 0;
 	}
@@ -98,7 +105,7 @@ namespace ExLibris
 	{
 	}
 
-	void TextLayoutDocument::_ParseTextToGlyphs()
+	void TextLayoutDocument::_ParseTextToCollections()
 	{
 		_ClearCollections();
 		m_CollectionCurrent = nullptr;
@@ -183,6 +190,40 @@ namespace ExLibris
 		}
 	}
 
+	void TextLayoutDocument::_LayoutGlyphs()
+	{
+		m_Cursor = glm::vec2(0.0f, 0.0f);
+
+		for (std::vector<Section*>::iterator section_it = m_Sections.begin(); section_it != m_Sections.end(); ++section_it)
+		{
+			Section* section = *section_it;
+
+			m_CharacterCurrent = nullptr;
+
+			for (std::vector<int>::iterator codepoint_it = section->codepoints.begin(); codepoint_it != section->codepoints.end(); ++codepoint_it)
+			{
+				int codepoint = *codepoint_it;
+
+				TextLayoutCharacter* character_next = new TextLayoutCharacter(section->face, codepoint);
+				character_next->SetPosition(m_Cursor);
+				AddChild(character_next);
+
+				m_Cursor.x += character_next->GetMetrics()->advance;
+
+				if (m_CharacterCurrent != nullptr)
+				{
+					glm::vec2 adjustment;
+					if (section->face->TryGetKerningAdjustment(adjustment, m_CharacterCurrent->GetCodepoint(), codepoint))
+					{
+						character_next->SetKerningAdjustment(adjustment);
+					}
+				}
+
+				m_CharacterCurrent = character_next;
+			}
+		}
+	}
+
 	void TextLayoutDocument::_ChangeFace()
 	{
 		Face* found = m_Library->RequestFace(m_Request);
@@ -202,17 +243,9 @@ namespace ExLibris
 
 				m_CollectionCurrent = nullptr;
 			}
-			else
-			{
-				m_SectionCurrent->face = m_FaceCurrent;
-			}
+			
+			m_SectionCurrent->face = m_FaceCurrent;
 		}
-	}
-
-	void TextLayoutDocument::_AddSection()
-	{
-		m_SectionCurrent = new Section;
-		m_Sections.push_back(m_SectionCurrent);
 	}
 
 	void TextLayoutDocument::_ClearSections()
@@ -224,12 +257,11 @@ namespace ExLibris
 		m_Sections.clear();
 	}
 
-	void TextLayoutDocument::_AddCollection(CharacterCollection::Type a_Type)
+	void TextLayoutDocument::_AddSection()
 	{
-		m_CollectionCurrent = new CharacterCollection;
-		m_CollectionCurrent->type = a_Type;
-		m_CollectionCurrent->sections.push_back(m_SectionCurrent);
-		m_Collections.push_back(m_CollectionCurrent);
+		m_SectionCurrent = new Section;
+		m_SectionCurrent->face = nullptr;
+		m_Sections.push_back(m_SectionCurrent);
 	}
 
 	void TextLayoutDocument::_ClearCollections()
@@ -239,6 +271,14 @@ namespace ExLibris
 			delete *collection_it;
 		}
 		m_Collections.clear();
+	}
+
+	void TextLayoutDocument::_AddCollection(CharacterCollection::Type a_Type)
+	{
+		m_CollectionCurrent = new CharacterCollection;
+		m_CollectionCurrent->type = a_Type;
+		m_CollectionCurrent->sections.push_back(m_SectionCurrent);
+		m_Collections.push_back(m_CollectionCurrent);
 	}
 
 }; // namespace ExLibris

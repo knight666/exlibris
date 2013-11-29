@@ -41,7 +41,7 @@ namespace ExLibris
 	
 	public:
 	
-		TextLayoutCharacter(Face* a_Face, int a_Codepoint, GlyphMetrics* a_Metrics);
+		TextLayoutCharacter(Face* a_Face, int a_Codepoint);
 		~TextLayoutCharacter();
 
 		Face* GetFace() const;
