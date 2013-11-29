@@ -51,13 +51,11 @@ namespace ExLibris
 
 	TextLayoutCharacter* TextLayoutSection::AddCharacter(int a_Codepoint)
 	{
-		GlyphMetrics* metrics = m_Face->CreateMetrics(a_Codepoint);
-
-		TextLayoutCharacter* character = new TextLayoutCharacter(m_Face, a_Codepoint, metrics);
+		TextLayoutCharacter* character = new TextLayoutCharacter(m_Face, a_Codepoint);
 		character->SetPosition(m_Cursor);
 		AddChild(character);
 
-		m_Cursor.x += metrics->advance;
+		m_Cursor.x += character->GetMetrics()->advance;
 
 		if (m_CharacterCurrent != nullptr)
 		{

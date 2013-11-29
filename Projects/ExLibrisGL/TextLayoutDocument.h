@@ -31,8 +31,9 @@ namespace ExLibris
 {
 	class Face;
 	class Library;
-	class TextParserMarkdown;
+	class TextLayoutCharacter;
 	class TextLayoutSection;
+	class TextParserMarkdown;
 }
 
 namespace ExLibris
@@ -86,7 +87,8 @@ namespace ExLibris
 
 	private:
 
-		void _ParseTextToGlyphs();
+		void _ParseTextToCollections();
+		void _LayoutGlyphs();
 
 		void _ChangeFace();
 
@@ -111,6 +113,9 @@ namespace ExLibris
 
 		std::vector<Section*> m_Sections;
 		Section* m_SectionCurrent;
+
+		TextLayoutCharacter* m_CharacterCurrent;
+		glm::vec2 m_Cursor;
 	
 	}; // class TextLayoutDocument
 

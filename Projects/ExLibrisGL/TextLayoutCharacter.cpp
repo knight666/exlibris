@@ -32,13 +32,17 @@
 namespace ExLibris
 {
 
-	TextLayoutCharacter::TextLayoutCharacter(Face* a_Face, int a_Codepoint, GlyphMetrics* a_Metrics)
+	TextLayoutCharacter::TextLayoutCharacter(Face* a_Face, int a_Codepoint)
 		: m_Face(a_Face)
 		, m_Codepoint(a_Codepoint)
-		, m_Metrics(a_Metrics)
+		, m_Metrics(nullptr)
 		, m_Position(0.0f, 0.0f)
 		, m_Adjustment(0.0f, 0.0f)
 	{
+		if (m_Face != nullptr)
+		{
+			m_Metrics = m_Face->CreateMetrics(a_Codepoint);
+		}
 	}
 	
 	TextLayoutCharacter::~TextLayoutCharacter()

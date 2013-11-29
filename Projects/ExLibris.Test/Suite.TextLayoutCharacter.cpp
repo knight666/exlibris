@@ -12,7 +12,7 @@ TEST(TextLayoutCharacter, Construct)
 	MockGlyphProvider provider(nullptr);
 	Face* face = provider.CreateFace(15.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'A', face->CreateMetrics('A'));
+	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'A');
 
 	EXPECT_EQ(face, character->GetFace());
 	EXPECT_EQ('A', character->GetCodepoint());
@@ -27,7 +27,7 @@ TEST(TextLayoutCharacter, CalculateGeometry)
 	MockGlyphProvider provider(nullptr);
 	Face* face = provider.CreateFace(24.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, '7', face->CreateMetrics('7'));
+	TextLayoutCharacter* character = new TextLayoutCharacter(face, '7');
 
 	character->CalculateGeometry();
 
@@ -42,7 +42,7 @@ TEST(TextLayoutCharacter, CalculateGeometryWithPosition)
 	MockGlyphProvider provider(nullptr);
 	Face* face = provider.CreateFace(24.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'P', face->CreateMetrics('P'));
+	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'P');
 	character->SetPosition(glm::vec2(51.0f, 12.0f));
 
 	character->CalculateGeometry();
@@ -58,7 +58,7 @@ TEST(TextLayoutCharacter, CalculateGeometryWithKerningAdjustment)
 	MockGlyphProvider provider(nullptr);
 	Face* face = provider.CreateFace(33.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, '%', face->CreateMetrics('%'));
+	TextLayoutCharacter* character = new TextLayoutCharacter(face, '%');
 	character->SetKerningAdjustment(glm::vec2(-2.4f, 15.2f));
 
 	character->CalculateGeometry();
