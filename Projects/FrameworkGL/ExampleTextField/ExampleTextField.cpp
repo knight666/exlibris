@@ -27,8 +27,13 @@ namespace fw = Framework;
 
 #include <FontLoaderFreetype.h>
 #include <GlyphBitmap.h>
+#include <GlyphMetrics.h>
 #include <Library.h>
 #include <TextLayout.h>
+#include <TextLayoutCharacter.h>
+#include <TextLayoutDocument.h>
+#include <TextLayoutLine.h>
+#include <TextParserMarkdown.h>
 
 namespace exl = ExLibris;
 
@@ -74,7 +79,10 @@ public:
 		, m_HelperBitmaps(nullptr)
 		, m_HelperBitmapsVisible(true)
 	{
-		m_Layout = new exl::TextLayout;
+		m_Layout = new exl::TextLayoutDocument(a_Library);
+		m_Layout->SetParser(new exl::TextParserMarkdown());
+		m_Layout->SetDefaultFamily("Roboto");
+		m_Layout->SetDefaultSize(24.0f);
 
 		glGenTextures(1, &m_Texture);
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
@@ -191,7 +199,7 @@ public:
 	void SetFont(exl::Face* a_Font)
 	{
 		m_Font = a_Font;
-		m_Layout->SetFace(m_Font);
+		//m_Layout->SetFace(m_Font);
 
 		m_RenderCorrection.y = -m_Font->GetAscent();
 
@@ -201,6 +209,14 @@ public:
 	void SetPosition(const glm::vec2& a_Position)
 	{
 		m_Position = a_Position;
+	}
+
+	void SetText(const std::string& a_Text)
+	{
+		m_Text = a_Text;
+		m_Layout->SetText(m_Text);
+
+		BuildTexture();
 	}
 
 	void AddCharacter(unsigned int a_Character)
@@ -226,7 +242,7 @@ public:
 	{
 		m_Layout->Layout();
 
-		exl::BoundingBox bounds = m_Layout->GetBoundingBox();
+		exl::BoundingBox bounds = m_Layout->GetLayoutGeometry();
 		glm::vec2 dimensions = bounds.GetDimensions();
 
 		// texture must be padded in order to support effects like glow and shadows
@@ -252,7 +268,7 @@ public:
 			}
 		}
 
-		m_TextureCorrection = -bounds.GetMinimum() + glm::vec2(m_TexturePadding);
+		m_TextureCorrection = -m_Layout->GetElementGeometry().GetMinimum() + glm::vec2(m_TexturePadding);
 		m_RenderCorrection = -m_TextureCorrection;
 
 		m_HelperLayout->Clear();
@@ -270,36 +286,36 @@ public:
 		exl::BoundingBox box = bounds.GetTranslated(m_Position);
 		m_HelperLayout->AddBox(box);
 
-		const std::vector<exl::TextLine*>& lines = m_Layout->GetLines();
+		const std::vector<exl::TextLayoutLine*>& lines = m_Layout->GetLines();
 
 		glm::vec2 cursor_position = m_Position;
 
-		for (std::vector<exl::TextLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
+		for (std::vector<exl::TextLayoutLine*>::const_iterator line_it = lines.begin(); line_it != lines.end(); ++line_it)
 		{
-			exl::TextLine* line = *line_it;
+			exl::TextLayoutLine* line = *line_it;
 
-			exl::BoundingBox box = line->bounding_box.GetTranslated(m_Position);
+			exl::BoundingBox box = line->GetLayoutGeometry().GetTranslated(m_Position);
 			m_HelperLines->AddBox(box);
 
 			m_CursorPosition = cursor_position;
-			m_CursorPosition.y -= m_Font->GetAscent();
+			//m_CursorPosition.y -= m_Font->GetAscent();
 
-			for (std::vector<exl::TextCharacter*>::const_iterator char_it = line->characters.begin(); char_it != line->characters.end(); ++char_it)
+			for (size_t index = 0; index < line->GetChildrenCount(); ++index)
 			{
-				exl::TextCharacter* character = *char_it;
+				exl::TextLayoutCharacter* character = dynamic_cast<exl::TextLayoutCharacter*>(line->GetChildAtIndex(index));
 
-				exl::BoundingBox box = character->bounding_box.GetTranslated(m_Position);
+				exl::BoundingBox box = character->GetLayoutGeometry().GetTranslated(m_Position);
 				m_HelperGlyphs->AddBox(box);
 
-				if (character->type == exl::TextCharacter::eType_Character)
+				//if (character->type == exl::TextCharacter::eType_Character)
 				{
 					_AddCharacterToTexture(character);
 				}
 
-				m_CursorPosition.x += character->advance;
+				m_CursorPosition.x += character->GetMetrics()->advance;
 			}
 
-			cursor_position.y += m_Font->GetLineHeight();
+			//cursor_position.y += m_Font->GetLineHeight();
 		}
 
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
@@ -412,11 +428,11 @@ public:
 
 private:
 
-	void _AddCharacterToTexture(exl::TextCharacter* a_Character)
+	void _AddCharacterToTexture(exl::TextLayoutCharacter* a_Character)
 	{
-		glm::vec2 texture_position = a_Character->bounding_box.GetMinimum() + m_TextureCorrection;
+		glm::vec2 texture_position = a_Character->GetElementGeometry().GetMinimum() + m_TextureCorrection;
 
-		exl::GlyphBitmap* bitmap = m_Font->CreateBitmap(a_Character->identifier);
+		exl::GlyphBitmap* bitmap = a_Character->GetFace()->CreateBitmap(a_Character->GetCodepoint());
 		if (bitmap != nullptr)
 		{
 			unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
@@ -478,7 +494,7 @@ private:
 
 	glm::vec2 m_Position;
 	exl::Face* m_Font;
-	exl::TextLayout* m_Layout;
+	exl::TextLayoutDocument* m_Layout;
 	std::string m_Text;
 
 	glm::vec2 m_RenderCorrection;
@@ -536,6 +552,8 @@ public:
 		m_Library = new exl::Library;
 		m_Library->AddLoader(new exl::FontLoaderFreetype(m_Library));
 		m_Library->MapFontToFile("Fonts/Roboto/Roboto-Regular.ttf");
+		m_Library->MapFontToFile("Fonts/Roboto/Roboto-Italic.ttf");
+		m_Library->MapFontToFile("Fonts/Roboto/Roboto-Bold.ttf");
 		m_Library->MapFontToFile("Fonts/00_starmap/00.fon");
 
 		try
@@ -549,7 +567,9 @@ public:
 		}
 
 		m_TextField = new TextField(m_Library, m_ProgramEffects);
-		m_TextField->SetPosition(glm::vec2(100.0f, 100.0f));
+		m_TextField->SetPosition(glm::vec2(20.0f, 20.0f));
+
+		m_TextField->SetText("I finally got some *italic* and **bold** text!");
 		
 		//m_Request.SetFamilyName("00 Starmap");
 		m_Request.SetFamilyName("Roboto");

@@ -103,13 +103,6 @@ namespace ExLibris
 		_LayoutGlyphs();
 
 		CalculateGeometry();
-
-		for (std::vector<TextLayoutLine*>::iterator line_it = m_Lines.begin(); line_it != m_Lines.end(); ++line_it)
-		{
-			TextLayoutLine* line = *line_it;
-
-			line->CalculateGeometry();
-		}
 	}
 
 	void TextLayoutDocument::OnGeometryCalculated()
@@ -217,6 +210,8 @@ namespace ExLibris
 
 		m_LineCurrent = new TextLayoutLine;
 		m_Lines.push_back(m_LineCurrent);
+
+		AddChild(m_LineCurrent);
 
 		for (std::vector<Character*>::iterator character_it = m_Characters.begin(); character_it != m_Characters.end(); ++character_it)
 		{
