@@ -12,6 +12,7 @@ TEST(TextParserMarkdown, Construct)
 
 	EXPECT_EQ(0, token.codepoint);
 	EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
+	EXPECT_EQ(TextParserToken::eCodepointType_Character, token.type);
 	EXPECT_STREQ("", token.family_name.c_str());
 	EXPECT_FLOAT_EQ(0.0f, token.size);
 	EXPECT_EQ(eWeight_Normal, token.weight);
@@ -30,6 +31,7 @@ TEST(TextParserMarkdown, ReadCodepoint)
 	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ('k', token.codepoint);
+	EXPECT_EQ(TextParserToken::eCodepointType_Character, token.type);
 }
 
 TEST(TextParserMarkdown, ReadThreeCodepoints)
@@ -56,6 +58,126 @@ TEST(TextParserMarkdown, ReadCodepointEmpty)
 	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ(0, token.codepoint);
+}
+
+TEST(TextParserMarkdown, ReadNewline)
+{
+	TextParserMarkdown parser;
+	parser.SetInput("\n");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextParserToken& token = parser.GetToken();
+
+		EXPECT_EQ(0, token.codepoint);
+		EXPECT_EQ(TextParserToken::eCodepointType_Newline, token.type);
+	}
+}
+
+TEST(TextParserMarkdown, ReadCarriageReturn)
+{
+	TextParserMarkdown parser;
+	parser.SetInput("\r");
+
+	EXPECT_TRUE(parser.ReadToken());
+
+	const TextParserToken& token = parser.GetToken();
+
+	EXPECT_EQ(0, token.codepoint);
+	EXPECT_EQ(TextParserToken::eCodepointType_Unprintable, token.type);
+}
+
+TEST(TextParserMarkdown, ReadCarriageReturnAndNewline)
+{
+	TextParserMarkdown parser;
+	parser.SetInput("\r\n");
+
+	EXPECT_TRUE(parser.ReadToken());
+
+	const TextParserToken& token = parser.GetToken();
+
+	EXPECT_EQ(0, token.codepoint);
+	EXPECT_EQ(TextParserToken::eCodepointType_Newline, token.type);
+
+	EXPECT_FALSE(parser.ReadToken());
+}
+
+TEST(TextParserMarkdown, ReadThreeNewLines)
+{
+	TextParserMarkdown parser;
+	parser.SetInput("\n\r\n\n");
+
+	EXPECT_TRUE(parser.ReadToken());
+	EXPECT_TRUE(parser.ReadToken());
+	EXPECT_TRUE(parser.ReadToken());
+
+	const TextParserToken& token = parser.GetToken();
+
+	EXPECT_EQ(0, token.codepoint);
+	EXPECT_EQ(TextParserToken::eCodepointType_Newline, token.type);
+
+	EXPECT_FALSE(parser.ReadToken());
+}
+
+TEST(TextParserMarkdown, ReadSpace)
+{
+	TextParserMarkdown parser;
+	parser.SetInput(" ");
+
+	EXPECT_TRUE(parser.ReadToken());
+
+	const TextParserToken& token = parser.GetToken();
+
+	EXPECT_EQ(' ', token.codepoint);
+	EXPECT_EQ(TextParserToken::eCodepointType_Whitespace, token.type);
+}
+
+TEST(TextParserMarkdown, ReadTab)
+{
+	TextParserMarkdown parser;
+	parser.SetInput("\t");
+
+	EXPECT_TRUE(parser.ReadToken());
+
+	const TextParserToken& token = parser.GetToken();
+
+	EXPECT_EQ('\t', token.codepoint);
+	EXPECT_EQ(TextParserToken::eCodepointType_Whitespace, token.type);
+}
+
+TEST(TextParserMarkdown, ReadWhitespace)
+{
+	TextParserMarkdown parser;
+	parser.SetInput(" \t  ");
+
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextParserToken& token = parser.GetToken();
+
+		EXPECT_EQ(' ', token.codepoint);
+		EXPECT_EQ(TextParserToken::eCodepointType_Whitespace, token.type);
+	}
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextParserToken& token = parser.GetToken();
+
+		EXPECT_EQ('\t', token.codepoint);
+		EXPECT_EQ(TextParserToken::eCodepointType_Whitespace, token.type);
+	}
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextParserToken& token = parser.GetToken();
+
+		EXPECT_EQ(' ', token.codepoint);
+		EXPECT_EQ(TextParserToken::eCodepointType_Whitespace, token.type);
+	}
+	EXPECT_TRUE(parser.ReadToken());
+	{
+		const TextParserToken& token = parser.GetToken();
+
+		EXPECT_EQ(' ', token.codepoint);
+		EXPECT_EQ(TextParserToken::eCodepointType_Whitespace, token.type);
+	}
 }
 
 TEST(TextParserMarkdown, ReadItalic)

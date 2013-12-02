@@ -35,9 +35,9 @@ namespace ExLibris
 
 		enum CodepointType
 		{
+			eCodepointType_Unprintable,
 			eCodepointType_Character,
-			eCodepointType_Space,
-			eCodepointType_Tab,
+			eCodepointType_Whitespace,
 			eCodepointType_Newline
 		};
 
