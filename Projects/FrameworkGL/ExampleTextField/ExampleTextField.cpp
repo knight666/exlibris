@@ -269,7 +269,7 @@ public:
 		}
 
 		m_TextureCorrection = -m_Layout->GetElementGeometry().GetMinimum() + glm::vec2(m_TexturePadding);
-		m_RenderCorrection = -m_TextureCorrection;
+		m_RenderCorrection = m_Layout->GetLayoutGeometry().GetMinimum() - glm::vec2(m_TexturePadding);
 
 		m_HelperLayout->Clear();
 		m_HelperLayout->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -303,6 +303,8 @@ public:
 			for (size_t index = 0; index < line->GetChildrenCount(); ++index)
 			{
 				exl::TextLayoutCharacter* character = dynamic_cast<exl::TextLayoutCharacter*>(line->GetChildAtIndex(index));
+
+				const exl::BoundingBox& geometry = character->GetLayoutGeometry();
 
 				exl::BoundingBox box = character->GetLayoutGeometry().GetTranslated(m_Position);
 				m_HelperGlyphs->AddBox(box);
@@ -349,7 +351,7 @@ public:
 		glm::vec2 screen_position = m_Position + m_RenderCorrection;
 
 		glm::mat4x4 modelview;
-		modelview = glm::translate(modelview, glm::vec3(screen_position.x, screen_position.y, 0.0f));
+		modelview = glm::translate(modelview, glm::vec3(screen_position, 0.0f));
 		modelview = glm::scale(modelview, glm::vec3((float)m_TextureWidth, (float)m_TextureHeight, 1.0f));
 
 		glm::mat4x4 projection = glm::ortho<float>(
@@ -567,7 +569,7 @@ public:
 		}
 
 		m_TextField = new TextField(m_Library, m_ProgramEffects);
-		m_TextField->SetPosition(glm::vec2(20.0f, 20.0f));
+		m_TextField->SetPosition(glm::vec2(20.0f, 50.0f));
 
 		m_TextField->SetText("I finally got some *italic* and **bold** text!");
 		

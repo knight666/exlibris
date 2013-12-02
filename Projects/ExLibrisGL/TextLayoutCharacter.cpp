@@ -90,7 +90,7 @@ namespace ExLibris
 		{
 			glm::vec2 position(
 				m_Position.x,
-				m_Position.y - m_Face->GetAscent() + m_Face->GetDescent()
+				m_Position.y - (m_Face->GetAscent() + m_Face->GetDescent())
 			);
 			glm::vec2 dimensions(
 				m_Metrics->advance + m_Adjustment.x,
