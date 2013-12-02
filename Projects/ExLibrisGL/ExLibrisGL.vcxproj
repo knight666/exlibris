@@ -144,6 +144,7 @@
     <ClInclude Include="TextLine.h" />
     <ClInclude Include="TextLayoutSection.h" />
     <ClInclude Include="TextParserMarkdown.h" />
+    <ClInclude Include="TextParserToken.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangleList.h" />
     <ClInclude Include="TriangleOrientation.h" />
