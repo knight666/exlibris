@@ -30,7 +30,7 @@
 namespace ExLibris
 {
 
-	struct TextToken
+	struct TextParserToken
 	{
 
 		enum Changed
@@ -46,7 +46,7 @@ namespace ExLibris
 
 	public:
 
-		TextToken()
+		TextParserToken()
 			: codepoint(0)
 			, changes(eChanged_None)
 			, size(0.0f)
@@ -83,7 +83,7 @@ namespace ExLibris
 
 		bool ReadToken();
 
-		const TextToken& GetToken() const;
+		const TextParserToken& GetToken() const;
 	
 	private:
 
@@ -97,7 +97,7 @@ namespace ExLibris
 		std::string m_Text;
 		std::string::iterator m_TextCursor;
 		int m_CodepointCurrent;
-		TextToken m_Token;
+		TextParserToken m_Token;
 
 		bool m_EscapeCharacter;
 	

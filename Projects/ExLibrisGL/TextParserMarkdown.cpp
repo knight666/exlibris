@@ -45,7 +45,7 @@ namespace ExLibris
 
 		m_EscapeCharacter = false;
 
-		TextToken clear;
+		TextParserToken clear;
 		m_Token = clear;
 	}
 
@@ -57,7 +57,7 @@ namespace ExLibris
 		}
 
 		m_Token.codepoint = 0;
-		m_Token.changes = TextToken::eChanged_None;
+		m_Token.changes = TextParserToken::eChanged_None;
 
 		switch (m_CodepointCurrent)
 		{
@@ -114,7 +114,7 @@ namespace ExLibris
 		return true;
 	}
 
-	const TextToken& TextParserMarkdown::GetToken() const
+	const TextParserToken& TextParserMarkdown::GetToken() const
 	{
 		return m_Token;
 	}
@@ -144,13 +144,13 @@ namespace ExLibris
 	void TextParserMarkdown::_ToggleItalic()
 	{
 		m_Token.style = (m_Token.style == eStyle_None) ? eStyle_Italicized : eStyle_None;
-		m_Token.changes |= TextToken::eChanged_Style;
+		m_Token.changes |= TextParserToken::eChanged_Style;
 	}
 
 	void TextParserMarkdown::_ToggleBold()
 	{
 		m_Token.weight = (m_Token.weight == eWeight_Normal) ? eWeight_Bold : eWeight_Normal;
-		m_Token.changes |= TextToken::eChanged_Weight;
+		m_Token.changes |= TextParserToken::eChanged_Weight;
 	}
 
 }; // namespace ExLibris

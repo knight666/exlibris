@@ -8,10 +8,10 @@ TEST(TextParserMarkdown, Construct)
 {
 	TextParserMarkdown parser;
 
-	const TextToken& token = parser.GetToken();
+	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ(0, token.codepoint);
-	EXPECT_EQ(TextToken::eChanged_None, token.changes);
+	EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	EXPECT_STREQ("", token.family_name.c_str());
 	EXPECT_FLOAT_EQ(0.0f, token.size);
 	EXPECT_EQ(eWeight_Normal, token.weight);
@@ -27,7 +27,7 @@ TEST(TextParserMarkdown, ReadCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 
-	const TextToken& token = parser.GetToken();
+	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ('k', token.codepoint);
 }
@@ -41,7 +41,7 @@ TEST(TextParserMarkdown, ReadThreeCodepoints)
 	EXPECT_TRUE(parser.ReadToken());
 	EXPECT_TRUE(parser.ReadToken());
 
-	const TextToken& token = parser.GetToken();
+	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ('g', token.codepoint);
 }
@@ -53,7 +53,7 @@ TEST(TextParserMarkdown, ReadCodepointEmpty)
 
 	EXPECT_FALSE(parser.ReadToken());
 
-	const TextToken& token = parser.GetToken();
+	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ(0, token.codepoint);
 }
@@ -65,10 +65,10 @@ TEST(TextParserMarkdown, ReadItalic)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 }
@@ -80,19 +80,19 @@ TEST(TextParserMarkdown, ReadItalicCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('i', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 }
@@ -104,28 +104,28 @@ TEST(TextParserMarkdown, ReadNormalAndItalicCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('8', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eStyle_None, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('7', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 }
@@ -137,37 +137,37 @@ TEST(TextParserMarkdown, ReadItalicAndNormalCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('H', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_None, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('M', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eStyle_None, token.style);
 	}
 }
@@ -179,10 +179,10 @@ TEST(TextParserMarkdown, ReadBold)
 
 	EXPECT_TRUE(parser.ReadToken());
 
-	const TextToken& token = parser.GetToken();
+	const TextParserToken& token = parser.GetToken();
 
 	EXPECT_EQ(0, token.codepoint);
-	EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+	EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 	EXPECT_EQ(eWeight_Bold, token.weight);
 }
 
@@ -193,19 +193,19 @@ TEST(TextParserMarkdown, ReadBoldCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('b', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 }
@@ -217,28 +217,28 @@ TEST(TextParserMarkdown, ReadNormalAndBoldCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('a', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Normal, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('z', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 }
@@ -250,37 +250,37 @@ TEST(TextParserMarkdown, ReadBoldAndNormalCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('p', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Normal, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('r', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Normal, token.weight);
 	}
 }
@@ -292,28 +292,28 @@ TEST(TextParserMarkdown, ReadBoldItalicCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('S', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
@@ -326,47 +326,47 @@ TEST(TextParserMarkdown, ReadBoldItalicAndItalicCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('V', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Normal, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('k', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Normal, token.weight);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
@@ -379,47 +379,47 @@ TEST(TextParserMarkdown, ReadBoldItalicAndBoldCodepoint)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('1', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_None, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('2', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 		EXPECT_EQ(eStyle_None, token.style);
 	}
@@ -440,10 +440,10 @@ TEST(TextParserMarkdown, EscapeAndSlash)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('\\', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 }
 
@@ -454,18 +454,18 @@ TEST(TextParserMarkdown, EscapeFiveSlashes)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('\\', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('\\', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 
 	EXPECT_FALSE(parser.ReadToken());
@@ -478,10 +478,10 @@ TEST(TextParserMarkdown, EscapeItalic)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('*', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 }
 
@@ -492,18 +492,18 @@ TEST(TextParserMarkdown, EscapeItalicAndReadItalic)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('*', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 }
@@ -515,18 +515,18 @@ TEST(TextParserMarkdown, EscapeItalicAndReadBold)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('*', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Weight, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Weight, token.changes);
 		EXPECT_EQ(eWeight_Bold, token.weight);
 	}
 }
@@ -538,27 +538,27 @@ TEST(TextParserMarkdown, EscapeItalicStar)
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_Italicized, token.style);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ('*', token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_None, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_None, token.changes);
 	}
 
 	EXPECT_TRUE(parser.ReadToken());
 	{
-		const TextToken& token = parser.GetToken();
+		const TextParserToken& token = parser.GetToken();
 
 		EXPECT_EQ(0, token.codepoint);
-		EXPECT_EQ(TextToken::eChanged_Style, token.changes);
+		EXPECT_EQ(TextParserToken::eChanged_Style, token.changes);
 		EXPECT_EQ(eStyle_None, token.style);
 	}
 }

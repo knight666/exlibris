@@ -128,9 +128,9 @@ namespace ExLibris
 
 		while (m_Parser->ReadToken())
 		{
-			const TextToken& token = m_Parser->GetToken();
+			const TextParserToken& token = m_Parser->GetToken();
 
-			if (token.changes == TextToken::eChanged_None)
+			if (token.changes == TextParserToken::eChanged_None)
 			{
 				CharacterCollection::Type collection_type_found = CharacterCollection::eType_End;
 
@@ -165,25 +165,25 @@ namespace ExLibris
 			}
 			else
 			{
-				if (token.changes & TextToken::eChanged_FamilyName)
+				if (token.changes & TextParserToken::eChanged_FamilyName)
 				{
 					m_Request.SetFamilyName(token.family_name);
 					m_FaceDirty = true;
 				}
 
-				if (token.changes & TextToken::eChanged_Size)
+				if (token.changes & TextParserToken::eChanged_Size)
 				{
 					m_Request.SetSize(token.size);
 					m_FaceDirty = true;
 				}
 
-				if (token.changes & TextToken::eChanged_Weight)
+				if (token.changes & TextParserToken::eChanged_Weight)
 				{
 					m_Request.SetWeight(token.weight);
 					m_FaceDirty = true;
 				}
 
-				if (token.changes & TextToken::eChanged_Style)
+				if (token.changes & TextParserToken::eChanged_Style)
 				{
 					m_Request.SetStyle(token.style);
 					m_FaceDirty = true;
