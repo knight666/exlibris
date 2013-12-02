@@ -24,41 +24,61 @@
 
 #pragma once
 
-#include "TextParserToken.h"
+#include "Style.h"
+#include "Weight.h"
 
 namespace ExLibris
 {
 
-	class TextParserMarkdown
+	struct TextParserToken
 	{
 
+		enum CodepointType
+		{
+			eCodepointType_Character,
+			eCodepointType_Space,
+			eCodepointType_Tab,
+			eCodepointType_Newline
+		};
+
+		enum Changed
+		{
+			eChanged_None            = 0,
+			eChanged_FamilyName      = (1 << 0),
+			eChanged_Size            = (1 << 1),
+			eChanged_Weight          = (1 << 2),
+			eChanged_Style           = (1 << 3),
+			eChanged_Color           = (1 << 4),
+			eChanged_BackgroundColor = (1 << 5),
+		};
+
 	public:
-	
-		TextParserMarkdown();
-		~TextParserMarkdown();
 
-		void SetInput(const std::string& a_Text);
+		TextParserToken()
+			: codepoint(0)
+			, type(eCodepointType_Character)
+			, changes(eChanged_None)
+			, size(0.0f)
+			, weight(eWeight_Normal)
+			, style(eStyle_None)
+			, color(0.0f, 0.0f, 0.0f, 1.0f)
+			, background_color(1.0f, 1.0f, 1.0f, 1.0f)
+		{
+		}
 
-		bool ReadToken();
+	public:
 
-		const TextParserToken& GetToken() const;
-	
-	private:
+		int codepoint;
+		CodepointType type;
 
-		int _NextCodepoint();
-		bool _ReadNextCodepoint();
-		void _ToggleItalic();
-		void _ToggleBold();
+		unsigned int changes;
+		std::string family_name;
+		float size;
+		Weight weight;
+		Style style;
+		glm::vec4 color;
+		glm::vec4 background_color;
 
-	private:
-
-		std::string m_Text;
-		std::string::iterator m_TextCursor;
-		int m_CodepointCurrent;
-		TextParserToken m_Token;
-
-		bool m_EscapeCharacter;
-	
-	}; // class TextParserMarkdown
+	};
 
 }; // namespace ExLibris
