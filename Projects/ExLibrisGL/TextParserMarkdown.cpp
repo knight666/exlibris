@@ -57,10 +57,26 @@ namespace ExLibris
 		}
 
 		m_Token.codepoint = 0;
+		m_Token.type = TextParserToken::eCodepointType_Unprintable;
 		m_Token.changes = TextParserToken::eChanged_None;
 
 		switch (m_CodepointCurrent)
 		{
+
+		case ' ':
+		case '\t':
+			{
+				m_Token.codepoint = m_CodepointCurrent;
+				m_Token.type = TextParserToken::eCodepointType_Whitespace;
+
+			} break;
+
+		case '\r':
+		case '\n':
+			{
+				_ParseNewline();
+
+			} break;
 
 		case '\\':
 			{
@@ -106,6 +122,7 @@ namespace ExLibris
 		default:
 			{
 				m_Token.codepoint = m_CodepointCurrent;
+				m_Token.type = TextParserToken::eCodepointType_Character;
 
 			} break;
 
@@ -139,6 +156,26 @@ namespace ExLibris
 		m_CodepointCurrent = (int)*m_TextCursor++;
 
 		return true;
+	}
+
+	void TextParserMarkdown::_ParseNewline()
+	{
+		if (m_CodepointCurrent == '\r')
+		{
+			if (_NextCodepoint() == '\n')
+			{
+				m_Token.type = TextParserToken::eCodepointType_Newline;
+				m_TextCursor++;
+			}
+			else
+			{
+				m_Token.type = TextParserToken::eCodepointType_Unprintable;
+			}
+		}
+		else if (m_CodepointCurrent == '\n')
+		{
+			m_Token.type = TextParserToken::eCodepointType_Newline;
+		}
 	}
 
 	void TextParserMarkdown::_ToggleItalic()

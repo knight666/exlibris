@@ -47,6 +47,7 @@ namespace ExLibris
 
 		int _NextCodepoint();
 		bool _ReadNextCodepoint();
+		void _ParseNewline();
 		void _ToggleItalic();
 		void _ToggleBold();
 
