@@ -29,6 +29,7 @@
 #include "Face.h"
 #include "GlyphMetrics.h"
 #include "Library.h"
+#include "TextFormat.h"
 #include "TextLayoutCharacter.h"
 #include "TextLayoutLine.h"
 #include "TextLayoutSection.h"
@@ -40,6 +41,7 @@ namespace ExLibris
 	TextLayoutDocument::TextLayoutDocument(Library* a_Library)
 		: m_Library(a_Library)
 		, m_Parser(nullptr)
+		, m_FormatCurrent(nullptr)
 		, m_FaceCurrent(nullptr)
 		, m_FaceDirty(true)
 		, m_CharacterCurrent(nullptr)
@@ -50,6 +52,7 @@ namespace ExLibris
 		if (m_Library != nullptr)
 		{
 			m_FaceCurrent = m_Library->RequestFace(m_Request);
+			m_FormatCurrent = new TextFormat(m_Library);
 		}
 	}
 	
@@ -67,6 +70,8 @@ namespace ExLibris
 
 	void TextLayoutDocument::SetDefaultFamily(const std::string& a_FamilyName)
 	{
+		m_FormatCurrent->SetFamilyName(a_FamilyName);
+
 		m_Request.SetFamilyName(a_FamilyName);
 
 		m_FaceDirty = true;
@@ -74,6 +79,8 @@ namespace ExLibris
 
 	void TextLayoutDocument::SetDefaultSize(float a_Size)
 	{
+		m_FormatCurrent->SetSize(a_Size);
+
 		m_Request.SetSize(a_Size);
 
 		m_FaceDirty = true;
