@@ -28,20 +28,25 @@
 
 #include "Face.h"
 #include "GlyphMetrics.h"
+#include "TextFormat.h"
 
 namespace ExLibris
 {
 
-	TextLayoutCharacter::TextLayoutCharacter(Face* a_Face, int a_Codepoint)
-		: m_Face(a_Face)
+	TextLayoutCharacter::TextLayoutCharacter(TextFormat* a_TextFormat, int a_Codepoint)
+		: m_TextFormat(a_TextFormat)
 		, m_Codepoint(a_Codepoint)
 		, m_Metrics(nullptr)
 		, m_Position(0.0f, 0.0f)
 		, m_Adjustment(0.0f, 0.0f)
 	{
-		if (m_Face != nullptr)
+		if (m_TextFormat != nullptr)
 		{
-			m_Metrics = m_Face->CreateMetrics(a_Codepoint);
+			Face* face = m_TextFormat->GetFace();
+			if (face != nullptr)
+			{
+				m_Metrics = face->CreateMetrics(a_Codepoint);
+			}
 		}
 	}
 	
@@ -49,9 +54,9 @@ namespace ExLibris
 	{
 	}
 
-	Face* TextLayoutCharacter::GetFace() const
+	TextFormat* TextLayoutCharacter::GetTextFormat() const
 	{
-		return m_Face;
+		return m_TextFormat;
 	}
 
 	int TextLayoutCharacter::GetCodepoint() const
@@ -86,15 +91,16 @@ namespace ExLibris
 
 	void TextLayoutCharacter::OnGeometryCalculated()
 	{
-		if (m_Face != nullptr && m_Metrics != nullptr)
+		Face* face = m_TextFormat->GetFace();
+		if (face != nullptr && m_Metrics != nullptr)
 		{
 			glm::vec2 position(
 				m_Position.x,
-				m_Position.y - (m_Face->GetAscent() + m_Face->GetDescent())
+				m_Position.y - (face->GetAscent() + face->GetDescent())
 			);
 			glm::vec2 dimensions(
 				m_Metrics->advance + m_Adjustment.x,
-				m_Face->GetLineHeight()
+				face->GetLineHeight()
 			);
 
 			m_LayoutGeometry.SetTopLeft(position);

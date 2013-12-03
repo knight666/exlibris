@@ -29,6 +29,7 @@
 namespace ExLibris
 {
 	struct GlyphMetrics;
+	class TextFormat;
 }
 
 namespace ExLibris
@@ -41,11 +42,13 @@ namespace ExLibris
 	
 	public:
 	
-		TextLayoutCharacter(Face* a_Face, int a_Codepoint);
+		TextLayoutCharacter(TextFormat* a_TextFormat, int a_Codepoint);
 		~TextLayoutCharacter();
 
-		Face* GetFace() const;
+		TextFormat* GetTextFormat() const;
+
 		int GetCodepoint() const;
+
 		GlyphMetrics* GetMetrics() const;
 	
 		const glm::vec2& GetPosition() const;
@@ -61,7 +64,7 @@ namespace ExLibris
 
 	private:
 
-		Face* m_Face;
+		TextFormat* m_TextFormat;
 		int m_Codepoint;
 		GlyphMetrics* m_Metrics;
 		glm::vec2 m_Position;
