@@ -31,6 +31,7 @@ namespace ExLibris
 {
 	class Face;
 	class Library;
+	class TextFormat;
 	class TextLayoutCharacter;
 	class TextLayoutLine;
 	class TextLayoutSection;
@@ -139,6 +140,8 @@ namespace ExLibris
 
 		TextLayoutCharacter* m_CharacterCurrent;
 		glm::vec2 m_Cursor;
+
+		TextFormat* m_FormatCurrent;
 	
 	}; // class TextLayoutDocument
 

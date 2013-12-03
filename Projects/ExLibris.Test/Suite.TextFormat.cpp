@@ -130,3 +130,33 @@ TEST(TextFormat, GetFaceAndFamily)
 	ASSERT_NE(nullptr, fm);
 	EXPECT_STREQ("Magic Shop", fm->GetName().c_str());
 }
+
+TEST(TextFormat, Copy)
+{
+	Library lib;
+
+	MockFontLoader* loader = new MockFontLoader(&lib);
+	loader->family_name = "Supreme Cheese";
+	loader->style = eStyle_Italicized;
+	lib.AddLoader(loader);
+
+	std::stringstream ss;
+	lib.MapFontToStream(ss);
+
+	TextFormat tf(&lib);
+	tf.SetFamilyName("Supreme Cheese");
+	tf.SetSize(17.8f);
+	tf.SetStyle(eStyle_Italicized);
+
+	TextFormat copy = tf;
+
+	Face* f = copy.GetFace();
+	ASSERT_NE(nullptr, f);
+	EXPECT_FLOAT_EQ(17.8, f->GetSize());
+	EXPECT_EQ(eWeight_Normal, f->GetWeight());
+	EXPECT_EQ(eStyle_Italicized, f->GetStyle());
+
+	Family* fm = f->GetFamily();
+	ASSERT_NE(nullptr, fm);
+	EXPECT_STREQ("Supreme Cheese", fm->GetName().c_str());
+}
