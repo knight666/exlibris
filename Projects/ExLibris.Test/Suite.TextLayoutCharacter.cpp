@@ -1,6 +1,7 @@
 #include "ExLibris.Test.PCH.h"
 
 #include <Face.h>
+#include <TextFormat.h>
 #include <TextLayoutCharacter.h>
 
 #include "Mock.GlyphProvider.h"
@@ -9,12 +10,17 @@ using namespace ExLibris;
 
 TEST(TextLayoutCharacter, Construct)
 {
-	MockGlyphProvider provider(nullptr);
+	Library lib;
+
+	MockGlyphProvider provider(&lib);
 	Face* face = provider.CreateFace(15.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'A');
+	TextFormat tf(&lib);
+	tf.SetFace(face);
 
-	EXPECT_EQ(face, character->GetFace());
+	TextLayoutCharacter* character = new TextLayoutCharacter(&tf, 'A');
+
+	EXPECT_EQ(&tf, character->GetTextFormat());
 	EXPECT_EQ('A', character->GetCodepoint());
 	EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetLayoutGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetLayoutGeometry().GetDimensions());
@@ -24,10 +30,15 @@ TEST(TextLayoutCharacter, Construct)
 
 TEST(TextLayoutCharacter, CalculateGeometry)
 {
-	MockGlyphProvider provider(nullptr);
+	Library lib;
+
+	MockGlyphProvider provider(&lib);
 	Face* face = provider.CreateFace(24.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, '7');
+	TextFormat tf(&lib);
+	tf.SetFace(face);
+
+	TextLayoutCharacter* character = new TextLayoutCharacter(&tf, '7');
 
 	character->CalculateGeometry();
 
@@ -39,10 +50,15 @@ TEST(TextLayoutCharacter, CalculateGeometry)
 
 TEST(TextLayoutCharacter, CalculateGeometryWithPosition)
 {
-	MockGlyphProvider provider(nullptr);
+	Library lib;
+
+	MockGlyphProvider provider(&lib);
 	Face* face = provider.CreateFace(24.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, 'P');
+	TextFormat tf(&lib);
+	tf.SetFace(face);
+
+	TextLayoutCharacter* character = new TextLayoutCharacter(&tf, 'P');
 	character->SetPosition(glm::vec2(51.0f, 12.0f));
 
 	character->CalculateGeometry();
@@ -55,10 +71,15 @@ TEST(TextLayoutCharacter, CalculateGeometryWithPosition)
 
 TEST(TextLayoutCharacter, CalculateGeometryWithKerningAdjustment)
 {
-	MockGlyphProvider provider(nullptr);
+	Library lib;
+
+	MockGlyphProvider provider(&lib);
 	Face* face = provider.CreateFace(33.0f);
 
-	TextLayoutCharacter* character = new TextLayoutCharacter(face, '%');
+	TextFormat tf(&lib);
+	tf.SetFace(face);
+
+	TextLayoutCharacter* character = new TextLayoutCharacter(&tf, '%');
 	character->SetKerningAdjustment(glm::vec2(-2.4f, 15.2f));
 
 	character->CalculateGeometry();

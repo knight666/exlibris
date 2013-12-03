@@ -235,7 +235,7 @@ namespace ExLibris
 				section_current = character->section;
 			}
 
-			TextLayoutCharacter* character_next = new TextLayoutCharacter(face, codepoint);
+			TextLayoutCharacter* character_next = new TextLayoutCharacter(m_FormatCurrent, codepoint);
 			character_next->SetPosition(m_Cursor);
 			m_LineCurrent->AddChild(character_next);
 
