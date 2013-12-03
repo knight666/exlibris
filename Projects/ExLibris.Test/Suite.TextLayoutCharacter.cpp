@@ -31,7 +31,7 @@ TEST(TextLayoutCharacter, CalculateGeometry)
 
 	character->CalculateGeometry();
 
-	EXPECT_VEC2_EQ(0.0f, 0.0f - (24.0f / 2.0f) + -(24.0f / 3.0f), character->GetLayoutGeometry().GetTopLeft());
+	EXPECT_VEC2_EQ(0.0f, 0.0f - ((24.0f / 2.0f) + -(24.0f / 3.0f)), character->GetLayoutGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(12.0f, 24.0f * 1.5f, character->GetLayoutGeometry().GetDimensions());
 	EXPECT_VEC2_EQ(2.0f, 2.0f, character->GetElementGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(8.0f, 8.0f, character->GetElementGeometry().GetDimensions());
@@ -47,7 +47,7 @@ TEST(TextLayoutCharacter, CalculateGeometryWithPosition)
 
 	character->CalculateGeometry();
 
-	EXPECT_VEC2_EQ(51.0f, 12.0f - (24.0f / 2.0f) + -(24.0f / 3.0f), character->GetLayoutGeometry().GetTopLeft());
+	EXPECT_VEC2_EQ(51.0f, 12.0f - ((24.0f / 2.0f) + -(24.0f / 3.0f)), character->GetLayoutGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(12.0f, 24.0f * 1.5f, character->GetLayoutGeometry().GetDimensions());
 	EXPECT_VEC2_EQ(51.0f + 2.0f, 12.0f + 2.0f, character->GetElementGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(8.0f, 8.0f, character->GetElementGeometry().GetDimensions());
@@ -63,7 +63,7 @@ TEST(TextLayoutCharacter, CalculateGeometryWithKerningAdjustment)
 
 	character->CalculateGeometry();
 
-	EXPECT_VEC2_EQ(0.0f, 0.0f - (33.0f / 2.0f) + -(33.0f / 3.0f), character->GetLayoutGeometry().GetTopLeft());
+	EXPECT_VEC2_EQ(0.0f, 0.0f - ((33.0f / 2.0f) + -(33.0f / 3.0f)), character->GetLayoutGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(12.0f - 2.4f, 33.0f * 1.5f, character->GetLayoutGeometry().GetDimensions());
 	EXPECT_VEC2_EQ(2.0f, 2.0f, character->GetElementGeometry().GetTopLeft());
 	EXPECT_VEC2_EQ(8.0f, 8.0f, character->GetElementGeometry().GetDimensions());
