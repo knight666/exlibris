@@ -83,6 +83,7 @@
     <ClCompile Include="Suite.LineShape.cpp" />
     <ClCompile Include="Suite.MeshBuilder.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
+    <ClCompile Include="Suite.TextFormat.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.TextLayoutCharacter.cpp" />
     <ClCompile Include="Suite.TextLayoutDocument.cpp" />

@@ -18,7 +18,7 @@ namespace ExLibris
 	
 	public:
 	
-		MockGlyphProvider(Library* a_Library)
+		MockGlyphProvider(Library* a_Library, const std::string& a_FamilyName = "MockFamily")
 			: IGlyphProvider(a_Library)
 			, use_font_metrics(false)
 			, use_glyph_metrics(false)
@@ -28,7 +28,7 @@ namespace ExLibris
 		{
 			if (m_Library != nullptr)
 			{
-				m_Family = m_Library->CreateFamily("MockFamily");
+				m_Family = m_Library->CreateFamily(a_FamilyName);
 			}
 		}
 
