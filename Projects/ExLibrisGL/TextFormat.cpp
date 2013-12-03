@@ -27,6 +27,7 @@
 #include "TextFormat.h"
 
 #include "Face.h"
+#include "Family.h"
 #include "Library.h"
 
 namespace ExLibris
@@ -57,6 +58,30 @@ namespace ExLibris
 		}
 
 		return m_Face;
+	}
+
+	void TextFormat::SetFace(Face* a_Face)
+	{
+		if (a_Face != nullptr)
+		{
+			m_Face = a_Face;
+
+			m_Family = a_Face->GetFamily();
+			if (m_Family != nullptr)
+			{
+				SetFamilyName(m_Family->GetName());
+			}
+
+			SetSize(m_Face->GetSize());
+			SetWeight(m_Face->GetWeight());
+			SetStyle(m_Face->GetStyle());
+
+			m_FaceDirty = false;
+		}
+		else
+		{
+			m_FaceDirty = true;
+		}
 	}
 
 	Family* TextFormat::GetFamily()

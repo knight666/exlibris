@@ -131,6 +131,46 @@ TEST(TextFormat, GetFaceAndFamily)
 	EXPECT_STREQ("Magic Shop", fm->GetName().c_str());
 }
 
+TEST(TextFormat, SetFace)
+{
+	Library lib;
+
+	MockGlyphProvider provider(&lib, "MidnightTrainz");
+	provider.SetWeight(eWeight_Bold);
+	provider.SetStyle(eStyle_Italicized);
+	Face* face = provider.CreateFace(126.2f);
+
+	TextFormat tf(&lib);
+	tf.SetFace(face);
+
+	EXPECT_TRUE(tf.HasProperty(TextFormat::eProperty_FamilyName));
+	EXPECT_STREQ("MidnightTrainz", tf.GetFamilyName().c_str());
+	EXPECT_TRUE(tf.HasProperty(TextFormat::eProperty_Size));
+	EXPECT_FLOAT_EQ(126.2f, tf.GetSize());
+	EXPECT_TRUE(tf.HasProperty(TextFormat::eProperty_Weight));
+	EXPECT_EQ(eWeight_Bold, tf.GetWeight());
+	EXPECT_TRUE(tf.HasProperty(TextFormat::eProperty_Style));
+	EXPECT_EQ(eStyle_Italicized, tf.GetStyle());
+}
+
+TEST(TextFormat, SetFaceInvalid)
+{
+	Library lib;
+
+	TextFormat tf(&lib);
+	tf.SetFamilyName("Yorgans");
+	tf.SetSize(43.23f);
+
+	tf.SetFace(nullptr);
+
+	EXPECT_TRUE(tf.HasProperty(TextFormat::eProperty_FamilyName));
+	EXPECT_STREQ("Yorgans", tf.GetFamilyName().c_str());
+	EXPECT_TRUE(tf.HasProperty(TextFormat::eProperty_Size));
+	EXPECT_FLOAT_EQ(43.23f, tf.GetSize());
+	EXPECT_FALSE(tf.HasProperty(TextFormat::eProperty_Weight));
+	EXPECT_FALSE(tf.HasProperty(TextFormat::eProperty_Style));
+}
+
 TEST(TextFormat, Copy)
 {
 	Library lib;
