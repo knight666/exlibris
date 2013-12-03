@@ -59,6 +59,8 @@ namespace ExLibris
 		~TextFormat();
 
 		Face* GetFace();
+		void SetFace(Face* a_Face);
+
 		Family* GetFamily();
 
 		bool HasProperty(unsigned int a_Property) const;
