@@ -48,6 +48,38 @@ namespace ExLibris
 	{
 	}
 
+	TextFormat* TextFormat::CreateSpecialization() const
+	{
+		TextFormat* format = new TextFormat(m_Library);
+
+		if (HasProperty(eProperty_FamilyName))
+		{
+			format->SetFamilyName(GetFamilyName());
+		}
+		if (HasProperty(eProperty_Size))
+		{
+			format->SetSize(GetSize());
+		}
+		if (HasProperty(eProperty_Weight))
+		{
+			format->SetWeight(GetWeight());
+		}
+		if (HasProperty(eProperty_Style))
+		{
+			format->SetStyle(GetStyle());
+		}
+		if (HasProperty(eProperty_Color))
+		{
+			format->SetColor(GetColor());
+		}
+		if (HasProperty(eProperty_BackgroundColor))
+		{
+			format->SetBackgroundColor(GetBackgroundColor());
+		}
+
+		return format;
+	}
+
 	Face* TextFormat::GetFace()
 	{
 		if (m_FaceDirty)
