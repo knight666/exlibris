@@ -200,3 +200,23 @@ TEST(TextFormat, Copy)
 	ASSERT_NE(nullptr, fm);
 	EXPECT_STREQ("Supreme Cheese", fm->GetName().c_str());
 }
+
+TEST(TextFormat, CreateSpecialization)
+{
+	Library lib;
+
+	TextFormat tf(&lib);
+	tf.SetFamilyName("Chees-o-Mania");
+	tf.SetSize(29.8f);
+	tf.SetStyle(eStyle_Italicized);
+
+	TextFormat* sz = tf.CreateSpecialization();
+
+	EXPECT_TRUE(sz->HasProperty(TextFormat::eProperty_FamilyName));
+	EXPECT_STREQ("Chees-o-Mania", sz->GetFamilyName().c_str());
+	EXPECT_TRUE(sz->HasProperty(TextFormat::eProperty_Size));
+	EXPECT_FLOAT_EQ(29.8f, sz->GetSize());
+	EXPECT_FALSE(sz->HasProperty(TextFormat::eProperty_Weight));
+	EXPECT_TRUE(sz->HasProperty(TextFormat::eProperty_Style));
+	EXPECT_EQ(eStyle_Italicized, sz->GetStyle());
+}

@@ -58,6 +58,8 @@ namespace ExLibris
 		TextFormat(Library* a_Library);
 		~TextFormat();
 
+		TextFormat* CreateSpecialization() const;
+
 		Face* GetFace();
 		void SetFace(Face* a_Face);
 
