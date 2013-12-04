@@ -29,7 +29,6 @@
 #include "Face.h"
 #include "GlyphMetrics.h"
 #include "Library.h"
-#include "TextFormat.h"
 #include "TextLayoutCharacter.h"
 #include "TextLayoutLine.h"
 #include "TextLayoutSection.h"
@@ -41,18 +40,18 @@ namespace ExLibris
 	TextLayoutDocument::TextLayoutDocument(Library* a_Library)
 		: m_Library(a_Library)
 		, m_Parser(nullptr)
-		, m_FormatCurrent(nullptr)
-		, m_FaceCurrent(nullptr)
-		, m_FaceDirty(true)
 		, m_CharacterCurrent(nullptr)
 		, m_LineCurrent(nullptr)
 		, m_SectionCurrent(nullptr)
 		, m_CollectionCurrent(nullptr)
+		, m_TextFormatCurrent(nullptr)
 	{
 		if (m_Library != nullptr)
 		{
-			m_FaceCurrent = m_Library->RequestFace(m_Request);
-			m_FormatCurrent = new TextFormat(m_Library);
+			m_TextFormatCurrent = new TextFormat(m_Library);
+
+			TextFormat* default = new TextFormat(m_Library);
+			m_TextFormats.push_back(default);
 		}
 	}
 	
@@ -68,22 +67,10 @@ namespace ExLibris
 		return m_Lines;
 	}
 
-	void TextLayoutDocument::SetDefaultFamily(const std::string& a_FamilyName)
+	void TextLayoutDocument::SetDefaultTextFormat(const TextFormat& a_TextFormat)
 	{
-		m_FormatCurrent->SetFamilyName(a_FamilyName);
-
-		m_Request.SetFamilyName(a_FamilyName);
-
-		m_FaceDirty = true;
-	}
-
-	void TextLayoutDocument::SetDefaultSize(float a_Size)
-	{
-		m_FormatCurrent->SetSize(a_Size);
-
-		m_Request.SetSize(a_Size);
-
-		m_FaceDirty = true;
+		TextFormat* default = *m_TextFormats.begin();
+		*default = a_TextFormat;
 	}
 
 	void TextLayoutDocument::SetParser(TextParserMarkdown* a_Parser)
@@ -130,8 +117,7 @@ namespace ExLibris
 		_ClearSections();
 		_AddSection();
 
-		_ChangeFace();
-		m_FaceDirty = false;
+		m_TextFormatCurrent = *m_TextFormats.begin();
 
 		while (m_Parser->ReadToken())
 		{
@@ -139,69 +125,38 @@ namespace ExLibris
 
 			if (token.changes == TextParserToken::eChanged_None)
 			{
-				CharacterCollection::Type collection_type_found = CharacterCollection::eType_End;
-
-				switch (token.codepoint)
-				{
-
-				case '\n':
-					{
-						collection_type_found = CharacterCollection::eType_Newline;
-
-					} break;
-
-				case ' ':
-					{
-						collection_type_found = CharacterCollection::eType_Whitespace;
-
-					} break;
-
-				default:
-					{
-						collection_type_found = CharacterCollection::eType_Characters;
-
-					} break;
-				}
-
-				if (m_CollectionCurrent == nullptr || collection_type_found != m_CollectionCurrent->type)
-				{
-					_AddCollection(collection_type_found);
-				}
-
-				_AddCharacter(token.codepoint);
+				Character* character = new Character;
+				character->codepoint = token.codepoint;
+				character->type = token.type;
+				character->format = m_TextFormatCurrent;
+				
+				m_Characters.push_back(character);
 			}
 			else
 			{
+				m_TextFormatCurrent = m_TextFormatCurrent->CreateSpecialization();
+
 				if (token.changes & TextParserToken::eChanged_FamilyName)
 				{
-					m_Request.SetFamilyName(token.family_name);
-					m_FaceDirty = true;
+					m_TextFormatCurrent->SetFamilyName(token.family_name);
 				}
 
 				if (token.changes & TextParserToken::eChanged_Size)
 				{
-					m_Request.SetSize(token.size);
-					m_FaceDirty = true;
+					m_TextFormatCurrent->SetSize(token.size);
 				}
 
 				if (token.changes & TextParserToken::eChanged_Weight)
 				{
-					m_Request.SetWeight(token.weight);
-					m_FaceDirty = true;
+					m_TextFormatCurrent->SetWeight(token.weight);
 				}
 
 				if (token.changes & TextParserToken::eChanged_Style)
 				{
-					m_Request.SetStyle(token.style);
-					m_FaceDirty = true;
+					m_TextFormatCurrent->SetStyle(token.style);
 				}
 
-				if (m_FaceDirty)
-				{
-					_ChangeFace();
-
-					m_FaceDirty = false;
-				}
+				m_TextFormats.push_back(m_TextFormatCurrent);
 			}
 		}
 	}
@@ -210,84 +165,49 @@ namespace ExLibris
 	{
 		m_Cursor = glm::vec2(0.0f, 0.0f);
 
-		CharacterCollection* collection_current = nullptr;
-		Section* section_current = nullptr;
-
-		m_CharacterCurrent = nullptr;
-
 		m_LineCurrent = new TextLayoutLine;
 		m_Lines.push_back(m_LineCurrent);
 
 		AddChild(m_LineCurrent);
 
+		TextFormat* format_current = nullptr;
+		Face* face_current = nullptr;
+
 		for (std::vector<Character*>::iterator character_it = m_Characters.begin(); character_it != m_Characters.end(); ++character_it)
 		{
 			Character* character = *character_it;
 
-			int codepoint = character->codepoint;
-			Face* face = character->section->face;
-
-			// reset kerning when face changes
-
-			if (section_current != character->section)
+			if (format_current != character->format)
 			{
-				m_CharacterCurrent = nullptr;
-				section_current = character->section;
+				// reset kerning if face changes
+
+				if (face_current != character->format->GetFace())
+				{
+					m_CharacterCurrent = nullptr;
+				}
+
+				format_current = character->format;
+				face_current = character->format->GetFace();
 			}
 
-			TextLayoutCharacter* character_next = new TextLayoutCharacter(m_FormatCurrent, codepoint);
+			TextLayoutCharacter* character_next = new TextLayoutCharacter(character->format, character->codepoint);
 			character_next->SetPosition(m_Cursor);
-			m_LineCurrent->AddChild(character_next);
 
 			m_Cursor.x += character_next->GetMetrics()->advance;
 
 			if (m_CharacterCurrent != nullptr)
 			{
 				glm::vec2 adjustment;
-				if (face->TryGetKerningAdjustment(adjustment, m_CharacterCurrent->GetCodepoint(), codepoint))
+				if (face_current->TryGetKerningAdjustment(adjustment, m_CharacterCurrent->GetCodepoint(), character->codepoint))
 				{
 					character_next->SetKerningAdjustment(adjustment);
 				}
 			}
 
+			m_LineCurrent->AddChild(character_next);
+
 			m_CharacterCurrent = character_next;
 		}
-	}
-
-	void TextLayoutDocument::_ChangeFace()
-	{
-		Face* found = m_Library->RequestFace(m_Request);
-		if (found != m_FaceCurrent)
-		{
-			m_FaceCurrent = found;
-
-			// if the section does not have any codepoints,
-			// we can just set its face
-
-			if (m_SectionCurrent->codepoints.size() > 0)
-			{
-				_AddSection();
-
-				// reset the collection so that future codepoints
-				// are added to the next collection
-
-				m_CollectionCurrent = nullptr;
-			}
-			
-			m_SectionCurrent->face = m_FaceCurrent;
-		}
-	}
-
-	void TextLayoutDocument::_AddCharacter(int a_Codepoint)
-	{
-		Character* character = new Character;
-		character->codepoint = a_Codepoint;
-		character->collection = m_CollectionCurrent;
-		character->section = m_SectionCurrent;
-		m_Characters.push_back(character);
-
-		m_CollectionCurrent->codepoints.push_back(a_Codepoint);
-		m_SectionCurrent->codepoints.push_back(a_Codepoint);
 	}
 
 	void TextLayoutDocument::_ClearCharacters()
