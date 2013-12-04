@@ -2,6 +2,7 @@
 
 #include <FontLoaderFreetype.h>
 #include <Library.h>
+#include <TextFormat.h>
 #include <TextLayoutCharacter.h>
 #include <TextLayoutDocument.h>
 #include <TextLayoutLine.h>
@@ -17,8 +18,12 @@ TEST(TextLayoutDocument, ParseText)
 	lib->MapFontToFile("Fonts/Roboto/Roboto-Italic.ttf");
 
 	TextLayoutDocument document(lib);
-	document.SetDefaultFamily("Roboto");
-	document.SetDefaultSize(12.0f);
+	
+	TextFormat tf(lib);
+	tf.SetFamilyName("Roboto");
+	tf.SetSize(12.0f);
+	document.SetDefaultTextFormat(tf);
+
 	document.SetParser(new TextParserMarkdown());
 
 	document.SetText("I'm on a *motorized* vehicle.");

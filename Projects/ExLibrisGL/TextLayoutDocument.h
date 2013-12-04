@@ -24,8 +24,9 @@
 
 #pragma once
 
-#include "FaceRequest.h"
 #include "ITextLayoutElement.h"
+#include "TextFormat.h"
+#include "TextParserToken.h"
 
 namespace ExLibris
 {
@@ -53,6 +54,8 @@ namespace ExLibris
 		struct Character
 		{
 			int codepoint;
+			TextParserToken::CodepointType type;
+			TextFormat* format;
 			Section* section;
 			CharacterCollection* collection;
 		};
@@ -87,8 +90,7 @@ namespace ExLibris
 
 		const std::vector<TextLayoutLine*>& GetLines() const;
 
-		void SetDefaultFamily(const std::string& a_FamilyName);
-		void SetDefaultSize(float a_Size);
+		void SetDefaultTextFormat(const TextFormat& a_TextFormat);
 	
 		void SetParser(TextParserMarkdown* a_Parser);
 
@@ -106,9 +108,6 @@ namespace ExLibris
 		void _ParseTextToCollections();
 		void _LayoutGlyphs();
 
-		void _ChangeFace();
-
-		void _AddCharacter(int a_Codepoint);
 		void _ClearCharacters();
 
 		void _AddSection();
@@ -122,10 +121,6 @@ namespace ExLibris
 		Library* m_Library;
 		TextParserMarkdown* m_Parser;
 		std::string m_Text;
-
-		FaceRequest m_Request;
-		Face* m_FaceCurrent;
-		bool m_FaceDirty;
 
 		std::vector<Character*> m_Characters;
 
@@ -141,7 +136,8 @@ namespace ExLibris
 		TextLayoutCharacter* m_CharacterCurrent;
 		glm::vec2 m_Cursor;
 
-		TextFormat* m_FormatCurrent;
+		std::vector<TextFormat*> m_TextFormats;
+		TextFormat* m_TextFormatCurrent;
 	
 	}; // class TextLayoutDocument
 
