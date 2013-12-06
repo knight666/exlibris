@@ -10,6 +10,7 @@
 #include <TextParserMarkdown.h>
 
 #include "Mock.GlyphProvider.h"
+#include "Mock.TextParser.h"
 
 using namespace ExLibris;
 
@@ -43,7 +44,8 @@ public:
 		format->SetFamilyName("DocumentContext");
 		format->SetSize(12.0f);
 
-		parser = new TextParserMarkdown;
+		parser = new MockTextParser;
+		parser->ignore_input = true;
 
 		document = new TextLayoutDocument(library);
 		document->SetDefaultTextFormat(*format);
@@ -66,13 +68,13 @@ protected:
 	MockGlyphProvider* provider_bolditalic;
 	TextFormat* format;
 	TextLayoutDocument* document;
-	TextParserMarkdown* parser;
+	MockTextParser* parser;
 
 };
 
 TEST_F(TextLayoutDocumentContext, LayoutCharacter)
 {
-	document->SetText("Y");
+	parser->AddTokenString("Y");
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -99,7 +101,7 @@ TEST_F(TextLayoutDocumentContext, LayoutCharacter)
 
 TEST_F(TextLayoutDocumentContext, LayoutTwoCharacters)
 {
-	document->SetText("H6");
+	parser->AddTokenString("H6");
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -131,7 +133,7 @@ TEST_F(TextLayoutDocumentContext, LayoutTwoCharacters)
 
 TEST_F(TextLayoutDocumentContext, FormatCharacterDefault)
 {
-	document->SetText("7");
+	parser->AddTokenString("7");
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -153,7 +155,17 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterDefault)
 
 TEST_F(TextLayoutDocumentContext, FormatCharacterBold)
 {
-	document->SetText("**Q");
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Weight;
+		token.weight = eWeight_Bold;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("Q");
+	}
+
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -175,7 +187,17 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterBold)
 
 TEST_F(TextLayoutDocumentContext, FormatCharacterItalic)
 {
-	document->SetText("*n");
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Style;
+		token.style = eStyle_Italicized;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("n");
+	}
+
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -197,7 +219,18 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterItalic)
 
 TEST_F(TextLayoutDocumentContext, FormatCharacterBoldAndItalic)
 {
-	document->SetText("***%");
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Weight | TextParserToken::eChanged_Style;
+		token.weight = eWeight_Bold;
+		token.style = eStyle_Italicized;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("n");
+	}
+
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -219,7 +252,28 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterBoldAndItalic)
 
 TEST_F(TextLayoutDocumentContext, FormatBoldAndItalicCharacter)
 {
-	document->SetText("**@***#");
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Weight;
+		token.weight = eWeight_Bold;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("@");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Weight | TextParserToken::eChanged_Style;
+		token.weight = eWeight_Normal;
+		token.style = eStyle_Italicized;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("#");
+	}
+
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
@@ -255,7 +309,46 @@ TEST_F(TextLayoutDocumentContext, FormatBoldAndItalicCharacter)
 
 TEST_F(TextLayoutDocumentContext, FormatSentence)
 {
-	document->SetText("I *drove* to **you**");
+	{
+		parser->AddTokenString("I ");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Style;
+		token.style = eStyle_Italicized;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("drove");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Style;
+		token.style = eStyle_None;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString(" to ");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Weight;
+		token.weight = eWeight_Bold;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("you");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Weight;
+		token.weight = eWeight_Normal;
+
+		parser->AddTokenStyle(token);
+	}
 	document->Layout();
 
 	const std::vector<TextLayoutLine*>& lines = document->GetLines();
