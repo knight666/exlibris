@@ -24,40 +24,35 @@
 
 #pragma once
 
-#include "ITextParser.h"
+#include "TextParserToken.h"
 
 namespace ExLibris
 {
 
-	class TextParserMarkdown
-		: public ITextParser
+	class ITextParser
 	{
+	
+	public:
+	
+		virtual ~ITextParser()
+		{
+		}
+
+		virtual void SetInput(const std::string& a_Text) = 0;
+
+		virtual bool ReadToken() = 0;
 
 	public:
 	
-		TextParserMarkdown();
-		~TextParserMarkdown();
+		const TextParserToken& GetToken() const
+		{
+			return m_Token;
+		}
 
-		void SetInput(const std::string& a_Text);
+	protected:
 
-		bool ReadToken();
+		TextParserToken m_Token;
 	
-	private:
-
-		int _NextCodepoint();
-		bool _ReadNextCodepoint();
-		void _ParseNewline();
-		void _ToggleItalic();
-		void _ToggleBold();
-
-	private:
-
-		std::string m_Text;
-		std::string::iterator m_TextCursor;
-		int m_CodepointCurrent;
-
-		bool m_EscapeCharacter;
-	
-	}; // class TextParserMarkdown
+	}; // class ITextParser
 
 }; // namespace ExLibris
