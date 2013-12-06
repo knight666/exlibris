@@ -131,11 +131,6 @@ namespace ExLibris
 		return true;
 	}
 
-	const TextParserToken& TextParserMarkdown::GetToken() const
-	{
-		return m_Token;
-	}
-
 	int TextParserMarkdown::_NextCodepoint()
 	{
 		if (m_TextCursor == m_Text.end())

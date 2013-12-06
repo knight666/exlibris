@@ -126,6 +126,7 @@
     <ClInclude Include="IMeshVisitor.h" />
     <ClInclude Include="ITextLayoutElement.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
+    <ClInclude Include="ITextParser.h" />
     <ClInclude Include="Library.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineMeshOptions.h" />
