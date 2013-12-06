@@ -70,7 +70,7 @@ protected:
 
 };
 
-TEST_F(TextLayoutDocumentContext, SetCharacter)
+TEST_F(TextLayoutDocumentContext, LayoutCharacter)
 {
 	document->SetText("Y");
 	document->Layout();
@@ -95,6 +95,222 @@ TEST_F(TextLayoutDocumentContext, SetCharacter)
 	EXPECT_VEC2_EQ(10.0f, 10.0f, character->GetElementGeometry().GetMaximum());
 	EXPECT_VEC2_EQ(0.0f, -2.0f, character->GetLayoutGeometry().GetMinimum());
 	EXPECT_VEC2_EQ(12.0f, 16.0f, character->GetLayoutGeometry().GetMaximum());
+}
+
+TEST_F(TextLayoutDocumentContext, LayoutTwoCharacters)
+{
+	document->SetText("H6");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	EXPECT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	EXPECT_EQ(2, line->GetChildrenCount());
+	EXPECT_VEC2_EQ(2.0f, 2.0f, line->GetElementGeometry().GetMinimum());
+	EXPECT_VEC2_EQ(2.0f + 12.0f + 8.0f, 10.0f, line->GetElementGeometry().GetMaximum());
+	EXPECT_VEC2_EQ(0.0f, -2.0f, line->GetLayoutGeometry().GetMinimum());
+	EXPECT_VEC2_EQ(0.0f + 12.0f + -1.5f + 12.0f, 16.0f, line->GetLayoutGeometry().GetMaximum());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+		EXPECT_EQ('H', character->GetCodepoint());
+		EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetPosition());
+		EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetKerningAdjustment());
+	}
+	
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(1));
+		ASSERT_NE(nullptr, character);
+		EXPECT_EQ('6', character->GetCodepoint());
+		EXPECT_VEC2_EQ(12.0f, 0.0f, character->GetPosition());
+		EXPECT_VEC2_EQ(-1.5f, 5.6f, character->GetKerningAdjustment());
+	}
+}
+
+TEST_F(TextLayoutDocumentContext, FormatCharacterDefault)
+{
+	document->SetText("7");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1, line->GetChildrenCount());
+
+	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+	ASSERT_NE(nullptr, character);
+
+	TextFormat* format = character->GetTextFormat();
+	ASSERT_NE(nullptr, format);
+	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+	EXPECT_EQ(eWeight_Normal, format->GetWeight());
+	EXPECT_EQ(eStyle_None, format->GetStyle());
+}
+
+TEST_F(TextLayoutDocumentContext, FormatCharacterBold)
+{
+	document->SetText("**Q");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1, line->GetChildrenCount());
+
+	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+	ASSERT_NE(nullptr, character);
+
+	TextFormat* format = character->GetTextFormat();
+	ASSERT_NE(nullptr, format);
+	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+	EXPECT_EQ(eWeight_Bold, format->GetWeight());
+	EXPECT_EQ(eStyle_None, format->GetStyle());
+}
+
+TEST_F(TextLayoutDocumentContext, FormatCharacterItalic)
+{
+	document->SetText("*n");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1, line->GetChildrenCount());
+
+	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+	ASSERT_NE(nullptr, character);
+
+	TextFormat* format = character->GetTextFormat();
+	ASSERT_NE(nullptr, format);
+	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+	EXPECT_EQ(eWeight_Normal, format->GetWeight());
+	EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+}
+
+TEST_F(TextLayoutDocumentContext, FormatCharacterBoldAndItalic)
+{
+	document->SetText("***%");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1, line->GetChildrenCount());
+
+	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+	ASSERT_NE(nullptr, character);
+
+	TextFormat* format = character->GetTextFormat();
+	ASSERT_NE(nullptr, format);
+	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+	EXPECT_EQ(eWeight_Bold, format->GetWeight());
+	EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+}
+
+TEST_F(TextLayoutDocumentContext, FormatBoldAndItalicCharacter)
+{
+	document->SetText("**@***#");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(2, line->GetChildrenCount());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Bold, format->GetWeight());
+		EXPECT_EQ(eStyle_None, format->GetStyle());
+	}
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(1));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Normal, format->GetWeight());
+		EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+	}
+}
+
+TEST_F(TextLayoutDocumentContext, FormatSentence)
+{
+	document->SetText("I *drove* to **you**");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1 + 1 + 5 + 1 + 2 + 1 + 3, line->GetChildrenCount());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Normal, format->GetWeight());
+		EXPECT_EQ(eStyle_None, format->GetStyle());
+	}
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(2));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Normal, format->GetWeight());
+		EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+	}
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(7));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Normal, format->GetWeight());
+		EXPECT_EQ(eStyle_None, format->GetStyle());
+	}
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(11));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Bold, format->GetWeight());
+		EXPECT_EQ(eStyle_None, format->GetStyle());
+	}
 }
 
 TEST(TextLayoutDocument, ParseText)
