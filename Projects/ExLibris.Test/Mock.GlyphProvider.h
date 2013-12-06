@@ -4,6 +4,7 @@
 
 #include <CurvePath.h>
 #include <Face.h>
+#include <Family.h>
 #include <GlyphBitmap.h>
 #include <GlyphMetrics.h>
 #include <IGlyphProvider.h>
@@ -29,6 +30,16 @@ namespace ExLibris
 			if (m_Library != nullptr)
 			{
 				m_Family = m_Library->CreateFamily(a_FamilyName);
+				m_Family->AddGlyphProvider(this);
+			}
+		}
+
+		void SetFamily(Family* a_Family)
+		{
+			m_Family = a_Family;
+			if (m_Family != nullptr)
+			{
+				m_Family->AddGlyphProvider(this);
 			}
 		}
 
