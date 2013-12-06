@@ -11,6 +11,11 @@ namespace ExLibris
 	
 	public:
 
+		MockTextParser()
+			: ignore_input(false)
+		{
+		}
+
 		void AddTokenString(const std::string& a_Text)
 		{
 			for (std::string::const_iterator char_it = a_Text.begin(); char_it != a_Text.end(); ++char_it)
@@ -61,7 +66,10 @@ namespace ExLibris
 
 		void SetInput(const std::string& a_Text)
 		{
-			AddTokenString(a_Text);
+			if (!ignore_input)
+			{
+				AddTokenString(a_Text);
+			}
 		}
 
 		bool ReadToken()
@@ -81,6 +89,7 @@ namespace ExLibris
 
 	public:
 
+		bool ignore_input;
 		std::string text;
 		std::queue<TextParserToken> tokens;
 	
