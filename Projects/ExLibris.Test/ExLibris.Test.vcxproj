@@ -87,6 +87,7 @@
     <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.TextLayoutCharacter.cpp" />
     <ClCompile Include="Suite.TextLayoutDocument.cpp" />
+    <ClCompile Include="Suite.TextParser.cpp" />
     <ClCompile Include="Suite.TextParserMarkdown.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
@@ -96,6 +97,7 @@
     <ClInclude Include="Mock.GlyphProvider.h" />
     <ClInclude Include="Mock.MeshVisitor.h" />
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
+    <ClInclude Include="Mock.TextParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
