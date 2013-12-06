@@ -54,6 +54,11 @@ namespace ExLibris
 			}
 		}
 
+		void AddTokenStyle(const TextParserToken& a_Token)
+		{
+			tokens.push(a_Token);
+		}
+
 		void SetInput(const std::string& a_Text)
 		{
 			AddTokenString(a_Text);
