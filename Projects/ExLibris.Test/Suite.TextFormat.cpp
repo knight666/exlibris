@@ -135,10 +135,10 @@ TEST(TextFormat, SetFace)
 {
 	Library lib;
 
-	MockGlyphProvider provider(&lib, "MidnightTrainz");
-	provider.SetWeight(eWeight_Bold);
-	provider.SetStyle(eStyle_Italicized);
-	Face* face = provider.CreateFace(126.2f);
+	MockGlyphProvider* provider = new MockGlyphProvider(&lib, "MidnightTrainz");
+	provider->SetWeight(eWeight_Bold);
+	provider->SetStyle(eStyle_Italicized);
+	Face* face = provider->CreateFace(126.2f);
 
 	TextFormat tf(&lib);
 	tf.SetFace(face);
