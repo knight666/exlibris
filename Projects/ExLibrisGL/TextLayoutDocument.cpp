@@ -28,6 +28,7 @@
 
 #include "Face.h"
 #include "GlyphMetrics.h"
+#include "ITextParser.h"
 #include "Library.h"
 #include "TextLayoutCharacter.h"
 #include "TextLayoutLine.h"
@@ -73,7 +74,7 @@ namespace ExLibris
 		*default = a_TextFormat;
 	}
 
-	void TextLayoutDocument::SetParser(TextParserMarkdown* a_Parser)
+	void TextLayoutDocument::SetParser(ITextParser* a_Parser)
 	{
 		m_Parser = a_Parser;
 	}

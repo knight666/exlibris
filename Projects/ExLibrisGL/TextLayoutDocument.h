@@ -31,12 +31,12 @@
 namespace ExLibris
 {
 	class Face;
+	class ITextParser;
 	class Library;
 	class TextFormat;
 	class TextLayoutCharacter;
 	class TextLayoutLine;
 	class TextLayoutSection;
-	class TextParserMarkdown;
 }
 
 namespace ExLibris
@@ -92,7 +92,7 @@ namespace ExLibris
 
 		void SetDefaultTextFormat(const TextFormat& a_TextFormat);
 	
-		void SetParser(TextParserMarkdown* a_Parser);
+		void SetParser(ITextParser* a_Parser);
 
 		void SetText(const std::string& a_Text);
 
@@ -119,7 +119,7 @@ namespace ExLibris
 	private:
 
 		Library* m_Library;
-		TextParserMarkdown* m_Parser;
+		ITextParser* m_Parser;
 		std::string m_Text;
 
 		std::vector<Character*> m_Characters;
