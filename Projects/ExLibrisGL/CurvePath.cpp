@@ -1,0 +1,201 @@
+/*
+ * This file is a part of the ExLibris project.
+ *
+ * Copyright (C) 2013 Quinten Lansu
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to deal 
+ * in the Software without restriction, including without limitation the rights 
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all 
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+ * SOFTWARE.
+ */
+
+#include "ExLibrisGL.PCH.h"
+
+#include "CurvePath.h"
+
+#include "Exception.h"
+
+namespace ExLibris
+{
+
+	CurvePath::CurvePath()
+	{
+	}
+	
+	CurvePath::~CurvePath()
+	{
+	}
+
+	size_t CurvePath::GetCommandCount() const
+	{
+		return m_Commands.size();
+	}
+
+	size_t CurvePath::GetPositionCount() const
+	{
+		return m_Positions.size();
+	}
+
+	const glm::vec2& CurvePath::GetPosition(size_t a_Index) const
+	{
+		if (a_Index >= m_Positions.size())
+		{
+			EXL_THROW("CurvePath::GetPosition", "Position index out of range");
+		}
+
+		return m_Positions[a_Index];
+	}
+
+	void CurvePath::Move(const glm::vec2& a_Position)
+	{
+		m_Commands.push_back(eCommandType_Move);
+		m_Positions.push_back(a_Position);
+	}
+
+	void CurvePath::LineTo(const glm::vec2& a_To)
+	{
+		m_Commands.push_back(eCommandType_Line);
+		m_Positions.push_back(a_To);
+	}
+
+	void CurvePath::ConicCurveTo(const glm::vec2& a_Control, const glm::vec2& a_To)
+	{
+		m_Commands.push_back(eCommandType_CurveConic);
+		m_Positions.push_back(a_Control);
+		m_Positions.push_back(a_To);
+	}
+
+	void CurvePath::QuadraticCurveTo(const glm::vec2& a_ControlA, const glm::vec2& a_ControlB, const glm::vec2& a_To)
+	{
+		m_Commands.push_back(eCommandType_CurveQuadratic);
+		m_Positions.push_back(a_ControlA);
+		m_Positions.push_back(a_ControlB);
+		m_Positions.push_back(a_To);
+	}
+
+	std::vector<Polygon> CurvePath::BuildPolygons(const CurveSettings& a_Settings) const
+	{
+		std::vector<Polygon> shapes;
+
+		if (m_Commands.size() == 0)
+		{
+			return shapes;
+		}
+
+		Polygon shape;
+		shapes.push_back(shape);
+
+		std::vector<glm::vec2>::const_iterator position_it = m_Positions.begin();
+		glm::vec2 position_previous;
+
+		for (std::vector<CommandType>::const_iterator command_it = m_Commands.begin(); command_it != m_Commands.end(); ++command_it)
+		{
+			Polygon* shape_current = &shapes.back();
+
+			switch (*command_it)
+			{
+
+			case eCommandType_Move:
+				{
+					// check if it's actually a new shape and not the first move command
+
+					if (command_it != m_Commands.begin())
+					{
+						Polygon shape;
+						shapes.push_back(shape);
+
+						shape_current = &shapes.back();
+					}
+
+					shape_current->positions.push_back(*position_it);
+
+				} break;
+
+			case eCommandType_Line:
+				{
+					shape_current->positions.push_back(*position_it);
+
+				} break;
+
+			case eCommandType_CurveConic:
+				{
+					glm::vec2 from = position_previous;
+					glm::vec2 control = *position_it++;
+					glm::vec2 to = *position_it;
+
+					if (a_Settings.precision > 1)
+					{
+						float delta = 1.0f / (float)a_Settings.precision;
+						float time = delta;
+
+						for (int step = 1; step < a_Settings.precision; ++step)
+						{
+							glm::vec2 ac = glm::mix(from, control, time);
+							glm::vec2 cb = glm::mix(control, to, time);
+							glm::vec2 mixed = glm::mix(ac, cb, time);
+
+							shape_current->positions.push_back(mixed);
+
+							time += delta;
+						}
+					}
+
+					shape_current->positions.push_back(to);
+
+				} break;
+
+			case eCommandType_CurveQuadratic:
+				{
+					glm::vec2 from = position_previous;
+					glm::vec2 control_a = *position_it++;
+					glm::vec2 control_b = *position_it++;
+					glm::vec2 to = *position_it;
+
+					if (a_Settings.precision > 1)
+					{
+						float delta = 1.0f / (float)a_Settings.precision;
+						float time = delta;
+
+						for (int step = 1; step < a_Settings.precision; ++step)
+						{
+							glm::vec2 ab = glm::mix(from, control_a, time);
+							glm::vec2 bc = glm::mix(control_a, control_b, time);
+							glm::vec2 cd = glm::mix(control_b, to, time);
+
+							glm::vec2 mixed_a = glm::mix(ab, bc, time);
+							glm::vec2 mixed_b = glm::mix(bc, cd, time);
+
+							glm::vec2 mixed = glm::mix(mixed_a, mixed_b, time);
+
+							shape_current->positions.push_back(mixed);
+
+							time += delta;
+						}
+					}
+
+					shape_current->positions.push_back(to);
+
+				} break;
+
+			}
+
+			position_previous = *position_it++;
+		}
+
+		return shapes;
+	}
+
+}; // namespace ExLibris

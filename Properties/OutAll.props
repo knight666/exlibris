@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)Build\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\$(Platform)$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <ProgramDataBaseFileName>$(IntDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)$(Configuration)</AssemblerListingLocation>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

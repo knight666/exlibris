@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C67E0543-2630-4DF8-9D4B-4AA6DAEF5745}</ProjectGuid>
+    <RootNamespace>ExLibrisTest</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Properties\OutAll.props" />
+    <Import Project="..\..\Properties\OutDebug.props" />
+    <Import Project="..\..\Properties\OptPrecompiled.props" />
+    <Import Project="..\..\Properties\LibFreeType.props" />
+    <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibGoogleTest.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
+    <Import Project="..\..\Properties\ProjExLibris.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Properties\OutAll.props" />
+    <Import Project="..\..\Properties\OutRelease.props" />
+    <Import Project="..\..\Properties\OptPrecompiled.props" />
+    <Import Project="..\..\Properties\LibFreeType.props" />
+    <Import Project="..\..\Properties\LibGLM.props" />
+    <Import Project="..\..\Properties\LibGoogleTest.props" />
+    <Import Project="..\..\Properties\LibPoly2Tri.props" />
+    <Import Project="..\..\Properties\ProjExLibris.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile />
+    <Link />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile />
+    <Link />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ExLibris.Test.Main.cpp" />
+    <ClCompile Include="ExLibris.Test.PCH.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Suite.BoundingBox.cpp" />
+    <ClCompile Include="Suite.CurvePath.cpp" />
+    <ClCompile Include="Suite.Face.cpp" />
+    <ClCompile Include="Suite.FaceRequest.cpp" />
+    <ClCompile Include="Suite.Family.cpp" />
+    <ClCompile Include="Suite.FontLoaderFreetype.cpp" />
+    <ClCompile Include="Suite.FreetypeErrors.cpp" />
+    <ClCompile Include="Suite.GlyphProvider.cpp" />
+    <ClCompile Include="Suite.GlyphProviderFreetype.cpp" />
+    <ClCompile Include="Suite.GlyphProviderSystem.cpp" />
+    <ClCompile Include="Suite.Streambuf.cpp" />
+    <ClCompile Include="Suite.Library.cpp" />
+    <ClCompile Include="Suite.Line.cpp" />
+    <ClCompile Include="Suite.LineShape.cpp" />
+    <ClCompile Include="Suite.MeshBuilder.cpp" />
+    <ClCompile Include="Suite.Polygon.cpp" />
+    <ClCompile Include="Suite.TextLayout.cpp" />
+    <ClCompile Include="Suite.TextParser.cpp" />
+    <ClCompile Include="Suite.TextParserMarkdown.cpp" />
+    <ClCompile Include="Suite.Triangle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ExLibris.Test.PCH.h" />
+    <ClInclude Include="Mock.FontLoader.h" />
+    <ClInclude Include="Mock.GlyphProvider.h" />
+    <ClInclude Include="Mock.MeshVisitor.h" />
+    <ClInclude Include="Mock.TextLayoutVisitor.h" />
+    <ClInclude Include="Mock.TextParser.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

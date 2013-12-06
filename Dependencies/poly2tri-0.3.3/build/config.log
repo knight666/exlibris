@@ -1,0 +1,16 @@
+# project p2t (0.3.3) configured on Mon Sep 09 14:08:07 2013 by
+# waf 1.6.2 (abi 98, python 20704f0 on win32)
+# using waf configure
+#
+----------------------------------------
+Setting top to
+D:\Projects\poly2tri
+----------------------------------------
+Setting out to
+D:\Projects\poly2tri\build
+----------------------------------------
+Checking for 'g++' (c++ compiler)
+find program=['g++', 'c++'] paths=['D:\\SDK\\NVIDIA GPU Computing Toolkit\\CUDA\\v5.0\\bin\\', 'D:\\SDK\\NVIDIA GPU Computing Toolkit\\CUDA\\v5.0\\libnvvp\\', 'C:\\Program Files\\Common Files\\Microsoft Shared\\Windows Live', 'C:\\Program Files (x86)\\Common Files\\Microsoft Shared\\Windows Live', 'C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common', 'C:\\Program Files (x86)\\Intel\\iCLS Client\\', 'C:\\Program Files\\Intel\\iCLS Client\\', 'C:\\windows\\system32', 'C:\\windows', 'C:\\windows\\System32\\Wbem', 'C:\\windows\\System32\\WindowsPowerShell\\v1.0\\', 'C:\\Program Files\\Intel\\Intel(R) Management Engine Components\\DAL', 'C:\\Program Files\\Intel\\Intel(R) Management Engine Components\\IPT', 'C:\\Program Files (x86)\\Intel\\Intel(R) Management Engine Components\\DAL', 'C:\\Program Files (x86)\\Intel\\Intel(R) Management Engine Components\\IPT', 'C:\\Program Files (x86)\\Intel\\OpenCL SDK\\2.0\\bin\\x86', 'C:\\Program Files (x86)\\Intel\\OpenCL SDK\\2.0\\bin\\x64', 'C:\\Program Files\\Intel\\WiFi\\bin\\', 'C:\\Program Files\\Common Files\\Intel\\WirelessCommon\\', 'C:\\Program Files (x86)\\Windows Live\\Shared', 'C:\\Program Files (x86)\\Microsoft SQL Server\\100\\Tools\\Binn\\', 'C:\\Program Files\\Microsoft SQL Server\\100\\Tools\\Binn\\', 'C:\\Program Files\\Microsoft SQL Server\\100\\DTS\\Binn\\', 'D:\\Programs\\TortoiseSVN\\bin', 'D:\\Programs\\SlikSvn\\bin', 'D:\\Programs\\010 Editor v3', 'D:\\SDK\\Python27', 'D:\\SDK\\NVIDIA Corporation\\Cg\\bin', 'D:\\SDK\\NVIDIA Corporation\\Cg\\bin.x64', 'D:\\Programs\\nodejs\\', 'C:\\Program Files (x86)\\Microsoft SQL Server\\90\\Tools\\binn\\', 'D:\\SDK\\Lua-5.1', 'D:\\SDK\\Lua-5.1\\clibs', 'D:\\SDK\\Lua-5.2\\', 'D:\\Programs\\TortoiseHg\\', 'D:\\Programs\\Visual Leak Detector\\bin\\Win32', 'D:\\Programs\\Visual Leak Detector\\bin\\Win64', 'C:\\Program Files (x86)\\ftldat', 'C:\\Program Files (x86)\\ftldat', 'C:\\Users\\knight666\\AppData\\Roaming\\npm'] var='CXX' -> None
+from D:\Projects\poly2tri: Could not find the program g++,c++
+not found
+from D:\Projects\poly2tri: could not configure a c++ compiler!
