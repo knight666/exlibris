@@ -12,8 +12,8 @@ TEST(TextLayoutCharacter, Construct)
 {
 	Library lib;
 
-	MockGlyphProvider provider(&lib);
-	Face* face = provider.CreateFace(15.0f);
+	MockGlyphProvider* provider = new MockGlyphProvider(&lib);
+	Face* face = provider->CreateFace(15.0f);
 
 	TextFormat tf(&lib);
 	tf.SetFace(face);
@@ -32,8 +32,8 @@ TEST(TextLayoutCharacter, CalculateGeometry)
 {
 	Library lib;
 
-	MockGlyphProvider provider(&lib);
-	Face* face = provider.CreateFace(24.0f);
+	MockGlyphProvider* provider = new MockGlyphProvider(&lib);
+	Face* face = provider->CreateFace(24.0f);
 
 	TextFormat tf(&lib);
 	tf.SetFace(face);
@@ -52,8 +52,8 @@ TEST(TextLayoutCharacter, CalculateGeometryWithPosition)
 {
 	Library lib;
 
-	MockGlyphProvider provider(&lib);
-	Face* face = provider.CreateFace(24.0f);
+	MockGlyphProvider* provider = new MockGlyphProvider(&lib);
+	Face* face = provider->CreateFace(24.0f);
 
 	TextFormat tf(&lib);
 	tf.SetFace(face);
@@ -73,8 +73,8 @@ TEST(TextLayoutCharacter, CalculateGeometryWithKerningAdjustment)
 {
 	Library lib;
 
-	MockGlyphProvider provider(&lib);
-	Face* face = provider.CreateFace(33.0f);
+	MockGlyphProvider* provider = new MockGlyphProvider(&lib);
+	Face* face = provider->CreateFace(33.0f);
 
 	TextFormat tf(&lib);
 	tf.SetFace(face);

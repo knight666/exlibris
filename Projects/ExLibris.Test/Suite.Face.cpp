@@ -31,7 +31,6 @@ public:
 	void TearDown()
 	{
 		delete face;
-		delete provider;
 		delete library;
 	}
 
