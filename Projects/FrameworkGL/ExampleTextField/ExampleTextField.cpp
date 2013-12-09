@@ -79,10 +79,13 @@ public:
 		, m_HelperBitmaps(nullptr)
 		, m_HelperBitmapsVisible(true)
 	{
+		exl::TextFormat default_format(m_Library);
+		default_format.SetFamilyName("Roboto");
+		default_format.SetSize(24.0f);
+
 		m_Layout = new exl::TextLayoutDocument(a_Library);
 		m_Layout->SetParser(new exl::TextParserMarkdown());
-		m_Layout->SetDefaultFamily("Roboto");
-		m_Layout->SetDefaultSize(24.0f);
+		m_Layout->SetDefaultTextFormat(default_format);
 
 		glGenTextures(1, &m_Texture);
 		glBindTexture(GL_TEXTURE_2D, m_Texture);
@@ -434,7 +437,9 @@ private:
 	{
 		glm::vec2 texture_position = a_Character->GetElementGeometry().GetMinimum() + m_TextureCorrection;
 
-		exl::GlyphBitmap* bitmap = a_Character->GetFace()->CreateBitmap(a_Character->GetCodepoint());
+		exl::TextFormat* format = a_Character->GetTextFormat();
+
+		exl::GlyphBitmap* bitmap = format->GetFace()->CreateBitmap(a_Character->GetCodepoint());
 		if (bitmap != nullptr)
 		{
 			unsigned char* dst = m_TextureData + ((unsigned int)texture_position.y * m_TexturePitch) + ((unsigned int)texture_position.x * 4);
