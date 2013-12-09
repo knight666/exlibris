@@ -208,3 +208,37 @@ TEST(Tokenizer, ReadNewLine)
 	EXPECT_TOKEN(Token::eType_Text, "MEGABUNNY", 1, 3);
 	EXPECT_END_TOKEN(10, 3);
 }
+
+TEST(Tokenizer, ReadDigit)
+{
+	std::stringstream ss;
+	ss << "6";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "6", 1, 1);
+	EXPECT_END_TOKEN(2, 1);
+}
+
+TEST(Tokenizer, ReadIntegerThreeDigits)
+{
+	std::stringstream ss;
+	ss << "127";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "127", 1, 1);
+	EXPECT_END_TOKEN(4, 1);
+}
+
+TEST(Tokenizer, ReadNegativeInteger)
+{
+	std::stringstream ss;
+	ss << "-85";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "85", 2, 1);
+	EXPECT_END_TOKEN(4, 1);
+}

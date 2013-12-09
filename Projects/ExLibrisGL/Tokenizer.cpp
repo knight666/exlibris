@@ -44,6 +44,10 @@ namespace ExLibris
 			} \
 	} \
 
+	TYPE_CLASS(Digit,
+		'0', '1', '2', '3', '4',
+		'5', '6', '7', '8', '9'
+	);
 	TYPE_CLASS(Symbol, 
 		'!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', 
 		',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', 
@@ -119,6 +123,12 @@ namespace ExLibris
 		switch (m_TokenCurrent.type)
 		{
 
+		case Token::eType_Integer:
+			{
+				result = _ReadOneOrMore();
+
+			} break;
+
 		case Token::eType_Symbol:
 			{
 				result = _ReadOne();
@@ -192,17 +202,21 @@ namespace ExLibris
 	{
 		Token::Type found_type = Token::eType_Text;
 
-		if (_IsCharacterOfType<CharacterTypeWhitespace>(a_Character))
+		if (_IsCharacterOfType<CharacterTypeDigit>(a_Character))
+		{
+			found_type = Token::eType_Integer;
+		}
+		else if (_IsCharacterOfType<CharacterTypeSymbol>(a_Character))
+		{
+			found_type = Token::eType_Symbol;
+		}
+		else if (_IsCharacterOfType<CharacterTypeWhitespace>(a_Character))
 		{
 			found_type = Token::eType_Whitespace;
 		}
 		else if (_IsCharacterOfType<CharacterTypeNewLine>(a_Character))
 		{
 			found_type = Token::eType_NewLine;
-		}
-		else if (_IsCharacterOfType<CharacterTypeSymbol>(a_Character))
-		{
-			found_type = Token::eType_Symbol;
 		}
 
 		return found_type;

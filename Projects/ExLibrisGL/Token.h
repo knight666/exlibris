@@ -39,6 +39,7 @@ namespace ExLibris
 			eType_Whitespace,
 			eType_NewLine,
 			eType_Symbol,
+			eType_Integer,
 			eType_End
 		};
 
