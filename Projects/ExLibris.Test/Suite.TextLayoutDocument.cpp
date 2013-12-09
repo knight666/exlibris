@@ -131,6 +131,59 @@ TEST_F(TextLayoutDocumentContext, LayoutTwoCharacters)
 	}
 }
 
+TEST_F(TextLayoutDocumentContext, LayoutChangeSize)
+{
+	{
+		parser->AddTokenString("A");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Size;
+		token.size = 24.0f;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("V");
+	}
+
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	EXPECT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	EXPECT_EQ(2, line->GetChildrenCount());
+	EXPECT_VEC2_EQ(2.0f, 2.0f, line->GetElementGeometry().GetMinimum());
+	EXPECT_VEC2_EQ(2.0f + 12.0f + 8.0f, 10.0f, line->GetElementGeometry().GetMaximum());
+	EXPECT_VEC2_EQ(0.0f, -4.0f, line->GetLayoutGeometry().GetMinimum());
+	EXPECT_VEC2_EQ(0.0f + 12.0f + 12.0f, 32.0f, line->GetLayoutGeometry().GetMaximum());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+		EXPECT_EQ('A', character->GetCodepoint());
+		EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetPosition());
+		EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetKerningAdjustment());
+		EXPECT_VEC2_EQ(2.0f, 2.0f, character->GetElementGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(10.0f, 10.0f, character->GetElementGeometry().GetMaximum());
+		EXPECT_VEC2_EQ(0.0f, -2.0f, character->GetLayoutGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(12.0f, 16.0f, character->GetLayoutGeometry().GetMaximum());
+	}
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(1));
+		ASSERT_NE(nullptr, character);
+		EXPECT_EQ('V', character->GetCodepoint());
+		EXPECT_VEC2_EQ(12.0f, 0.0f, character->GetPosition());
+		EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetKerningAdjustment());
+		EXPECT_VEC2_EQ(2.0f + 12.0f, 2.0f, character->GetElementGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(2.0f + 12.0f + 8.0f, 10.0f, character->GetElementGeometry().GetMaximum());
+		EXPECT_VEC2_EQ(12.0f, -4.0f, character->GetLayoutGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(24.0f, 32.0f, character->GetLayoutGeometry().GetMaximum());
+	}
+}
+
 TEST_F(TextLayoutDocumentContext, LayoutTwoLines)
 {
 	parser->AddTokenString("Bg\nD");
