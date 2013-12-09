@@ -131,6 +131,57 @@ TEST_F(TextLayoutDocumentContext, LayoutTwoCharacters)
 	}
 }
 
+TEST_F(TextLayoutDocumentContext, LayoutTwoLines)
+{
+	parser->AddTokenString("Bg\nD");
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(2, lines.size());
+
+	{
+		TextLayoutLine* line = lines[0];
+		EXPECT_EQ(2, line->GetChildrenCount());
+		EXPECT_VEC2_EQ(2.0f, 2.0f, line->GetElementGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(2.0f + 12.0f + 8.0f, 10.0f, line->GetElementGeometry().GetMaximum());
+		EXPECT_VEC2_EQ(0.0f, -2.0f, line->GetLayoutGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(0.0f + 12.0f + -1.5f + 12.0f, 16.0f, line->GetLayoutGeometry().GetMaximum());
+
+		{
+			TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+			ASSERT_NE(nullptr, character);
+			EXPECT_EQ('B', character->GetCodepoint());
+			EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetPosition());
+			EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetKerningAdjustment());
+		}
+
+		{
+			TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(1));
+			ASSERT_NE(nullptr, character);
+			EXPECT_EQ('g', character->GetCodepoint());
+			EXPECT_VEC2_EQ(12.0f, 0.0f, character->GetPosition());
+			EXPECT_VEC2_EQ(-1.5f, 5.6f, character->GetKerningAdjustment());
+		}
+	}
+
+	{
+		TextLayoutLine* line = lines[1];
+		EXPECT_EQ(1, line->GetChildrenCount());
+		EXPECT_VEC2_EQ(2.0f, 20.0f, line->GetElementGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(10.0f, 28.0f, line->GetElementGeometry().GetMaximum());
+		EXPECT_VEC2_EQ(0.0f, 16.0f, line->GetLayoutGeometry().GetMinimum());
+		EXPECT_VEC2_EQ(12.0f, 34.0f, line->GetLayoutGeometry().GetMaximum());
+
+		{
+			TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+			ASSERT_NE(nullptr, character);
+			EXPECT_EQ('D', character->GetCodepoint());
+			EXPECT_VEC2_EQ(0.0f, 18.0f, character->GetPosition());
+			EXPECT_VEC2_EQ(0.0f, 0.0f, character->GetKerningAdjustment());
+		}
+	}
+}
+
 TEST_F(TextLayoutDocumentContext, FormatDefault)
 {
 	parser->AddTokenString("7");
