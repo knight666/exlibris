@@ -174,12 +174,8 @@ namespace ExLibris
 
 	void TextLayoutDocument::_LayoutGlyphs()
 	{
-		m_Cursor = glm::vec2(0.0f, 0.0f);
-
-		m_LineCurrent = new TextLayoutLine;
-		m_Lines.push_back(m_LineCurrent);
-
-		AddChild(m_LineCurrent);
+		m_LineCurrent = nullptr;
+		_NextLine();
 
 		TextFormat* format_current = nullptr;
 		Face* face_current = nullptr;
@@ -187,6 +183,15 @@ namespace ExLibris
 		for (std::vector<Character*>::iterator character_it = m_Characters.begin(); character_it != m_Characters.end(); ++character_it)
 		{
 			Character* character = *character_it;
+
+			if (character->type == TextParserToken::eCodepointType_Newline)
+			{
+				_NextLine();
+
+				m_CharacterCurrent = nullptr;
+
+				continue;
+			}
 
 			if (format_current != character->format)
 			{
@@ -219,6 +224,26 @@ namespace ExLibris
 
 			m_CharacterCurrent = character_next;
 		}
+	}
+
+	void TextLayoutDocument::_NextLine()
+	{
+		if (m_LineCurrent != nullptr)
+		{
+			m_LineCurrent->CalculateGeometry();
+
+			m_Cursor.x = 0.0f;
+			m_Cursor.y += m_LineCurrent->GetLayoutGeometry().GetHeight();
+		}
+		else
+		{
+			m_Cursor = glm::vec2(0.0f, 0.0f);
+		}
+
+		m_LineCurrent = new TextLayoutLine;
+		AddChild(m_LineCurrent);
+
+		m_Lines.push_back(m_LineCurrent);
 	}
 
 	void TextLayoutDocument::_ClearCharacters()

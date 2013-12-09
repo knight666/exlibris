@@ -110,6 +110,8 @@ namespace ExLibris
 
 		void _ClearCharacters();
 
+		void _NextLine();
+
 		void _AddSection();
 		void _ClearSections();
 
