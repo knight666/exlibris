@@ -157,6 +157,16 @@ namespace ExLibris
 					m_TextFormatCurrent->SetStyle(token.style);
 				}
 
+				if (token.changes & TextParserToken::eChanged_Color)
+				{
+					m_TextFormatCurrent->SetColor(token.color);
+				}
+
+				if (token.changes & TextParserToken::eChanged_BackgroundColor)
+				{
+					m_TextFormatCurrent->SetBackgroundColor(token.background_color);
+				}
+
 				m_TextFormats.push_back(m_TextFormatCurrent);
 			}
 		}
