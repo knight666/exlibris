@@ -131,7 +131,7 @@ TEST_F(TextLayoutDocumentContext, LayoutTwoCharacters)
 	}
 }
 
-TEST_F(TextLayoutDocumentContext, FormatCharacterDefault)
+TEST_F(TextLayoutDocumentContext, FormatDefault)
 {
 	parser->AddTokenString("7");
 	document->Layout();
@@ -142,18 +142,85 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterDefault)
 	TextLayoutLine* line = lines[0];
 	ASSERT_EQ(1, line->GetChildrenCount());
 
-	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
-	ASSERT_NE(nullptr, character);
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
 
-	TextFormat* format = character->GetTextFormat();
-	ASSERT_NE(nullptr, format);
-	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
-	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
-	EXPECT_EQ(eWeight_Normal, format->GetWeight());
-	EXPECT_EQ(eStyle_None, format->GetStyle());
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Normal, format->GetWeight());
+		EXPECT_EQ(eStyle_None, format->GetStyle());
+	}
 }
 
-TEST_F(TextLayoutDocumentContext, FormatCharacterBold)
+TEST_F(TextLayoutDocumentContext, FormatSize)
+{
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Size;
+		token.size = 24.5f;
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("v");
+	}
+
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1, line->GetChildrenCount());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_FLOAT_EQ(24.5f, format->GetSize());
+	}
+}
+
+TEST_F(TextLayoutDocumentContext, FormatFamily)
+{
+	Family* fam = library->CreateFamily("Yggdrasil");
+	fam->AddGlyphProvider(new MockGlyphProvider(library, "Yggdrasil"));
+
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_FamilyName;
+		token.family_name = "Yggdrasil";
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("v");
+	}
+
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(1, line->GetChildrenCount());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("Yggdrasil", format->GetFamilyName().c_str());
+	}
+}
+
+TEST_F(TextLayoutDocumentContext, FormatBold)
 {
 	{
 		TextParserToken token;
@@ -174,18 +241,20 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterBold)
 	TextLayoutLine* line = lines[0];
 	ASSERT_EQ(1, line->GetChildrenCount());
 
-	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
-	ASSERT_NE(nullptr, character);
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
 
-	TextFormat* format = character->GetTextFormat();
-	ASSERT_NE(nullptr, format);
-	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
-	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
-	EXPECT_EQ(eWeight_Bold, format->GetWeight());
-	EXPECT_EQ(eStyle_None, format->GetStyle());
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Bold, format->GetWeight());
+		EXPECT_EQ(eStyle_None, format->GetStyle());
+	}
 }
 
-TEST_F(TextLayoutDocumentContext, FormatCharacterItalic)
+TEST_F(TextLayoutDocumentContext, FormatItalic)
 {
 	{
 		TextParserToken token;
@@ -206,18 +275,20 @@ TEST_F(TextLayoutDocumentContext, FormatCharacterItalic)
 	TextLayoutLine* line = lines[0];
 	ASSERT_EQ(1, line->GetChildrenCount());
 
-	TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
-	ASSERT_NE(nullptr, character);
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
 
-	TextFormat* format = character->GetTextFormat();
-	ASSERT_NE(nullptr, format);
-	EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
-	EXPECT_FLOAT_EQ(12.0f, format->GetSize());
-	EXPECT_EQ(eWeight_Normal, format->GetWeight());
-	EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_STREQ("DocumentContext", format->GetFamilyName().c_str());
+		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
+		EXPECT_EQ(eWeight_Normal, format->GetWeight());
+		EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+	}
 }
 
-TEST_F(TextLayoutDocumentContext, FormatCharacterBoldAndItalic)
+TEST_F(TextLayoutDocumentContext, FormatBoldAndItalic)
 {
 	{
 		TextParserToken token;
@@ -304,6 +375,57 @@ TEST_F(TextLayoutDocumentContext, FormatBoldAndItalicCharacter)
 		EXPECT_FLOAT_EQ(12.0f, format->GetSize());
 		EXPECT_EQ(eWeight_Normal, format->GetWeight());
 		EXPECT_EQ(eStyle_Italicized, format->GetStyle());
+	}
+}
+
+TEST_F(TextLayoutDocumentContext, FormatColor)
+{
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_Color;
+		token.color = glm::vec4(1.0f, 0.8f, 0.2f, 1.0f);
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("B");
+	}
+	{
+		TextParserToken token;
+		token.changes = TextParserToken::eChanged_BackgroundColor;
+		token.background_color = glm::vec4(0.2f, 0.2f, 1.0f, 1.0f);
+
+		parser->AddTokenStyle(token);
+	}
+	{
+		parser->AddTokenString("C");
+	}
+
+	document->Layout();
+
+	const std::vector<TextLayoutLine*>& lines = document->GetLines();
+	ASSERT_EQ(1, lines.size());
+
+	TextLayoutLine* line = lines[0];
+	ASSERT_EQ(2, line->GetChildrenCount());
+
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(0));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_COLOR_EQ(1.0f, 0.8f, 0.2f, 1.0f, format->GetColor());
+		EXPECT_COLOR_EQ(1.0f, 1.0f, 1.0f, 1.0f, format->GetBackgroundColor());
+	}
+	{
+		TextLayoutCharacter* character = dynamic_cast<TextLayoutCharacter*>(line->GetChildAtIndex(1));
+		ASSERT_NE(nullptr, character);
+
+		TextFormat* format = character->GetTextFormat();
+		ASSERT_NE(nullptr, format);
+		EXPECT_COLOR_EQ(1.0f, 0.8f, 0.2f, 1.0f, format->GetColor());
+		EXPECT_COLOR_EQ(0.2f, 0.2f, 1.0f, 1.0f, format->GetBackgroundColor());
 	}
 }
 
