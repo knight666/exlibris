@@ -47,12 +47,16 @@ namespace ExLibris
 	private:
 
 		bool _TryReadCharacter();
+		void _QueueCurrentCharacter();
 
 		bool _ReadOne();
 		bool _ReadOneOrMore();
 
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
+
+		template<typename CharacterType>
+		bool _TryReadOneOrMore();
 
 		Token::Type _GetTypeForCharacter(int a_Character);
 
@@ -63,6 +67,8 @@ namespace ExLibris
 		Token m_TokenCurrent;
 
 		int m_CharacterCurrent;
+		std::queue<int> m_CharacterQueue;
+
 		int m_Column;
 		int m_Line;
 	
@@ -72,6 +78,29 @@ namespace ExLibris
 	inline bool Tokenizer::_IsCharacterOfType(int a_Character)
 	{
 		return (CharacterType::IsKnown(a_Character));
+	}
+
+	template<typename CharacterType>
+	inline bool Tokenizer::_TryReadOneOrMore()
+	{
+		int previous = m_CharacterCurrent;
+		int found = 0;
+
+		while (_TryReadCharacter() && _IsCharacterOfType<CharacterType>(m_CharacterCurrent))
+		{
+			m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
+
+			found++;
+		}
+
+		if (found == 0)
+		{
+			_QueueCurrentCharacter();
+
+			m_CharacterCurrent = previous;
+		}
+
+		return (found > 0);
 	}
 
 }; // namespace ExLibris

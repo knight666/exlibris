@@ -238,7 +238,18 @@ TEST(Tokenizer, ReadNegativeInteger)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "85", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "-85", 1, 1);
 	EXPECT_END_TOKEN(4, 1);
+}
+
+TEST(Tokenizer, ReadNotANegativeInteger)
+{
+	std::stringstream ss;
+	ss << "-graphics";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "graphics", 2, 1);
+	EXPECT_END_TOKEN(10, 1);
 }

@@ -131,7 +131,25 @@ namespace ExLibris
 
 		case Token::eType_Symbol:
 			{
-				result = _ReadOne();
+				// check if it's a negative number
+
+				if (m_CharacterCurrent == '-')
+				{
+					if (_TryReadOneOrMore<CharacterTypeDigit>())
+					{
+						m_TokenCurrent.type = Token::eType_Integer;
+
+						result = true;
+					}
+					else
+					{
+						result = _ReadOne();
+					}
+				}
+				else
+				{
+					result = _ReadOne();
+				}
 
 			} break;
 
@@ -163,11 +181,25 @@ namespace ExLibris
 
 	bool Tokenizer::_TryReadCharacter()
 	{
-		m_CharacterCurrent = m_Stream->get();
+		if (m_CharacterQueue.size() > 0)
+		{
+			m_CharacterCurrent = m_CharacterQueue.front();
+			m_CharacterQueue.pop();
+		}
+		else
+		{
+			m_CharacterCurrent = m_Stream->get();
+		}
 
 		m_Column++;
 
 		return (m_CharacterCurrent != -1);
+	}
+
+	void Tokenizer::_QueueCurrentCharacter()
+	{
+		m_CharacterQueue.push(m_CharacterCurrent);
+		m_Column--;
 	}
 
 	bool Tokenizer::_ReadOne()
