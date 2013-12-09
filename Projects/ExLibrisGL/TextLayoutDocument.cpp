@@ -49,8 +49,6 @@ namespace ExLibris
 	{
 		if (m_Library != nullptr)
 		{
-			m_TextFormatCurrent = new TextFormat(m_Library);
-
 			TextFormat* default = new TextFormat(m_Library);
 			m_TextFormats.push_back(default);
 		}
@@ -58,6 +56,17 @@ namespace ExLibris
 	
 	TextLayoutDocument::~TextLayoutDocument()
 	{
+		if (m_Parser != nullptr)
+		{
+			delete m_Parser;
+		}
+
+		for (std::vector<TextFormat*>::iterator format_it = m_TextFormats.begin(); format_it != m_TextFormats.end(); ++format_it)
+		{
+			delete *format_it;
+		}
+		m_TextFormats.clear();
+
 		_ClearCharacters();
 		_ClearCollections();
 		_ClearSections();
@@ -76,6 +85,11 @@ namespace ExLibris
 
 	void TextLayoutDocument::SetParser(ITextParser* a_Parser)
 	{
+		if (m_Parser != nullptr)
+		{
+			delete m_Parser;
+		}
+
 		m_Parser = a_Parser;
 	}
 

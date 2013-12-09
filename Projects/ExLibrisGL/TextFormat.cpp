@@ -46,6 +46,10 @@ namespace ExLibris
 
 	TextFormat::~TextFormat()
 	{
+		if (m_Face != nullptr)
+		{
+			delete m_Face;
+		}
 	}
 
 	TextFormat* TextFormat::CreateSpecialization() const
@@ -205,6 +209,11 @@ namespace ExLibris
 
 	void TextFormat::_LoadFace()
 	{
+		if (m_Face != nullptr)
+		{
+			delete m_Face;
+		}
+
 		m_Face = m_Library->RequestFace(m_Request);
 		if (m_Face != nullptr)
 		{
