@@ -37,6 +37,7 @@ namespace ExLibris
 			eType_Start,
 			eType_Unprintable,
 			eType_Text,
+			eType_String,
 			eType_Whitespace,
 			eType_NewLine,
 			eType_Symbol,
