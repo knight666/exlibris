@@ -79,15 +79,6 @@ namespace ExLibris
 
 		m_Column = 1;
 		m_Line = 1;
-
-		if (m_Stream != nullptr)
-		{
-			m_CharacterCurrent = m_Stream->get();
-		}
-		else
-		{
-			m_CharacterCurrent = -1;
-		}
 	}
 
 	const Token& Tokenizer::GetCurrentToken() const
@@ -97,7 +88,7 @@ namespace ExLibris
 
 	bool Tokenizer::IsNextTokenAvailable() const
 	{
-		return (m_Stream != nullptr && !m_Stream->eof() && m_CharacterCurrent != -1);
+		return ((m_Stream != nullptr && !m_Stream->eof()) || (m_CharacterQueue.size() > 0));
 	}
 
 	bool Tokenizer::ReadToken()
@@ -107,79 +98,113 @@ namespace ExLibris
 		m_TokenCurrent.column = m_Column;
 		m_TokenCurrent.line = m_Line;
 
-		if (!IsNextTokenAvailable())
+		if (!_IsNextCharacterAvailable())
 		{
 			m_TokenCurrent.type = Token::eType_End;
 
 			return false;
 		}
 
-		m_TokenCurrent.type = _GetTypeForCharacter(m_CharacterCurrent);
+		_NextCharacter();
 
-		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
-
-		bool result = false;
-
-		switch (m_TokenCurrent.type)
+		if (m_CharacterCurrent == -1)
 		{
+			m_TokenCurrent.type = Token::eType_End;
 
-		case Token::eType_Integer:
+			return false;
+		}
+
+		if (_TryConsume('-'))
+		{
+			_NextCharacter();
+
+			// is it a negative number?
+
+			if (_TryConsumeOneOrMore<CharacterTypeDigit>())
 			{
-				result = _ReadOneOrMore();
-
-			} break;
-
-		case Token::eType_Symbol:
+				m_TokenCurrent.type = Token::eType_Integer;
+			}
+			else
 			{
-				// check if it's a negative number
+				// just a symbol
 
-				if (m_CharacterCurrent == '-')
-				{
-					if (_TryReadOneOrMore<CharacterTypeDigit>())
-					{
-						m_TokenCurrent.type = Token::eType_Integer;
+				m_TokenCurrent.type = Token::eType_Symbol;
 
-						result = true;
-					}
-					else
-					{
-						result = _ReadOne();
-					}
-				}
-				else
-				{
-					result = _ReadOne();
-				}
+				_QueueCurrentCharacter();
+			}
+		}
+		else if (_TryConsume('\r'))
+		{
+			_NextCharacter();
 
-			} break;
+			// carriage return followed by line feed?
 
-		case Token::eType_Whitespace:
+			if (_TryConsume('\n'))
 			{
-				result = _ReadOneOrMore();
-
-			} break;
-
-		case Token::eType_NewLine:
-			{
-				result = _ReadOneOrMore();
+				m_TokenCurrent.type = Token::eType_NewLine;
 
 				m_Column = 1;
 				m_Line++;
-
-			} break;
-
-		case Token::eType_Text:
+			}
+			else
 			{
-				result = _ReadOneOrMore();
+				// just a carriage return
 
-			} break;
+				m_TokenCurrent.type = Token::eType_Unprintable;
 
+				_QueueCurrentCharacter();
+			}
+		}
+		else if (_TryConsume('\n'))
+		{
+			m_TokenCurrent.type = Token::eType_NewLine;
+
+			m_Column = 1;
+			m_Line++;
+		}
+		else if (_TryConsumeOneOrMore<CharacterTypeDigit>())
+		{
+			m_TokenCurrent.type = Token::eType_Integer;
+		}
+		else if (_TryConsumeOne<CharacterTypeSymbol>())
+		{
+			m_TokenCurrent.type = Token::eType_Symbol;
+		}
+		else if (_TryConsumeOne<CharacterTypeWhitespace>())
+		{
+			m_TokenCurrent.type = Token::eType_Whitespace;
+		}
+		else
+		{
+			m_TokenCurrent.type = Token::eType_Text;
+
+			_AddCurrentToToken();
+
+			while (_IsNextCharacterAvailable())
+			{
+				_NextCharacter();
+
+				Token::Type type_found = _GetTypeForCharacter(m_CharacterCurrent);
+				if (type_found != Token::eType_Text)
+				{
+					_QueueCurrentCharacter();
+
+					break;
+				}
+
+				_AddCurrentToToken();
+			}
 		}
 
-		return result;
+		return true;
 	}
 
-	bool Tokenizer::_TryReadCharacter()
+	bool Tokenizer::_IsNextCharacterAvailable() const
+	{
+		return ((m_Stream != nullptr && !m_Stream->eof()) || (m_CharacterQueue.size() > 0) && m_CharacterCurrent != -1);
+	}
+
+	void Tokenizer::_NextCharacter()
 	{
 		if (m_CharacterQueue.size() > 0)
 		{
@@ -192,8 +217,6 @@ namespace ExLibris
 		}
 
 		m_Column++;
-
-		return (m_CharacterCurrent != -1);
 	}
 
 	void Tokenizer::_QueueCurrentCharacter()
@@ -202,36 +225,18 @@ namespace ExLibris
 		m_Column--;
 	}
 
-	bool Tokenizer::_ReadOne()
+	void Tokenizer::_AddCurrentToToken()
 	{
-		_TryReadCharacter();
-
-		return true;
-	}
-
-	bool Tokenizer::_ReadOneOrMore()
-	{
-		while (1)
-		{
-			if (!_TryReadCharacter())
-			{
-				break;
-			}
-
-			Token::Type token_type_found = _GetTypeForCharacter(m_CharacterCurrent);
-			if (token_type_found != m_TokenCurrent.type)
-			{
-				break;
-			}
-
-			m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
-		}
-
-		return true;
+		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
 	}
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
 	{
+		if (a_Character == -1)
+		{
+			return Token::eType_End;
+		}
+
 		Token::Type found_type = Token::eType_Text;
 
 		if (_IsCharacterOfType<CharacterTypeDigit>(a_Character))
@@ -252,6 +257,20 @@ namespace ExLibris
 		}
 
 		return found_type;
+	}
+
+	bool Tokenizer::_TryConsume(int a_Character)
+	{
+		if (m_CharacterCurrent == a_Character)
+		{
+			_AddCurrentToToken();
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 }; // namespace ExLibris"

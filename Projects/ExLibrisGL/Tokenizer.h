@@ -46,19 +46,23 @@ namespace ExLibris
 
 	private:
 
-		bool _TryReadCharacter();
+		bool _IsNextCharacterAvailable() const;
+		void _NextCharacter();
+		void _AddCurrentToToken();
 		void _QueueCurrentCharacter();
-
-		bool _ReadOne();
-		bool _ReadOneOrMore();
-
+		
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
 
-		template<typename CharacterType>
-		bool _TryReadOneOrMore();
-
 		Token::Type _GetTypeForCharacter(int a_Character);
+
+		template<typename CharacterType>
+		bool _TryConsumeOne();
+
+		template<typename CharacterType>
+		bool _TryConsumeOneOrMore();
+
+		bool _TryConsume(int a_Character);
 
 	private:
 
@@ -81,26 +85,45 @@ namespace ExLibris
 	}
 
 	template<typename CharacterType>
-	inline bool Tokenizer::_TryReadOneOrMore()
+	inline bool Tokenizer::_TryConsumeOne()
 	{
-		int previous = m_CharacterCurrent;
-		int found = 0;
-
-		while (_TryReadCharacter() && _IsCharacterOfType<CharacterType>(m_CharacterCurrent))
+		if (CharacterType::IsKnown(m_CharacterCurrent))
 		{
-			m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
+			_AddCurrentToToken();
 
-			found++;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	template<typename CharacterType>
+	inline bool Tokenizer::_TryConsumeOneOrMore()
+	{
+		if (!CharacterType::IsKnown(m_CharacterCurrent))
+		{
+			return false;
 		}
 
-		if (found == 0)
-		{
-			_QueueCurrentCharacter();
+		_AddCurrentToToken();
 
-			m_CharacterCurrent = previous;
+		while (_IsNextCharacterAvailable())
+		{
+			_NextCharacter();
+
+			if (!CharacterType::IsKnown(m_CharacterCurrent))
+			{
+				_QueueCurrentCharacter();
+
+				break;
+			}
+
+			_AddCurrentToToken();
 		}
 
-		return (found > 0);
+		return true;
 	}
 
 }; // namespace ExLibris
