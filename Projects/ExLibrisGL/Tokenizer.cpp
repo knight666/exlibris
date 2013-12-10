@@ -114,86 +114,14 @@ namespace ExLibris
 			return false;
 		}
 
-		if (_TryConsume('-'))
+		if (
+			!_ConsumeNumber() &&
+			!_ConsumeSymbol() &&
+			!_ConsumeWhitespace() &&
+			!_ConsumeNewLine()
+		)
 		{
-			_NextCharacter();
-
-			// is it a negative number?
-
-			if (_TryConsumeOneOrMore<CharacterTypeDigit>())
-			{
-				m_TokenCurrent.type = Token::eType_Integer;
-			}
-			else
-			{
-				// just a symbol
-
-				m_TokenCurrent.type = Token::eType_Symbol;
-
-				_QueueCurrentCharacter();
-			}
-		}
-		else if (_TryConsume('\r'))
-		{
-			_NextCharacter();
-
-			// carriage return followed by line feed?
-
-			if (_TryConsume('\n'))
-			{
-				m_TokenCurrent.type = Token::eType_NewLine;
-
-				m_Column = 1;
-				m_Line++;
-			}
-			else
-			{
-				// just a carriage return
-
-				m_TokenCurrent.type = Token::eType_Unprintable;
-
-				_QueueCurrentCharacter();
-			}
-		}
-		else if (_TryConsume('\n'))
-		{
-			m_TokenCurrent.type = Token::eType_NewLine;
-
-			m_Column = 1;
-			m_Line++;
-		}
-		else if (_TryConsumeOneOrMore<CharacterTypeDigit>())
-		{
-			m_TokenCurrent.type = Token::eType_Integer;
-		}
-		else if (_TryConsumeOne<CharacterTypeSymbol>())
-		{
-			m_TokenCurrent.type = Token::eType_Symbol;
-		}
-		else if (_TryConsumeOne<CharacterTypeWhitespace>())
-		{
-			m_TokenCurrent.type = Token::eType_Whitespace;
-		}
-		else
-		{
-			m_TokenCurrent.type = Token::eType_Text;
-
-			_AddCurrentToToken();
-
-			while (_IsNextCharacterAvailable())
-			{
-				_NextCharacter();
-
-				Token::Type type_found = _GetTypeForCharacter(m_CharacterCurrent);
-				if (type_found != Token::eType_Text)
-				{
-					_QueueCurrentCharacter();
-
-					break;
-				}
-
-				_AddCurrentToToken();
-			}
+			_ConsumeText();
 		}
 
 		return true;
@@ -270,6 +198,132 @@ namespace ExLibris
 		else
 		{
 			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeNumber()
+	{
+		if (_TryConsume('-'))
+		{
+			_NextCharacter();
+
+			// is it a negative number?
+
+			if (_TryConsumeOneOrMore<CharacterTypeDigit>())
+			{
+				m_TokenCurrent.type = Token::eType_Integer;
+			}
+			else
+			{
+				// just a symbol
+
+				m_TokenCurrent.type = Token::eType_Symbol;
+
+				_QueueCurrentCharacter();
+			}
+
+			return true;
+		}
+		else if (_TryConsumeOneOrMore<CharacterTypeDigit>())
+		{
+			m_TokenCurrent.type = Token::eType_Integer;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeSymbol()
+	{
+		if (_TryConsumeOne<CharacterTypeSymbol>())
+		{
+			m_TokenCurrent.type = Token::eType_Symbol;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeNewLine()
+	{
+		if (_TryConsume('\r'))
+		{
+			_NextCharacter();
+
+			// carriage return followed by line feed?
+
+			if (_TryConsume('\n'))
+			{
+				m_TokenCurrent.type = Token::eType_NewLine;
+
+				m_Column = 1;
+				m_Line++;
+			}
+			else
+			{
+				// just a carriage return
+
+				m_TokenCurrent.type = Token::eType_Unprintable;
+
+				_QueueCurrentCharacter();
+			}
+
+			return true;
+		}
+		else if (_TryConsume('\n'))
+		{
+			m_TokenCurrent.type = Token::eType_NewLine;
+
+			m_Column = 1;
+			m_Line++;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeWhitespace()
+	{
+		if (_TryConsumeOne<CharacterTypeWhitespace>())
+		{
+			m_TokenCurrent.type = Token::eType_Whitespace;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void Tokenizer::_ConsumeText()
+	{
+		m_TokenCurrent.type = Token::eType_Text;
+
+		_AddCurrentToToken();
+
+		while (_IsNextCharacterAvailable())
+		{
+			_NextCharacter();
+
+			Token::Type type_found = _GetTypeForCharacter(m_CharacterCurrent);
+			if (type_found != Token::eType_Text)
+			{
+				_QueueCurrentCharacter();
+
+				break;
+			}
+
+			_AddCurrentToToken();
 		}
 	}
 

@@ -64,6 +64,12 @@ namespace ExLibris
 
 		bool _TryConsume(int a_Character);
 
+		bool _ConsumeNumber();
+		bool _ConsumeSymbol();
+		bool _ConsumeWhitespace();
+		bool _ConsumeNewLine();
+		void _ConsumeText();
+
 	private:
 
 		std::basic_istream<char>* m_Stream;
