@@ -116,6 +116,7 @@ namespace ExLibris
 
 		if (
 			!_ConsumeNumber() &&
+			!_ConsumeString() &&
 			!_ConsumeSymbol() &&
 			!_ConsumeWhitespace() &&
 			!_ConsumeNewLine()
@@ -137,7 +138,7 @@ namespace ExLibris
 		if (m_CharacterQueue.size() > 0)
 		{
 			m_CharacterCurrent = m_CharacterQueue.front();
-			m_CharacterQueue.pop();
+			m_CharacterQueue.pop_front();
 		}
 		else
 		{
@@ -149,7 +150,7 @@ namespace ExLibris
 
 	void Tokenizer::_QueueCurrentCharacter()
 	{
-		m_CharacterQueue.push(m_CharacterCurrent);
+		m_CharacterQueue.push_front(m_CharacterCurrent);
 		m_Column--;
 	}
 
@@ -229,6 +230,70 @@ namespace ExLibris
 			m_TokenCurrent.type = Token::eType_Integer;
 
 			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeString()
+	{
+		if (_TryConsume('\"') || _TryConsume('\''))
+		{
+			m_TokenCurrent.type = Token::eType_String;
+
+			int delimiter = m_CharacterCurrent;
+			std::queue<int> found;
+			bool undo = false;
+
+			while (_IsNextCharacterAvailable())
+			{
+				_NextCharacter();
+
+				found.push(m_CharacterCurrent);
+
+				if (m_CharacterCurrent == delimiter)
+				{
+					_AddCurrentToToken();
+
+					break;
+				}
+				else if (m_CharacterCurrent == -1)
+				{
+					undo = true;
+
+					break;
+				}
+				else
+				{
+					Token::Type type_found = _GetTypeForCharacter(m_CharacterCurrent);
+					if (type_found == Token::eType_NewLine)
+					{
+						undo = true;
+
+						break;
+					}
+				}
+
+				_AddCurrentToToken();
+			}
+
+			if (undo)
+			{
+				while (found.size() > 0)
+				{
+					m_CharacterQueue.push_back(found.front());
+					found.pop();
+
+					m_Column--;
+				}
+
+				m_TokenCurrent.text.clear();
+				m_CharacterCurrent = delimiter;
+			}
+
+			return !undo;
 		}
 		else
 		{

@@ -180,28 +180,91 @@ TEST(Tokenizer, ReadSymbols)
 	EXPECT_END_TOKEN(33, 1);
 }
 
-TEST(Tokenizer, ReadEncapsulatedSentence)
+TEST(Tokenizer, ReadQuotedString)
+{
+	std::stringstream ss;
+	ss << "\"Tiles.\"";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_String, "\"Tiles.\"", 1, 1);
+	EXPECT_END_TOKEN(9, 1);
+}
+
+TEST(Tokenizer, ReadQuotedStringWithOtherQuoteType)
+{
+	std::stringstream ss;
+	ss << "'Spring\"aling\"'";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_String, "'Spring\"aling\"'", 1, 1);
+	EXPECT_END_TOKEN(16, 1);
+}
+
+TEST(Tokenizer, ReadQuotedStringOpenEnded)
+{
+	std::stringstream ss;
+	ss << "\"Start of something";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "\"", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Start", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 1);
+	EXPECT_TOKEN(Token::eType_Text, "of", 8, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 10, 1);
+	EXPECT_TOKEN(Token::eType_Text, "something", 11, 1);
+	EXPECT_END_TOKEN(20, 1);
+}
+
+TEST(Tokenizer, ReadQuotedStringMultipleLines)
+{
+	std::stringstream ss;
+	ss << "Start 'a band\nthey said'.";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Text, "Start", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 6, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "'", 7, 1);
+	EXPECT_TOKEN(Token::eType_Text, "a", 8, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
+	EXPECT_TOKEN(Token::eType_Text, "band", 10, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\n", 14, 1);
+	EXPECT_TOKEN(Token::eType_Text, "they", 1, 2);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 5, 2);
+	EXPECT_TOKEN(Token::eType_Text, "said", 6, 2);
+	EXPECT_TOKEN(Token::eType_Symbol, "'", 10, 2);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 11, 2);
+	EXPECT_END_TOKEN(12, 2);
+}
+
+TEST(Tokenizer, ReadQuotedStringAndText)
+{
+	std::stringstream ss;
+	ss << "\"That's what she said\", he said.";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_String, "\"That's what she said\"", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ",", 23, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 24, 1);
+	EXPECT_TOKEN(Token::eType_Text, "he", 25, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 27, 1);
+	EXPECT_TOKEN(Token::eType_Text, "said", 28, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 32, 1);
+	EXPECT_END_TOKEN(33, 1);
+}
+
+TEST(Tokenizer, ReadQuotedStringSentence)
 {
 	std::stringstream ss;
 	ss << "\"This is a drill, I think.\"";
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Symbol, "\"", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "This", 2, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 6, 1);
-	EXPECT_TOKEN(Token::eType_Text, "is", 7, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
-	EXPECT_TOKEN(Token::eType_Text, "a", 10, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
-	EXPECT_TOKEN(Token::eType_Text, "drill", 12, 1);
-	EXPECT_TOKEN(Token::eType_Symbol, ",", 17, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 18, 1);
-	EXPECT_TOKEN(Token::eType_Text, "I", 19, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 20, 1);
-	EXPECT_TOKEN(Token::eType_Text, "think", 21, 1);
-	EXPECT_TOKEN(Token::eType_Symbol, ".", 26, 1);
-	EXPECT_TOKEN(Token::eType_Symbol, "\"", 27, 1);
+	EXPECT_TOKEN(Token::eType_String, "\"This is a drill, I think.\"", 1, 1);
 	EXPECT_END_TOKEN(28, 1);
 }
 
@@ -290,3 +353,4 @@ TEST(Tokenizer, ReadNotANegativeInteger)
 	EXPECT_TOKEN(Token::eType_Text, "graphics", 2, 1);
 	EXPECT_END_TOKEN(10, 1);
 }
+

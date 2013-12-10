@@ -65,6 +65,7 @@ namespace ExLibris
 		bool _TryConsume(int a_Character);
 
 		bool _ConsumeNumber();
+		bool _ConsumeString();
 		bool _ConsumeSymbol();
 		bool _ConsumeWhitespace();
 		bool _ConsumeNewLine();
@@ -77,7 +78,7 @@ namespace ExLibris
 		Token m_TokenCurrent;
 
 		int m_CharacterCurrent;
-		std::queue<int> m_CharacterQueue;
+		std::deque<int> m_CharacterQueue;
 
 		int m_Column;
 		int m_Line;
