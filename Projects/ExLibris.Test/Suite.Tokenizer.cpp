@@ -106,7 +106,18 @@ TEST(Tokenizer, ReadWhitespace)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Whitespace, "    \t   \t   ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 3, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 4, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 5, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 6, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 8, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 9, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 10, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 12, 1);
 	EXPECT_END_TOKEN(13, 1);
 }
 
@@ -195,6 +206,32 @@ TEST(Tokenizer, ReadEncapsulatedSentence)
 }
 
 TEST(Tokenizer, ReadNewLine)
+{
+	std::stringstream ss;
+	ss << "worries\n";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Text, "worries", 1, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\n", 8, 1);
+	EXPECT_END_TOKEN(1, 2);
+}
+
+TEST(Tokenizer, ReadCarriageReturn)
+{
+	std::stringstream ss;
+	ss << "buh\rneh?";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Text, "buh", 1, 1);
+	EXPECT_TOKEN(Token::eType_Unprintable, "\r", 4, 1);
+	EXPECT_TOKEN(Token::eType_Text, "neh", 5, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "?", 8, 1);
+	EXPECT_END_TOKEN(9, 1);
+}
+
+TEST(Tokenizer, ReadSentenceOverSeveralLines)
 {
 	std::stringstream ss;
 	ss << "THIS\nIS\r\nMEGABUNNY";
