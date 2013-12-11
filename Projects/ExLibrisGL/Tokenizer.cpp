@@ -124,6 +124,8 @@ namespace ExLibris
 			return false;
 		}
 
+		m_CharactersUndoConsumed.clear();
+
 		if (
 			!_ConsumeNumber() &&
 			!_ConsumeString() &&
@@ -223,88 +225,49 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumber()
 	{
-		m_CharactersUndoConsumed.clear();
-
-		bool is_negative = false;
-
-		if (_TryConsume('-'))
+		if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
-			_NextCharacter();
-
-			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
-
-			is_negative = true;
+			return false;
 		}
 
 		bool is_number = false;
 
-		if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		// is it an octal or hexadecimal number?
+
+		if (_TryConsume('0'))
 		{
-			// is it an octal or hexadecimal number?
+			m_CharacterRestore = '0';
 
-			if (_TryConsume('0'))
+			_NextCharacter();
+
+			if (_IsNextCharacterAvailable())
 			{
-				if (is_negative)
+				if (_TryConsume('x'))
 				{
-					m_CharacterRestore = '-';
+					is_number = _ConsumeNumberHexadecimal();
 				}
 				else
 				{
-					m_CharacterRestore = '0';
-				}
-
-				_NextCharacter();
-
-				if (_IsNextCharacterAvailable())
-				{
-					if (_TryConsume('x'))
-					{
-						is_number = _ConsumeNumberHexadecimal();
-					}
-					else
-					{
-						_QueueCurrentCharacter();
-
-						is_number = _ConsumeNumberOctal();
-					}
-
-					if (!is_number && is_negative)
-					{
-						// just a symbol
-
-						m_TokenCurrent.type = Token::eType_Symbol;
-						_AddCurrentToToken();
-
-						return true;
-					}
-				}
-				else
-				{
-					// sometimes a zero is just a zero
-
-					m_TokenCurrent.type = Token::eType_Integer;
-
 					_QueueCurrentCharacter();
 
-					is_number = true;
+					is_number = _ConsumeNumberOctal();
 				}
 			}
-
-			if (!is_number)
+			else
 			{
-				is_number = _ConsumeNumberInteger();
+				// sometimes a zero is just a zero
+
+				m_TokenCurrent.type = Token::eType_Integer;
+
+				_QueueCurrentCharacter();
+
+				is_number = true;
 			}
 		}
 
-		if (is_negative && !is_number)
+		if (!is_number)
 		{
-			// just a symbol
-
-			m_TokenCurrent.type = Token::eType_Symbol;
-
-			_QueueCurrentCharacter();
-
-			return true;
+			is_number = _ConsumeNumberInteger();
 		}
 
 		return is_number;
@@ -406,8 +369,6 @@ namespace ExLibris
 
 			m_CharacterRestore = delimiter;
 			bool undo = false;
-
-			m_CharactersUndoConsumed.clear();
 
 			while (_IsNextCharacterAvailable())
 			{
