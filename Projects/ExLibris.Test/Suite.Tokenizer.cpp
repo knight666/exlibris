@@ -570,3 +570,84 @@ TEST(Tokenizer, ReadNumber)
 	EXPECT_TOKEN(Token::eType_Number, "12.15", 1, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
+
+TEST(Tokenizer, ReadNumberContained)
+{
+	std::stringstream ss;
+	ss << "Price: $ 52.122 per pound";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Text, "Price", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ":", 6, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "$", 8, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
+	EXPECT_TOKEN(Token::eType_Number, "52.122", 10, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 16, 1);
+	EXPECT_TOKEN(Token::eType_Text, "per", 17, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 20, 1);
+	EXPECT_TOKEN(Token::eType_Text, "pound", 21, 1);
+	EXPECT_END_TOKEN(26, 1);
+}
+
+TEST(Tokenizer, ReadNumberDoubleDot)
+{
+	std::stringstream ss;
+	ss << "20.0.115";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "20.0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Number, ".115", 5, 1);
+	EXPECT_END_TOKEN(9, 1);
+}
+
+TEST(Tokenizer, ReadNumberLeadingDot)
+{
+	std::stringstream ss;
+	ss << ".129";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, ".129", 1, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
+TEST(Tokenizer, ReadNumberTripleLeadingDot)
+{
+	std::stringstream ss;
+	ss << "...1901";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 2, 1);
+	EXPECT_TOKEN(Token::eType_Number, ".1901", 3, 1);
+	EXPECT_END_TOKEN(8, 1);
+}
+
+TEST(Tokenizer, ReadNumberTrailingDot)
+{
+	std::stringstream ss;
+	ss << "1877.";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "1877", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 5, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
+
+TEST(Tokenizer, ReadNumberDoubleTrailingDot)
+{
+	std::stringstream ss;
+	ss << "131..";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "131", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 4, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 5, 1);
+	EXPECT_END_TOKEN(6, 1);
+}

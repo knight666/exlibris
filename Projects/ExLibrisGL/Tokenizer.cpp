@@ -225,6 +225,17 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumber()
 	{
+		// is it a floating point number?
+
+		if (_TryConsume('.'))
+		{
+			m_CharacterRestore = m_CharacterCurrent;
+
+			_NextCharacter();
+
+			return _ConsumeNumberFloat();
+		}
+
 		if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
 			return false;
@@ -280,10 +291,11 @@ namespace ExLibris
 			return false;
 		}
 
+		m_CharacterRestore = m_CharacterCurrent;
+
 		m_TokenCurrent.type = Token::eType_Integer;
 
 		_AddCurrentToToken();
-		m_CharacterRestore = m_CharacterCurrent;
 
 		while (_IsNextCharacterAvailable())
 		{
@@ -291,8 +303,26 @@ namespace ExLibris
 
 			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
 
-			if (m_CharacterCurrent == '.' && _ConsumeNumberFloat())
+			if (m_CharacterCurrent == '.')
 			{
+				_NextCharacter();
+
+				if (_IsNextCharacterAvailable() && _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+				{
+					m_TokenCurrent.text.push_back('.');
+
+					m_CharacterRestore = m_CharacterCurrent;
+
+					_ConsumeNumberFloat();
+				}
+				else
+				{
+					_QueueCurrentCharacter();
+
+					m_CharacterQueue.push_front('.');
+					m_Column--;
+				}
+
 				break;
 			}
 
@@ -383,6 +413,14 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumberFloat()
 	{
+		if (!_IsNextCharacterAvailable() || !_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		{
+			_QueueCurrentCharacter();
+			_UndoConsumed();
+
+			return false;
+		}
+
 		_AddCurrentToToken();
 
 		int found = 0;
@@ -393,7 +431,7 @@ namespace ExLibris
 
 			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
 
-			if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+			if (m_CharacterCurrent == '.' || !_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 			{
 				_QueueCurrentCharacter();
 
@@ -404,16 +442,9 @@ namespace ExLibris
 			found++;
 		}
 
-		if (found > 0)
-		{
-			m_TokenCurrent.type = Token::eType_Number;
+		m_TokenCurrent.type = Token::eType_Number;
 
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return true;
 	}
 
 	bool Tokenizer::_ConsumeString()
