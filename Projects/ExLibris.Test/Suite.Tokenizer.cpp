@@ -362,7 +362,7 @@ TEST(Tokenizer, ReadPositiveInteger)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Symbol, "+", 1, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "116", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "166", 2, 1);
 	EXPECT_END_TOKEN(5, 1);
 }
 
