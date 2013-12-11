@@ -43,6 +43,7 @@ namespace ExLibris
 			eType_Symbol,
 			eType_Integer,
 			eType_Octal,
+			eType_Hexadecimal,
 			eType_End
 		};
 

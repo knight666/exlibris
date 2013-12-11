@@ -400,3 +400,109 @@ TEST(Tokenizer, ReadNegativeOctal)
 	EXPECT_TOKEN(Token::eType_Octal, "-0154", 1, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
+
+TEST(Tokenizer, ReadHexadecimal)
+{
+	std::stringstream ss;
+	ss << "0x1288f";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0x1288f", 1, 1);
+	EXPECT_END_TOKEN(8, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalLowerCase)
+{
+	std::stringstream ss;
+	ss << "0xabcdef";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xaffa", 1, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalUpperCase)
+{
+	std::stringstream ss;
+	ss << "0xBADFEC";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xBADFEC", 1, 1);
+	EXPECT_END_TOKEN(9, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalMixedCase)
+{
+	std::stringstream ss;
+	ss << "0xAaABcDE";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xAaABcDE", 1, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalNegative)
+{
+	std::stringstream ss;
+	ss << "-0xDAD0";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "-0xDAD0", 1, 1);
+	EXPECT_END_TOKEN(8, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalInvalidCharacters)
+{
+	std::stringstream ss;
+	ss << "0xA5EGOGO";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xA5E", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "GOGO", 6, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalWrongSpecifier)
+{
+	std::stringstream ss;
+	ss << "0X771AABB";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "X", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "771", 3, 1);
+	EXPECT_TOKEN(Token::eType_Text, "AABB", 6, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalNotEnoughValidCharacters)
+{
+	std::stringstream ss;
+	ss << "0xxxx0";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "xxxx", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "0", 6, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalNoData)
+{
+	std::stringstream ss;
+	ss << "0x";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "x", 2, 1);
+	EXPECT_END_TOKEN(3, 1);
+}
