@@ -50,7 +50,7 @@ namespace ExLibris
 		void _NextCharacter();
 		void _AddCurrentToToken();
 		void _QueueCurrentCharacter();
-		void _UndoConsomed();
+		void _UndoConsumed();
 		
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
@@ -68,6 +68,7 @@ namespace ExLibris
 		bool _ConsumeNumber();
 		bool _ConsumeNumberInteger();
 		bool _ConsumeNumberOctal();
+		bool _ConsumeNumberHexadecimal();
 		bool _ConsumeString();
 		bool _ConsumeSymbol();
 		bool _ConsumeWhitespace();

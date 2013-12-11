@@ -163,7 +163,7 @@ namespace ExLibris
 		m_Column--;
 	}
 
-	void Tokenizer::_UndoConsomed()
+	void Tokenizer::_UndoConsumed()
 	{
 		m_CharacterQueue.insert(m_CharacterQueue.end(), m_CharactersUndoConsumed.begin(), m_CharactersUndoConsumed.end());
 		m_Column -= (int)m_CharactersUndoConsumed.size();
@@ -216,50 +216,67 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumber()
 	{
+		bool is_negative = false;
+
 		if (_TryConsume('-'))
 		{
 			_NextCharacter();
 
-			// is it a negative number?
+			is_negative = true;
+		}
 
-			bool number = false;
+		bool is_number = false;
 
-			if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		{
+			// is it an octal or hexadecimal number?
+
+			if (_TryConsume('0'))
 			{
-				number = _TryConsume('0') && _ConsumeNumberOctal();
-				
-				if (!number)
+				_NextCharacter();
+
+				if (_IsNextCharacterAvailable())
 				{
-					number = _ConsumeNumberInteger();
+					if (_TryConsume('x') || _TryConsume('X'))
+					{
+						is_number = _ConsumeNumberHexadecimal();
+					}
+					else
+					{
+						_QueueCurrentCharacter();
+
+						is_number = _ConsumeNumberOctal();
+					}
+				}
+				else
+				{
+					// sometimes a zero is just a zero
+
+					m_TokenCurrent.type = Token::eType_Integer;
+					m_Column--;
+
+					is_number = true;
 				}
 			}
 
-			if (!number)
+			if (!is_number)
 			{
-				// just a symbol
-
-				m_TokenCurrent.type = Token::eType_Symbol;
-
-				_QueueCurrentCharacter();
+				is_number = _ConsumeNumberInteger();
 			}
+		}
+
+		if (is_negative && !is_number)
+		{
+			// just a symbol
+
+			m_TokenCurrent.type = Token::eType_Symbol;
+
+			_QueueCurrentCharacter();
 
 			return true;
 		}
-		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
-		{
-			if (_TryConsume('0') && _ConsumeNumberOctal())
-			{
-				return true;
-			}
-			else
-			{
-				return _ConsumeNumberInteger();
-			}
-		}
-		else
-		{
-			return false;
-		}
+
+		return is_number;
 	}
 
 	bool Tokenizer::_ConsumeNumberInteger()
@@ -298,7 +315,7 @@ namespace ExLibris
 
 		if (valid == 0)
 		{
-			_UndoConsomed();
+			_UndoConsumed();
 
 			m_CharacterCurrent = '0';
 
@@ -312,6 +329,11 @@ namespace ExLibris
 
 			return true;
 		}
+	}
+
+	bool Tokenizer::_ConsumeNumberHexadecimal()
+	{
+		return false;
 	}
 
 	bool Tokenizer::_ConsumeString()
@@ -359,7 +381,7 @@ namespace ExLibris
 
 			if (undo)
 			{
-				_UndoConsomed();
+				_UndoConsumed();
 
 				m_CharacterCurrent = delimiter;
 			}
