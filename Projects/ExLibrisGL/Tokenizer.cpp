@@ -275,16 +275,38 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumberInteger()
 	{
-		if (_TryConsumeOneOrMore<CharacterTypeDigit>())
-		{
-			m_TokenCurrent.type = Token::eType_Integer;
-
-			return true;
-		}
-		else
+		if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
 			return false;
 		}
+
+		m_TokenCurrent.type = Token::eType_Integer;
+
+		_AddCurrentToToken();
+		m_CharacterRestore = m_CharacterCurrent;
+
+		while (_IsNextCharacterAvailable())
+		{
+			_NextCharacter();
+
+			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
+
+			if (m_CharacterCurrent == '.' && _ConsumeNumberFloat())
+			{
+				break;
+			}
+
+			if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+			{
+				_QueueCurrentCharacter();
+
+				break;
+			}
+
+			_AddCurrentToToken();
+		}
+
+		return true;
 	}
 
 	bool Tokenizer::_ConsumeNumberOctal()
@@ -356,6 +378,41 @@ namespace ExLibris
 			_QueueCurrentCharacter();
 
 			return true;
+		}
+	}
+
+	bool Tokenizer::_ConsumeNumberFloat()
+	{
+		_AddCurrentToToken();
+
+		int found = 0;
+
+		while (_IsNextCharacterAvailable())
+		{
+			_NextCharacter();
+
+			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
+
+			if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+			{
+				_QueueCurrentCharacter();
+
+				break;
+			}
+
+			_AddCurrentToToken();
+			found++;
+		}
+
+		if (found > 0)
+		{
+			m_TokenCurrent.type = Token::eType_Number;
+
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

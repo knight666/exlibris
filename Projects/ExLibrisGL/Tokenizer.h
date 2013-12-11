@@ -69,6 +69,7 @@ namespace ExLibris
 		bool _ConsumeNumberInteger();
 		bool _ConsumeNumberOctal();
 		bool _ConsumeNumberHexadecimal();
+		bool _ConsumeNumberFloat();
 		bool _ConsumeString();
 		bool _ConsumeSymbol();
 		bool _ConsumeWhitespace();
