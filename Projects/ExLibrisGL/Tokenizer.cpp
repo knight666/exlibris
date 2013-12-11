@@ -52,6 +52,12 @@ namespace ExLibris
 		'0', '1', '2', '3',
 		'4', '5', '6', '7'
 	);
+	TYPE_CLASS(Hexadecimal,
+		'0', '1', '2', '3', '4',
+		'5', '6', '7', '8', '9',
+		'a', 'b', 'c', 'd', 'e', 'f',
+		'A', 'B', 'C', 'D', 'E', 'F',
+	);
 	TYPE_CLASS(Symbol, 
 		'!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', 
 		',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', 
@@ -169,6 +175,7 @@ namespace ExLibris
 		m_Column -= (int)m_CharactersUndoConsumed.size();
 
 		m_TokenCurrent.text.clear();
+		m_CharacterCurrent = m_CharacterRestore;
 	}
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
@@ -216,11 +223,15 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumber()
 	{
+		m_CharactersUndoConsumed.clear();
+
 		bool is_negative = false;
 
 		if (_TryConsume('-'))
 		{
 			_NextCharacter();
+
+			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
 
 			is_negative = true;
 		}
@@ -233,11 +244,20 @@ namespace ExLibris
 
 			if (_TryConsume('0'))
 			{
+				if (is_negative)
+				{
+					m_CharacterRestore = '-';
+				}
+				else
+				{
+					m_CharacterRestore = '0';
+				}
+
 				_NextCharacter();
 
 				if (_IsNextCharacterAvailable())
 				{
-					if (_TryConsume('x') || _TryConsume('X'))
+					if (_TryConsume('x'))
 					{
 						is_number = _ConsumeNumberHexadecimal();
 					}
@@ -247,13 +267,24 @@ namespace ExLibris
 
 						is_number = _ConsumeNumberOctal();
 					}
+
+					if (!is_number && is_negative)
+					{
+						// just a symbol
+
+						m_TokenCurrent.type = Token::eType_Symbol;
+						_AddCurrentToToken();
+
+						return true;
+					}
 				}
 				else
 				{
 					// sometimes a zero is just a zero
 
 					m_TokenCurrent.type = Token::eType_Integer;
-					m_Column--;
+
+					_QueueCurrentCharacter();
 
 					is_number = true;
 				}
@@ -295,7 +326,6 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumberOctal()
 	{
-		m_CharactersUndoConsumed.clear();
 		int valid = 0;
 
 		while (_IsNextCharacterAvailable())
@@ -317,8 +347,6 @@ namespace ExLibris
 		{
 			_UndoConsumed();
 
-			m_CharacterCurrent = '0';
-
 			return false;
 		}
 		else
@@ -333,7 +361,39 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumberHexadecimal()
 	{
-		return false;
+		m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
+
+		int valid = 0;
+
+		while (_IsNextCharacterAvailable())
+		{
+			_NextCharacter();
+
+			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
+
+			if (!_IsCharacterOfType<CharacterTypeHexadecimal>(m_CharacterCurrent))
+			{
+				break;
+			}
+
+			_AddCurrentToToken();
+			valid++;
+		}
+
+		if (valid == 0)
+		{
+			_UndoConsumed();
+
+			return false;
+		}
+		else
+		{
+			m_TokenCurrent.type = Token::eType_Hexadecimal;
+
+			_QueueCurrentCharacter();
+
+			return true;
+		}
 	}
 
 	bool Tokenizer::_ConsumeString()
@@ -343,6 +403,8 @@ namespace ExLibris
 			m_TokenCurrent.type = Token::eType_String;
 
 			int delimiter = m_CharacterCurrent;
+
+			m_CharacterRestore = delimiter;
 			bool undo = false;
 
 			m_CharactersUndoConsumed.clear();
@@ -382,8 +444,6 @@ namespace ExLibris
 			if (undo)
 			{
 				_UndoConsumed();
-
-				m_CharacterCurrent = delimiter;
 			}
 
 			return !undo;
