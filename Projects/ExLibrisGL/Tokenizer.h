@@ -50,6 +50,7 @@ namespace ExLibris
 		void _NextCharacter();
 		void _AddCurrentToToken();
 		void _QueueCurrentCharacter();
+		void _UndoConsomed();
 		
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
@@ -81,6 +82,8 @@ namespace ExLibris
 
 		int m_CharacterCurrent;
 		std::deque<int> m_CharacterQueue;
+
+		std::deque<int> m_CharactersUndoConsumed;
 
 		int m_Column;
 		int m_Line;
