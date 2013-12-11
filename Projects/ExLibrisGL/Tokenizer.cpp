@@ -48,6 +48,10 @@ namespace ExLibris
 		'0', '1', '2', '3', '4',
 		'5', '6', '7', '8', '9'
 	);
+	TYPE_CLASS(Octal,
+		'0', '1', '2', '3',
+		'4', '5', '6', '7'
+	);
 	TYPE_CLASS(Symbol, 
 		'!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', 
 		',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', 
@@ -210,11 +214,14 @@ namespace ExLibris
 
 			// is it a negative number?
 
-			if (_TryConsumeOneOrMore<CharacterTypeDigit>())
+			bool number = false;
+
+			if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 			{
-				m_TokenCurrent.type = Token::eType_Integer;
+				number = _ConsumeNumberOctal() || _ConsumeNumberInteger();
 			}
-			else
+
+			if (!number)
 			{
 				// just a symbol
 
@@ -225,7 +232,19 @@ namespace ExLibris
 
 			return true;
 		}
-		else if (_TryConsumeOneOrMore<CharacterTypeDigit>())
+		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		{
+			return _ConsumeNumberOctal() || _ConsumeNumberInteger();
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeNumberInteger()
+	{
+		if (_TryConsumeOneOrMore<CharacterTypeDigit>())
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
 
@@ -234,6 +253,56 @@ namespace ExLibris
 		else
 		{
 			return false;
+		}
+	}
+
+	bool Tokenizer::_ConsumeNumberOctal()
+	{
+		if (!_TryConsume('0'))
+		{
+			return false;
+		}
+
+		std::queue<int> undo_characters;
+		int valid = 0;
+
+		while (_IsNextCharacterAvailable())
+		{
+			_NextCharacter();
+
+			undo_characters.push(m_CharacterCurrent);
+
+			if (!_IsCharacterOfType<CharacterTypeOctal>(m_CharacterCurrent))
+			{
+				break;
+			}
+
+			_AddCurrentToToken();
+			valid++;
+		}
+
+		if (valid == 0)
+		{
+			while (undo_characters.size() > 0)
+			{
+				m_CharacterQueue.push_back(undo_characters.front());
+				undo_characters.pop();
+
+				m_Column--;
+			}
+
+			m_TokenCurrent.text.clear();
+			m_CharacterCurrent = '0';
+
+			return false;
+		}
+		else
+		{
+			m_TokenCurrent.type = Token::eType_Octal;
+
+			_QueueCurrentCharacter();
+
+			return true;
 		}
 	}
 
