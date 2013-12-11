@@ -84,6 +84,7 @@ namespace ExLibris
 		int m_CharacterCurrent;
 		std::deque<int> m_CharacterQueue;
 
+		int m_CharacterRestore;
 		std::deque<int> m_CharactersUndoConsumed;
 
 		int m_Column;

@@ -401,6 +401,19 @@ TEST(Tokenizer, ReadNegativeOctal)
 	EXPECT_END_TOKEN(6, 1);
 }
 
+TEST(Tokenizer, ReadNegativeOctalInvalid)
+{
+	std::stringstream ss;
+	ss << "-0Buh";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "0", 2, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Buh", 3, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
+
 TEST(Tokenizer, ReadHexadecimal)
 {
 	std::stringstream ss;
@@ -419,8 +432,8 @@ TEST(Tokenizer, ReadHexadecimalLowerCase)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xaffa", 1, 1);
-	EXPECT_END_TOKEN(7, 1);
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xabcdef", 1, 1);
+	EXPECT_END_TOKEN(9, 1);
 }
 
 TEST(Tokenizer, ReadHexadecimalUpperCase)
@@ -505,4 +518,17 @@ TEST(Tokenizer, ReadHexadecimalNoData)
 	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
 	EXPECT_TOKEN(Token::eType_Text, "x", 2, 1);
 	EXPECT_END_TOKEN(3, 1);
+}
+
+TEST(Tokenizer, ReadHexadecimalNegativeNoData)
+{
+	std::stringstream ss;
+	ss << "-0x";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "0", 2, 1);
+	EXPECT_TOKEN(Token::eType_Text, "x", 3, 1);
+	EXPECT_END_TOKEN(4, 1);
 }
