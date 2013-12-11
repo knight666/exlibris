@@ -42,6 +42,7 @@ namespace ExLibris
 			eType_NewLine,
 			eType_Symbol,
 			eType_Integer,
+			eType_Octal,
 			eType_End
 		};
 

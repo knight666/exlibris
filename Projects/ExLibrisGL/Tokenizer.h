@@ -65,6 +65,8 @@ namespace ExLibris
 		bool _TryConsume(int a_Character);
 
 		bool _ConsumeNumber();
+		bool _ConsumeNumberInteger();
+		bool _ConsumeNumberOctal();
 		bool _ConsumeString();
 		bool _ConsumeSymbol();
 		bool _ConsumeWhitespace();

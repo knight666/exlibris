@@ -320,6 +320,17 @@ TEST(Tokenizer, ReadDigit)
 	EXPECT_END_TOKEN(2, 1);
 }
 
+TEST(Tokenizer, ReadDigitZero)
+{
+	std::stringstream ss;
+	ss << "0";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_END_TOKEN(2, 1);
+}
+
 TEST(Tokenizer, ReadIntegerThreeDigits)
 {
 	std::stringstream ss;
@@ -354,3 +365,38 @@ TEST(Tokenizer, ReadNotANegativeInteger)
 	EXPECT_END_TOKEN(10, 1);
 }
 
+TEST(Tokenizer, ReadOctal)
+{
+	std::stringstream ss;
+	ss << "0777";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Octal, "0777", 1, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
+TEST(Tokenizer, ReadOctalInvalid)
+{
+	std::stringstream ss;
+	ss << "0F9GH";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "F", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "9", 3, 1);
+	EXPECT_TOKEN(Token::eType_Text, "GH", 4, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
+
+TEST(Tokenizer, ReadNegativeOctal)
+{
+	std::stringstream ss;
+	ss << "-0154";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Octal, "-0154", 1, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
