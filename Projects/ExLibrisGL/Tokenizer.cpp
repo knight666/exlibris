@@ -152,15 +152,23 @@ namespace ExLibris
 		m_Column++;
 	}
 
+	void Tokenizer::_AddCurrentToToken()
+	{
+		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
+	}
+
 	void Tokenizer::_QueueCurrentCharacter()
 	{
 		m_CharacterQueue.push_front(m_CharacterCurrent);
 		m_Column--;
 	}
 
-	void Tokenizer::_AddCurrentToToken()
+	void Tokenizer::_UndoConsomed()
 	{
-		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
+		m_CharacterQueue.insert(m_CharacterQueue.end(), m_CharactersUndoConsumed.begin(), m_CharactersUndoConsumed.end());
+		m_Column -= (int)m_CharactersUndoConsumed.size();
+
+		m_TokenCurrent.text.clear();
 	}
 
 	Token::Type Tokenizer::_GetTypeForCharacter(int a_Character)
@@ -218,7 +226,12 @@ namespace ExLibris
 
 			if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 			{
-				number = _ConsumeNumberOctal() || _ConsumeNumberInteger();
+				number = _TryConsume('0') && _ConsumeNumberOctal();
+				
+				if (!number)
+				{
+					number = _ConsumeNumberInteger();
+				}
 			}
 
 			if (!number)
@@ -234,7 +247,14 @@ namespace ExLibris
 		}
 		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
-			return _ConsumeNumberOctal() || _ConsumeNumberInteger();
+			if (_TryConsume('0') && _ConsumeNumberOctal())
+			{
+				return true;
+			}
+			else
+			{
+				return _ConsumeNumberInteger();
+			}
 		}
 		else
 		{
@@ -258,19 +278,14 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumberOctal()
 	{
-		if (!_TryConsume('0'))
-		{
-			return false;
-		}
-
-		std::queue<int> undo_characters;
+		m_CharactersUndoConsumed.clear();
 		int valid = 0;
 
 		while (_IsNextCharacterAvailable())
 		{
 			_NextCharacter();
 
-			undo_characters.push(m_CharacterCurrent);
+			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
 
 			if (!_IsCharacterOfType<CharacterTypeOctal>(m_CharacterCurrent))
 			{
@@ -283,15 +298,8 @@ namespace ExLibris
 
 		if (valid == 0)
 		{
-			while (undo_characters.size() > 0)
-			{
-				m_CharacterQueue.push_back(undo_characters.front());
-				undo_characters.pop();
+			_UndoConsomed();
 
-				m_Column--;
-			}
-
-			m_TokenCurrent.text.clear();
 			m_CharacterCurrent = '0';
 
 			return false;
@@ -313,14 +321,15 @@ namespace ExLibris
 			m_TokenCurrent.type = Token::eType_String;
 
 			int delimiter = m_CharacterCurrent;
-			std::queue<int> found;
 			bool undo = false;
+
+			m_CharactersUndoConsumed.clear();
 
 			while (_IsNextCharacterAvailable())
 			{
 				_NextCharacter();
 
-				found.push(m_CharacterCurrent);
+				m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
 
 				if (m_CharacterCurrent == delimiter)
 				{
@@ -350,15 +359,8 @@ namespace ExLibris
 
 			if (undo)
 			{
-				while (found.size() > 0)
-				{
-					m_CharacterQueue.push_back(found.front());
-					found.pop();
+				_UndoConsomed();
 
-					m_Column--;
-				}
-
-				m_TokenCurrent.text.clear();
 				m_CharacterCurrent = delimiter;
 			}
 
