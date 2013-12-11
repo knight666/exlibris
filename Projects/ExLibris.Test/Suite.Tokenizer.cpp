@@ -523,7 +523,6 @@ TEST(Tokenizer, ReadHexadecimalNoData)
 	EXPECT_END_TOKEN(3, 1);
 }
 
-
 TEST(Tokenizer, ReadHexadecimalNegative)
 {
 	std::stringstream ss;
@@ -559,4 +558,15 @@ TEST(Tokenizer, ReadSignedHexadecimalNoData)
 	EXPECT_TOKEN(Token::eType_Integer, "0", 2, 1);
 	EXPECT_TOKEN(Token::eType_Text, "x", 3, 1);
 	EXPECT_END_TOKEN(4, 1);
+}
+
+TEST(Tokenizer, ReadNumber)
+{
+	std::stringstream ss;
+	ss << "12.15";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "12.15", 1, 1);
+	EXPECT_END_TOKEN(6, 1);
 }

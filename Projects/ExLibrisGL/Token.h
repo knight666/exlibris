@@ -34,7 +34,7 @@ namespace ExLibris
 
 		enum Type
 		{
-			eType_Start,
+			eType_End,
 			eType_Unprintable,
 			eType_Text,
 			eType_String,
@@ -44,7 +44,7 @@ namespace ExLibris
 			eType_Integer,
 			eType_Octal,
 			eType_Hexadecimal,
-			eType_End
+			eType_Number
 		};
 
 	public:
