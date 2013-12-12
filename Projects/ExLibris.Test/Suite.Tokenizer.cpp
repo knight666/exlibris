@@ -606,6 +606,63 @@ TEST(Tokenizer, ReadNumberPositive)
 	EXPECT_END_TOKEN(5, 1);
 }
 
+TEST(Tokenizer, ReadNumberSpecifierAfterFloat)
+{
+	std::stringstream ss;
+	ss << "12.76f";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "12.76f", 1, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(Tokenizer, ReadNumberUpperCaseSpecifierAfterFloat)
+{
+	std::stringstream ss;
+	ss << "3.8888F";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "3.8888F", 1, 1);
+	EXPECT_END_TOKEN(8, 1);
+}
+
+TEST(Tokenizer, ReadNumberTextAfterFloat)
+{
+	std::stringstream ss;
+	ss << "12.67food";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "12.67f", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "ood", 7, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadNumberSpecifierInMiddleOfFloat)
+{
+	std::stringstream ss;
+	ss << "15.97f112";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "15.97f", 1, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "112", 7, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadNumberSpecifierAfterDot)
+{
+	std::stringstream ss;
+	ss << "1.F";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "1.F", 1, 1);
+	EXPECT_END_TOKEN(4, 1);
+}
+
 TEST(Tokenizer, ReadNumberContained)
 {
 	std::stringstream ss;
