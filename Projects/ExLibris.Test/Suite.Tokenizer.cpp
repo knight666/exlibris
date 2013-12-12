@@ -571,6 +571,41 @@ TEST(Tokenizer, ReadNumber)
 	EXPECT_END_TOKEN(6, 1);
 }
 
+TEST(Tokenizer, ReadNumberLeadingZero)
+{
+	std::stringstream ss;
+	ss << "0.5551";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Number, "0.5551", 1, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(Tokenizer, ReadNumberNegative)
+{
+	std::stringstream ss;
+	ss << "-555.91";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
+	EXPECT_TOKEN(Token::eType_Number, "555.91", 2, 1);
+	EXPECT_END_TOKEN(8, 1);
+}
+
+TEST(Tokenizer, ReadNumberPositive)
+{
+	std::stringstream ss;
+	ss << "+1.5";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "+", 1, 1);
+	EXPECT_TOKEN(Token::eType_Number, "1.5", 2, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
 TEST(Tokenizer, ReadNumberContained)
 {
 	std::stringstream ss;
@@ -650,4 +685,41 @@ TEST(Tokenizer, ReadNumberDoubleTrailingDot)
 	EXPECT_TOKEN(Token::eType_Symbol, ".", 4, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, ".", 5, 1);
 	EXPECT_END_TOKEN(6, 1);
+}
+
+TEST(Tokenizer, ReadNumberDotInHexadecimal)
+{
+	std::stringstream ss;
+	ss << "0x118.120";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0x118", 1, 1);
+	EXPECT_TOKEN(Token::eType_Number, ".120", 6, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadNumberInvalidHexadecimal)
+{
+	std::stringstream ss;
+	ss << "0x.999";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "x", 2, 1);
+	EXPECT_TOKEN(Token::eType_Number, ".999", 3, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(Tokenizer, ReadNumberDotInOctal)
+{
+	std::stringstream ss;
+	ss << "0128.90";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Octal, "012", 1, 1);
+	EXPECT_TOKEN(Token::eType_Number, "8.90", 4, 1);
+	EXPECT_END_TOKEN(8, 1);
 }
