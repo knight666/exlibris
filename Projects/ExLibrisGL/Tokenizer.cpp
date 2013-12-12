@@ -233,7 +233,15 @@ namespace ExLibris
 
 			_NextCharacter();
 
-			return _ConsumeNumberFloat();
+			if (!_ConsumeNumberFloat())
+			{
+				// it was just a dot
+
+				m_TokenCurrent.type = Token::eType_Symbol;
+				m_TokenCurrent.text.push_back('.');
+			}
+			
+			return true;
 		}
 
 		if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
@@ -307,7 +315,7 @@ namespace ExLibris
 			{
 				_NextCharacter();
 
-				if (_IsNextCharacterAvailable() && _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+				if (_IsNextCharacterAvailable() && (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent) || m_CharacterCurrent == 'f' || m_CharacterCurrent == 'F'))
 				{
 					m_TokenCurrent.text.push_back('.');
 
@@ -355,7 +363,7 @@ namespace ExLibris
 			{
 				_NextCharacter();
 
-				if (_IsNextCharacterAvailable() && _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+				if (_IsNextCharacterAvailable() && (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent) || m_CharacterCurrent == 'f' || m_CharacterCurrent == 'F'))
 				{
 					m_TokenCurrent.text.push_back('.');
 
@@ -440,12 +448,21 @@ namespace ExLibris
 
 	bool Tokenizer::_ConsumeNumberFloat()
 	{
-		if (!_IsNextCharacterAvailable() || !_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		if (!_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
-			_QueueCurrentCharacter();
-			_UndoConsumed();
+			if (_IsNextCharacterAvailable() && (_TryConsume('f') || _TryConsume('F')))
+			{
+				m_TokenCurrent.type = Token::eType_Number;
 
-			return false;
+				return true;
+			}
+			else
+			{
+				_QueueCurrentCharacter();
+				_UndoConsumed();
+
+				return false;
+			}
 		}
 
 		_AddCurrentToToken();
@@ -460,7 +477,14 @@ namespace ExLibris
 
 			if (m_CharacterCurrent == '.' || !_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 			{
-				_QueueCurrentCharacter();
+				if (_TryConsume('f') || _TryConsume('F'))
+				{
+					found++;
+				}
+				else
+				{
+					_QueueCurrentCharacter();
+				}
 
 				break;
 			}
