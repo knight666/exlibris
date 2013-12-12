@@ -321,6 +321,8 @@ namespace ExLibris
 
 					m_CharacterQueue.push_front('.');
 					m_Column--;
+
+					m_CharacterCurrent = '.';
 				}
 
 				break;
@@ -348,6 +350,31 @@ namespace ExLibris
 			_NextCharacter();
 
 			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
+
+			if (m_CharacterCurrent == '.')
+			{
+				_NextCharacter();
+
+				if (_IsNextCharacterAvailable() && _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+				{
+					m_TokenCurrent.text.push_back('.');
+
+					m_CharacterRestore = m_CharacterCurrent;
+
+					return _ConsumeNumberFloat();
+				}
+				else
+				{
+					_QueueCurrentCharacter();
+
+					m_CharacterQueue.push_front('.');
+					m_Column--;
+
+					m_CharacterCurrent = '.';
+
+					break;
+				}
+			}
 
 			if (!_IsCharacterOfType<CharacterTypeOctal>(m_CharacterCurrent))
 			{
@@ -386,7 +413,7 @@ namespace ExLibris
 
 			m_CharactersUndoConsumed.push_back(m_CharacterCurrent);
 
-			if (!_IsCharacterOfType<CharacterTypeHexadecimal>(m_CharacterCurrent))
+			if (m_CharacterCurrent == '.' || !_IsCharacterOfType<CharacterTypeHexadecimal>(m_CharacterCurrent))
 			{
 				break;
 			}
