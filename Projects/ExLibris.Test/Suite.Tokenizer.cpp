@@ -4,10 +4,56 @@
 
 using namespace ExLibris;
 
+#define TOKEN_TYPE_TO_STRING(_type) #_type
+
+static const char* s_TokenTypeMap[Token::eType_End + 1] = {
+	TOKEN_TYPE_TO_STRING(eType_Unprintable),
+	TOKEN_TYPE_TO_STRING(eType_Text),
+	TOKEN_TYPE_TO_STRING(eType_String),
+	TOKEN_TYPE_TO_STRING(eType_Whitespace),
+	TOKEN_TYPE_TO_STRING(eType_NewLine),
+	TOKEN_TYPE_TO_STRING(eType_Symbol),
+	TOKEN_TYPE_TO_STRING(eType_Integer),
+	TOKEN_TYPE_TO_STRING(eType_Octal),
+	TOKEN_TYPE_TO_STRING(eType_Hexadecimal),
+	TOKEN_TYPE_TO_STRING(eType_Number),
+	TOKEN_TYPE_TO_STRING(eType_End)
+};
+
+inline const char* TokenTypeToString(Token::Type a_Type)
+{
+	if (a_Type < 0 || a_Type > Token::eType_End)
+	{
+		return "<Invalid>";
+	}
+	else
+	{
+		return s_TokenTypeMap[a_Type];
+	}
+}
+
+::testing::AssertionResult ExpectTokenType(
+	const char* a_ExpressionLeft, const char* a_ExpressionRight,
+	Token::Type a_TypeLeft, Token::Type a_TypeRight
+)
+{
+	if (a_TypeLeft == a_TypeRight)
+	{
+		return ::testing::AssertionSuccess();
+	}
+	else
+	{
+		return ::testing::AssertionFailure()
+			<< "Type does not match:" << std::endl
+			<< "  Actual: " << TokenTypeToString(a_TypeRight) << std::endl
+			<< "Expected: " << TokenTypeToString(a_TypeLeft);
+	}
+}
+
 #define EXPECT_TOKEN(_type, _text, _column, _line) { \
 	EXPECT_TRUE(tk.ReadToken()); \
 	const Token& t = tk.GetCurrentToken(); \
-	EXPECT_EQ(_type, t.type); \
+	EXPECT_PRED_FORMAT2(ExpectTokenType, _type, t.type); \
 	EXPECT_STREQ(_text, t.text.c_str()); \
 	EXPECT_EQ(_column, t.column); \
 	EXPECT_EQ(_line, t.line); \
@@ -16,7 +62,7 @@ using namespace ExLibris;
 #define EXPECT_END_TOKEN(_column, _line) { \
 	EXPECT_FALSE(tk.ReadToken()); \
 	const Token& t = tk.GetCurrentToken(); \
-	EXPECT_EQ(Token::eType_End, t.type); \
+	EXPECT_PRED_FORMAT2(ExpectTokenType, Token::eType_End, t.type); \
 	EXPECT_STREQ("", t.text.c_str()); \
 	EXPECT_EQ(_column, t.column); \
 	EXPECT_EQ(_line, t.line); \
