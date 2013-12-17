@@ -74,6 +74,7 @@ namespace ExLibris
 		: m_Stream(nullptr)
 		, m_StreamEnd(false)
 		, m_CharactersConsumedCount(0)
+		, m_FoundFloatingDot(false)
 		, m_CharacterCurrent(-1)
 		, m_Column(0)
 		, m_Line(0)
@@ -128,6 +129,14 @@ namespace ExLibris
 
 			return _RecursiveReadToken();
 		}
+		else if (m_CharacterCurrent == '.')
+		{
+			m_TokenCurrent.type = Token::eType_Number;
+
+			m_FoundFloatingDot = false;
+
+			return _RecursiveReadToken();
+		}
 
 		if (m_CharacterCurrent == -1)
 		{
@@ -165,9 +174,13 @@ namespace ExLibris
 				{
 					m_TokenCurrent.type = Token::eType_Octal;
 				}
-				else if (_TryConsume('.'))
+				else if (m_CharacterCurrent == '.')
 				{
 					m_TokenCurrent.type = Token::eType_Number;
+
+					m_FoundFloatingDot = false;
+
+					return _RecursiveReadToken();
 				}
 				else if (!_TryConsumeOne<CharacterTypeDigit>())
 				{
@@ -178,9 +191,13 @@ namespace ExLibris
 
 		case Token::eType_Octal:
 			{
-				if (_TryConsume('.'))
+				if (m_CharacterCurrent == '.')
 				{
 					m_TokenCurrent.type = Token::eType_Number;
+
+					m_FoundFloatingDot = false;
+
+					return _RecursiveReadToken();
 				}
 				else if (m_CharactersConsumedCount == 1 && _TryConsume('x'))
 				{
@@ -231,11 +248,109 @@ namespace ExLibris
 			{
 				if (_TryConsume('f') || _TryConsume('F'))
 				{
-					handled = true;
+					// no more digits after specifier
+
+					return true;
+				}
+				else if (m_CharacterCurrent == '.')
+				{
+					if (m_FoundFloatingDot)
+					{
+						if (m_CharactersConsumedCount == 0)
+						{
+							// just a dot
+
+							m_TokenCurrent.type = Token::eType_Symbol;
+						}
+
+						handled = true;
+					}
+					else
+					{
+						_NextCharacter();
+
+						if (m_CharacterCurrent == 'f' || m_CharacterCurrent == 'F' || _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+						{
+							m_TokenCurrent.text.push_back('.');
+
+							_AddCurrentToToken();
+
+							m_FoundFloatingDot = true;
+						}
+						else if (!_IsNextAvailable())
+						{
+							if (m_CharactersConsumedCount == 0)
+							{
+								// dot only
+
+								m_TokenCurrent.type = Token::eType_Symbol;
+								m_TokenCurrent.text.push_back('.');
+							}
+							else
+							{
+								// trailing dot
+
+								_Revert(1);
+
+								m_TokenCurrent.type = Token::eType_Integer;
+							}
+
+							// make sure the next token starts at the correct position
+
+							m_Column--;
+
+							return true;
+						}
+						else
+						{
+							if (m_CharactersConsumedCount == 0)
+							{
+								// leading dot
+
+								_Revert(1);
+
+								m_TokenCurrent.type = Token::eType_Symbol;
+								m_TokenCurrent.text.push_back('.');
+							}
+							else
+							{
+								// trailing dot
+
+								_Revert(2);
+
+								m_TokenCurrent.type = Token::eType_Integer;
+							}
+
+							return true;
+						}
+					}
 				}
 				else if (!_TryConsumeOne<CharacterTypeDigit>())
 				{
-					handled = true;
+					if (m_CharactersConsumedCount == 0 && m_CharactersRead.size() > 0 && m_CharactersRead.back() == '.')
+					{
+						// trailing dot
+
+						m_TokenCurrent.type = Token::eType_Integer;
+
+						m_TokenCurrent.text.clear();
+
+						size_t revert_count = m_CharactersRead.size() - 1;
+
+						for (size_t i = 0; i < revert_count; ++i)
+						{
+							m_TokenCurrent.text.push_back(m_CharactersRead.front());
+							m_CharactersRead.pop_front();
+						}
+
+						_Revert(1);
+
+						return true;
+					}
+					else
+					{
+						handled = true;
+					}
 				}
 
 			} break;
@@ -282,19 +397,24 @@ namespace ExLibris
 
 	void Tokenizer::_NextCharacter()
 	{
+		bool add = false;
+
 		if (m_CharacterQueue.size() > 0)
 		{
 			m_CharacterCurrent = m_CharacterQueue.front();
 			m_CharacterQueue.pop_front();
+
+			add = true;
 		}
 		else if (m_Stream != nullptr && !m_Stream->eof())
 		{
 			m_CharacterCurrent = m_Stream->get();
-			if (m_Stream->eof())
-			{
-				m_StreamEnd = true;
-			}
 
+			add = !m_Stream->eof();
+		}
+
+		if (add)
+		{
 			m_CharactersRead.push_back(m_CharacterCurrent);
 		}
 
@@ -832,6 +952,11 @@ namespace ExLibris
 		}
 
 		return next_available;
+	}
+
+	bool Tokenizer::_IsInputValid() const
+	{
+		return (m_Stream != nullptr) && !m_Stream->eof();
 	}
 
 }; // namespace ExLibris

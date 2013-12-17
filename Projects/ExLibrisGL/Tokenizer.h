@@ -48,6 +48,7 @@ namespace ExLibris
 
 		bool _RecursiveReadToken();
 
+		bool _IsInputValid() const;
 		bool _IsNextCharacterAvailable() const;
 		bool _IsNextAvailable() const;
 		bool _ReadNextCharacter();
@@ -89,6 +90,7 @@ namespace ExLibris
 		Token m_TokenCurrent;
 		std::deque<int> m_CharactersRead;
 		int m_CharactersConsumedCount;
+		bool m_FoundFloatingDot;
 
 		int m_CharacterCurrent;
 		std::deque<int> m_CharacterQueue;
