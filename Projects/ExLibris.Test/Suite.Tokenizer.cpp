@@ -395,6 +395,36 @@ TEST(Tokenizer, ReadCarriageReturn)
 	EXPECT_END_TOKEN(9, 1);
 }
 
+TEST(Tokenizer, ReadCarriageReturnAndNewLine)
+{
+	std::stringstream ss;
+	ss << "aww\r\nyiss";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Text, "aww", 1, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 4, 1);
+	EXPECT_TOKEN(Token::eType_Text, "yiss", 1, 2);
+	EXPECT_END_TOKEN(5, 2);
+}
+
+TEST(Tokenizer, ReadMultipleCarriageReturnsAndNewLines)
+{
+	std::stringstream ss;
+	ss << "\r\r\n\n\r\n\r\n\r\r";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Unprintable, "\r", 1, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 2, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\n", 1, 2);
+	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 1, 3);
+	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 1, 4);
+	EXPECT_TOKEN(Token::eType_Unprintable, "\r", 1, 5);
+	EXPECT_TOKEN(Token::eType_Unprintable, "\r", 2, 5);
+	EXPECT_END_TOKEN(3, 5);
+}
+
 TEST(Tokenizer, ReadSentenceOverSeveralLines)
 {
 	std::stringstream ss;

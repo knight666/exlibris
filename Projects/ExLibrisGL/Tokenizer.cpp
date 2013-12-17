@@ -136,6 +136,18 @@ namespace ExLibris
 
 			return _RecursiveReadToken();
 		}
+		else if (m_CharacterCurrent == '\r')
+		{
+			m_TokenCurrent.type = Token::eType_Unprintable;
+
+			return _RecursiveReadToken();
+		}
+		else if (m_CharacterCurrent == '\n')
+		{
+			m_TokenCurrent.type = Token::eType_NewLine;
+
+			return _RecursiveReadToken();
+		}
 		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
@@ -325,6 +337,51 @@ namespace ExLibris
 				else if (!_TryConsumeOne<CharacterTypeDigit>())
 				{
 					handled = true;
+				}
+
+			} break;
+
+		case Token::eType_Unprintable:
+			{
+				if (_TryConsume('\r'))
+				{
+					_NextCharacter();
+
+					if (m_CharacterCurrent == '\n')
+					{
+						// carriage return and newline combine to a newline
+
+						m_TokenCurrent.type = Token::eType_NewLine;
+
+						_Revert(1);
+					}
+					else
+					{
+						// just a carriage return
+
+						if (_IsNextAvailable())
+						{
+							_Revert(1);
+						}
+						else
+						{
+							m_Column--;
+						}
+
+						return true;
+					}
+				}
+
+			} break;
+
+		case Token::eType_NewLine:
+			{
+				if (_TryConsume('\n'))
+				{
+					m_Column = 1;
+					m_Line++;
+
+					return true;
 				}
 
 			} break;
