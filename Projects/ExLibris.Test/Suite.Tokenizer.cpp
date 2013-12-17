@@ -683,6 +683,17 @@ TEST(Tokenizer, ReadNumberLeadingZero)
 	EXPECT_END_TOKEN(7, 1);
 }
 
+TEST(Tokenizer, ReadNumberDotOnly)
+{
+	std::stringstream ss;
+	ss << ".";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 1, 1);
+	EXPECT_END_TOKEN(2, 1);
+}
+
 TEST(Tokenizer, ReadNumberNegative)
 {
 	std::stringstream ss;
