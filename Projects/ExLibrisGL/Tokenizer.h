@@ -48,7 +48,6 @@ namespace ExLibris
 
 		bool _RecursiveReadToken();
 
-		bool _IsInputValid() const;
 		bool _IsNextCharacterAvailable() const;
 		bool _IsNextAvailable() const;
 		bool _ReadNextCharacter();

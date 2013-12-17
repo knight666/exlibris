@@ -106,11 +106,7 @@ namespace ExLibris
 
 	bool Tokenizer::ReadToken()
 	{
-		m_CharactersRead.clear();
-		m_CharactersConsumedCount = 0;
-
 		m_TokenCurrent.text.clear();
-
 		m_TokenCurrent.column = m_Column;
 		m_TokenCurrent.line = m_Line;
 
@@ -121,19 +117,28 @@ namespace ExLibris
 			return false;
 		}
 
+		m_CharactersRead.clear();
+		m_CharactersConsumedCount = 0;
+
+		m_FoundFloatingDot = false;
+
 		_NextCharacter();
 
-		if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
-		{
-			m_TokenCurrent.type = Token::eType_Integer;
-
-			return _RecursiveReadToken();
-		}
-		else if (m_CharacterCurrent == '.')
+		if (m_CharacterCurrent == '.')
 		{
 			m_TokenCurrent.type = Token::eType_Number;
 
-			m_FoundFloatingDot = false;
+			return _RecursiveReadToken();
+		}
+		else if (m_CharacterCurrent == '0')
+		{
+			m_TokenCurrent.type = Token::eType_Octal;
+
+			return _RecursiveReadToken();
+		}
+		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		{
+			m_TokenCurrent.type = Token::eType_Integer;
 
 			return _RecursiveReadToken();
 		}
@@ -170,15 +175,9 @@ namespace ExLibris
 
 		case Token::eType_Integer:
 			{
-				if (m_CharactersConsumedCount == 0 && _TryConsume('0'))
-				{
-					m_TokenCurrent.type = Token::eType_Octal;
-				}
-				else if (m_CharacterCurrent == '.')
+				if (m_CharacterCurrent == '.')
 				{
 					m_TokenCurrent.type = Token::eType_Number;
-
-					m_FoundFloatingDot = false;
 
 					return _RecursiveReadToken();
 				}
@@ -194,8 +193,6 @@ namespace ExLibris
 				if (m_CharacterCurrent == '.')
 				{
 					m_TokenCurrent.type = Token::eType_Number;
-
-					m_FoundFloatingDot = false;
 
 					return _RecursiveReadToken();
 				}
@@ -327,30 +324,7 @@ namespace ExLibris
 				}
 				else if (!_TryConsumeOne<CharacterTypeDigit>())
 				{
-					if (m_CharactersConsumedCount == 0 && m_CharactersRead.size() > 0 && m_CharactersRead.back() == '.')
-					{
-						// trailing dot
-
-						m_TokenCurrent.type = Token::eType_Integer;
-
-						m_TokenCurrent.text.clear();
-
-						size_t revert_count = m_CharactersRead.size() - 1;
-
-						for (size_t i = 0; i < revert_count; ++i)
-						{
-							m_TokenCurrent.text.push_back(m_CharactersRead.front());
-							m_CharactersRead.pop_front();
-						}
-
-						_Revert(1);
-
-						return true;
-					}
-					else
-					{
-						handled = true;
-					}
+					handled = true;
 				}
 
 			} break;
@@ -952,11 +926,6 @@ namespace ExLibris
 		}
 
 		return next_available;
-	}
-
-	bool Tokenizer::_IsInputValid() const
-	{
-		return (m_Stream != nullptr) && !m_Stream->eof();
 	}
 
 }; // namespace ExLibris
