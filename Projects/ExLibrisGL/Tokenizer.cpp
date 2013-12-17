@@ -72,6 +72,8 @@ namespace ExLibris
 
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(nullptr)
+		, m_StreamEnd(false)
+		, m_CharactersConsumedCount(0)
 		, m_CharacterCurrent(-1)
 		, m_Column(0)
 		, m_Line(0)
@@ -103,12 +105,15 @@ namespace ExLibris
 
 	bool Tokenizer::ReadToken()
 	{
+		m_CharactersRead.clear();
+		m_CharactersConsumedCount = 0;
+
 		m_TokenCurrent.text.clear();
 
 		m_TokenCurrent.column = m_Column;
 		m_TokenCurrent.line = m_Line;
 
-		if (!_IsNextCharacterAvailable())
+		if (!_IsNextAvailable())
 		{
 			m_TokenCurrent.type = Token::eType_End;
 
@@ -116,6 +121,13 @@ namespace ExLibris
 		}
 
 		_NextCharacter();
+
+		if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		{
+			m_TokenCurrent.type = Token::eType_Integer;
+
+			return _RecursiveReadToken();
+		}
 
 		if (m_CharacterCurrent == -1)
 		{
@@ -140,9 +152,132 @@ namespace ExLibris
 		return true;
 	}
 
+	bool Tokenizer::_RecursiveReadToken()
+	{
+		bool handled = false;
+
+		switch (m_TokenCurrent.type)
+		{
+
+		case Token::eType_Integer:
+			{
+				if (m_CharactersConsumedCount == 0 && _TryConsume('0'))
+				{
+					m_TokenCurrent.type = Token::eType_Octal;
+				}
+				else if (_TryConsume('.'))
+				{
+					m_TokenCurrent.type = Token::eType_Number;
+				}
+				else if (!_TryConsumeOne<CharacterTypeDigit>())
+				{
+					handled = true;
+				}
+
+			} break;
+
+		case Token::eType_Octal:
+			{
+				if (_TryConsume('.'))
+				{
+					m_TokenCurrent.type = Token::eType_Number;
+				}
+				else if (m_CharactersConsumedCount == 1 && _TryConsume('x'))
+				{
+					m_TokenCurrent.type = Token::eType_Hexadecimal;
+				}
+				else if (!_TryConsumeOne<CharacterTypeOctal>())
+				{
+					if (m_CharactersConsumedCount == 1)
+					{
+						// just a zero
+
+						m_TokenCurrent.type = Token::eType_Integer;
+					}
+
+					handled = true;
+				}
+
+			} break;
+
+		case Token::eType_Hexadecimal:
+			{
+				if (!_TryConsumeOne<CharacterTypeHexadecimal>())
+				{
+					if (m_CharactersConsumedCount == 2)
+					{
+						// was a zero with text
+
+						m_TokenCurrent.type = Token::eType_Integer;
+
+						_Revert(3);
+
+						m_TokenCurrent.text.clear();
+
+						_NextCharacter();
+						_AddCurrentToToken();
+
+						return true;
+					}
+					else
+					{
+						handled = true;
+					}
+				}
+
+			} break;
+
+		case Token::eType_Number:
+			{
+				if (_TryConsume('f') || _TryConsume('F'))
+				{
+					handled = true;
+				}
+				else if (!_TryConsumeOne<CharacterTypeDigit>())
+				{
+					handled = true;
+				}
+
+			} break;
+
+		default:
+			{
+				return false;
+
+			} break;
+
+		}
+
+		bool next_available = _IsNextAvailable();
+
+		if (handled)
+		{
+			if (next_available)
+			{
+				_Revert(1);
+			}
+
+			return true;
+		}
+		else
+		{
+			if (next_available)
+			{
+				_ReadNextCharacter();
+			}
+
+			return _RecursiveReadToken();
+		}
+	}
+
 	bool Tokenizer::_IsNextCharacterAvailable() const
 	{
 		return ((m_Stream != nullptr && !m_Stream->eof()) || (m_CharacterQueue.size() > 0) && m_CharacterCurrent != -1);
+	}
+
+	bool Tokenizer::_IsNextAvailable() const
+	{
+		return ((m_Stream != nullptr) && !m_Stream->eof()) || (m_CharacterQueue.size() > 0);
 	}
 
 	void Tokenizer::_NextCharacter()
@@ -152,17 +287,39 @@ namespace ExLibris
 			m_CharacterCurrent = m_CharacterQueue.front();
 			m_CharacterQueue.pop_front();
 		}
-		else
+		else if (m_Stream != nullptr && !m_Stream->eof())
 		{
 			m_CharacterCurrent = m_Stream->get();
+			if (m_Stream->eof())
+			{
+				m_StreamEnd = true;
+			}
+
+			m_CharactersRead.push_back(m_CharacterCurrent);
 		}
 
 		m_Column++;
 	}
 
+	void Tokenizer::_Revert(int a_Count)
+	{
+		int added = 0;
+
+		while (added < a_Count && m_CharactersRead.size() > 0)
+		{
+			m_CharacterQueue.push_front(m_CharactersRead.back());
+			m_CharactersRead.pop_back();
+
+			++added;
+		}
+
+		m_Column -= added;
+	}
+
 	void Tokenizer::_AddCurrentToToken()
 	{
 		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
+		m_CharactersConsumedCount++;
 	}
 
 	void Tokenizer::_QueueCurrentCharacter()
@@ -645,4 +802,36 @@ namespace ExLibris
 		}
 	}
 
-}; // namespace ExLibris"
+	bool Tokenizer::_ReadNextCharacter()
+	{
+		bool next_available = false;
+
+		if (m_CharacterQueue.size() > 0)
+		{
+			next_available = true;
+
+			m_CharacterCurrent = m_CharacterQueue.front();
+			m_CharacterQueue.pop_front();
+		}
+		else
+		{
+			next_available = (m_Stream != nullptr) && !m_Stream->eof();
+			if (next_available)
+			{
+				m_CharacterCurrent = m_Stream->get();
+
+				next_available = !m_Stream->eof();
+			}
+		}
+
+		if (next_available)
+		{
+			m_Column++;
+
+			m_CharactersRead.push_back(m_CharacterCurrent);
+		}
+
+		return next_available;
+	}
+
+}; // namespace ExLibris
