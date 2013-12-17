@@ -46,8 +46,13 @@ namespace ExLibris
 
 	private:
 
+		bool _RecursiveReadToken();
+
 		bool _IsNextCharacterAvailable() const;
+		bool _IsNextAvailable() const;
+		bool _ReadNextCharacter();
 		void _NextCharacter();
+		void _Revert(int a_Count);
 		void _AddCurrentToToken();
 		void _QueueCurrentCharacter();
 		void _UndoConsumed();
@@ -79,8 +84,11 @@ namespace ExLibris
 	private:
 
 		std::basic_istream<char>* m_Stream;
+		bool m_StreamEnd;
 
 		Token m_TokenCurrent;
+		std::deque<int> m_CharactersRead;
+		int m_CharactersConsumedCount;
 
 		int m_CharacterCurrent;
 		std::deque<int> m_CharacterQueue;
@@ -117,28 +125,22 @@ namespace ExLibris
 	template<typename CharacterType>
 	inline bool Tokenizer::_TryConsumeOneOrMore()
 	{
-		if (!CharacterType::IsKnown(m_CharacterCurrent))
+		if (_IsCharacterOfType<CharacterType>(m_CharacterCurrent))
+		{
+			do 
+			{
+				_AddCurrentToToken();
+
+				_NextCharacter();
+			}
+			while (!m_StreamEnd && _IsCharacterOfType<CharacterType>(m_CharacterCurrent));
+
+			return true;
+		}
+		else
 		{
 			return false;
 		}
-
-		_AddCurrentToToken();
-
-		while (_IsNextCharacterAvailable())
-		{
-			_NextCharacter();
-
-			if (!CharacterType::IsKnown(m_CharacterCurrent))
-			{
-				_QueueCurrentCharacter();
-
-				break;
-			}
-
-			_AddCurrentToToken();
-		}
-
-		return true;
 	}
 
 }; // namespace ExLibris
