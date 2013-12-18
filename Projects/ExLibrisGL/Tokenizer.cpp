@@ -161,6 +161,12 @@ namespace ExLibris
 
 			return _RecursiveReadToken();
 		}
+		else if (_TryConsumeOne<CharacterTypeSymbol>())
+		{
+			m_TokenCurrent.type = Token::eType_Symbol;
+
+			return true;
+		}
 
 		if (m_CharacterCurrent == -1)
 		{
