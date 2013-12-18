@@ -53,7 +53,7 @@ namespace ExLibris
 		bool _IsNextCharacterAvailable() const;
 		bool _IsNextAvailable() const;
 		bool _ReadNextCharacter();
-		void _NextCharacter();
+		bool _NextCharacter();
 		void _Revert(int a_Count);
 		void _AddCurrentToToken();
 		void _QueueCurrentCharacter();
