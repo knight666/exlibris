@@ -341,6 +341,47 @@ TEST(Tokenizer, ReadQuotedStringMultipleLines)
 	EXPECT_END_TOKEN(12, 2);
 }
 
+TEST(Tokenizer, ReadQuotedStringUnprintableCharacters)
+{
+	std::stringstream ss;
+	ss << "\"Listen to me: \ryou're not a bad person.\r\nNot in the slightest.\"";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "\"", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Listen", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 8, 1);
+	EXPECT_TOKEN(Token::eType_Text, "to", 9, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
+	EXPECT_TOKEN(Token::eType_Text, "me", 12, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ":", 14, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 15, 1);
+	EXPECT_TOKEN(Token::eType_Unprintable, "\r", 16, 1);
+	EXPECT_TOKEN(Token::eType_Text, "you", 17, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "'", 20, 1);
+	EXPECT_TOKEN(Token::eType_Text, "re", 21, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 23, 1);
+	EXPECT_TOKEN(Token::eType_Text, "not", 24, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 27, 1);
+	EXPECT_TOKEN(Token::eType_Text, "a", 28, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 29, 1);
+	EXPECT_TOKEN(Token::eType_Text, "bad", 30, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 33, 1);
+	EXPECT_TOKEN(Token::eType_Text, "person", 34, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 40, 1);
+	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 41, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Not", 1, 2);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 4, 2);
+	EXPECT_TOKEN(Token::eType_Text, "in", 5, 2);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 2);
+	EXPECT_TOKEN(Token::eType_Text, "the", 8, 2);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 2);
+	EXPECT_TOKEN(Token::eType_Text, "slightest", 12, 2);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 21, 2);
+	EXPECT_TOKEN(Token::eType_Symbol, "\"", 22, 2);
+	EXPECT_END_TOKEN(23, 2);
+}
+
 TEST(Tokenizer, ReadQuotedStringAndText)
 {
 	std::stringstream ss;

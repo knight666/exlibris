@@ -121,6 +121,7 @@ namespace ExLibris
 		m_CharactersConsumedCount = 0;
 
 		m_FoundFloatingDot = false;
+		m_StringDelimiter = -1;
 
 		_NextCharacter();
 
@@ -145,6 +146,12 @@ namespace ExLibris
 		else if (m_CharacterCurrent == '\n')
 		{
 			m_TokenCurrent.type = Token::eType_NewLine;
+
+			return _RecursiveReadToken();
+		}
+		else if (m_CharacterCurrent == '\"' || m_CharacterCurrent == '\'')
+		{
+			m_TokenCurrent.type = Token::eType_String;
 
 			return _RecursiveReadToken();
 		}
@@ -184,6 +191,65 @@ namespace ExLibris
 
 		switch (m_TokenCurrent.type)
 		{
+
+		case Token::eType_String:
+			{
+				if (_TryConsume(m_StringDelimiter))
+				{
+					return true;
+				}
+				else if (m_CharactersConsumedCount == 0 && (_TryConsume('\'') || _TryConsume('\"')))
+				{
+					m_StringDelimiter = m_CharacterCurrent;
+				}
+				else if (m_CharacterCurrent == '\r')
+				{
+					_NextCharacter();
+
+					if (m_CharacterCurrent == '\n' || !_IsNextAvailable())
+					{
+						// undo consumed
+
+						_Revert(m_CharactersRead.size());
+
+						// quote character was just a symbol
+
+						m_TokenCurrent.type = Token::eType_Symbol;
+						m_TokenCurrent.text.clear();
+						_NextCharacter();
+						_AddCurrentToToken();
+
+						return true;
+					}
+					else
+					{
+						_Revert(2);
+
+						_NextCharacter();
+						_AddCurrentToToken();
+					}
+				}
+				else if (m_CharacterCurrent == '\n' || !_IsNextAvailable())
+				{
+					// undo consumed
+
+					_Revert(m_CharactersRead.size());
+
+					// quote character was just a symbol
+
+					m_TokenCurrent.type = Token::eType_Symbol;
+					m_TokenCurrent.text.clear();
+					_NextCharacter();
+					_AddCurrentToToken();
+
+					return true;
+				}
+				else
+				{
+					_AddCurrentToToken();
+				}
+
+			} break;
 
 		case Token::eType_Integer:
 			{
