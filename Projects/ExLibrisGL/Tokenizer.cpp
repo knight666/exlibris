@@ -31,44 +31,32 @@ namespace ExLibris
 
 
 #define TYPE_CLASS_NAME(_name) CharacterType##_name
-#define TYPE_CLASS(_name, ...) \
+#define TYPE_CLASS(_name, _condition) \
 	class TYPE_CLASS_NAME(_name) { \
 		public: \
-			static inline bool IsKnown(int a_Character) { \
-				static const int identifiers[] = { __VA_ARGS__ }; \
-				static const int identifiers_size = sizeof(identifiers) / sizeof(int); \
-				for (int i = 0; i < identifiers_size; ++i) { \
-					if (a_Character == identifiers[i]) { return true; } \
-				} \
-				return false; \
+			static inline bool IsKnown(int c) { \
+				return _condition; \
 			} \
-	} \
+	}
 
-	TYPE_CLASS(Digit,
-		'0', '1', '2', '3', '4',
-		'5', '6', '7', '8', '9'
-	);
-	TYPE_CLASS(Octal,
-		'0', '1', '2', '3',
-		'4', '5', '6', '7'
-	);
-	TYPE_CLASS(Hexadecimal,
-		'0', '1', '2', '3', '4',
-		'5', '6', '7', '8', '9',
-		'a', 'b', 'c', 'd', 'e', 'f',
-		'A', 'B', 'C', 'D', 'E', 'F',
-	);
-	TYPE_CLASS(Symbol, 
-		'!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', 
-		',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', 
-		'[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'
-	);
-	TYPE_CLASS(Whitespace,
-		' ', '\t'
-	);
-	TYPE_CLASS(NewLine,
-		'\r', '\n'
-	);
+	TYPE_CLASS(Digit, (c >= '0' && c <= '9'));
+	TYPE_CLASS(Octal, (c >= '0' && c <= '7'));
+	TYPE_CLASS(Hexadecimal, (
+		(c >= '0' && c <= '9') || 
+		(c >= 'a' && c <= 'f') ||
+		(c >= 'A' && c <= 'F')
+	));
+	TYPE_CLASS(Symbol, (
+		c == '!' || c == '\"' || c == '#' || c == '$' || c == '%' ||
+		c == '&' || c == '\'' || c == '(' || c == ')' || c == '*' ||
+		c == '+' || c == ',' || c == '-' || c == '.' || c == '/' ||
+		c == ':' || c == ';' || c == '<' || c == '=' || c == '>' ||
+		c == '?' || c == '@' || c == '[' || c == '\\' || c == ']' ||
+		c == '^' || c == '_' || c == '`' || c == '{' || c == '|' ||
+		c == '}' || c == '~'
+	));
+	TYPE_CLASS(Whitespace, (c == ' ' || c == '\t'));
+	TYPE_CLASS(NewLine, (c == '\r' || c == '\n'));
 
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(nullptr)
