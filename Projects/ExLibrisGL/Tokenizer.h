@@ -90,6 +90,7 @@ namespace ExLibris
 		std::deque<int> m_CharactersRead;
 		int m_CharactersConsumedCount;
 		bool m_FoundFloatingDot;
+		int m_StringDelimiter;
 
 		int m_CharacterCurrent;
 		std::deque<int> m_CharacterQueue;
