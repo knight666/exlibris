@@ -73,6 +73,7 @@ namespace ExLibris
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Stream(nullptr)
 		, m_StreamEnd(false)
+		, m_TabWidth(4)
 		, m_CharactersConsumedCount(0)
 		, m_FoundFloatingDot(false)
 		, m_CharacterCurrent(-1)
@@ -92,6 +93,11 @@ namespace ExLibris
 
 		m_Column = 1;
 		m_Line = 1;
+	}
+
+	void Tokenizer::SetTabWidth(size_t a_Width)
+	{
+		m_TabWidth = std::max<size_t>(1, a_Width);
 	}
 
 	const Token& Tokenizer::GetCurrentToken() const
@@ -152,6 +158,12 @@ namespace ExLibris
 		else if (m_CharacterCurrent == '\"' || m_CharacterCurrent == '\'')
 		{
 			m_TokenCurrent.type = Token::eType_String;
+
+			return _RecursiveReadToken();
+		}
+		else if (m_CharacterCurrent == ' ' || m_CharacterCurrent == '\t')
+		{
+			m_TokenCurrent.type = Token::eType_Whitespace;
 
 			return _RecursiveReadToken();
 		}
@@ -407,6 +419,27 @@ namespace ExLibris
 					}
 				}
 				else if (!_TryConsumeOne<CharacterTypeDigit>())
+				{
+					handled = true;
+				}
+
+			} break;
+
+		case Token::eType_Whitespace:
+			{
+				if (_TryConsume('\t'))
+				{
+					// tab position is determined from index, not column
+
+					m_Column = m_TokenCurrent.column + (m_TabWidth - ((m_TokenCurrent.column - 1) % m_TabWidth));
+
+					return true;
+				}
+				else if (_TryConsume(' '))
+				{
+					return true;
+				}
+				else
 				{
 					handled = true;
 				}

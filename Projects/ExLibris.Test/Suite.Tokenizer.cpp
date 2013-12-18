@@ -200,10 +200,84 @@ TEST(Tokenizer, ReadText)
 	EXPECT_END_TOKEN(7, 1);
 }
 
-TEST(Tokenizer, ReadWhitespace)
+TEST(Tokenizer, ReadWhitespaceSpace)
 {
 	std::stringstream ss;
-	ss << "    \t   \t   ";
+	ss << " ";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_END_TOKEN(2, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceThreeSpaces)
+{
+	std::stringstream ss;
+	ss << "   ";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 3, 1);
+	EXPECT_END_TOKEN(4, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceTab)
+{
+	std::stringstream ss;
+	ss << "\t";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 1, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceSpaceAndTab)
+{
+	std::stringstream ss;
+	ss << " \t";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 2, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceTwoSpacesAndTab)
+{
+	std::stringstream ss;
+	ss << "  \t";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 3, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceThreeSpacesAndTab)
+{
+	std::stringstream ss;
+	ss << "   \t";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 3, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 4, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceFourSpacesAndTab)
+{
+	std::stringstream ss;
+	ss << "    \t";
 
 	Tokenizer tk(&ss);
 
@@ -212,14 +286,51 @@ TEST(Tokenizer, ReadWhitespace)
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 3, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 4, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 5, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 6, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 8, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 9, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 10, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 12, 1);
-	EXPECT_END_TOKEN(13, 1);
+	EXPECT_END_TOKEN(9, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceTwoTabs)
+{
+	std::stringstream ss;
+	ss << "\t\ts";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 5, 1);
+	EXPECT_TOKEN(Token::eType_Text, "s", 9, 1);
+	EXPECT_END_TOKEN(10, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceTabWidthTwo)
+{
+	std::stringstream ss;
+	ss << "\t \t\t";
+
+	Tokenizer tk(&ss);
+	tk.SetTabWidth(2);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 3, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 4, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 5, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(Tokenizer, ReadWhitespaceTabWidthZero)
+{
+	std::stringstream ss;
+	ss << " \t\t  ";
+
+	Tokenizer tk(&ss);
+	tk.SetTabWidth(0);
+
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 1, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 2, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 3, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 4, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 5, 1);
+	EXPECT_END_TOKEN(6, 1);
 }
 
 TEST(Tokenizer, ReadSentence)

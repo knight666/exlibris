@@ -39,6 +39,8 @@ namespace ExLibris
 
 		void SetInput(std::basic_istream<char>* a_Stream);
 
+		void SetTabWidth(size_t a_Width);
+
 		const Token& GetCurrentToken() const;
 
 		bool IsNextTokenAvailable() const;
@@ -85,6 +87,8 @@ namespace ExLibris
 
 		std::basic_istream<char>* m_Stream;
 		bool m_StreamEnd;
+
+		size_t m_TabWidth;
 
 		Token m_TokenCurrent;
 		std::deque<int> m_CharactersRead;
