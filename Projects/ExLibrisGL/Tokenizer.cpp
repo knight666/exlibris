@@ -104,24 +104,22 @@ namespace ExLibris
 
 	bool Tokenizer::ReadToken()
 	{
-		m_TokenCurrent.text.clear();
-		m_TokenCurrent.column = m_Column;
-		m_TokenCurrent.line = m_Line;
-
-		if (!_IsNextAvailable())
-		{
-			m_TokenCurrent.type = Token::eType_End;
-
-			return false;
-		}
-
 		m_CharactersRead.clear();
 		m_CharactersConsumedCount = 0;
 
 		m_FoundFloatingDot = false;
 		m_StringDelimiter = -1;
 
-		_NextCharacter();
+		m_TokenCurrent.text.clear();
+		m_TokenCurrent.column = m_Column;
+		m_TokenCurrent.line = m_Line;
+
+		if (!_IsNextAvailable() || !_NextCharacter())
+		{
+			m_TokenCurrent.type = Token::eType_End;
+
+			return false;
+		}
 
 		if (m_CharacterCurrent == '.')
 		{
@@ -549,7 +547,7 @@ namespace ExLibris
 		return ((m_Stream != nullptr) && !m_Stream->eof()) || (m_CharacterQueue.size() > 0);
 	}
 
-	void Tokenizer::_NextCharacter()
+	bool Tokenizer::_NextCharacter()
 	{
 		bool add = false;
 
@@ -573,6 +571,8 @@ namespace ExLibris
 		}
 
 		m_Column++;
+
+		return add;
 	}
 
 	void Tokenizer::_Revert(int a_Count)
