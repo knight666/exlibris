@@ -46,6 +46,10 @@ namespace ExLibris
 		(c >= 'a' && c <= 'f') ||
 		(c >= 'A' && c <= 'F')
 	));
+	TYPE_CLASS(Alphabetical, (
+		(c >= 'A' && c <= 'Z') ||
+		(c >= 'a' && c <= 'z')
+	));
 	TYPE_CLASS(Symbol, (
 		c == '!' || c == '\"' || c == '#' || c == '$' || c == '%' ||
 		c == '&' || c == '\'' || c == '(' || c == ')' || c == '*' ||
@@ -161,6 +165,12 @@ namespace ExLibris
 
 			return _RecursiveReadToken();
 		}
+		else if (_IsCharacterOfType<CharacterTypeAlphabetical>(m_CharacterCurrent))
+		{
+			m_TokenCurrent.type = Token::eType_Text;
+
+			return _RecursiveReadToken();
+		}
 		else if (_TryConsumeOne<CharacterTypeSymbol>())
 		{
 			m_TokenCurrent.type = Token::eType_Symbol;
@@ -197,6 +207,26 @@ namespace ExLibris
 
 		switch (m_TokenCurrent.type)
 		{
+
+		case Token::eType_Text:
+			{
+				if (!_IsNextAvailable())
+				{
+					_TryConsumeOne<CharacterTypeAlphabetical>();
+
+					return true;
+				}
+				else if (!_TryConsumeOne<CharacterTypeAlphabetical>())
+				{
+					if (_IsNextAvailable())
+					{
+						_Revert(1);
+					}
+
+					return true;
+				}
+
+			} break;
 
 		case Token::eType_String:
 			{
