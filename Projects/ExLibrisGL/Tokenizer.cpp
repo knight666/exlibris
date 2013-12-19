@@ -108,6 +108,7 @@ namespace ExLibris
 		m_CharactersConsumedCount = 0;
 
 		m_FoundFloatingDot = false;
+		m_FoundScientificSign = false;
 		m_StringDelimiter = -1;
 
 		m_TokenCurrent.text.clear();
@@ -328,6 +329,12 @@ namespace ExLibris
 
 					return true;
 				}
+				else if (_Match2('e', 'E'))
+				{
+					m_TokenCurrent.type = Token::eType_Scientific;
+
+					return _RecursiveReadToken();
+				}
 				else if (m_CharacterCurrent == '.')
 				{
 					if (m_FoundFloatingDot)
@@ -398,6 +405,33 @@ namespace ExLibris
 					}
 				}
 				else if (!_TryConsumeOne<CharacterTypeDigit>())
+				{
+					handled = true;
+				}
+
+			} break;
+
+		case Token::eType_Scientific:
+			{
+				if (_Match2('e', 'E'))
+				{
+					int natural_log = m_CharacterCurrent;
+
+					if (_NextCharacter() && _Match2('-', '+'))
+					{
+						_AddToToken(natural_log);
+						_AddCurrentToToken();
+					}
+					else
+					{
+						_Revert(2);
+
+						m_TokenCurrent.type = Token::eType_Number;
+
+						m_FoundScientificSign = true;
+					}
+				}
+				else if (!_IsNextCharacterAvailable() || _TryConsume2('f', 'F') || !_TryConsumeOne<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
@@ -542,26 +576,6 @@ namespace ExLibris
 		}
 
 		m_Column -= added;
-	}
-
-	void Tokenizer::_AddCurrentToToken()
-	{
-		m_TokenCurrent.text.push_back((char)m_CharacterCurrent);
-		m_CharactersConsumedCount++;
-	}
-
-	bool Tokenizer::_TryConsume(int a_Character)
-	{
-		if (m_CharacterCurrent == a_Character)
-		{
-			_AddCurrentToToken();
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 
 }; // namespace ExLibris

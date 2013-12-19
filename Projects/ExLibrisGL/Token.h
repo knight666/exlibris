@@ -44,6 +44,7 @@ namespace ExLibris
 			eType_Octal,
 			eType_Hexadecimal,
 			eType_Number,
+			eType_Scientific,
 			eType_End
 		};
 

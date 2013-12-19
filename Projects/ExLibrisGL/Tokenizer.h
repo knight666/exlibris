@@ -53,7 +53,16 @@ namespace ExLibris
 		bool _IsNextCharacterAvailable() const;
 		bool _NextCharacter();
 		void _Revert(int a_Count);
-		void _AddCurrentToToken();
+
+		inline void _AddToToken(int a_Character)
+		{
+			m_TokenCurrent.text.push_back((char)a_Character);
+			m_CharactersConsumedCount++;
+		}
+		inline void _AddCurrentToToken()
+		{
+			_AddToToken(m_CharacterCurrent);
+		}
 		
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
@@ -61,7 +70,43 @@ namespace ExLibris
 		template<typename CharacterType>
 		bool _TryConsumeOne();
 
-		bool _TryConsume(int a_Character);
+		inline bool _Match(int a_A) const
+		{
+			return (m_CharacterCurrent == a_A);
+		}
+
+		inline bool _Match2(int a_A, int a_B) const
+		{
+			return (m_CharacterCurrent == a_A || m_CharacterCurrent == a_B);
+		}
+
+		inline bool _TryConsume(int a_Character)
+		{
+			if (m_CharacterCurrent == a_Character)
+			{
+				_AddCurrentToToken();
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		inline bool _TryConsume2(int a_A, int a_B)
+		{
+			if (m_CharacterCurrent == a_A || m_CharacterCurrent == a_B)
+			{
+				_AddCurrentToToken();
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
 	private:
 
@@ -74,6 +119,7 @@ namespace ExLibris
 		std::deque<int> m_CharactersRead;
 		int m_CharactersConsumedCount;
 		bool m_FoundFloatingDot;
+		bool m_FoundScientificSign;
 		int m_StringDelimiter;
 
 		int m_CharacterCurrent;
