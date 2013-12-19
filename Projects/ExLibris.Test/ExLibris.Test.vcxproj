@@ -90,6 +90,7 @@
     <ClCompile Include="Suite.Tokenizer.NewLine.cpp" />
     <ClCompile Include="Suite.Tokenizer.Number.cpp" />
     <ClCompile Include="Suite.Tokenizer.Octal.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Scientific.cpp" />
     <ClCompile Include="Suite.Tokenizer.String.cpp" />
     <ClCompile Include="Suite.Tokenizer.Symbol.cpp" />
     <ClCompile Include="Suite.Tokenizer.Text.cpp" />
