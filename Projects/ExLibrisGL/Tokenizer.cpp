@@ -124,59 +124,46 @@ namespace ExLibris
 		if (m_CharacterCurrent == '.')
 		{
 			m_TokenCurrent.type = Token::eType_Number;
-
-			return _RecursiveReadToken();
 		}
 		else if (m_CharacterCurrent == '0')
 		{
 			m_TokenCurrent.type = Token::eType_Octal;
-
-			return _RecursiveReadToken();
 		}
 		else if (m_CharacterCurrent == '\r')
 		{
 			m_TokenCurrent.type = Token::eType_Unprintable;
-
-			return _RecursiveReadToken();
 		}
 		else if (m_CharacterCurrent == '\n')
 		{
 			m_TokenCurrent.type = Token::eType_NewLine;
-
-			return _RecursiveReadToken();
 		}
 		else if (m_CharacterCurrent == '\"' || m_CharacterCurrent == '\'')
 		{
 			m_TokenCurrent.type = Token::eType_String;
-
-			return _RecursiveReadToken();
 		}
 		else if (m_CharacterCurrent == ' ' || m_CharacterCurrent == '\t')
 		{
 			m_TokenCurrent.type = Token::eType_Whitespace;
-
-			return _RecursiveReadToken();
 		}
 		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
-
-			return _RecursiveReadToken();
-		}
-		else if (_IsCharacterOfType<CharacterTypeAlphabetical>(m_CharacterCurrent))
-		{
-			m_TokenCurrent.type = Token::eType_Text;
-
-			return _RecursiveReadToken();
 		}
 		else if (_TryConsumeOne<CharacterTypeSymbol>())
 		{
+			// note that a symbol is always a single character,
+			// so we don't need to call the recursive method
+
 			m_TokenCurrent.type = Token::eType_Symbol;
 
 			return true;
 		}
+		else
+		{
+			m_TokenCurrent.type = Token::eType_Text;
+		}
 
-		return true;
+		return _RecursiveReadToken();
 	}
 
 	bool Tokenizer::_RecursiveReadToken()
