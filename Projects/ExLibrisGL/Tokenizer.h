@@ -50,8 +50,7 @@ namespace ExLibris
 
 		bool _RecursiveReadToken();
 
-		bool _IsNextAvailable() const;
-		bool _ReadNextCharacter();
+		bool _IsNextCharacterAvailable() const;
 		bool _NextCharacter();
 		void _Revert(int a_Count);
 		void _AddCurrentToToken();

@@ -114,7 +114,7 @@ namespace ExLibris
 		m_TokenCurrent.column = m_Column;
 		m_TokenCurrent.line = m_Line;
 
-		if (!_IsNextAvailable() || !_NextCharacter())
+		if (!_IsNextCharacterAvailable() || !_NextCharacter())
 		{
 			m_TokenCurrent.type = Token::eType_End;
 
@@ -188,7 +188,7 @@ namespace ExLibris
 
 		case Token::eType_Text:
 			{
-				if (!_IsNextAvailable())
+				if (!_IsNextCharacterAvailable())
 				{
 					_TryConsumeOne<CharacterTypeAlphabetical>();
 
@@ -196,7 +196,7 @@ namespace ExLibris
 				}
 				else if (!_TryConsumeOne<CharacterTypeAlphabetical>())
 				{
-					if (_IsNextAvailable())
+					if (_IsNextCharacterAvailable())
 					{
 						_Revert(1);
 					}
@@ -220,7 +220,7 @@ namespace ExLibris
 				{
 					_NextCharacter();
 
-					if (m_CharacterCurrent == '\n' || !_IsNextAvailable())
+					if (m_CharacterCurrent == '\n' || !_IsNextCharacterAvailable())
 					{
 						// undo consumed
 
@@ -243,7 +243,7 @@ namespace ExLibris
 						_AddCurrentToToken();
 					}
 				}
-				else if (m_CharacterCurrent == '\n' || !_IsNextAvailable())
+				else if (m_CharacterCurrent == '\n' || !_IsNextCharacterAvailable())
 				{
 					// undo consumed
 
@@ -308,7 +308,7 @@ namespace ExLibris
 
 		case Token::eType_Hexadecimal:
 			{
-				if (!_TryConsumeOne<CharacterTypeHexadecimal>())
+				if (!_IsNextCharacterAvailable() || !_TryConsumeOne<CharacterTypeHexadecimal>())
 				{
 					if (m_CharactersConsumedCount == 2)
 					{
@@ -366,7 +366,7 @@ namespace ExLibris
 
 							m_FoundFloatingDot = true;
 						}
-						else if (!_IsNextAvailable())
+						else if (!_IsNextCharacterAvailable())
 						{
 							if (m_CharactersConsumedCount == 0)
 							{
@@ -383,10 +383,6 @@ namespace ExLibris
 
 								m_TokenCurrent.type = Token::eType_Integer;
 							}
-
-							// make sure the next token starts at the correct position
-
-							m_Column--;
 
 							return true;
 						}
@@ -460,13 +456,9 @@ namespace ExLibris
 					{
 						// just a carriage return
 
-						if (_IsNextAvailable())
+						if (_IsNextCharacterAvailable())
 						{
 							_Revert(1);
-						}
-						else
-						{
-							m_Column--;
 						}
 
 						return true;
@@ -495,7 +487,7 @@ namespace ExLibris
 
 		}
 
-		bool next_available = _IsNextAvailable();
+		bool next_available = _IsNextCharacterAvailable();
 
 		if (handled)
 		{
@@ -510,44 +502,44 @@ namespace ExLibris
 		{
 			if (next_available)
 			{
-				_ReadNextCharacter();
+				_NextCharacter();
 			}
 
 			return _RecursiveReadToken();
 		}
 	}
 
-	bool Tokenizer::_IsNextAvailable() const
+	bool Tokenizer::_IsNextCharacterAvailable() const
 	{
 		return ((m_Stream != nullptr) && !m_Stream->eof()) || (m_CharacterQueue.size() > 0);
 	}
 
 	bool Tokenizer::_NextCharacter()
 	{
-		bool add = false;
+		bool next_available = false;
 
 		if (m_CharacterQueue.size() > 0)
 		{
 			m_CharacterCurrent = m_CharacterQueue.front();
 			m_CharacterQueue.pop_front();
 
-			add = true;
+			next_available = true;
 		}
 		else if (m_Stream != nullptr && !m_Stream->eof())
 		{
 			m_CharacterCurrent = m_Stream->get();
 
-			add = !m_Stream->eof();
+			next_available = !m_Stream->eof();
 		}
 
-		if (add)
+		if (next_available)
 		{
 			m_CharactersRead.push_back(m_CharacterCurrent);
+
+			m_Column++;
 		}
 
-		m_Column++;
-
-		return add;
+		return next_available;
 	}
 
 	void Tokenizer::_Revert(int a_Count)
@@ -583,38 +575,6 @@ namespace ExLibris
 		{
 			return false;
 		}
-	}
-
-	bool Tokenizer::_ReadNextCharacter()
-	{
-		bool next_available = false;
-
-		if (m_CharacterQueue.size() > 0)
-		{
-			next_available = true;
-
-			m_CharacterCurrent = m_CharacterQueue.front();
-			m_CharacterQueue.pop_front();
-		}
-		else
-		{
-			next_available = (m_Stream != nullptr) && !m_Stream->eof();
-			if (next_available)
-			{
-				m_CharacterCurrent = m_Stream->get();
-
-				next_available = !m_Stream->eof();
-			}
-		}
-
-		if (next_available)
-		{
-			m_Column++;
-
-			m_CharactersRead.push_back(m_CharacterCurrent);
-		}
-
-		return next_available;
 	}
 
 }; // namespace ExLibris
