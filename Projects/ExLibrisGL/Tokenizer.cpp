@@ -295,7 +295,7 @@ namespace ExLibris
 
 		case Token::eType_Hexadecimal:
 			{
-				if (!_IsNextCharacterAvailable() || !_TryConsumeOne<CharacterTypeHexadecimal>())
+				if (!_TryConsumeOne<CharacterTypeHexadecimal>())
 				{
 					if (m_CharactersConsumedCount == 2)
 					{
