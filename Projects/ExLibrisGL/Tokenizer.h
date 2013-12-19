@@ -68,16 +68,22 @@ namespace ExLibris
 		bool _IsCharacterOfType(int a_Character);
 
 		template<typename CharacterType>
-		bool _TryConsumeOne();
+		bool _TryConsumeType();
 
 		inline bool _Match(int a_A) const
 		{
 			return (m_CharacterCurrent == a_A);
 		}
 
-		inline bool _Match2(int a_A, int a_B) const
+		inline bool _MatchEither(int a_A, int a_B) const
 		{
 			return (m_CharacterCurrent == a_A || m_CharacterCurrent == a_B);
+		}
+
+		template<typename CharacterType>
+		inline bool _MatchType() const
+		{
+			return (CharacterType::IsKnown(m_CharacterCurrent));
 		}
 
 		inline bool _TryConsume(int a_Character)
@@ -94,7 +100,7 @@ namespace ExLibris
 			}
 		}
 
-		inline bool _TryConsume2(int a_A, int a_B)
+		inline bool _TryConsumeEither(int a_A, int a_B)
 		{
 			if (m_CharacterCurrent == a_A || m_CharacterCurrent == a_B)
 			{
@@ -120,6 +126,7 @@ namespace ExLibris
 		int m_CharactersConsumedCount;
 		bool m_FoundFloatingDot;
 		bool m_FoundScientificSign;
+		Token::Type m_ScientificTypeRestore;
 		int m_StringDelimiter;
 
 		int m_CharacterCurrent;
@@ -140,7 +147,7 @@ namespace ExLibris
 	}
 
 	template<typename CharacterType>
-	inline bool Tokenizer::_TryConsumeOne()
+	inline bool Tokenizer::_TryConsumeType()
 	{
 		if (CharacterType::IsKnown(m_CharacterCurrent))
 		{

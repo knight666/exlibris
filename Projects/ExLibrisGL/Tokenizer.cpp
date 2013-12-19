@@ -150,7 +150,7 @@ namespace ExLibris
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
 		}
-		else if (_TryConsumeOne<CharacterTypeSymbol>())
+		else if (_TryConsumeType<CharacterTypeSymbol>())
 		{
 			// note that a symbol is always a single character,
 			// so we don't need to call the recursive method
@@ -176,21 +176,17 @@ namespace ExLibris
 
 		case Token::eType_Text:
 			{
-				if (!_IsNextCharacterAvailable())
+				while (_TryConsumeType<CharacterTypeAlphabetical>())
 				{
-					_TryConsumeOne<CharacterTypeAlphabetical>();
-
-					return true;
-				}
-				else if (!_TryConsumeOne<CharacterTypeAlphabetical>())
-				{
-					if (_IsNextCharacterAvailable())
+					if (!_NextCharacter())
 					{
-						_Revert(1);
+						return true;
 					}
-
-					return true;
 				}
+
+				_Revert(1);
+
+				return true;
 
 			} break;
 
@@ -200,15 +196,15 @@ namespace ExLibris
 				{
 					return true;
 				}
-				else if (m_CharactersConsumedCount == 0 && (_TryConsume('\'') || _TryConsume('\"')))
+				else if (m_CharactersConsumedCount == 0 && _TryConsumeEither('\'', '\"'))
 				{
 					m_StringDelimiter = m_CharacterCurrent;
 				}
-				else if (m_CharacterCurrent == '\r')
+				else if (_Match('\r'))
 				{
 					_NextCharacter();
 
-					if (m_CharacterCurrent == '\n' || !_IsNextCharacterAvailable())
+					if (_Match('\n') || !_IsNextCharacterAvailable())
 					{
 						// undo consumed
 
@@ -231,7 +227,7 @@ namespace ExLibris
 						_AddCurrentToToken();
 					}
 				}
-				else if (m_CharacterCurrent == '\n' || !_IsNextCharacterAvailable())
+				else if (_Match('\n') || !_IsNextCharacterAvailable())
 				{
 					// undo consumed
 
@@ -255,13 +251,19 @@ namespace ExLibris
 
 		case Token::eType_Integer:
 			{
-				if (m_CharacterCurrent == '.')
+				if (_Match('.'))
 				{
 					m_TokenCurrent.type = Token::eType_Number;
 
 					return _RecursiveReadToken();
 				}
-				else if (!_TryConsumeOne<CharacterTypeDigit>())
+				else if (_MatchEither('e', 'E'))
+				{
+					m_TokenCurrent.type = Token::eType_Scientific;
+
+					return _RecursiveReadToken();
+				}
+				else if (!_TryConsumeType<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
@@ -270,9 +272,17 @@ namespace ExLibris
 
 		case Token::eType_Octal:
 			{
-				if (m_CharacterCurrent == '.')
+				if (_Match('.'))
 				{
 					m_TokenCurrent.type = Token::eType_Number;
+
+					return _RecursiveReadToken();
+				}
+				else if (_MatchEither('e', 'E'))
+				{
+					m_ScientificTypeRestore = m_TokenCurrent.type;
+
+					m_TokenCurrent.type = Token::eType_Scientific;
 
 					return _RecursiveReadToken();
 				}
@@ -280,7 +290,7 @@ namespace ExLibris
 				{
 					m_TokenCurrent.type = Token::eType_Hexadecimal;
 				}
-				else if (!_TryConsumeOne<CharacterTypeOctal>())
+				else if (!_TryConsumeType<CharacterTypeOctal>())
 				{
 					if (m_CharactersConsumedCount == 1)
 					{
@@ -296,7 +306,7 @@ namespace ExLibris
 
 		case Token::eType_Hexadecimal:
 			{
-				if (!_TryConsumeOne<CharacterTypeHexadecimal>())
+				if (!_TryConsumeType<CharacterTypeHexadecimal>())
 				{
 					if (m_CharactersConsumedCount == 2)
 					{
@@ -329,8 +339,10 @@ namespace ExLibris
 
 					return true;
 				}
-				else if (_Match2('e', 'E'))
+				else if (!m_FoundScientificSign && _MatchEither('e', 'E'))
 				{
+					m_ScientificTypeRestore = m_TokenCurrent.type;
+
 					m_TokenCurrent.type = Token::eType_Scientific;
 
 					return _RecursiveReadToken();
@@ -352,7 +364,7 @@ namespace ExLibris
 					{
 						_NextCharacter();
 
-						if (m_CharacterCurrent == 'f' || m_CharacterCurrent == 'F' || _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+						if (_MatchEither('f', 'F') || _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
 						{
 							m_TokenCurrent.text.push_back('.');
 
@@ -404,7 +416,7 @@ namespace ExLibris
 						}
 					}
 				}
-				else if (!_TryConsumeOne<CharacterTypeDigit>())
+				else if (!_TryConsumeType<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
@@ -413,25 +425,39 @@ namespace ExLibris
 
 		case Token::eType_Scientific:
 			{
-				if (_Match2('e', 'E'))
+				if (_MatchEither('e', 'E'))
 				{
-					int natural_log = m_CharacterCurrent;
+					int queued[3] = { m_CharacterCurrent, 0, 0 };
+					int found = 1;
 
-					if (_NextCharacter() && _Match2('-', '+'))
+					size_t found_start = m_CharactersRead.size();
+
+					if (_NextCharacter() && _MatchEither('-', '+'))
 					{
-						_AddToToken(natural_log);
-						_AddCurrentToToken();
+						queued[found++] = m_CharacterCurrent;
+
+						if (_NextCharacter() && _MatchType<CharacterTypeDigit>())
+						{
+							queued[found++] = m_CharacterCurrent;
+						}
+					}
+
+					if (found == 3)
+					{
+						_AddToToken(queued[0]);
+						_AddToToken(queued[1]);
+						_AddToToken(queued[2]);
 					}
 					else
 					{
-						_Revert(2);
+						_Revert(m_CharactersRead.size() - found_start + 1);
 
 						m_TokenCurrent.type = Token::eType_Number;
 
-						m_FoundScientificSign = true;
+						return true;
 					}
 				}
-				else if (!_IsNextCharacterAvailable() || _TryConsume2('f', 'F') || !_TryConsumeOne<CharacterTypeDigit>())
+				else if (!_IsNextCharacterAvailable() || _TryConsumeEither('f', 'F') || !_TryConsumeType<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
