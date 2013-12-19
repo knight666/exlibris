@@ -50,38 +50,19 @@ namespace ExLibris
 
 		bool _RecursiveReadToken();
 
-		bool _IsNextCharacterAvailable() const;
 		bool _IsNextAvailable() const;
 		bool _ReadNextCharacter();
 		bool _NextCharacter();
 		void _Revert(int a_Count);
 		void _AddCurrentToToken();
-		void _QueueCurrentCharacter();
-		void _UndoConsumed();
 		
 		template<typename CharacterType>
 		bool _IsCharacterOfType(int a_Character);
 
-		Token::Type _GetTypeForCharacter(int a_Character);
-
 		template<typename CharacterType>
 		bool _TryConsumeOne();
 
-		template<typename CharacterType>
-		bool _TryConsumeOneOrMore();
-
 		bool _TryConsume(int a_Character);
-
-		bool _ConsumeNumber();
-		bool _ConsumeNumberInteger();
-		bool _ConsumeNumberOctal();
-		bool _ConsumeNumberHexadecimal();
-		bool _ConsumeNumberFloat();
-		bool _ConsumeString();
-		bool _ConsumeSymbol();
-		bool _ConsumeWhitespace();
-		bool _ConsumeNewLine();
-		void _ConsumeText();
 
 	private:
 
@@ -119,27 +100,6 @@ namespace ExLibris
 		if (CharacterType::IsKnown(m_CharacterCurrent))
 		{
 			_AddCurrentToToken();
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	template<typename CharacterType>
-	inline bool Tokenizer::_TryConsumeOneOrMore()
-	{
-		if (_IsCharacterOfType<CharacterType>(m_CharacterCurrent))
-		{
-			do 
-			{
-				_AddCurrentToToken();
-
-				_NextCharacter();
-			}
-			while (!m_StreamEnd && _IsCharacterOfType<CharacterType>(m_CharacterCurrent));
 
 			return true;
 		}
