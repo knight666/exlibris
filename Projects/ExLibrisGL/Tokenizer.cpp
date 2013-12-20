@@ -67,7 +67,7 @@ namespace ExLibris
 		, m_StreamEnd(false)
 		, m_TabWidth(4)
 		, m_CharactersConsumedCount(0)
-		, m_FoundFloatingDot(false)
+		, m_NumberFoundDot(false)
 		, m_CharacterCurrent(-1)
 		, m_Column(0)
 		, m_Line(0)
@@ -107,7 +107,7 @@ namespace ExLibris
 		m_CharactersRead.clear();
 		m_CharactersConsumedCount = 0;
 
-		m_FoundFloatingDot = false;
+		m_NumberFoundDot = false;
 		m_StringDelimiter = -1;
 
 		m_TokenCurrent.text.clear();
@@ -121,31 +121,31 @@ namespace ExLibris
 			return false;
 		}
 
-		if (m_CharacterCurrent == '.')
+		if (_Match('.'))
 		{
 			m_TokenCurrent.type = Token::eType_Number;
 		}
-		else if (m_CharacterCurrent == '0')
+		else if (_Match('0'))
 		{
 			m_TokenCurrent.type = Token::eType_Octal;
 		}
-		else if (m_CharacterCurrent == '\r')
+		else if (_Match('\r'))
 		{
 			m_TokenCurrent.type = Token::eType_Unprintable;
 		}
-		else if (m_CharacterCurrent == '\n')
+		else if (_Match('\n'))
 		{
 			m_TokenCurrent.type = Token::eType_NewLine;
 		}
-		else if (m_CharacterCurrent == '\"' || m_CharacterCurrent == '\'')
+		else if (_MatchEither('\"', '\''))
 		{
 			m_TokenCurrent.type = Token::eType_String;
 		}
-		else if (m_CharacterCurrent == ' ' || m_CharacterCurrent == '\t')
+		else if (_MatchEither(' ', '\t'))
 		{
 			m_TokenCurrent.type = Token::eType_Whitespace;
 		}
-		else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+		else if (_MatchType<CharacterTypeDigit>())
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
 		}
@@ -350,7 +350,7 @@ namespace ExLibris
 				}
 				else if (m_CharacterCurrent == '.')
 				{
-					if (m_FoundFloatingDot)
+					if (m_NumberFoundDot)
 					{
 						if (m_CharactersConsumedCount == 0)
 						{
@@ -372,12 +372,12 @@ namespace ExLibris
 
 								return true;
 							}
-							else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+							else if (_MatchType<CharacterTypeDigit>())
 							{
 								_AddToToken('.');
 								_AddCurrentToToken();
 
-								m_FoundFloatingDot = true;
+								m_NumberFoundDot = true;
 							}
 							else
 							{

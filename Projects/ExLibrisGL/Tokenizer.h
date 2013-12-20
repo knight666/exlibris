@@ -63,12 +63,6 @@ namespace ExLibris
 		{
 			_AddToToken(m_CharacterCurrent);
 		}
-		
-		template<typename CharacterType>
-		bool _IsCharacterOfType(int a_Character);
-
-		template<typename CharacterType>
-		bool _TryConsumeType();
 
 		inline bool _Match(int a_A) const
 		{
@@ -114,6 +108,21 @@ namespace ExLibris
 			}
 		}
 
+		template<typename CharacterType>
+		inline bool _TryConsumeType()
+		{
+			if (CharacterType::IsKnown(m_CharacterCurrent))
+			{
+				_AddCurrentToToken();
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 	private:
 
 		std::basic_istream<char>* m_Stream;
@@ -124,7 +133,8 @@ namespace ExLibris
 		Token m_TokenCurrent;
 		std::deque<int> m_CharactersRead;
 		int m_CharactersConsumedCount;
-		bool m_FoundFloatingDot;
+
+		bool m_NumberFoundDot;
 		Token::Type m_ScientificTypeRestore;
 		int m_StringDelimiter;
 
@@ -138,26 +148,5 @@ namespace ExLibris
 		int m_Line;
 	
 	}; // class Tokenizer
-
-	template<typename CharacterType>
-	inline bool Tokenizer::_IsCharacterOfType(int a_Character)
-	{
-		return (CharacterType::IsKnown(a_Character));
-	}
-
-	template<typename CharacterType>
-	inline bool Tokenizer::_TryConsumeType()
-	{
-		if (CharacterType::IsKnown(m_CharacterCurrent))
-		{
-			_AddCurrentToToken();
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
 
 }; // namespace ExLibris
