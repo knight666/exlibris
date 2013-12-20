@@ -362,52 +362,61 @@ namespace ExLibris
 					}
 					else
 					{
-						_NextCharacter();
-
-						if (_MatchEither('f', 'F') || _IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+						if (_NextCharacter())
 						{
-							m_TokenCurrent.text.push_back('.');
+							if (_MatchEither('f', 'F'))
+							{
+								_AddToToken('.');
+								_AddCurrentToToken();
 
-							_AddCurrentToToken();
+								return true;
+							}
+							else if (_IsCharacterOfType<CharacterTypeDigit>(m_CharacterCurrent))
+							{
+								_AddToToken('.');
+								_AddCurrentToToken();
 
-							m_FoundFloatingDot = true;
+								m_FoundFloatingDot = true;
+							}
+							else
+							{
+								if (m_CharactersConsumedCount == 0)
+								{
+									// leading dot
+
+									_Revert(1);
+
+									m_TokenCurrent.type = Token::eType_Symbol;
+									
+									_AddToToken('.');
+								}
+								else
+								{
+									// trailing dot
+
+									_Revert(2);
+
+									m_TokenCurrent.type = Token::eType_Integer;
+								}
+
+								return true;
+							}
 						}
-						else if (!_IsNextCharacterAvailable())
+						else
 						{
 							if (m_CharactersConsumedCount == 0)
 							{
 								// dot only
 
 								m_TokenCurrent.type = Token::eType_Symbol;
-								m_TokenCurrent.text.push_back('.');
+								
+								_AddToToken('.');
 							}
 							else
 							{
 								// trailing dot
 
 								_Revert(1);
-
-								m_TokenCurrent.type = Token::eType_Integer;
-							}
-
-							return true;
-						}
-						else
-						{
-							if (m_CharactersConsumedCount == 0)
-							{
-								// leading dot
-
-								_Revert(1);
-
-								m_TokenCurrent.type = Token::eType_Symbol;
-								m_TokenCurrent.text.push_back('.');
-							}
-							else
-							{
-								// trailing dot
-
-								_Revert(2);
 
 								m_TokenCurrent.type = Token::eType_Integer;
 							}
