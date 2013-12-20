@@ -498,26 +498,19 @@ namespace ExLibris
 			{
 				if (_TryConsume('\r'))
 				{
-					_NextCharacter();
-
-					if (m_CharacterCurrent == '\n')
+					if (_NextCharacter() && _Match('\n'))
 					{
 						// carriage return and newline combine to a newline
 
 						m_TokenCurrent.type = Token::eType_NewLine;
 
-						_Revert(1);
+						return _RecursiveReadToken();
 					}
 					else
 					{
 						// just a carriage return
 
-						if (_IsNextCharacterAvailable())
-						{
-							_Revert(1);
-						}
-
-						return true;
+						handled = true;
 					}
 				}
 
