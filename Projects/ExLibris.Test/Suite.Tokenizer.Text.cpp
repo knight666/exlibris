@@ -12,6 +12,7 @@ TEST(TokenizerText, ReadLowerCase)
 	ss << "c";
 
 	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
 
 	EXPECT_TOKEN(Token::eType_Text, "c", 1, 1);
 	EXPECT_END_TOKEN(2, 1);
@@ -23,6 +24,7 @@ TEST(TokenizerText, ReadUpperCase)
 	ss << "D";
 
 	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
 
 	EXPECT_TOKEN(Token::eType_Text, "D", 1, 1);
 	EXPECT_END_TOKEN(2, 1);
@@ -34,6 +36,7 @@ TEST(TokenizerText, ReadWord)
 	ss << "Teacup";
 
 	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
 
 	EXPECT_TOKEN(Token::eType_Text, "Teacup", 1, 1);
 	EXPECT_END_TOKEN(7, 1);
@@ -45,6 +48,7 @@ TEST(TokenizerText, ReadContractedWord)
 	ss << "you'll'rn't";
 
 	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
 
 	EXPECT_TOKEN(Token::eType_Text, "you", 1, 1);
 	EXPECT_TOKEN(Token::eType_String, "'ll'", 4, 1);
@@ -54,12 +58,55 @@ TEST(TokenizerText, ReadContractedWord)
 	EXPECT_END_TOKEN(12, 1);
 }
 
-TEST(Tokenizer, ReadSentence)
+TEST(TokenizerText, ReadUnderscored)
+{
+	std::stringstream ss;
+	ss << "m_TestsValidated";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Text, "m", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "_", 2, 1);
+	EXPECT_TOKEN(Token::eType_Text, "TestsValidated", 3, 1);
+	EXPECT_END_TOKEN(17, 1);
+}
+
+TEST(TokenizerText, ReadLeadingUnderscore)
+{
+	std::stringstream ss;
+	ss << "_Bottleship";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Symbol, "_", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "Bottleship", 2, 1);
+	EXPECT_END_TOKEN(12, 1);
+}
+
+TEST(TokenizerText, ReadTrailingUnderscore)
+{
+	std::stringstream ss;
+	ss << "Ugh___";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Text, "Ugh", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "_", 4, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "_", 5, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, "_", 6, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(TokenizerText, ReadSentence)
 {
 	std::stringstream ss;
 	ss << "Mary had a bomb";
 
 	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
 
 	EXPECT_TOKEN(Token::eType_Text, "Mary", 1, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 5, 1);

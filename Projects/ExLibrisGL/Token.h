@@ -35,6 +35,7 @@ namespace ExLibris
 		enum Type
 		{
 			eType_Unprintable,
+			eType_Identifier,
 			eType_Text,
 			eType_String,
 			eType_Whitespace,

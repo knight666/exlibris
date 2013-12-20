@@ -50,6 +50,12 @@ namespace ExLibris
 		(c >= 'A' && c <= 'Z') ||
 		(c >= 'a' && c <= 'z')
 	));
+	TYPE_CLASS(Identifier, (
+		(c >= 'A' && c <= 'Z') ||
+		(c >= 'a' && c <= 'z') ||
+		(c >= '0' && c <= '9') ||
+		c == '_'
+	));
 	TYPE_CLASS(Symbol, (
 		c == '!' || c == '\"' || c == '#' || c == '$' || c == '%' ||
 		c == '&' || c == '\'' || c == '(' || c == ')' || c == '*' ||
@@ -170,6 +176,10 @@ namespace ExLibris
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
 		}
+		else if (IsOptionEnabled(Tokenizer::eOption_Identifiers) && _MatchType<CharacterTypeIdentifier>())
+		{
+			m_TokenCurrent.type = Token::eType_Identifier;
+		}
 		else if (_TryConsumeType<CharacterTypeSymbol>())
 		{
 			// note that a symbol is always a single character,
@@ -193,6 +203,57 @@ namespace ExLibris
 
 		switch (m_TokenCurrent.type)
 		{
+
+		case Token::eType_Identifier:
+			{
+				if (m_CharactersConsumedCount == 0 && _Match('_'))
+				{
+					if (_NextCharacter())
+					{
+						_AddToToken('_');
+
+						while (_TryConsumeType<CharacterTypeIdentifier>())
+						{
+							if (!_NextCharacter())
+							{
+								return true;
+							}
+						}
+
+						if (m_CharactersConsumedCount == 1)
+						{
+							m_TokenCurrent.type = Token::eType_Symbol;
+						}
+
+						_Revert(1);
+
+						return true;
+					}
+					else
+					{
+						m_TokenCurrent.type = Token::eType_Symbol;
+						
+						_AddCurrentToToken();
+
+						handled = true;
+					}
+				}
+				else
+				{
+					while (_TryConsumeType<CharacterTypeIdentifier>())
+					{
+						if (!_NextCharacter())
+						{
+							return true;
+						}
+					}
+
+					_Revert(1);
+
+					return true;
+				}
+
+			} break;
 
 		case Token::eType_Text:
 			{

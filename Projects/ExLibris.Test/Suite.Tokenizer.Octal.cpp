@@ -25,9 +25,7 @@ TEST(TokenizerOctal, ReadInvalid)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "F", 2, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "9", 3, 1);
-	EXPECT_TOKEN(Token::eType_Text, "GH", 4, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "F9GH", 2, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
 
@@ -64,6 +62,6 @@ TEST(TokenizerOctal, ReadSignedInvalid)
 
 	EXPECT_TOKEN(Token::eType_Symbol, "-", 1, 1);
 	EXPECT_TOKEN(Token::eType_Integer, "0", 2, 1);
-	EXPECT_TOKEN(Token::eType_Text, "Buh", 3, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "Buh", 3, 1);
 	EXPECT_END_TOKEN(6, 1);
 }

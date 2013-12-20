@@ -9,6 +9,7 @@ namespace ExLibris
 
 	static const char* s_TokenTypeMap[Token::eType_End + 1] = {
 		TOKEN_TYPE_TO_STRING(eType_Unprintable),
+		TOKEN_TYPE_TO_STRING(eType_Identifier),
 		TOKEN_TYPE_TO_STRING(eType_Text),
 		TOKEN_TYPE_TO_STRING(eType_String),
 		TOKEN_TYPE_TO_STRING(eType_Whitespace),
@@ -18,6 +19,7 @@ namespace ExLibris
 		TOKEN_TYPE_TO_STRING(eType_Octal),
 		TOKEN_TYPE_TO_STRING(eType_Hexadecimal),
 		TOKEN_TYPE_TO_STRING(eType_Number),
+		TOKEN_TYPE_TO_STRING(eType_Scientific),
 		TOKEN_TYPE_TO_STRING(eType_End)
 	};
 
