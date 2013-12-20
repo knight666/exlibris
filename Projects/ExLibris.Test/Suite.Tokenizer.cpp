@@ -71,20 +71,3 @@ TEST(Tokenizer, ReadEmpty)
 
 	EXPECT_END_TOKEN(1, 1);
 }
-
-TEST(Tokenizer, ReadSentence)
-{
-	std::stringstream ss;
-	ss << "Mary had a bomb";
-
-	Tokenizer tk(&ss);
-
-	EXPECT_TOKEN(Token::eType_Text, "Mary", 1, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 5, 1);
-	EXPECT_TOKEN(Token::eType_Text, "had", 6, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
-	EXPECT_TOKEN(Token::eType_Text, "a", 10, 1);
-	EXPECT_TOKEN(Token::eType_Whitespace, " ", 11, 1);
-	EXPECT_TOKEN(Token::eType_Text, "bomb", 12, 1);
-	EXPECT_END_TOKEN(16, 1);
-}
