@@ -31,15 +31,28 @@ namespace ExLibris
 
 	class Tokenizer
 	{
+
+	public:
+
+		enum Option
+		{
+			eOption_Identifiers = (1 << 0)
+		};
 	
 	public:
 	
 		Tokenizer(std::basic_istream<char>* a_Stream);
 		~Tokenizer();
 
-		void SetInput(std::basic_istream<char>* a_Stream);
+		bool IsOptionEnabled(Option a_Option) const;
+		void EnableOptions(unsigned int a_Options);
+
+		bool IsOptionDisabled(Option a_Option) const;
+		void DisableOptions(unsigned int a_Options);
 
 		void SetTabWidth(size_t a_Width);
+
+		void SetInput(std::basic_istream<char>* a_Stream);
 
 		const Token& GetCurrentToken() const;
 
@@ -124,6 +137,8 @@ namespace ExLibris
 		}
 
 	private:
+
+		unsigned int m_Options;
 
 		std::basic_istream<char>* m_Stream;
 		bool m_StreamEnd;

@@ -31,6 +31,24 @@ TEST(Tokenizer, ConstructNoDataAvailable)
 	EXPECT_FALSE(tk.IsNextTokenAvailable());
 }
 
+TEST(Tokenizer, EnableOption)
+{
+	Tokenizer tk(nullptr);
+
+	tk.EnableOptions(Tokenizer::eOption_Identifiers);
+	EXPECT_TRUE(tk.IsOptionEnabled(Tokenizer::eOption_Identifiers));
+	EXPECT_FALSE(tk.IsOptionDisabled(Tokenizer::eOption_Identifiers));
+}
+
+TEST(Tokenizer, DisableOption)
+{
+	Tokenizer tk(nullptr);
+
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+	EXPECT_TRUE(tk.IsOptionDisabled(Tokenizer::eOption_Identifiers));
+	EXPECT_FALSE(tk.IsOptionEnabled(Tokenizer::eOption_Identifiers));
+}
+
 TEST(Tokenizer, SetInput)
 {
 	Tokenizer tk(nullptr);

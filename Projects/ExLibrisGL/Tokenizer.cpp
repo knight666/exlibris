@@ -63,7 +63,8 @@ namespace ExLibris
 	TYPE_CLASS(NewLine, (c == '\r' || c == '\n'));
 
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
-		: m_Stream(nullptr)
+		: m_Options(eOption_Identifiers)
+		, m_Stream(nullptr)
 		, m_StreamEnd(false)
 		, m_TabWidth(4)
 		, m_CharactersConsumedCount(0)
@@ -77,6 +78,26 @@ namespace ExLibris
 	
 	Tokenizer::~Tokenizer()
 	{
+	}
+
+	bool Tokenizer::IsOptionEnabled(Option a_Option) const
+	{
+		return (m_Options & a_Option);
+	}
+
+	void Tokenizer::EnableOptions(unsigned int a_Options)
+	{
+		m_Options |= a_Options;
+	}
+
+	bool Tokenizer::IsOptionDisabled(Option a_Option) const
+	{
+		return !(m_Options & a_Option);
+	}
+
+	void Tokenizer::DisableOptions(unsigned int a_Options)
+	{
+		m_Options = (m_Options & ~a_Options);
 	}
 
 	void Tokenizer::SetInput(std::basic_istream<char>* a_Stream)
