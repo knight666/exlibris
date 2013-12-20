@@ -58,7 +58,7 @@ TEST(TokenizerHexadecimal, ReadInvalidCharacters)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xA5E", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "GOGO", 6, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "GOGO", 6, 1);
 	EXPECT_END_TOKEN(10, 1);
 }
 
@@ -70,9 +70,7 @@ TEST(TokenizerHexadecimal, ReadWrongSpecifier)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "X", 2, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "771", 3, 1);
-	EXPECT_TOKEN(Token::eType_Text, "AABB", 6, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "X771AABB", 2, 1);
 	EXPECT_END_TOKEN(10, 1);
 }
 
@@ -84,8 +82,7 @@ TEST(TokenizerHexadecimal, ReadNotEnoughValidCharacters)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "xxxx", 2, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "0", 6, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "xxxx0", 2, 1);
 	EXPECT_END_TOKEN(7, 1);
 }
 
@@ -97,7 +94,7 @@ TEST(TokenizerHexadecimal, ReadNoData)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "x", 2, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "x", 2, 1);
 	EXPECT_END_TOKEN(3, 1);
 }
 
@@ -134,6 +131,6 @@ TEST(TokenizerHexadecimal, ReadSignedNoData)
 
 	EXPECT_TOKEN(Token::eType_Symbol, "+", 1, 1);
 	EXPECT_TOKEN(Token::eType_Integer, "0", 2, 1);
-	EXPECT_TOKEN(Token::eType_Text, "x", 3, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "x", 3, 1);
 	EXPECT_END_TOKEN(4, 1);
 }

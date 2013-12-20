@@ -13,7 +13,7 @@ TEST(TokenizerNewLine, Read)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Text, "worries", 1, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "worries", 1, 1);
 	EXPECT_TOKEN(Token::eType_NewLine, "\n", 8, 1);
 	EXPECT_END_TOKEN(1, 2);
 }
@@ -25,9 +25,9 @@ TEST(TokenizerNewLine, ReadCarriageReturn)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Text, "buh", 1, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "buh", 1, 1);
 	EXPECT_TOKEN(Token::eType_Unprintable, "\r", 4, 1);
-	EXPECT_TOKEN(Token::eType_Text, "neh", 5, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "neh", 5, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "?", 8, 1);
 	EXPECT_END_TOKEN(9, 1);
 }
@@ -39,9 +39,9 @@ TEST(TokenizerNewLine, ReadCarriageReturnAndNewLine)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Text, "aww", 1, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "aww", 1, 1);
 	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 4, 1);
-	EXPECT_TOKEN(Token::eType_Text, "yiss", 1, 2);
+	EXPECT_TOKEN(Token::eType_Identifier, "yiss", 1, 2);
 	EXPECT_END_TOKEN(5, 2);
 }
 
@@ -69,10 +69,10 @@ TEST(TokenizerNewLine, ReadSentenceOverSeveralLines)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Text, "THIS", 1, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "THIS", 1, 1);
 	EXPECT_TOKEN(Token::eType_NewLine, "\n", 5, 1);
-	EXPECT_TOKEN(Token::eType_Text, "IS", 1, 2);
+	EXPECT_TOKEN(Token::eType_Identifier, "IS", 1, 2);
 	EXPECT_TOKEN(Token::eType_NewLine, "\r\n", 3, 2);
-	EXPECT_TOKEN(Token::eType_Text, "MEGABUNNY", 1, 3);
+	EXPECT_TOKEN(Token::eType_Identifier, "MEGABUNNY", 1, 3);
 	EXPECT_END_TOKEN(10, 3);
 }

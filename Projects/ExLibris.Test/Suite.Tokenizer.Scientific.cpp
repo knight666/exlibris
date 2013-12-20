@@ -25,7 +25,7 @@ TEST(TokenizerScientific, ReadNumberTwoSignifiers)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Number, "56.98", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "EE", 6, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "EE", 6, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "-", 8, 1);
 	EXPECT_TOKEN(Token::eType_Integer, "3", 9, 1);
 	EXPECT_END_TOKEN(10, 1);
@@ -39,7 +39,7 @@ TEST(TokenizerScientific, ReadNumberNoPower)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Number, "2.65", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 5, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e", 5, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "+", 6, 1);
 	EXPECT_END_TOKEN(7, 1);
 }
@@ -52,8 +52,7 @@ TEST(TokenizerScientific, ReadNumberNoSign)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Number, "0.5", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 4, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "12", 5, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e12", 4, 1);
 	EXPECT_END_TOKEN(7, 1);
 }
 
@@ -65,7 +64,7 @@ TEST(TokenizerScientific, ReadNumberNoPowerAndNoSign)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Number, "18.7", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 5, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e", 5, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
 
@@ -78,7 +77,7 @@ TEST(TokenizerScientific, ReadNumberTrailingDot)
 
 	EXPECT_TOKEN(Token::eType_Integer, "5", 1, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, ".", 2, 1);
-	EXPECT_TOKEN(Token::eType_Text, "E", 3, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "E", 3, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "+", 4, 1);
 	EXPECT_TOKEN(Token::eType_Integer, "166", 5, 1);
 	EXPECT_END_TOKEN(8, 1);
@@ -103,7 +102,7 @@ TEST(TokenizerScientific, ReadIntegerNoPower)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "777", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 4, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e", 4, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "+", 5, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
@@ -116,8 +115,7 @@ TEST(TokenizerScientific, ReadIntegerNoSign)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "99", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 3, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "32", 4, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e32", 3, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
 
@@ -129,7 +127,7 @@ TEST(TokenizerScientific, ReadIntegerNoPowerAndNoSign)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "1", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 2, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e", 2, 1);
 	EXPECT_END_TOKEN(3, 1);
 }
 
@@ -141,7 +139,7 @@ TEST(TokenizerScientific, ReadIntegerThreeSignifiers)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "118", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "eEe", 4, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "eEe", 4, 1);
 	EXPECT_END_TOKEN(7, 1);
 }
 
@@ -164,8 +162,7 @@ TEST(TokenizerScientific, ReadOctalNoPower)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Octal, "0111", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 5, 1);
-	EXPECT_TOKEN(Token::eType_Octal, "0134", 6, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e0134", 5, 1);
 	EXPECT_END_TOKEN(10, 1);
 }
 
@@ -177,8 +174,7 @@ TEST(TokenizerScientific, ReadOctalNoSign)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Octal, "0127", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 5, 1);
-	EXPECT_TOKEN(Token::eType_Integer, "15", 6, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e15", 5, 1);
 	EXPECT_END_TOKEN(8, 1);
 }
 
@@ -190,7 +186,7 @@ TEST(TokenizerScientific, ReadOctalNoSignAndNoPower)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Octal, "031", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "e", 4, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e", 4, 1);
 	EXPECT_END_TOKEN(5, 1);
 }
 
@@ -202,7 +198,7 @@ TEST(TokenizerScientific, ReadOctalTwoSignifiers)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Octal, "01", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "ee", 3, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "ee", 3, 1);
 	EXPECT_END_TOKEN(5, 1);
 }
 

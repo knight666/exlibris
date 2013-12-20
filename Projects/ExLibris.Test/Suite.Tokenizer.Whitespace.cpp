@@ -104,7 +104,7 @@ TEST(TokenizerWhitespace, ReadTwoTabs)
 
 	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 1, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, "\t", 5, 1);
-	EXPECT_TOKEN(Token::eType_Text, "s", 9, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "s", 9, 1);
 	EXPECT_END_TOKEN(10, 1);
 }
 

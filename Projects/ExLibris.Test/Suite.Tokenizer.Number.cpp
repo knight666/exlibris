@@ -93,7 +93,7 @@ TEST(TokenizerNumber, ReadTextAfterFloat)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Number, "12.67f", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "ood", 7, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "ood", 7, 1);
 	EXPECT_END_TOKEN(10, 1);
 }
 
@@ -127,16 +127,16 @@ TEST(TokenizerNumber, ReadContained)
 
 	Tokenizer tk(&ss);
 
-	EXPECT_TOKEN(Token::eType_Text, "Price", 1, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "Price", 1, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, ":", 6, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 1);
 	EXPECT_TOKEN(Token::eType_Symbol, "$", 8, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 9, 1);
 	EXPECT_TOKEN(Token::eType_Number, "52.122", 10, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 16, 1);
-	EXPECT_TOKEN(Token::eType_Text, "per", 17, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "per", 17, 1);
 	EXPECT_TOKEN(Token::eType_Whitespace, " ", 20, 1);
-	EXPECT_TOKEN(Token::eType_Text, "pound", 21, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "pound", 21, 1);
 	EXPECT_END_TOKEN(26, 1);
 }
 
@@ -221,7 +221,7 @@ TEST(TokenizerNumber, ReadInvalidHexadecimal)
 	Tokenizer tk(&ss);
 
 	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
-	EXPECT_TOKEN(Token::eType_Text, "x", 2, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "x", 2, 1);
 	EXPECT_TOKEN(Token::eType_Number, ".999", 3, 1);
 	EXPECT_END_TOKEN(7, 1);
 }
