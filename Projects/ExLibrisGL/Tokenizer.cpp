@@ -108,7 +108,6 @@ namespace ExLibris
 		m_CharactersConsumedCount = 0;
 
 		m_FoundFloatingDot = false;
-		m_FoundScientificSign = false;
 		m_StringDelimiter = -1;
 
 		m_TokenCurrent.text.clear();
@@ -261,6 +260,8 @@ namespace ExLibris
 				{
 					m_TokenCurrent.type = Token::eType_Scientific;
 
+					m_ScientificTypeRestore = Token::eType_Integer;
+
 					return _RecursiveReadToken();
 				}
 				else if (!_TryConsumeType<CharacterTypeDigit>())
@@ -280,9 +281,9 @@ namespace ExLibris
 				}
 				else if (_MatchEither('e', 'E'))
 				{
-					m_ScientificTypeRestore = m_TokenCurrent.type;
-
 					m_TokenCurrent.type = Token::eType_Scientific;
+
+					m_ScientificTypeRestore = Token::eType_Octal;
 
 					return _RecursiveReadToken();
 				}
@@ -339,11 +340,11 @@ namespace ExLibris
 
 					return true;
 				}
-				else if (!m_FoundScientificSign && _MatchEither('e', 'E'))
+				else if (_MatchEither('e', 'E'))
 				{
-					m_ScientificTypeRestore = m_TokenCurrent.type;
-
 					m_TokenCurrent.type = Token::eType_Scientific;
+
+					m_ScientificTypeRestore = Token::eType_Number;
 
 					return _RecursiveReadToken();
 				}
@@ -461,7 +462,7 @@ namespace ExLibris
 					{
 						_Revert(m_CharactersRead.size() - found_start + 1);
 
-						m_TokenCurrent.type = Token::eType_Number;
+						m_TokenCurrent.type = m_ScientificTypeRestore;
 
 						return true;
 					}

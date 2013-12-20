@@ -125,7 +125,6 @@ namespace ExLibris
 		std::deque<int> m_CharactersRead;
 		int m_CharactersConsumedCount;
 		bool m_FoundFloatingDot;
-		bool m_FoundScientificSign;
 		Token::Type m_ScientificTypeRestore;
 		int m_StringDelimiter;
 
