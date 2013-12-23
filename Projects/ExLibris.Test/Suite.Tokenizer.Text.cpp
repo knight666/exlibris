@@ -117,3 +117,60 @@ TEST(TokenizerText, ReadSentence)
 	EXPECT_TOKEN(Token::eType_Text, "bomb", 12, 1);
 	EXPECT_END_TOKEN(16, 1);
 }
+
+TEST(TokenizerText, ReadInvalidOctal)
+{
+	std::stringstream ss;
+	ss << "0BE88";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "BE", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "88", 4, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
+
+TEST(TokenizerText, ReadInvalidHexadecimalCharacters)
+{
+	std::stringstream ss;
+	ss << "0xFAXE";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Hexadecimal, "0xFA", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "XE", 5, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(TokenizerText, ReadInvalidHexadecimalWrongSpecifier)
+{
+	std::stringstream ss;
+	ss << "0X88E3";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "X", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "88", 3, 1);
+	EXPECT_TOKEN(Token::eType_Text, "E", 5, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "3", 6, 1);
+	EXPECT_END_TOKEN(7, 1);
+}
+
+TEST(TokenizerText, ReadInvalidHexadecimalNotEnoughValidCharacters)
+{
+	std::stringstream ss;
+	ss << "0xir0";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Text, "xir", 2, 1);
+	EXPECT_TOKEN(Token::eType_Integer, "0", 5, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
