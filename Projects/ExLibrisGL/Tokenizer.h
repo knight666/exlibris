@@ -93,7 +93,7 @@ namespace ExLibris
 			return (CharacterType::IsKnown(m_CharacterCurrent));
 		}
 
-		inline bool _TryConsume(int a_Character)
+		inline bool _Consume(int a_Character)
 		{
 			if (m_CharacterCurrent == a_Character)
 			{
@@ -107,7 +107,7 @@ namespace ExLibris
 			}
 		}
 
-		inline bool _TryConsumeEither(int a_A, int a_B)
+		inline bool _ConsumeEither(int a_A, int a_B)
 		{
 			if (m_CharacterCurrent == a_A || m_CharacterCurrent == a_B)
 			{
@@ -122,7 +122,7 @@ namespace ExLibris
 		}
 
 		template<typename CharacterType>
-		inline bool _TryConsumeType()
+		inline bool _ConsumeType()
 		{
 			if (CharacterType::IsKnown(m_CharacterCurrent))
 			{

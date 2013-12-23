@@ -109,6 +109,7 @@ namespace ExLibris
 	void Tokenizer::SetInput(std::basic_istream<char>* a_Stream)
 	{
 		m_Stream = a_Stream;
+		m_CharacterQueue.clear();
 
 		m_Column = 1;
 		m_Line = 1;
@@ -141,7 +142,7 @@ namespace ExLibris
 		m_TokenCurrent.column = m_Column;
 		m_TokenCurrent.line = m_Line;
 
-		if (!_IsNextCharacterAvailable() || !_NextCharacter())
+		if (!_NextCharacter())
 		{
 			m_TokenCurrent.type = Token::eType_End;
 
@@ -180,7 +181,7 @@ namespace ExLibris
 		{
 			m_TokenCurrent.type = Token::eType_Identifier;
 		}
-		else if (_TryConsumeType<CharacterTypeSymbol>())
+		else if (_ConsumeType<CharacterTypeSymbol>())
 		{
 			// note that a symbol is always a single character,
 			// so we don't need to call the recursive method
@@ -212,7 +213,7 @@ namespace ExLibris
 					{
 						_AddToToken('_');
 
-						while (_TryConsumeType<CharacterTypeIdentifier>())
+						while (_ConsumeType<CharacterTypeIdentifier>())
 						{
 							if (!_NextCharacter())
 							{
@@ -240,7 +241,7 @@ namespace ExLibris
 				}
 				else
 				{
-					while (_TryConsumeType<CharacterTypeIdentifier>())
+					while (_ConsumeType<CharacterTypeIdentifier>())
 					{
 						if (!_NextCharacter())
 						{
@@ -257,7 +258,7 @@ namespace ExLibris
 
 		case Token::eType_Text:
 			{
-				while (_TryConsumeType<CharacterTypeAlphabetical>())
+				while (_ConsumeType<CharacterTypeAlphabetical>())
 				{
 					if (!_NextCharacter())
 					{
@@ -273,38 +274,46 @@ namespace ExLibris
 
 		case Token::eType_String:
 			{
-				if (_TryConsume(m_StringDelimiter))
+				if (_Consume(m_StringDelimiter))
 				{
 					return true;
 				}
-				else if (m_CharactersConsumedCount == 0 && _TryConsumeEither('\'', '\"'))
+				else if (m_CharactersConsumedCount == 0 && _ConsumeEither('\'', '\"'))
 				{
 					m_StringDelimiter = m_CharacterCurrent;
 				}
 				else if (_Match('\r'))
 				{
-					_NextCharacter();
-
-					if (_Match('\n') || !_IsNextCharacterAvailable())
+					if (_NextCharacter())
 					{
-						// undo consumed
+						if (_Match('\n'))
+						{
+							// undo consumed
 
-						_Revert(m_CharactersRead.size());
+							_Revert(m_CharactersRead.size());
 
-						// quote character was just a symbol
+							// quote character was just a symbol
 
-						m_TokenCurrent.type = Token::eType_Symbol;
-						m_TokenCurrent.text.clear();
-						_NextCharacter();
-						_AddCurrentToToken();
+							m_TokenCurrent.type = Token::eType_Symbol;
+							m_TokenCurrent.text.clear();
+							_NextCharacter();
+							_AddCurrentToToken();
 
-						return true;
+							return true;
+						}
+						else
+						{
+							// just a line feed
+
+							_Revert(1);
+
+							_AddToToken('\r');
+						}
 					}
 					else
 					{
-						_Revert(2);
+						 // just a line feed
 
-						_NextCharacter();
 						_AddCurrentToToken();
 					}
 				}
@@ -346,7 +355,7 @@ namespace ExLibris
 
 					return _RecursiveReadToken();
 				}
-				else if (!_TryConsumeType<CharacterTypeDigit>())
+				else if (!_ConsumeType<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
@@ -369,11 +378,11 @@ namespace ExLibris
 
 					return _RecursiveReadToken();
 				}
-				else if (m_CharactersConsumedCount == 1 && _TryConsume('x'))
+				else if (m_CharactersConsumedCount == 1 && _Consume('x'))
 				{
 					m_TokenCurrent.type = Token::eType_Hexadecimal;
 				}
-				else if (!_TryConsumeType<CharacterTypeOctal>())
+				else if (!_ConsumeType<CharacterTypeOctal>())
 				{
 					if (m_CharactersConsumedCount == 1)
 					{
@@ -389,7 +398,7 @@ namespace ExLibris
 
 		case Token::eType_Hexadecimal:
 			{
-				if (!_TryConsumeType<CharacterTypeHexadecimal>())
+				if (!_ConsumeType<CharacterTypeHexadecimal>())
 				{
 					if (m_CharactersConsumedCount == 2)
 					{
@@ -416,7 +425,7 @@ namespace ExLibris
 
 		case Token::eType_Number:
 			{
-				if (_TryConsume('f') || _TryConsume('F'))
+				if (_Consume('f') || _Consume('F'))
 				{
 					// no more digits after specifier
 
@@ -508,7 +517,7 @@ namespace ExLibris
 						}
 					}
 				}
-				else if (!_TryConsumeType<CharacterTypeDigit>())
+				else if (!_ConsumeType<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
@@ -549,7 +558,7 @@ namespace ExLibris
 						return true;
 					}
 				}
-				else if (!_IsNextCharacterAvailable() || _TryConsumeEither('f', 'F') || !_TryConsumeType<CharacterTypeDigit>())
+				else if (!_IsNextCharacterAvailable() || _ConsumeEither('f', 'F') || !_ConsumeType<CharacterTypeDigit>())
 				{
 					handled = true;
 				}
@@ -558,7 +567,7 @@ namespace ExLibris
 
 		case Token::eType_Whitespace:
 			{
-				if (_TryConsume('\t'))
+				if (_Consume('\t'))
 				{
 					// tab position is determined from index, not column
 
@@ -566,7 +575,7 @@ namespace ExLibris
 
 					return true;
 				}
-				else if (_TryConsume(' '))
+				else if (_Consume(' '))
 				{
 					return true;
 				}
@@ -579,7 +588,7 @@ namespace ExLibris
 
 		case Token::eType_Unprintable:
 			{
-				if (_TryConsume('\r'))
+				if (_Consume('\r'))
 				{
 					if (_NextCharacter() && _Match('\n'))
 					{
@@ -601,7 +610,7 @@ namespace ExLibris
 
 		case Token::eType_NewLine:
 			{
-				if (_TryConsume('\n'))
+				if (_Consume('\n'))
 				{
 					m_Column = 1;
 					m_Line++;
