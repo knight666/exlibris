@@ -3,6 +3,10 @@ syntax: regexp
 Build/.*(Debug|Release)\.(dll|exe|exp|lib)
 .*systemfont.txt
 
+# Documentation
+syntax: glob
+Documentation/html/*
+
 # CMake
 syntax: glob
 */CMakeFiles/*
