@@ -202,6 +202,18 @@ TEST(TokenizerScientific, ReadOctalTwoSignifiers)
 	EXPECT_END_TOKEN(5, 1);
 }
 
+TEST(TokenizerScientific, ReadOctalNoData)
+{
+	std::stringstream ss;
+	ss << "0e89";
+
+	Tokenizer tk(&ss);
+
+	EXPECT_TOKEN(Token::eType_Integer, "0", 1, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "e89", 2, 1);
+	EXPECT_END_TOKEN(5, 1);
+}
+
 TEST(TokenizerScientific, ReadHexadecimal)
 {
 	std::stringstream ss;

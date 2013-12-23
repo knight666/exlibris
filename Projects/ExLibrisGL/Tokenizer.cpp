@@ -374,7 +374,16 @@ namespace ExLibris
 				{
 					m_TokenCurrent.type = Token::eType_Scientific;
 
-					m_ScientificTypeRestore = Token::eType_Octal;
+					if (m_CharactersConsumedCount == 1)
+					{
+						// just a zero
+
+						m_ScientificTypeRestore = Token::eType_Integer;
+					}
+					else
+					{
+						m_ScientificTypeRestore = Token::eType_Octal;
+					}
 
 					return _RecursiveReadToken();
 				}
