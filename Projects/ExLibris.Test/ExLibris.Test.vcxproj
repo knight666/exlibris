@@ -85,6 +85,7 @@
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.TextParser.cpp" />
+    <ClCompile Include="Suite.TextParserRtf.cpp" />
     <ClCompile Include="Suite.Tokenizer.cpp" />
     <ClCompile Include="Suite.TextParserMarkdown.cpp" />
     <ClCompile Include="Suite.Tokenizer.Hexadecimal.cpp" />
