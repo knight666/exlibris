@@ -113,6 +113,11 @@ namespace ExLibris
 
 		m_Column = 1;
 		m_Line = 1;
+
+		m_TokenCurrent.type = Token::eType_End;
+		m_TokenCurrent.text.clear();
+		m_TokenCurrent.column = m_Column;
+		m_TokenCurrent.line = m_Line;
 	}
 
 	void Tokenizer::SetTabWidth(size_t a_Width)

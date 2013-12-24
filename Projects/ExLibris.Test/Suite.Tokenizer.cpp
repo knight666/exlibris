@@ -89,3 +89,23 @@ TEST(Tokenizer, ReadEmpty)
 
 	EXPECT_END_TOKEN(1, 1);
 }
+
+TEST(Tokenizer, ReadTokenAndClearInput)
+{
+	Tokenizer tk(nullptr);
+	
+	std::stringstream ss;
+	ss << "testing";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TOKEN(Token::eType_Identifier, "testing", 1, 1);
+
+	tk.SetInput(nullptr);
+
+	const Token& t = tk.GetCurrentToken();
+	EXPECT_EQ(Token::eType_End, t.type);
+	EXPECT_STREQ("", t.text.c_str());
+	EXPECT_EQ(1, t.column);
+	EXPECT_EQ(1, t.line);
+}
