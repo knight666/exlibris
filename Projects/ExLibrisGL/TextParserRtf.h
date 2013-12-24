@@ -26,6 +26,8 @@
 
 #include "ITextParser.h"
 
+#include "Token.h"
+
 namespace ExLibris
 {
 	class Tokenizer;
@@ -64,15 +66,62 @@ namespace ExLibris
 
 	private:
 
+		typedef bool (TextParserRtf::*CommandHandler)(const Token&);
+
 		enum ParseType
 		{
 			eParseType_Invalid,
 			eParseType_GroupOpen,
 			eParseType_GroupClose,
-			eParseType_Command
+			eParseType_Command,
+			eParseType_Text
 		};
 
+		bool _ReadCommand(const std::string& a_Text);
+		int _ReadInteger();
+		bool _ParseHeader();
 		ParseType _Parse();
+		bool _ParseCommand(const Token& a_Token);
+
+		struct Group
+		{
+			Group()
+				: parent(nullptr)
+				, index(0)
+				, handlers(nullptr)
+			{
+			}
+
+			Group* parent;
+			int index;
+			std::map<std::string, CommandHandler>* handlers;
+			std::vector<std::string> commands;
+		};
+
+		enum FamilyType
+		{
+			eFamilyType_Nil,
+			eFamilyType_Roman,
+			eFamilyType_Swiss,
+			eFamilyType_Modern,
+			eFamilyType_Script,
+			eFamilyType_Decor,
+			eFamilyType_Tech,
+			eFamilyType_Bidi,
+		};
+
+		struct FontEntry
+		{
+			FontEntry()
+				: index(0)
+				, family(eFamilyType_Nil)
+			{
+			}
+
+			int index;
+			FamilyType family;
+			std::string name;
+		};
 
 	private:
 
@@ -85,6 +134,22 @@ namespace ExLibris
 		std::string m_CommandCurrent;
 		ParseType m_Parsed;
 		int m_GroupIndex;
+
+		std::vector<Group*> m_Groups;
+		Group* m_GroupCurrent;
+
+		std::map<int, FontEntry*> m_FontEntries;
+		FontEntry* m_FontEntryCurrent;
+
+	private:
+
+		bool _CommandCharacterSet(const Token& a_Token);
+		bool _CommandFontTable(const Token& a_Token);
+		bool _CommandFont(const Token& a_Token);
+		bool _CommandFontFamily(const Token& a_Token);
+
+		std::map<std::string, CommandHandler> m_CommandHandlers;
+		std::map<std::string, CommandHandler> m_CommandHandlersFontTable;
 	
 	}; // class TextParserRtf
 
