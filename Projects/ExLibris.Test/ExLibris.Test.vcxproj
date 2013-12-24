@@ -84,7 +84,9 @@
     <ClCompile Include="Suite.MeshBuilder.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
+    <ClCompile Include="Suite.TextParser.cpp" />
     <ClCompile Include="Suite.Tokenizer.cpp" />
+    <ClCompile Include="Suite.TextParserMarkdown.cpp" />
     <ClCompile Include="Suite.Tokenizer.Hexadecimal.cpp" />
     <ClCompile Include="Suite.Tokenizer.Identifier.cpp" />
     <ClCompile Include="Suite.Tokenizer.Integer.cpp" />
@@ -104,6 +106,7 @@
     <ClInclude Include="Mock.GlyphProvider.h" />
     <ClInclude Include="Mock.MeshVisitor.h" />
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
+    <ClInclude Include="Mock.TextParser.h" />
     <ClInclude Include="Tools.Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
