@@ -188,6 +188,15 @@ TEST(TextParser, ReadSentence)
 	}
 }
 
+TEST(TextParser, IgnoreInput)
+{
+	MockTextParser parser;
+	parser.ignore_input = true;
+	parser.SetInput("Test string please ignore");
+
+	EXPECT_FALSE(parser.ReadToken());
+}
+
 TEST(TextParser, SetFamilyName)
 {
 	MockTextParser parser;
