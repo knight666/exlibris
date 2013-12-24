@@ -88,7 +88,7 @@ namespace ExLibris
 
 	bool Tokenizer::IsOptionEnabled(Option a_Option) const
 	{
-		return (m_Options & a_Option);
+		return ((m_Options & a_Option) != 0);
 	}
 
 	void Tokenizer::EnableOptions(unsigned int a_Options)
@@ -98,7 +98,7 @@ namespace ExLibris
 
 	bool Tokenizer::IsOptionDisabled(Option a_Option) const
 	{
-		return !(m_Options & a_Option);
+		return ((m_Options & a_Option) == 0);
 	}
 
 	void Tokenizer::DisableOptions(unsigned int a_Options)
