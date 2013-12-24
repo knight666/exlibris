@@ -85,7 +85,19 @@
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
     <ClCompile Include="Suite.TextParser.cpp" />
+    <ClCompile Include="Suite.Tokenizer.cpp" />
     <ClCompile Include="Suite.TextParserMarkdown.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Hexadecimal.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Identifier.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Integer.cpp" />
+    <ClCompile Include="Suite.Tokenizer.NewLine.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Number.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Octal.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Scientific.cpp" />
+    <ClCompile Include="Suite.Tokenizer.String.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Symbol.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Text.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Whitespace.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +107,7 @@
     <ClInclude Include="Mock.MeshVisitor.h" />
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
     <ClInclude Include="Mock.TextParser.h" />
+    <ClInclude Include="Tools.Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
