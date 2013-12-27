@@ -73,6 +73,7 @@ namespace ExLibris
 		, m_Stream(nullptr)
 		, m_StreamEnd(false)
 		, m_TabWidth(4)
+		, m_RevertToken(false)
 		, m_CharactersConsumedCount(0)
 		, m_NumberFoundDot(false)
 		, m_CharacterCurrent(-1)
@@ -137,6 +138,13 @@ namespace ExLibris
 
 	bool Tokenizer::ReadToken()
 	{
+		if (m_RevertToken)
+		{
+			m_RevertToken = false;
+
+			return (m_TokenCurrent.type != Token::eType_End);
+		}
+
 		m_CharactersRead.clear();
 		m_CharactersConsumedCount = 0;
 
@@ -201,6 +209,11 @@ namespace ExLibris
 		}
 
 		return _RecursiveReadToken();
+	}
+
+	void Tokenizer::RevertToken()
+	{
+		m_RevertToken = true;
 	}
 
 	bool Tokenizer::_RecursiveReadToken()

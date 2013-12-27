@@ -177,6 +177,17 @@ namespace ExLibris
 		*/
 		bool ReadToken();
 
+		/*!
+			\brief Reverts the last read token
+
+			This method can be used to undo a mistake made by a greedy parser.
+			Note that only the last read token can be reverted, because
+			the tokenizer does not keep track of tokens read.
+
+			\sa ReadToken, IsNextTokenAvailable, GetCurrentToken
+		*/
+		void RevertToken();
+
 	private:
 
 		bool _RecursiveReadToken();
@@ -264,6 +275,7 @@ namespace ExLibris
 		size_t m_TabWidth;
 
 		Token m_TokenCurrent;
+		bool m_RevertToken;
 		std::deque<int> m_CharactersRead;
 		int m_CharactersConsumedCount;
 
