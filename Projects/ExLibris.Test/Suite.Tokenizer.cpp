@@ -109,3 +109,63 @@ TEST(Tokenizer, ReadTokenAndClearInput)
 	EXPECT_EQ(1, t.column);
 	EXPECT_EQ(1, t.line);
 }
+
+TEST(Tokenizer, UndoRead)
+{
+	Tokenizer tk(nullptr);
+
+	std::stringstream ss;
+	ss << "Oops;";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TOKEN(Token::eType_Identifier, "Oops", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ";", 5, 1);
+
+	tk.RevertToken();
+
+	EXPECT_TOKEN(Token::eType_Symbol, ";", 5, 1);
+	EXPECT_END_TOKEN(6, 1);
+}
+
+TEST(Tokenizer, UndoReadTwice)
+{
+	Tokenizer tk(nullptr);
+
+	std::stringstream ss;
+	ss << "Pears: none";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TOKEN(Token::eType_Identifier, "Pears", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ":", 6, 1);
+
+	tk.RevertToken();
+
+	EXPECT_TOKEN(Token::eType_Symbol, ":", 6, 1);
+
+	tk.RevertToken();
+
+	EXPECT_TOKEN(Token::eType_Symbol, ":", 6, 1);
+	EXPECT_TOKEN(Token::eType_Whitespace, " ", 7, 1);
+	EXPECT_TOKEN(Token::eType_Identifier, "none", 8, 1);
+	EXPECT_END_TOKEN(12, 1);
+}
+
+TEST(Tokenizer, UndoReadAtEnd)
+{
+	Tokenizer tk(nullptr);
+
+	std::stringstream ss;
+	ss << "Done.";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TOKEN(Token::eType_Identifier, "Done", 1, 1);
+	EXPECT_TOKEN(Token::eType_Symbol, ".", 5, 1);
+	EXPECT_END_TOKEN(6, 1);
+
+	tk.RevertToken();
+
+	EXPECT_END_TOKEN(6, 1);
+}
