@@ -37,6 +37,7 @@ namespace ExLibris
 		: m_Tokenizer(nullptr)
 		, m_Document(nullptr)
 		, m_ElementCurrent(nullptr)
+		, m_FontDefault(nullptr)
 		, m_GroupCurrent(nullptr)
 		, m_GroupIndex(0)
 	{
@@ -50,6 +51,7 @@ namespace ExLibris
 
 		m_CommandHandlers.insert(std::make_pair("fonttbl", &TextParserRtf::_CommandFontTable));
 		m_CommandHandlers.insert(std::make_pair("f", &TextParserRtf::_CommandFont));
+		m_CommandHandlers.insert(std::make_pair("deff", &TextParserRtf::_CommandFontDefault));
 		m_CommandHandlers.insert(std::make_pair("fnil", &TextParserRtf::_CommandFontFamily));
 		m_CommandHandlers.insert(std::make_pair("froman", &TextParserRtf::_CommandFontFamily));
 		m_CommandHandlers.insert(std::make_pair("fswiss", &TextParserRtf::_CommandFontFamily));
@@ -94,6 +96,7 @@ namespace ExLibris
 		}
 
 		m_ElementCurrent = m_Document->GetRootElement();
+		m_FontDefault = nullptr;
 
 		RtfToken command = _ReadNextToken();
 		while (command.type != eParseType_Invalid)
@@ -146,7 +149,7 @@ namespace ExLibris
 		// rtf command
 
 		RtfToken header_command = _ReadNextToken();
-		if (header_command.type != eParseType_Command || header_command.value != "rtf" || header_command.index != 1)
+		if (header_command.type != eParseType_Command || header_command.value != "rtf" || header_command.parameter != 1)
 		{
 			return false;
 		}
@@ -195,7 +198,7 @@ namespace ExLibris
 						{
 							if (tk.type == Token::eType_Integer)
 							{
-								token.index = atoi(tk.text.c_str());
+								token.parameter = atoi(tk.text.c_str());
 							}
 							else
 							{
@@ -378,12 +381,29 @@ namespace ExLibris
 
 	bool TextParserRtf::_CommandFont(const RtfToken& a_Token)
 	{
-		if (a_Token.index == -1)
+		if (a_Token.parameter == -1)
 		{
 			return false;
 		}
 
-		m_ElementCurrent->TextFormat.font = &m_Document->GetFont(a_Token.index);
+		m_ElementCurrent->TextFormat.font = &m_Document->GetFont(a_Token.parameter);
+
+		return true;
+	}
+
+	bool TextParserRtf::_CommandFontDefault(const RtfToken& a_Token)
+	{
+		if (a_Token.parameter == -1)
+		{
+			return false;
+		}
+
+		m_FontDefault = &m_Document->GetFont(a_Token.parameter);
+
+		if (m_ElementCurrent->TextFormat.font == nullptr)
+		{
+			m_ElementCurrent->TextFormat.font = m_FontDefault;
+		}
 
 		return true;
 	}
