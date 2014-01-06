@@ -92,6 +92,7 @@
     <ClCompile Include="MeshBuilder.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Quad.cpp" />
+    <ClCompile Include="RtfDomDocument.cpp" />
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TextParserMarkdown.cpp" />
     <ClCompile Include="TextParserRtf.cpp" />
@@ -130,9 +131,11 @@
     <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
+    <ClInclude Include="RtfFont.h" />
     <ClInclude Include="SizePolicy.h" />
     <ClInclude Include="Style.h" />
     <ClInclude Include="TextCharacter.h" />
+    <ClInclude Include="RtfDomDocument.h" />
     <ClInclude Include="TextLayout.h" />
     <ClInclude Include="TextLine.h" />
     <ClInclude Include="TextParserMarkdown.h" />
