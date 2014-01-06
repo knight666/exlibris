@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RtfCharacterSet.h"
+
 namespace ExLibris
 {
 
@@ -32,12 +34,14 @@ namespace ExLibris
 		RtfFont()
 			: family(eFamilyType_Nil)
 			, pitch(ePitch_Default)
+			, character_set(eRtfCharacterSet_Default)
 		{
 		}
 
 		std::string name;
 		FamilyType family;
 		Pitch pitch;
+		RtfCharacterSet character_set;
 
 	}; // struct RtfFont
 

@@ -15,9 +15,9 @@ TEST(RtfDomDocument, CharacterSet)
 {
 	RtfDomDocument doc;
 
-	doc.GetTextFormat().character_set = eRtfCharacterSet_AppleMacintosh;
+	doc.GetTextFormat().character_set = eRtfCharacterSet_AppleMacintoshRoman;
 
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintosh, doc.GetTextFormat().character_set);
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, doc.GetTextFormat().character_set);
 }
 
 TEST(RtfDomDocument, GetFont)
@@ -28,6 +28,8 @@ TEST(RtfDomDocument, GetFont)
 
 	EXPECT_STREQ("", f0.name.c_str());
 	EXPECT_EQ(RtfFont::eFamilyType_Nil, f0.family);
+	EXPECT_EQ(RtfFont::ePitch_Default, f0.pitch);
+	EXPECT_EQ(eRtfCharacterSet_Default, f0.character_set);
 }
 
 TEST(RtfDomDocument, GetFontTwice)

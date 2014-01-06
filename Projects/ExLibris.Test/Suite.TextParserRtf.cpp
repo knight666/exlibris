@@ -72,6 +72,32 @@ TEST(TextParserRtf, FontSetPitch)
 	EXPECT_EQ(RtfFont::ePitch_Variable, doc->GetFont(2).pitch);
 }
 
+TEST(TextParserRtf, FontSetCharacterSet)
+{
+	TextParserRtf parser;
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi";
+	input << "{\\fonttbl";
+	input << "{\\f0\\fcharset77 Tester;}";
+	input << "{\\f1\\fcharset186 Band-Maid;}";
+	input << "{\\f2\\fcharset128 Tingling;}";
+	input << "}}";
+
+	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	ASSERT_NE(nullptr, doc);
+
+	EXPECT_STREQ("Tester", doc->GetFont(0).name.c_str());
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, doc->GetFont(0).character_set);
+
+	EXPECT_STREQ("Band-Maid", doc->GetFont(1).name.c_str());
+	EXPECT_EQ(eRtfCharacterSet_Baltic, doc->GetFont(1).character_set);
+
+	EXPECT_STREQ("Tingling", doc->GetFont(2).name.c_str());
+	EXPECT_EQ(eRtfCharacterSet_ShiftJis, doc->GetFont(2).character_set);
+}
+
 TEST(TextParserRtf, ColorTable)
 {
 	TextParserRtf parser;

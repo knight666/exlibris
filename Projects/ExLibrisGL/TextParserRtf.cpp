@@ -286,7 +286,6 @@ namespace ExLibris
 
 		if (m_GroupCurrent != nullptr)
 		{
-			group_create->type = m_GroupCurrent->type;
 			group_create->process_commands = m_GroupCurrent->process_commands;
 			group_create->process_value = m_GroupCurrent->process_value;
 		}
@@ -369,28 +368,86 @@ namespace ExLibris
 		return true;
 	}
 
+
+	RtfCharacterSet TextParserRtf::_TokenToCharset(const RtfToken& a_Token)
+	{
+		RtfCharacterSet character_set = eRtfCharacterSet_Invalid;
+
+		if (a_Token.parameter >= 0)
+		{
+
+#define CHARSET_CASE(_index, _value) case _index: { character_set = _value; } break;
+
+			switch (a_Token.parameter)
+			{
+				CHARSET_CASE(0, eRtfCharacterSet_Ansi);
+				CHARSET_CASE(1, eRtfCharacterSet_Default);
+				CHARSET_CASE(2, eRtfCharacterSet_Symbol);
+				CHARSET_CASE(77, eRtfCharacterSet_AppleMacintoshRoman);
+				CHARSET_CASE(78, eRtfCharacterSet_AppleMacintoshShiftJis);
+				CHARSET_CASE(79, eRtfCharacterSet_AppleMacintoshHangul);
+				CHARSET_CASE(80, eRtfCharacterSet_AppleMacintoshGb2332);
+				CHARSET_CASE(81, eRtfCharacterSet_AppleMacintoshBig5);
+				CHARSET_CASE(82, eRtfCharacterSet_AppleMacintoshJohabOld);
+				CHARSET_CASE(83, eRtfCharacterSet_AppleMacintoshHebrew);
+				CHARSET_CASE(84, eRtfCharacterSet_AppleMacintoshArabic);
+				CHARSET_CASE(85, eRtfCharacterSet_AppleMacintoshGreek);
+				CHARSET_CASE(86, eRtfCharacterSet_AppleMacintoshTurkish);
+				CHARSET_CASE(87, eRtfCharacterSet_AppleMacintoshThai);
+				CHARSET_CASE(88, eRtfCharacterSet_AppleMacintoshEasternEuropean);
+				CHARSET_CASE(89, eRtfCharacterSet_AppleMacintoshRussian);
+				CHARSET_CASE(128, eRtfCharacterSet_ShiftJis);
+				CHARSET_CASE(129, eRtfCharacterSet_Hangul);
+				CHARSET_CASE(130, eRtfCharacterSet_Johab);
+				CHARSET_CASE(134, eRtfCharacterSet_Gb2332);
+				CHARSET_CASE(136, eRtfCharacterSet_Big5);
+				CHARSET_CASE(161, eRtfCharacterSet_Greek);
+				CHARSET_CASE(162, eRtfCharacterSet_Turkish);
+				CHARSET_CASE(163, eRtfCharacterSet_Vietnamese);
+				CHARSET_CASE(177, eRtfCharacterSet_Hebrew);
+				CHARSET_CASE(178, eRtfCharacterSet_Arabic);
+				CHARSET_CASE(179, eRtfCharacterSet_ArabicTraditionalOld);
+				CHARSET_CASE(180, eRtfCharacterSet_ArabicUserOld);
+				CHARSET_CASE(181, eRtfCharacterSet_HebrewUserOld);
+				CHARSET_CASE(186, eRtfCharacterSet_Baltic);
+				CHARSET_CASE(204, eRtfCharacterSet_Russian);
+				CHARSET_CASE(222, eRtfCharacterSet_Thai);
+				CHARSET_CASE(238, eRtfCharacterSet_EasternEuropean);
+				CHARSET_CASE(254, eRtfCharacterSet_IbmPcCodePage437);
+				CHARSET_CASE(255, eRtfCharacterSet_Oem);
+			}
+
+#undef CHARSET_CASE
+
+		}
+		else if (a_Token.value.size() > 0)
+		{
+			if (a_Token.value == "ansi")
+			{
+				character_set = eRtfCharacterSet_Ansi;
+			}
+			else if (a_Token.value == "mac")
+			{
+				character_set = eRtfCharacterSet_AppleMacintoshRoman;
+			}
+			else if (a_Token.value == "pc")
+			{
+				character_set = eRtfCharacterSet_IbmPcCodePage437;
+			}
+			else if (a_Token.value == "pca")
+			{
+				character_set = eRtfCharacterSet_Oem;
+			}
+		}
+		
+		return character_set;
+	}
+
 	bool TextParserRtf::_CommandCharacterSet(const RtfToken& a_Token)
 	{
-		RtfTextFormat& format = m_ElementCurrent->TextFormat;
+		m_ElementCurrent->TextFormat.character_set = _TokenToCharset(a_Token);
 
-		if (a_Token.value == "ansi")
-		{
-			format.character_set = eRtfCharacterSet_Ansi;
-		}
-		else if (a_Token.value == "mac")
-		{
-			format.character_set = eRtfCharacterSet_AppleMacintosh;
-		}
-		else if (a_Token.value == "pc")
-		{
-			format.character_set = eRtfCharacterSet_IbmPcCodePage437;
-		}
-		else if (a_Token.value == "pca")
-		{
-			format.character_set = eRtfCharacterSet_IbmPcCodePage850;
-		}
-
-		return true;
+		return (m_ElementCurrent->TextFormat.character_set != eRtfCharacterSet_Invalid);
 	}
 
 	bool TextParserRtf::_CommandFontTable(const RtfToken& a_Token)
@@ -491,6 +548,27 @@ namespace ExLibris
 							}
 
 							font->pitch = (RtfFont::Pitch)token.parameter;
+						}
+
+						// characterset
+
+						else if (token.value == "fcharset")
+						{
+							font->character_set = _TokenToCharset(token);
+
+							if (font->character_set == eRtfCharacterSet_Invalid)
+							{
+								std::cerr << "Invalid character set " << token.parameter << " specified for font." << std::endl;
+
+								return false;
+							}
+						}
+
+						// unhandled
+
+						else
+						{
+							std::cout << "Unhandled control \"\\" << token.value << "\"" << std::endl;
 						}
 					}
 

@@ -83,25 +83,17 @@ namespace ExLibris
 
 		typedef bool (TextParserRtf::*CommandHandler)(const RtfToken&);
 
-		enum GroupType
-		{
-			eGroupType_Default,
-			eGroupType_FontTable
-		};
-
 		struct Group
 		{
 			Group()
 				: parent(nullptr)
 				, index(0)
-				, type(eGroupType_Default)
 				, process_commands(nullptr)
 			{
 			}
 
 			Group* parent;
 			int index;
-			GroupType type;
 			std::map<std::string, CommandHandler>* process_commands;
 			CommandHandler process_value;
 			std::vector<std::string> commands;
@@ -115,6 +107,7 @@ namespace ExLibris
 		void _GroupOpen();
 		void _GroupClose();
 		bool _ProcessToken(const RtfToken& a_Token);
+		RtfCharacterSet _TokenToCharset(const RtfToken& a_Token);
 
 	private:
 
