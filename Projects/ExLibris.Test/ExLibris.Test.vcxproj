@@ -78,6 +78,7 @@
     <ClCompile Include="Suite.GlyphProviderFreetype.cpp" />
     <ClCompile Include="Suite.GlyphProviderSystem.cpp" />
     <ClCompile Include="Suite.Rtf.Document.cpp" />
+    <ClCompile Include="Suite.Rtf.Element.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
     <ClCompile Include="Suite.Library.cpp" />
     <ClCompile Include="Suite.Line.cpp" />
