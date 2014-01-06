@@ -6,10 +6,10 @@ namespace ExLibris
 	enum RtfCharacterSet
 	{
 		eRtfCharacterSet_Invalid,
-		eRtfCharacterSet_ANSI,
+		eRtfCharacterSet_Ansi,
 		eRtfCharacterSet_AppleMacintosh,
-		eRtfCharacterSet_IBMPCCodePage437,
-		eRtfCharacterSet_IBMPCCodePage850,
+		eRtfCharacterSet_IbmPcCodePage437,
+		eRtfCharacterSet_IbmPcCodePage850,
 	};
 
 }; // namespace ExLibris

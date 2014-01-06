@@ -34,7 +34,7 @@ namespace ExLibris
 	TextParserRtf::TextParserRtf()
 		: m_Tokenizer(nullptr)
 		, m_Valid(false)
-		, m_CharacterSet(eRtfCharacterSet_ANSI)
+		, m_CharacterSet(eRtfCharacterSet_Ansi)
 		, m_GroupCurrent(nullptr)
 		, m_GroupIndex(0)
 		, m_FontEntryCurrent(nullptr)
@@ -340,7 +340,7 @@ namespace ExLibris
 	{
 		if (a_Token.value == "ansi")
 		{
-			m_CharacterSet = eRtfCharacterSet_ANSI;
+			m_CharacterSet = eRtfCharacterSet_Ansi;
 		}
 		else if (a_Token.value == "mac")
 		{
@@ -348,11 +348,11 @@ namespace ExLibris
 		}
 		else if (a_Token.value == "pc")
 		{
-			m_CharacterSet = eRtfCharacterSet_IBMPCCodePage437;
+			m_CharacterSet = eRtfCharacterSet_IbmPcCodePage437;
 		}
 		else if (a_Token.value == "pca")
 		{
-			m_CharacterSet = eRtfCharacterSet_IBMPCCodePage850;
+			m_CharacterSet = eRtfCharacterSet_IbmPcCodePage850;
 		}
 
 		return true;
