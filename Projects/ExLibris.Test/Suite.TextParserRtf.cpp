@@ -152,14 +152,14 @@ TEST(TextParserRtf, ColorTable)
 	ASSERT_NE(nullptr, doc);
 
 	RtfColor color0;
-	EXPECT_TRUE(doc->TryGetColor(color0, 0));
+	EXPECT_TRUE(doc->GetColorTable()->TryGetColor(color0, 0));
 	EXPECT_EQ(0, color0.r);
 	EXPECT_EQ(0, color0.g);
 	EXPECT_EQ(0, color0.b);
 	EXPECT_EQ(255, color0.a);
 
 	RtfColor color1;
-	EXPECT_TRUE(doc->TryGetColor(color1, 1));
+	EXPECT_TRUE(doc->GetColorTable()->TryGetColor(color1, 1));
 	EXPECT_EQ(128, color1.r);
 	EXPECT_EQ(128, color1.g);
 	EXPECT_EQ(128, color1.b);

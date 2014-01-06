@@ -92,6 +92,7 @@
     <ClCompile Include="MeshBuilder.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Quad.cpp" />
+    <ClCompile Include="RtfColorTable.cpp" />
     <ClCompile Include="RtfDomDocument.cpp" />
     <ClCompile Include="RtfDomElement.cpp" />
     <ClCompile Include="RtfLogMessage.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="Quad.h" />
     <ClInclude Include="RtfCharacterSet.h" />
     <ClInclude Include="RtfColor.h" />
+    <ClInclude Include="RtfColorTable.h" />
     <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
     <ClInclude Include="RtfLogMessage.h" />

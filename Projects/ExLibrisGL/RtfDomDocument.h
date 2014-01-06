@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RtfColor.h"
+#include "RtfColorTable.h"
 #include "RtfFont.h"
 #include "RtfTextFormat.h"
 
@@ -24,8 +24,7 @@ namespace ExLibris
 
 		RtfFont& GetFont(int a_Index);
 
-		void AddColor(const RtfColor& a_Color);
-		bool TryGetColor(RtfColor& a_Target, int a_Index) const;
+		RtfColorTable* GetColorTable() const;
 
 		RtfDomElement* GetRootElement() const;
 
@@ -34,7 +33,7 @@ namespace ExLibris
 		RtfTextFormat m_TextFormat;
 
 		std::map<int, RtfFont*> m_FontTable;
-		std::vector<RtfColor> m_ColorTable;
+		RtfColorTable* m_ColorTable;
 
 		RtfDomElement* m_RootElement;
 
