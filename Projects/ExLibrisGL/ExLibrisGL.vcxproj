@@ -93,6 +93,7 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RtfDomDocument.cpp" />
+    <ClCompile Include="RtfDomElement.cpp" />
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TextParserMarkdown.cpp" />
     <ClCompile Include="TextParserRtf.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="RtfCharacterSet.h" />
+    <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
     <ClInclude Include="RtfTextFormat.h" />
     <ClInclude Include="SizePolicy.h" />
