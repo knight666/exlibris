@@ -83,17 +83,25 @@ namespace ExLibris
 
 		typedef bool (TextParserRtf::*CommandHandler)(const RtfToken&);
 
+		enum GroupType
+		{
+			eGroupType_Default,
+			eGroupType_FontTable
+		};
+
 		struct Group
 		{
 			Group()
 				: parent(nullptr)
 				, index(0)
+				, type(eGroupType_Default)
 				, process_commands(nullptr)
 			{
 			}
 
 			Group* parent;
 			int index;
+			GroupType type;
 			std::map<std::string, CommandHandler>* process_commands;
 			CommandHandler process_value;
 			std::vector<std::string> commands;
@@ -113,6 +121,7 @@ namespace ExLibris
 		bool _CommandFont(const RtfToken& a_Token);
 		bool _CommandFontDefault(const RtfToken& a_Token);
 		bool _CommandFontFamily(const RtfToken& a_Token);
+		bool _CommandFontPitch(const RtfToken& a_Token);
 		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
 		bool _CommandParagraph(const RtfToken& a_Token);
 
@@ -121,16 +130,17 @@ namespace ExLibris
 
 	private:
 
-		RtfDomDocument* m_Document;
-		RtfDomElement* m_ElementCurrent;
-		RtfFont* m_FontDefault;
-
 		std::stringstream m_Input;
 		Tokenizer* m_Tokenizer;
 
 		std::vector<Group*> m_Groups;
 		Group* m_GroupCurrent;
 		int m_GroupIndex;
+
+		RtfDomDocument* m_Document;
+		RtfDomElement* m_ElementCurrent;
+		RtfFont* m_FontDefault;
+		RtfFont* m_FontCurrent;
 
 		std::map<std::string, CommandHandler> m_CommandHandlers;
 	
