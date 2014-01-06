@@ -20,15 +20,24 @@ namespace ExLibris
 			eFamilyType_Bidi,
 		};
 
+		enum Pitch
+		{
+			ePitch_Default  = 0,
+			ePitch_Fixed    = 1,
+			ePitch_Variable = 2
+		};
+
 	public:
 
 		RtfFont()
 			: family(eFamilyType_Nil)
+			, pitch(ePitch_Default)
 		{
 		}
 
-		FamilyType family;
 		std::string name;
+		FamilyType family;
+		Pitch pitch;
 
 	}; // struct RtfFont
 

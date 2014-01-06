@@ -46,6 +46,32 @@ TEST(TextParserRtf, UseDefaultFont)
 	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
 }
 
+TEST(TextParserRtf, FontSetPitch)
+{
+	TextParserRtf parser;
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi";
+	input << "{\\fonttbl";
+	input << "{\\f0\\fprq1 Magnified;}";
+	input << "{\\f1\\fprq0 Simplified;}";
+	input << "{\\f2\\fprq2 Testified;}";
+	input << "}}";
+
+	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	ASSERT_NE(nullptr, doc);
+
+	EXPECT_STREQ("Magnified", doc->GetFont(0).name.c_str());
+	EXPECT_EQ(RtfFont::ePitch_Fixed, doc->GetFont(0).pitch);
+
+	EXPECT_STREQ("Simplified", doc->GetFont(1).name.c_str());
+	EXPECT_EQ(RtfFont::ePitch_Default, doc->GetFont(1).pitch);
+
+	EXPECT_STREQ("Testified", doc->GetFont(2).name.c_str());
+	EXPECT_EQ(RtfFont::ePitch_Variable, doc->GetFont(2).pitch);
+}
+
 TEST(TextParserRtf, ControlTrailingWhitespace)
 {
 	TextParserRtf parser;
