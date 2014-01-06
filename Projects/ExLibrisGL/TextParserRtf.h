@@ -66,16 +66,33 @@ namespace ExLibris
 
 	private:
 
-		typedef bool (TextParserRtf::*CommandHandler)(const Token&);
-
 		enum ParseType
 		{
 			eParseType_Invalid,
 			eParseType_GroupOpen,
 			eParseType_GroupClose,
 			eParseType_Command,
+			eParseType_Value,
 			eParseType_Text
 		};
+
+		struct RtfToken
+		{
+			RtfToken()
+				: type(eParseType_Invalid)
+				, index(-1)
+			{
+			}
+
+			ParseType type;
+			std::string value;
+			int index;
+		};
+
+		typedef bool (TextParserRtf::*CommandHandler)(const RtfToken&);
+
+		RtfToken _ReadNextToken();
+		bool _ProcessToken(const RtfToken& a_Token);
 
 		bool _ReadCommand(const std::string& a_Text);
 		int _ReadInteger();
@@ -88,13 +105,14 @@ namespace ExLibris
 			Group()
 				: parent(nullptr)
 				, index(0)
-				, handlers(nullptr)
+				, process_commands(nullptr)
 			{
 			}
 
 			Group* parent;
 			int index;
-			std::map<std::string, CommandHandler>* handlers;
+			std::map<std::string, CommandHandler>* process_commands;
+			CommandHandler process_value;
 			std::vector<std::string> commands;
 		};
 
@@ -143,10 +161,16 @@ namespace ExLibris
 
 	private:
 
-		bool _CommandCharacterSet(const Token& a_Token);
-		bool _CommandFontTable(const Token& a_Token);
-		bool _CommandFont(const Token& a_Token);
-		bool _CommandFontFamily(const Token& a_Token);
+		bool _CommandCharacterSet(const RtfToken& a_Token);
+		bool _CommandFontTable(const RtfToken& a_Token);
+		bool _CommandUseFont(const RtfToken& a_Token);
+		bool _CommandFontDefinition(const RtfToken& a_Token);
+		bool _CommandFontFamily(const RtfToken& a_Token);
+		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
+		bool _CommandParagraphEnd(const RtfToken& a_Token);
+
+		bool _ProcessValueDefault(const RtfToken& a_Token);
+		bool _ProcessValueFontEntry(const RtfToken& a_Token);
 
 		std::map<std::string, CommandHandler> m_CommandHandlers;
 		std::map<std::string, CommandHandler> m_CommandHandlersFontTable;
