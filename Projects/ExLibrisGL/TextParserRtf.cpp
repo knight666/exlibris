@@ -202,6 +202,13 @@ namespace ExLibris
 								m_Tokenizer->RevertToken();
 							}
 						}
+
+						// read trailing space
+
+						if (m_Tokenizer->ReadToken() && (tk.type != Token::eType_Whitespace || tk.text[0] != ' '))
+						{
+							m_Tokenizer->RevertToken();
+						}
 					}
 					else
 					{
@@ -236,13 +243,7 @@ namespace ExLibris
 		if (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace)
 		{
 			token.type = eParseType_Text;
-
-			// don't add leading whitespace
-
-			if (tk.type == Token::eType_Text)
-			{
-				token.value += tk.text;
-			}
+			token.value = tk.text;
 
 			while (m_Tokenizer->ReadToken() && (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace || tk.type == Token::eType_Symbol))
 			{
