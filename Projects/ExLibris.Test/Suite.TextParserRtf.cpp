@@ -72,6 +72,36 @@ TEST(TextParserRtf, FontSetPitch)
 	EXPECT_EQ(RtfFont::ePitch_Variable, doc->GetFont(2).pitch);
 }
 
+TEST(TextParserRtf, ColorTable)
+{
+	TextParserRtf parser;
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi";
+	input << "{\\colortbl;";
+	input << "\\red0\\green0\\blue0;";
+	input << "\\red128\\green128\\blue128;";
+	input << "}}";
+
+	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	ASSERT_NE(nullptr, doc);
+
+	RtfColor color0;
+	EXPECT_TRUE(doc->TryGetColor(color0, 0));
+	EXPECT_EQ(0, color0.r);
+	EXPECT_EQ(0, color0.g);
+	EXPECT_EQ(0, color0.b);
+	EXPECT_EQ(255, color0.a);
+
+	RtfColor color1;
+	EXPECT_TRUE(doc->TryGetColor(color1, 1));
+	EXPECT_EQ(128, color1.r);
+	EXPECT_EQ(128, color1.g);
+	EXPECT_EQ(128, color1.b);
+	EXPECT_EQ(255, color1.a);
+}
+
 TEST(TextParserRtf, ControlTrailingWhitespace)
 {
 	TextParserRtf parser;
