@@ -65,6 +65,8 @@ namespace ExLibris
 		m_Tokenizer = new Tokenizer(nullptr);
 		m_Tokenizer->DisableOptions(Tokenizer::eOption_Identifiers);
 
+		m_CommandHandlers.insert(std::make_pair("*", &TextParserRtf::_CommandExtended));
+
 		m_CommandHandlers.insert(std::make_pair("ansi", &TextParserRtf::_CommandCharacterSet));
 		m_CommandHandlers.insert(std::make_pair("mac", &TextParserRtf::_CommandCharacterSet));
 		m_CommandHandlers.insert(std::make_pair("pc", &TextParserRtf::_CommandCharacterSet));
@@ -219,9 +221,16 @@ namespace ExLibris
 
 			case '\\':
 				{
+					if (!m_Tokenizer->ReadToken())
+					{
+						token.type = eParseType_Invalid;
+
+						return token;
+					}
+
 					token.type = eParseType_Command;
 
-					if (m_Tokenizer->ReadToken() && tk.type == Token::eType_Text)
+					if (tk.type == Token::eType_Text)
 					{
 						token.value = tk.text;
 
@@ -236,17 +245,21 @@ namespace ExLibris
 								m_Tokenizer->RevertToken();
 							}
 						}
-
-						// read trailing space
-
-						if (m_Tokenizer->ReadToken() && (tk.type != Token::eType_Whitespace || tk.text[0] != ' '))
-						{
-							m_Tokenizer->RevertToken();
-						}
+					}
+					else if (tk.type == Token::eType_Symbol && tk.text[0] == '*')
+					{
+						token.value = tk.text;
 					}
 					else
 					{
 						token.type = eParseType_Invalid;
+					}
+
+					// read trailing space
+
+					if (m_Tokenizer->ReadToken() && (tk.type != Token::eType_Whitespace || tk.text[0] != ' '))
+					{
+						m_Tokenizer->RevertToken();
 					}
 
 					return token;
@@ -477,6 +490,65 @@ namespace ExLibris
 		}
 		
 		return character_set;
+	}
+
+	bool TextParserRtf::_CommandExtended(const RtfToken& a_Token)
+	{
+		Group* group_previous = m_GroupCurrent->parent;
+		if (group_previous == nullptr)
+		{
+			LOG_ERROR(a_Token) << "Extended controls must be contained in their own group.";
+
+			return false;
+		}
+
+		RtfToken token = _ReadNextToken();
+
+		if (token.type != eParseType_Command)
+		{
+			LOG_ERROR(a_Token) << "Extended control must be followed by another control.";
+
+			return false;
+		}
+
+		// check if command is known
+
+		std::map<std::string, CommandHandler>::iterator found = m_GroupCurrent->process_commands->find(token.value);
+
+		if (found != m_GroupCurrent->process_commands->end())
+		{
+			return _ProcessToken(token);
+		}
+
+		// skip entire group
+
+		while (token.type != eParseType_Invalid)
+		{
+			switch (token.type)
+			{
+
+			case eParseType_GroupOpen:
+				{
+					_GroupOpen();
+
+				} break;
+
+			case eParseType_GroupClose:
+				{
+					_GroupClose();
+
+					if (m_GroupCurrent == group_previous)
+					{
+						return true;
+					}
+
+				} break;
+			}
+
+			token = _ReadNextToken();
+		}
+
+		return true;
 	}
 
 	bool TextParserRtf::_CommandCharacterSet(const RtfToken& a_Token)
