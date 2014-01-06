@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RtfCharacterSet.h"
 #include "RtfFont.h"
+#include "RtfTextFormat.h"
 
 namespace ExLibris
 {
@@ -14,14 +14,14 @@ namespace ExLibris
 		RtfDomDocument();
 		~RtfDomDocument();
 
-		RtfCharacterSet GetCharacterSet() const;
-		void SetCharacterSet(RtfCharacterSet a_CharacterSet);
+		RtfTextFormat& GetTextFormat();
 
 		RtfFont& GetFont(int a_Index);
 
 	private:
 
-		RtfCharacterSet m_CharacterSet;
+		RtfTextFormat m_TextFormat;
+
 		std::map<int, RtfFont*> m_FontTable;
 
 	}; // class RtfDomDocument

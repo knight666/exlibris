@@ -8,16 +8,16 @@ TEST(RtfDomDocument, Construct)
 {
 	RtfDomDocument doc;
 
-	EXPECT_EQ(eRtfCharacterSet_Invalid, doc.GetCharacterSet());
+	EXPECT_EQ(eRtfCharacterSet_Invalid, doc.GetTextFormat().character_set);
 }
 
 TEST(RtfDomDocument, CharacterSet)
 {
 	RtfDomDocument doc;
 
-	doc.SetCharacterSet(eRtfCharacterSet_AppleMacintosh);
+	doc.GetTextFormat().character_set = eRtfCharacterSet_AppleMacintosh;
 
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintosh, doc.GetCharacterSet());
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintosh, doc.GetTextFormat().character_set);
 }
 
 TEST(RtfDomDocument, GetFont)
