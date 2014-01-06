@@ -9,6 +9,7 @@ namespace ExLibris
 
 	RtfDomDocument::RtfDomDocument()
 		: m_RootElement(new RtfDomElement())
+		, m_ColorTable(new RtfColorTable())
 	{
 	}
 
@@ -19,6 +20,8 @@ namespace ExLibris
 			delete font_it->second;
 		}
 		m_FontTable.clear();
+
+		delete m_ColorTable;
 
 		delete m_RootElement;
 	}
@@ -47,21 +50,9 @@ namespace ExLibris
 		return *font;
 	}
 
-	void RtfDomDocument::AddColor(const RtfColor& a_Color)
+	RtfColorTable* RtfDomDocument::GetColorTable() const
 	{
-		m_ColorTable.push_back(a_Color);
-	}
-
-	bool RtfDomDocument::TryGetColor(RtfColor& a_Target, int a_Index) const
-	{
-		if (a_Index < 0 || a_Index > (int)m_ColorTable.size())
-		{
-			return false;
-		}
-
-		a_Target = m_ColorTable[a_Index];
-
-		return true;
+		return m_ColorTable;
 	}
 
 	RtfDomElement* RtfDomDocument::GetRootElement() const

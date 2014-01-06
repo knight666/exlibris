@@ -737,6 +737,8 @@ namespace ExLibris
 		}
 
 		RtfColor color;
+		RtfColorTable* color_table = m_Document->GetColorTable();
+
 		token = _ReadNextToken();
 
 		while (token.type != eParseType_Invalid)
@@ -762,7 +764,7 @@ namespace ExLibris
 			}
 			else if (token.type == eParseType_Value)
 			{
-				m_Document->AddColor(color);
+				color_table->AddColor(color);
 
 				color.r = 0;
 				color.g = 0;
