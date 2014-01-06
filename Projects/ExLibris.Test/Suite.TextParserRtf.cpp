@@ -29,6 +29,29 @@ TEST(TextParserRtf, HelloWorld)
 	EXPECT_EQ(1, root->GetChildrenCount());
 }
 
+TEST(TextParserRtf, ExtendedControlSkipUnknownGroup)
+{
+	TextParserRtf parser;
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi";
+	input << "{\\*\\zanzibar{\\new\\group\\please}This text should be ignored.}";
+	input << "This text is totally rad.";
+	input << "}";
+
+	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
+
+	ASSERT_NE(nullptr, doc);
+
+	RtfDomElement* root = doc->GetRootElement();
+
+	EXPECT_EQ(0, root->GetChildrenCount());
+	EXPECT_STREQ("This text is totally rad.", root->InnerText.c_str());
+}
+
 TEST(TextParserRtf, UseDefaultFont)
 {
 	TextParserRtf parser;

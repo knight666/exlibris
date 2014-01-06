@@ -117,6 +117,7 @@ namespace ExLibris
 
 	private:
 
+		bool _CommandExtended(const RtfToken& a_Token);
 		bool _CommandCharacterSet(const RtfToken& a_Token);
 		bool _CommandFontTable(const RtfToken& a_Token);
 		bool _CommandFont(const RtfToken& a_Token);
