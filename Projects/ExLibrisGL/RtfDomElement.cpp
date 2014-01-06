@@ -5,8 +5,8 @@
 namespace ExLibris
 {
 
-	RtfDomElement::RtfDomElement(RtfDomElement* a_Parent /*= nullptr*/)
-		: m_Parent(a_Parent)
+	RtfDomElement::RtfDomElement()
+		: m_Parent(nullptr)
 		, m_SiblingPrevious(nullptr)
 		, m_SiblingNext(nullptr)
 		, m_ChildPrevious(nullptr)
@@ -56,8 +56,9 @@ namespace ExLibris
 
 	RtfDomElement* RtfDomElement::AddChild()
 	{
-		RtfDomElement* child = new RtfDomElement(this);
-
+		RtfDomElement* child = new RtfDomElement;
+		child->m_Parent = this;
+		child->TextFormat = TextFormat;
 		child->m_SiblingPrevious = m_ChildPrevious;
 
 		if (m_ChildPrevious != nullptr)

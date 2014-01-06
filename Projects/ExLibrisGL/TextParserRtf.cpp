@@ -26,6 +26,8 @@
 
 #include "TextParserRtf.h"
 
+#include "RtfDomElement.h"
+#include "RtfTextFormat.h"
 #include "Tokenizer.h"
 
 namespace ExLibris
@@ -33,11 +35,10 @@ namespace ExLibris
 
 	TextParserRtf::TextParserRtf()
 		: m_Tokenizer(nullptr)
-		, m_Valid(false)
-		, m_CharacterSet(eRtfCharacterSet_Ansi)
+		, m_Document(nullptr)
+		, m_ElementCurrent(nullptr)
 		, m_GroupCurrent(nullptr)
 		, m_GroupIndex(0)
-		, m_FontEntryCurrent(nullptr)
 	{
 		m_Tokenizer = new Tokenizer(nullptr);
 		m_Tokenizer->DisableOptions(Tokenizer::eOption_Identifiers);
@@ -46,20 +47,20 @@ namespace ExLibris
 		m_CommandHandlers.insert(std::make_pair("mac", &TextParserRtf::_CommandCharacterSet));
 		m_CommandHandlers.insert(std::make_pair("pc", &TextParserRtf::_CommandCharacterSet));
 		m_CommandHandlers.insert(std::make_pair("pca", &TextParserRtf::_CommandCharacterSet));
-		m_CommandHandlers.insert(std::make_pair("fonttbl", &TextParserRtf::_CommandFontTable));
-		m_CommandHandlers.insert(std::make_pair("f", &TextParserRtf::_CommandUseFont));
-		m_CommandHandlers.insert(std::make_pair("pard", &TextParserRtf::_CommandParagraphResetToDefault));
-		m_CommandHandlers.insert(std::make_pair("par", &TextParserRtf::_CommandParagraphEnd));
 
-		m_CommandHandlersFontTable.insert(std::make_pair("f", &TextParserRtf::_CommandFontDefinition));
-		m_CommandHandlersFontTable.insert(std::make_pair("fnil", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("froman", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("fswiss", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("fmodern", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("fscript", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("fdecor", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("ftech", &TextParserRtf::_CommandFontFamily));
-		m_CommandHandlersFontTable.insert(std::make_pair("fbidi", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("fonttbl", &TextParserRtf::_CommandFontTable));
+		m_CommandHandlers.insert(std::make_pair("f", &TextParserRtf::_CommandFont));
+		m_CommandHandlers.insert(std::make_pair("fnil", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("froman", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("fswiss", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("fmodern", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("fscript", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("fdecor", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("ftech", &TextParserRtf::_CommandFontFamily));
+		m_CommandHandlers.insert(std::make_pair("fbidi", &TextParserRtf::_CommandFontFamily));
+
+		m_CommandHandlers.insert(std::make_pair("pard", &TextParserRtf::_CommandParagraphResetToDefault));
+		m_CommandHandlers.insert(std::make_pair("par", &TextParserRtf::_CommandParagraph));
 	}
 	
 	TextParserRtf::~TextParserRtf()
@@ -73,31 +74,29 @@ namespace ExLibris
 		m_Groups.clear();
 	}
 
-	bool TextParserRtf::IsValid() const
+	RtfDomDocument* TextParserRtf::ParseDocument(std::basic_istream<char>* a_Stream)
 	{
-		return m_Valid;
-	}
+		if (a_Stream == nullptr)
+		{
+			return nullptr;
+		}
 
-	RtfCharacterSet TextParserRtf::GetCharacterSet() const
-	{
-		return m_CharacterSet;
-	}
+		m_Document = new RtfDomDocument;
 
-	void TextParserRtf::SetInput(const std::string& a_Text)
-	{
-		m_Input.clear();
-		m_Input << a_Text;
-		m_Tokenizer->SetInput(&m_Input);
+		m_Tokenizer->SetInput(a_Stream);
 
 		if (!_ParseHeader())
 		{
-			m_Valid = false;
+			delete m_Document;
+			m_Document = nullptr;
 
-			return;
+			return nullptr;
 		}
 
+		m_ElementCurrent = m_Document->GetRootElement();
+
 		RtfToken command = _ReadNextToken();
-		while (command.type != eParseType_Invalid && command.type != eParseType_Text)
+		while (command.type != eParseType_Invalid)
 		{
 			if (!_ProcessToken(command))
 			{
@@ -107,43 +106,21 @@ namespace ExLibris
 			command = _ReadNextToken();
 		}
 
-		m_Valid = true;
+		return m_Document;
+	}
+
+	bool TextParserRtf::IsValid() const
+	{
+		return false;
+	}
+
+	void TextParserRtf::SetInput(const std::string& a_Text)
+	{
 	}
 
 	bool TextParserRtf::ReadToken()
 	{
-		RtfToken command = _ReadNextToken();
-
-		return command.type != eParseType_Invalid;
-	}
-
-	bool TextParserRtf::_ReadCommand(const std::string& a_Text)
-	{
-		const Token& tk = m_Tokenizer->GetCurrentToken();
-
-		if (!m_Tokenizer->ReadToken() || tk.type != Token::eType_Symbol || tk.text[0] != '\\')
-		{
-			return false;
-		}
-
-		if (!m_Tokenizer->ReadToken() || tk.type != Token::eType_Text || tk.text != a_Text)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	int TextParserRtf::_ReadInteger()
-	{
-		const Token& tk = m_Tokenizer->GetCurrentToken();
-
-		if (!m_Tokenizer->ReadToken() || tk.type != Token::eType_Integer)
-		{
-			return -1;
-		}
-
-		return atoi(tk.text.c_str());
+		return false;
 	}
 
 	bool TextParserRtf::_ParseHeader()
@@ -231,6 +208,8 @@ namespace ExLibris
 						token.type = eParseType_Invalid;
 					}
 
+					return token;
+
 				} break;
 
 			default:
@@ -241,28 +220,52 @@ namespace ExLibris
 				} break;
 			}
 		}
-		else if (tk.type == Token::eType_Whitespace && tk.text[0] == ' ')
+		else if (tk.type == Token::eType_NewLine)
 		{
-			while (m_Tokenizer->ReadToken())
+			while (tk.type == Token::eType_NewLine)
 			{
-				if (tk.type == Token::eType_Symbol && tk.text[0] == ';')
+				if (!m_Tokenizer->ReadToken())
 				{
-					break;
+					token.type = eParseType_Invalid;
+
+					return token;
+				}
+			}
+		}
+
+		if (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace)
+		{
+			token.type = eParseType_Text;
+
+			// don't add leading whitespace
+
+			if (tk.type == Token::eType_Text)
+			{
+				token.value += tk.text;
+			}
+
+			while (m_Tokenizer->ReadToken() && (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace || tk.type == Token::eType_Symbol))
+			{
+				if (tk.type == Token::eType_Symbol)
+				{
+					char symbol = tk.text[0];
+
+					if (symbol == '{' || symbol == '}' || symbol == '\\')
+					{
+						m_Tokenizer->RevertToken();
+
+						break;
+					}
+					else if (symbol == ';')
+					{
+						token.type = eParseType_Value;
+
+						break;
+					}
 				}
 
 				token.value += tk.text;
 			}
-
-			token.type = eParseType_Value;
-		}
-		else if (tk.type == Token::eType_NewLine)
-		{
-			token.type = eParseType_Text;
-		}
-		else if (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace)
-		{
-			token.value += tk.text;
-			token.type = eParseType_Text;
 		}
 
 		return token;
@@ -331,6 +334,11 @@ namespace ExLibris
 
 			} break;
 
+		case eParseType_Text:
+			{
+				m_ElementCurrent->InnerText += a_Token.value;
+
+			} break;
 		}
 
 		return true;
@@ -338,21 +346,23 @@ namespace ExLibris
 
 	bool TextParserRtf::_CommandCharacterSet(const RtfToken& a_Token)
 	{
+		RtfTextFormat& format = m_ElementCurrent->TextFormat;
+
 		if (a_Token.value == "ansi")
 		{
-			m_CharacterSet = eRtfCharacterSet_Ansi;
+			format.character_set = eRtfCharacterSet_Ansi;
 		}
 		else if (a_Token.value == "mac")
 		{
-			m_CharacterSet = eRtfCharacterSet_AppleMacintosh;
+			format.character_set = eRtfCharacterSet_AppleMacintosh;
 		}
 		else if (a_Token.value == "pc")
 		{
-			m_CharacterSet = eRtfCharacterSet_IbmPcCodePage437;
+			format.character_set = eRtfCharacterSet_IbmPcCodePage437;
 		}
 		else if (a_Token.value == "pca")
 		{
-			m_CharacterSet = eRtfCharacterSet_IbmPcCodePage850;
+			format.character_set = eRtfCharacterSet_IbmPcCodePage850;
 		}
 
 		return true;
@@ -360,47 +370,28 @@ namespace ExLibris
 
 	bool TextParserRtf::_CommandFontTable(const RtfToken& a_Token)
 	{
-		m_GroupCurrent->process_commands = &m_CommandHandlersFontTable;
 		m_GroupCurrent->process_value = &TextParserRtf::_ProcessValueFontEntry;
 
 		return true;
 	}
 
-	bool TextParserRtf::_CommandFontDefinition(const RtfToken& a_Token)
+	bool TextParserRtf::_CommandFont(const RtfToken& a_Token)
 	{
 		if (a_Token.index == -1)
 		{
 			return false;
 		}
 
-		m_FontEntryCurrent = new FontEntry;
-		m_FontEntryCurrent->index = a_Token.index;
-
-		m_FontEntries.insert(std::make_pair(m_FontEntryCurrent->index, m_FontEntryCurrent));
+		m_ElementCurrent->TextFormat.font = &m_Document->GetFont(a_Token.index);
 
 		return true;
 	}
 
-	bool TextParserRtf::_CommandUseFont(const RtfToken& a_Token)
-	{
-		std::map<int, FontEntry*>::iterator found = m_FontEntries.find(a_Token.index);
-		if (found == m_FontEntries.end())
-		{
-			std::cerr << "Could not find font entry with index " << a_Token.index << std::endl;
-
-			return false;
-		}
-		else
-		{
-			m_FontEntryCurrent = found->second;
-
-			return true;
-		}
-	}
-
 	bool TextParserRtf::_CommandFontFamily(const RtfToken& a_Token)
 	{
-		if (m_FontEntryCurrent == nullptr)
+		RtfFont* font = m_ElementCurrent->TextFormat.font;
+
+		if (font == nullptr)
 		{
 			std::cerr << "Could not set font family: no font entry was specified." << std::endl;
 
@@ -409,35 +400,35 @@ namespace ExLibris
 
 		if (a_Token.value == "froman")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Roman;
+			font->family = RtfFont::eFamilyType_Roman;
 		}
 		else if (a_Token.value == "fswiss")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Swiss;
+			font->family = RtfFont::eFamilyType_Swiss;
 		}
 		else if (a_Token.value == "fmodern")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Modern;
+			font->family = RtfFont::eFamilyType_Modern;
 		}
 		else if (a_Token.value == "fscript")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Script;
+			font->family = RtfFont::eFamilyType_Script;
 		}
 		else if (a_Token.value == "fdecor")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Decor;
+			font->family = RtfFont::eFamilyType_Decor;
 		}
 		else if (a_Token.value == "ftech")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Tech;
+			font->family = RtfFont::eFamilyType_Tech;
 		}
 		else if (a_Token.value == "fbidi")
 		{
-			m_FontEntryCurrent->family = eFamilyType_Bidi;
+			font->family = RtfFont::eFamilyType_Bidi;
 		}
 		else
 		{
-			m_FontEntryCurrent->family = eFamilyType_Nil;
+			font->family = RtfFont::eFamilyType_Nil;
 		}
 
 		return true;
@@ -448,8 +439,10 @@ namespace ExLibris
 		return true;
 	}
 
-	bool TextParserRtf::_CommandParagraphEnd(const RtfToken& a_Token)
+	bool TextParserRtf::_CommandParagraph(const RtfToken& a_Token)
 	{
+		m_ElementCurrent = m_ElementCurrent->AddChild();
+
 		return true;
 	}
 
@@ -460,14 +453,14 @@ namespace ExLibris
 
 	bool TextParserRtf::_ProcessValueFontEntry(const RtfToken& a_Token)
 	{
-		if (m_FontEntryCurrent == nullptr)
+		if (m_ElementCurrent->TextFormat.font == nullptr)
 		{
 			std::cerr << "Could not set font name: no font entry was specified." << std::endl;
 
 			return false;
 		}
 
-		m_FontEntryCurrent->name = a_Token.value;
+		m_ElementCurrent->TextFormat.font->name = a_Token.value;
 
 		return true;
 	}

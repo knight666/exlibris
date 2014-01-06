@@ -2,10 +2,13 @@
 
 #include "RtfDomDocument.h"
 
+#include "RtfDomElement.h"
+
 namespace ExLibris
 {
 
 	RtfDomDocument::RtfDomDocument()
+		: m_RootElement(new RtfDomElement())
 	{
 	}
 
@@ -16,6 +19,8 @@ namespace ExLibris
 			delete font_it->second;
 		}
 		m_FontTable.clear();
+
+		delete m_RootElement;
 	}
 
 	RtfTextFormat& RtfDomDocument::GetTextFormat()
@@ -40,6 +45,11 @@ namespace ExLibris
 		}
 
 		return *font;
+	}
+
+	RtfDomElement* RtfDomDocument::GetRootElement() const
+	{
+		return m_RootElement;
 	}
 
 }; // namespace ExLibris

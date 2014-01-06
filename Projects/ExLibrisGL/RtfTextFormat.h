@@ -4,6 +4,11 @@
 
 namespace ExLibris
 {
+	struct RtfFont;
+}
+
+namespace ExLibris
+{
 
 	struct RtfTextFormat
 	{
@@ -12,10 +17,12 @@ namespace ExLibris
 
 		RtfTextFormat()
 			: character_set(eRtfCharacterSet_Invalid)
+			, font(nullptr)
 		{
 		}
 
 		RtfCharacterSet character_set;
+		RtfFont* font;
 
 	}; // struct RtfFormat
 

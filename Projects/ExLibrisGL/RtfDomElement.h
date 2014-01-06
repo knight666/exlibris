@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RtfTextFormat.h"
+
 namespace ExLibris
 {
 
@@ -10,8 +12,12 @@ namespace ExLibris
 
 	public:
 
-		RtfDomElement(RtfDomElement* a_Parent = nullptr);
+		RtfDomElement();
 		~RtfDomElement();
+
+		RtfTextFormat TextFormat;
+
+		std::string InnerText;
 
 		RtfDomElement* GetParent() const;
 

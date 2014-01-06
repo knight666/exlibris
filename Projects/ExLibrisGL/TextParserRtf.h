@@ -26,10 +26,13 @@
 
 #include "ITextParser.h"
 #include "RtfCharacterSet.h"
+#include "RtfDomElement.h"
+#include "RtfDomDocument.h"
 #include "Token.h"
 
 namespace ExLibris
 {
+	class RtfDomElement;
 	class Tokenizer;
 }
 
@@ -45,9 +48,9 @@ namespace ExLibris
 		TextParserRtf();
 		~TextParserRtf();
 
-		bool IsValid() const;
+		RtfDomDocument* ParseDocument(std::basic_istream<char>* a_Stream);
 
-		RtfCharacterSet GetCharacterSet() const;
+		bool IsValid() const;
 
 		void SetInput(const std::string& a_Text);
 
@@ -80,15 +83,6 @@ namespace ExLibris
 
 		typedef bool (TextParserRtf::*CommandHandler)(const RtfToken&);
 
-		RtfToken _ReadNextToken();
-		bool _ProcessToken(const RtfToken& a_Token);
-
-		bool _ReadCommand(const std::string& a_Text);
-		int _ReadInteger();
-		bool _ParseHeader();
-		ParseType _Parse();
-		bool _ParseCommand(const Token& a_Token);
-
 		struct Group
 		{
 			Group()
@@ -105,64 +99,38 @@ namespace ExLibris
 			std::vector<std::string> commands;
 		};
 
-		enum FamilyType
-		{
-			eFamilyType_Nil,
-			eFamilyType_Roman,
-			eFamilyType_Swiss,
-			eFamilyType_Modern,
-			eFamilyType_Script,
-			eFamilyType_Decor,
-			eFamilyType_Tech,
-			eFamilyType_Bidi,
-		};
-
-		struct FontEntry
-		{
-			FontEntry()
-				: index(0)
-				, family(eFamilyType_Nil)
-			{
-			}
-
-			int index;
-			FamilyType family;
-			std::string name;
-		};
-
 	private:
 
-		std::stringstream m_Input;
-		Tokenizer* m_Tokenizer;
+		bool _ParseHeader();
 
-		RtfCharacterSet m_CharacterSet;
-		bool m_Valid;
-
-		std::string m_CommandCurrent;
-		ParseType m_Parsed;
-		int m_GroupIndex;
-
-		std::vector<Group*> m_Groups;
-		Group* m_GroupCurrent;
-
-		std::map<int, FontEntry*> m_FontEntries;
-		FontEntry* m_FontEntryCurrent;
+		RtfToken _ReadNextToken();
+		bool _ProcessToken(const RtfToken& a_Token);
 
 	private:
 
 		bool _CommandCharacterSet(const RtfToken& a_Token);
 		bool _CommandFontTable(const RtfToken& a_Token);
-		bool _CommandUseFont(const RtfToken& a_Token);
-		bool _CommandFontDefinition(const RtfToken& a_Token);
+		bool _CommandFont(const RtfToken& a_Token);
 		bool _CommandFontFamily(const RtfToken& a_Token);
 		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
-		bool _CommandParagraphEnd(const RtfToken& a_Token);
+		bool _CommandParagraph(const RtfToken& a_Token);
 
 		bool _ProcessValueDefault(const RtfToken& a_Token);
 		bool _ProcessValueFontEntry(const RtfToken& a_Token);
 
+	private:
+
+		RtfDomDocument* m_Document;
+		RtfDomElement* m_ElementCurrent;
+
+		std::stringstream m_Input;
+		Tokenizer* m_Tokenizer;
+
+		std::vector<Group*> m_Groups;
+		Group* m_GroupCurrent;
+		int m_GroupIndex;
+
 		std::map<std::string, CommandHandler> m_CommandHandlers;
-		std::map<std::string, CommandHandler> m_CommandHandlersFontTable;
 	
 	}; // class TextParserRtf
 
