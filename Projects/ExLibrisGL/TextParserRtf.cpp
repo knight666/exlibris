@@ -34,6 +34,26 @@
 namespace ExLibris
 {
 
+	class MessageFinisher
+	{
+
+	public:
+
+		void operator = (RtfLogMessage& a_Message)
+		{
+			a_Message.Finish();
+		}
+
+	};
+
+#define LOG_WARNING(_token) \
+	::ExLibris::MessageFinisher() = \
+	::ExLibris::RtfLogMessage(&m_LogWarnings, (_token).column, (_token).line)
+
+#define LOG_ERROR(_token) \
+	::ExLibris::MessageFinisher() = \
+	::ExLibris::RtfLogMessage(&m_LogErrors, (_token).column, (_token).line)
+
 	TextParserRtf::TextParserRtf()
 		: m_Tokenizer(nullptr)
 		, m_GroupCurrent(nullptr)
@@ -78,6 +98,9 @@ namespace ExLibris
 			return nullptr;
 		}
 
+		m_LogWarnings.clear();
+		m_LogErrors.clear();
+
 		m_Document = new RtfDomDocument;
 
 		m_Tokenizer->SetInput(a_Stream);
@@ -105,6 +128,16 @@ namespace ExLibris
 		}
 
 		return m_Document;
+	}
+
+	const std::vector<RtfLogMessage>& TextParserRtf::GetWarnings() const
+	{
+		return m_LogWarnings;
+	}
+
+	const std::vector<RtfLogMessage>& TextParserRtf::GetErrors() const
+	{
+		return m_LogErrors;
 	}
 
 	bool TextParserRtf::IsValid() const
@@ -163,6 +196,9 @@ namespace ExLibris
 		}
 
 		const Token& tk = m_Tokenizer->GetCurrentToken();
+
+		token.column = tk.column;
+		token.line = tk.line;
 
 		if (tk.type == Token::eType_Symbol)
 		{
@@ -338,12 +374,12 @@ namespace ExLibris
 					CommandHandler handler = found->second;
 					if (!(this->*handler)(a_Token))
 					{
-						std::cerr << "Error while parsing command \"\\" << a_Token.value << "\"" << std::endl;
+						LOG_ERROR(a_Token) << "Error while parsing command \"\\" << a_Token.value << "\"";
 					}
 				}
 				else
 				{
-					std::cout << "Unhandled command \"\\" << a_Token.value << "\"" << std::endl;
+					LOG_WARNING(a_Token) << "Unhandled command \"\\" << a_Token.value << "\"";
 				}
 
 			} break;
@@ -353,7 +389,7 @@ namespace ExLibris
 				CommandHandler handler = m_GroupCurrent->process_value;
 				if (!(this->*handler)(a_Token))
 				{
-					std::cerr << "Error while parsing value \"\\" << a_Token.value << "\"" << std::endl;
+					LOG_ERROR(a_Token) << "Error while parsing value \"\\" << a_Token.value << "\"";
 				}
 
 			} break;
@@ -455,7 +491,7 @@ namespace ExLibris
 		Group* group_fonttable_parent = m_GroupCurrent->parent;
 		if (group_fonttable_parent == nullptr)
 		{
-			std::cerr << "Font table must be inside a group.";
+			LOG_ERROR(a_Token) << "Font table must be inside a group.";
 
 			return false;
 		}
@@ -491,7 +527,7 @@ namespace ExLibris
 					{
 						if (token.parameter < 0)
 						{
-							std::cerr << "Invalid parameter \"" << token.parameter << "\" for font control." << std::endl;
+							LOG_ERROR(a_Token) << "Invalid parameter \"" << token.parameter << "\" for font control.";
 
 							return false;
 						}
@@ -502,7 +538,7 @@ namespace ExLibris
 					{
 						if (font == nullptr)
 						{
-							std::cerr << "Invalid control \\" << token.value << " because target font was not set." << std::endl;
+							LOG_ERROR(a_Token) << "Invalid control \\" << token.value << " because target font was not set.";
 
 							return false;
 						}
@@ -558,7 +594,7 @@ namespace ExLibris
 
 							if (font->character_set == eRtfCharacterSet_Invalid)
 							{
-								std::cerr << "Invalid character set " << token.parameter << " specified for font." << std::endl;
+								LOG_ERROR(a_Token) << "Invalid character set " << token.parameter << " specified for font.";
 
 								return false;
 							}
@@ -568,7 +604,7 @@ namespace ExLibris
 
 						else
 						{
-							std::cout << "Unhandled control \"\\" << token.value << "\"" << std::endl;
+							LOG_WARNING(a_Token) << "Unhandled control \"\\" << token.value << "\"";
 						}
 					}
 
@@ -649,7 +685,7 @@ namespace ExLibris
 				}
 				else
 				{
-					std::cerr << "Unknown color control \\" << token.parameter << "\\" << std::endl;
+					LOG_ERROR(a_Token) << "Unknown color control \\" << token.parameter << "\\";
 				}
 			}
 			else if (token.type == eParseType_Value)

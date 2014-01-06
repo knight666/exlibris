@@ -28,6 +28,7 @@
 #include "RtfCharacterSet.h"
 #include "RtfDomElement.h"
 #include "RtfDomDocument.h"
+#include "RtfLogMessage.h"
 #include "Token.h"
 
 namespace ExLibris
@@ -49,6 +50,9 @@ namespace ExLibris
 		~TextParserRtf();
 
 		RtfDomDocument* ParseDocument(std::basic_istream<char>* a_Stream);
+
+		const std::vector<RtfLogMessage>& GetWarnings() const;
+		const std::vector<RtfLogMessage>& GetErrors() const;
 
 		bool IsValid() const;
 
@@ -76,6 +80,8 @@ namespace ExLibris
 			{
 			}
 
+			int column;
+			int line;
 			ParseType type;
 			std::string value;
 			int parameter;
@@ -125,6 +131,9 @@ namespace ExLibris
 
 		std::stringstream m_Input;
 		Tokenizer* m_Tokenizer;
+
+		std::vector<RtfLogMessage> m_LogWarnings;
+		std::vector<RtfLogMessage> m_LogErrors;
 
 		std::vector<Group*> m_Groups;
 		Group* m_GroupCurrent;

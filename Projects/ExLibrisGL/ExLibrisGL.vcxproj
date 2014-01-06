@@ -94,6 +94,7 @@
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RtfDomDocument.cpp" />
     <ClCompile Include="RtfDomElement.cpp" />
+    <ClCompile Include="RtfLogMessage.cpp" />
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TextParserMarkdown.cpp" />
     <ClCompile Include="TextParserRtf.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="RtfColor.h" />
     <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
+    <ClInclude Include="RtfLogMessage.h" />
     <ClInclude Include="RtfTextFormat.h" />
     <ClInclude Include="SizePolicy.h" />
     <ClInclude Include="Style.h" />
