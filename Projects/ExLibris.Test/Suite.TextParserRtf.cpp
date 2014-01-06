@@ -25,3 +25,39 @@ TEST(TextParserRtf, HelloWorld)
 
 	EXPECT_EQ(1, root->GetChildrenCount());
 }
+
+TEST(TextParserRtf, UseDefaultFont)
+{
+	TextParserRtf parser;
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi\\deff0{\\fonttbl\\f0Robotica;}Bleep bloop.}";
+
+	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	ASSERT_NE(nullptr, doc);
+
+	RtfDomElement* root = doc->GetRootElement();
+
+	ASSERT_NE(nullptr, root->TextFormat.font);
+
+	EXPECT_EQ(RtfFont::eFamilyType_Nil, root->TextFormat.font->family);
+	EXPECT_STREQ("Robotica", root->TextFormat.font->name.c_str());
+	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
+}
+
+TEST(TextParserRtf, ControlTrailingWhitespace)
+{
+	TextParserRtf parser;
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi{\\fonttbl\\f0 Comic Sans MS;}\\f0\\pard    }";
+
+	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	ASSERT_NE(nullptr, doc);
+
+	RtfDomElement* root = doc->GetRootElement();
+
+	EXPECT_STREQ("   ", root->InnerText.c_str());
+}

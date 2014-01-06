@@ -72,13 +72,13 @@ namespace ExLibris
 		{
 			RtfToken()
 				: type(eParseType_Invalid)
-				, index(-1)
+				, parameter(-1)
 			{
 			}
 
 			ParseType type;
 			std::string value;
-			int index;
+			int parameter;
 		};
 
 		typedef bool (TextParserRtf::*CommandHandler)(const RtfToken&);
@@ -111,6 +111,7 @@ namespace ExLibris
 		bool _CommandCharacterSet(const RtfToken& a_Token);
 		bool _CommandFontTable(const RtfToken& a_Token);
 		bool _CommandFont(const RtfToken& a_Token);
+		bool _CommandFontDefault(const RtfToken& a_Token);
 		bool _CommandFontFamily(const RtfToken& a_Token);
 		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
 		bool _CommandParagraph(const RtfToken& a_Token);
@@ -122,6 +123,7 @@ namespace ExLibris
 
 		RtfDomDocument* m_Document;
 		RtfDomElement* m_ElementCurrent;
+		RtfFont* m_FontDefault;
 
 		std::stringstream m_Input;
 		Tokenizer* m_Tokenizer;
