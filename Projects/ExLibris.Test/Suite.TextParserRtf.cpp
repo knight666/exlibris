@@ -13,6 +13,9 @@ TEST(TextParserRtf, HelloWorld)
 
 	RtfDomDocument* doc = parser.ParseDocument(&input);
 
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
+
 	ASSERT_NE(nullptr, doc);
 
 	EXPECT_EQ(RtfFont::eFamilyType_Swiss, doc->GetFont(0).family);
@@ -34,6 +37,9 @@ TEST(TextParserRtf, UseDefaultFont)
 	input << "{\\rtf1\\ansi\\deff0{\\fonttbl\\f0Robotica;}Bleep bloop.}";
 
 	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
 
 	ASSERT_NE(nullptr, doc);
 
@@ -59,6 +65,9 @@ TEST(TextParserRtf, FontSetPitch)
 	input << "}}";
 
 	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
 
 	ASSERT_NE(nullptr, doc);
 
@@ -86,6 +95,9 @@ TEST(TextParserRtf, FontSetCharacterSet)
 
 	RtfDomDocument* doc = parser.ParseDocument(&input);
 
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
+
 	ASSERT_NE(nullptr, doc);
 
 	EXPECT_STREQ("Tester", doc->GetFont(0).name.c_str());
@@ -110,6 +122,9 @@ TEST(TextParserRtf, ColorTable)
 	input << "}}";
 
 	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
 
 	ASSERT_NE(nullptr, doc);
 
@@ -136,6 +151,9 @@ TEST(TextParserRtf, ControlTrailingWhitespace)
 	input << "{\\rtf1\\ansi{\\fonttbl\\f0 Comic Sans MS;}\\f0\\pard    }";
 
 	RtfDomDocument* doc = parser.ParseDocument(&input);
+
+	EXPECT_EQ(0, parser.GetWarnings().size());
+	EXPECT_EQ(0, parser.GetErrors().size());
 
 	ASSERT_NE(nullptr, doc);
 
