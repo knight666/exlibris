@@ -112,6 +112,8 @@ namespace ExLibris
 		bool _ParseHeader();
 
 		RtfToken _ReadNextToken();
+		void _GroupOpen();
+		void _GroupClose();
 		bool _ProcessToken(const RtfToken& a_Token);
 
 	private:
@@ -120,14 +122,11 @@ namespace ExLibris
 		bool _CommandFontTable(const RtfToken& a_Token);
 		bool _CommandFont(const RtfToken& a_Token);
 		bool _CommandFontDefault(const RtfToken& a_Token);
-		bool _CommandFontFamily(const RtfToken& a_Token);
-		bool _CommandFontPitch(const RtfToken& a_Token);
 		bool _CommandColorTable(const RtfToken& a_Token);
 		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
 		bool _CommandParagraph(const RtfToken& a_Token);
 
 		bool _ProcessValueDefault(const RtfToken& a_Token);
-		bool _ProcessValueFontEntry(const RtfToken& a_Token);
 
 	private:
 
@@ -141,7 +140,6 @@ namespace ExLibris
 		RtfDomDocument* m_Document;
 		RtfDomElement* m_ElementCurrent;
 		RtfFont* m_FontDefault;
-		RtfFont* m_FontCurrent;
 
 		std::map<std::string, CommandHandler> m_CommandHandlers;
 	
