@@ -12,5 +12,5 @@ TEST(TextParserRtf, HelloWorld)
 	parser.SetInput(input);
 
 	EXPECT_TRUE(parser.IsValid());
-	EXPECT_EQ(TextParserRtf::eCharacterSet_ANSI, parser.GetCharacterSet());
+	EXPECT_EQ(eRtfCharacterSet_ANSI, parser.GetCharacterSet());
 }

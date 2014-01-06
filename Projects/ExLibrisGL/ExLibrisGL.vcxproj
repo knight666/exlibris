@@ -131,6 +131,7 @@
     <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
+    <ClInclude Include="RtfCharacterSet.h" />
     <ClInclude Include="RtfFont.h" />
     <ClInclude Include="SizePolicy.h" />
     <ClInclude Include="Style.h" />

@@ -25,7 +25,7 @@
 #pragma once
 
 #include "ITextParser.h"
-
+#include "RtfCharacterSet.h"
 #include "Token.h"
 
 namespace ExLibris
@@ -39,17 +39,6 @@ namespace ExLibris
 	class TextParserRtf
 		: public ITextParser
 	{
-
-	public:
-
-		enum CharacterSet
-		{
-			eCharacterSet_Invalid,
-			eCharacterSet_ANSI,
-			eCharacterSet_AppleMacintosh,
-			eCharacterSet_IBMPCCodePage437,
-			eCharacterSet_IBMPCCodePage850,
-		};
 	
 	public:
 	
@@ -58,7 +47,7 @@ namespace ExLibris
 
 		bool IsValid() const;
 
-		CharacterSet GetCharacterSet() const;
+		RtfCharacterSet GetCharacterSet() const;
 
 		void SetInput(const std::string& a_Text);
 
@@ -146,7 +135,7 @@ namespace ExLibris
 		std::stringstream m_Input;
 		Tokenizer* m_Tokenizer;
 
-		CharacterSet m_CharacterSet;
+		RtfCharacterSet m_CharacterSet;
 		bool m_Valid;
 
 		std::string m_CommandCurrent;
