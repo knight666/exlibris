@@ -122,6 +122,7 @@ namespace ExLibris
 		bool _CommandFontDefault(const RtfToken& a_Token);
 		bool _CommandFontFamily(const RtfToken& a_Token);
 		bool _CommandFontPitch(const RtfToken& a_Token);
+		bool _CommandColorTable(const RtfToken& a_Token);
 		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
 		bool _CommandParagraph(const RtfToken& a_Token);
 

@@ -47,6 +47,23 @@ namespace ExLibris
 		return *font;
 	}
 
+	void RtfDomDocument::AddColor(const RtfColor& a_Color)
+	{
+		m_ColorTable.push_back(a_Color);
+	}
+
+	bool RtfDomDocument::TryGetColor(RtfColor& a_Target, int a_Index) const
+	{
+		if (a_Index < 0 || a_Index > (int)m_ColorTable.size())
+		{
+			return false;
+		}
+
+		a_Target = m_ColorTable[a_Index];
+
+		return true;
+	}
+
 	RtfDomElement* RtfDomDocument::GetRootElement() const
 	{
 		return m_RootElement;

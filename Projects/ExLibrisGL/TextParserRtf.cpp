@@ -26,6 +26,7 @@
 
 #include "TextParserRtf.h"
 
+#include "RtfColor.h"
 #include "RtfDomElement.h"
 #include "RtfTextFormat.h"
 #include "Tokenizer.h"
@@ -62,6 +63,8 @@ namespace ExLibris
 		m_CommandHandlers.insert(std::make_pair("ftech", &TextParserRtf::_CommandFontFamily));
 		m_CommandHandlers.insert(std::make_pair("fbidi", &TextParserRtf::_CommandFontFamily));
 		m_CommandHandlers.insert(std::make_pair("fprq", &TextParserRtf::_CommandFontPitch));
+
+		m_CommandHandlers.insert(std::make_pair("colortbl", &TextParserRtf::_CommandColorTable));
 
 		m_CommandHandlers.insert(std::make_pair("pard", &TextParserRtf::_CommandParagraphResetToDefault));
 		m_CommandHandlers.insert(std::make_pair("par", &TextParserRtf::_CommandParagraph));
@@ -222,6 +225,12 @@ namespace ExLibris
 					}
 
 					return token;
+
+				} break;
+
+			case ';':
+				{
+					token.type = eParseType_Value;
 
 				} break;
 
@@ -506,6 +515,63 @@ namespace ExLibris
 		}
 
 		m_FontCurrent->pitch = (RtfFont::Pitch)a_Token.parameter;
+
+		return true;
+	}
+
+	bool TextParserRtf::_CommandColorTable(const RtfToken& a_Token)
+	{
+		RtfToken token = _ReadNextToken();
+
+		// first empty value indicator
+
+		if (token.type != eParseType_Value)
+		{
+			return false;
+		}
+
+		RtfColor color;
+		token = _ReadNextToken();
+
+		while (token.type != eParseType_Invalid)
+		{
+			if (token.type == eParseType_Command)
+			{
+				if (token.value == "red")
+				{
+					color.r = token.parameter;
+				}
+				else if (token.value == "green")
+				{
+					color.g = token.parameter;
+				}
+				else if (token.value == "blue")
+				{
+					color.b = token.parameter;
+				}
+				else
+				{
+					std::cerr << "Unknown color control \\" << token.parameter << "\\" << std::endl;
+				}
+			}
+			else if (token.type == eParseType_Value)
+			{
+				m_Document->AddColor(color);
+
+				color.r = 0;
+				color.g = 0;
+				color.b = 0;
+				color.a = 255;
+			}
+			else
+			{
+				m_Tokenizer->RevertToken();
+
+				break;
+			}
+
+			token = _ReadNextToken();
+		}
 
 		return true;
 	}

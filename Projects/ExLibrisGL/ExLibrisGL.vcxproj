@@ -133,6 +133,7 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="RtfCharacterSet.h" />
+    <ClInclude Include="RtfColor.h" />
     <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
     <ClInclude Include="RtfTextFormat.h" />
