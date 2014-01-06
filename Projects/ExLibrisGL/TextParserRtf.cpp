@@ -47,8 +47,11 @@ namespace ExLibris
 		m_CommandHandlers.insert(std::make_pair("pc", &TextParserRtf::_CommandCharacterSet));
 		m_CommandHandlers.insert(std::make_pair("pca", &TextParserRtf::_CommandCharacterSet));
 		m_CommandHandlers.insert(std::make_pair("fonttbl", &TextParserRtf::_CommandFontTable));
+		m_CommandHandlers.insert(std::make_pair("f", &TextParserRtf::_CommandUseFont));
+		m_CommandHandlers.insert(std::make_pair("pard", &TextParserRtf::_CommandParagraphResetToDefault));
+		m_CommandHandlers.insert(std::make_pair("par", &TextParserRtf::_CommandParagraphEnd));
 
-		m_CommandHandlersFontTable.insert(std::make_pair("f", &TextParserRtf::_CommandFont));
+		m_CommandHandlersFontTable.insert(std::make_pair("f", &TextParserRtf::_CommandFontDefinition));
 		m_CommandHandlersFontTable.insert(std::make_pair("fnil", &TextParserRtf::_CommandFontFamily));
 		m_CommandHandlersFontTable.insert(std::make_pair("froman", &TextParserRtf::_CommandFontFamily));
 		m_CommandHandlersFontTable.insert(std::make_pair("fswiss", &TextParserRtf::_CommandFontFamily));
@@ -93,28 +96,25 @@ namespace ExLibris
 			return;
 		}
 
-		// commands
-
-		ParseType parsed = eParseType_Invalid;
-
-		do 
+		RtfToken command = _ReadNextToken();
+		while (command.type != eParseType_Invalid && command.type != eParseType_Text)
 		{
-			parsed = _Parse();
-
-			if (parsed == eParseType_Invalid)
+			if (!_ProcessToken(command))
 			{
-				m_Valid = false;
-				return;
+				break;
 			}
+
+			command = _ReadNextToken();
 		}
-		while (parsed != eParseType_Text);
 
 		m_Valid = true;
 	}
 
 	bool TextParserRtf::ReadToken()
 	{
-		return false;
+		RtfToken command = _ReadNextToken();
+
+		return command.type != eParseType_Invalid;
 	}
 
 	bool TextParserRtf::_ReadCommand(const std::string& a_Text)
@@ -150,14 +150,26 @@ namespace ExLibris
 	{
 		// document group
 
-		if (_Parse() != eParseType_GroupOpen)
+		RtfToken document_group = _ReadNextToken();
+		if (document_group.type != eParseType_GroupOpen)
 		{
 			return false;
 		}
 
+		m_GroupIndex = 0;
+
+		m_GroupCurrent = new Group;
+		m_GroupCurrent->index = m_GroupIndex++;
+		m_GroupCurrent->parent = nullptr;
+		m_GroupCurrent->process_commands = &m_CommandHandlers;
+		m_GroupCurrent->process_value = &TextParserRtf::_ProcessValueDefault;
+
+		m_Groups.push_back(m_GroupCurrent);
+
 		// rtf command
 
-		if (!_ReadCommand("rtf") || _ReadInteger() != 1)
+		RtfToken header_command = _ReadNextToken();
+		if (header_command.type != eParseType_Command || header_command.value != "rtf" || header_command.index != 1)
 		{
 			return false;
 		}
@@ -165,13 +177,14 @@ namespace ExLibris
 		return true;
 	}
 
-	TextParserRtf::ParseType TextParserRtf::_Parse()
+	TextParserRtf::RtfToken TextParserRtf::_ReadNextToken()
 	{
-		ParseType result = eParseType_Invalid;
+		RtfToken token;
+		token.type = eParseType_Invalid;
 
 		if (!m_Tokenizer->ReadToken())
 		{
-			return result;
+			return token;
 		}
 
 		const Token& tk = m_Tokenizer->GetCurrentToken();
@@ -183,97 +196,161 @@ namespace ExLibris
 
 			case '{':
 				{
-					m_GroupIndex++;
-
-					Group* group_create = new Group;
-					group_create->index = m_GroupIndex;
-					group_create->parent = m_GroupCurrent;
-					group_create->handlers = &m_CommandHandlers;
-
-					m_GroupCurrent = group_create;
-
-					m_Groups.push_back(group_create);
-
-					result = eParseType_GroupOpen;
+					token.type = eParseType_GroupOpen;
 
 				} break;
 
 			case '}':
 				{
-					m_GroupIndex--;
-
-					if (m_GroupCurrent != nullptr && m_GroupCurrent->parent != nullptr)
-					{
-						m_GroupCurrent = m_GroupCurrent->parent;
-					}
-
-					result = eParseType_GroupClose;
+					token.type = eParseType_GroupClose;
 
 				} break;
 
 			case '\\':
 				{
-					if (!m_Tokenizer->ReadToken())
+					token.type = eParseType_Command;
+
+					if (m_Tokenizer->ReadToken() && tk.type == Token::eType_Text)
 					{
-						result = eParseType_Invalid;
+						token.value = tk.text;
 
-						break;
-					}
-
-					if (tk.type == Token::eType_Text)
-					{
-						std::map<std::string, CommandHandler>::iterator found = m_GroupCurrent->handlers->find(tk.text);
-
-						m_GroupCurrent->commands.push_back(tk.text);
-
-						if (found != m_GroupCurrent->handlers->end())
+						if (m_Tokenizer->ReadToken())
 						{
-							CommandHandler handler = found->second;
-							if (!(this->*handler)(tk))
+							if (tk.type == Token::eType_Integer)
 							{
-								std::cerr << "Error while parsing command \"\\" << tk.text << "\" at column " << tk.column << " on line " << tk.line << std::endl;
+								token.index = atoi(tk.text.c_str());
+							}
+							else
+							{
+								m_Tokenizer->RevertToken();
 							}
 						}
-						else
-						{
-							std::cout << "Unhandled command \"\\" << tk.text << "\" at column " << tk.column << " on line " << tk.line << std::endl;
-						}
-
-						result = eParseType_Command;
 					}
-					
+					else
+					{
+						token.type = eParseType_Invalid;
+					}
+
 				} break;
 
 			default:
 				{
-					result = eParseType_Text;
+					token.value += tk.text;
+					token.type = eParseType_Text;
 
 				} break;
 			}
 		}
-		else if (tk.type == Token::eType_Whitespace || tk.type == Token::eType_Text)
+		else if (tk.type == Token::eType_Whitespace && tk.text[0] == ' ')
 		{
-			result = eParseType_Text;
+			while (m_Tokenizer->ReadToken())
+			{
+				if (tk.type == Token::eType_Symbol && tk.text[0] == ';')
+				{
+					break;
+				}
+
+				token.value += tk.text;
+			}
+
+			token.type = eParseType_Value;
+		}
+		else if (tk.type == Token::eType_NewLine)
+		{
+			token.type = eParseType_Text;
+		}
+		else if (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace)
+		{
+			token.value += tk.text;
+			token.type = eParseType_Text;
 		}
 
-		return result;
+		return token;
 	}
 
-	bool TextParserRtf::_CommandCharacterSet(const Token& a_Token)
+	bool TextParserRtf::_ProcessToken(const RtfToken& a_Token)
 	{
-		if (m_CommandCurrent == "ansi")
+		switch (a_Token.type)
+		{
+
+		case eParseType_GroupOpen:
+			{
+				m_GroupIndex++;
+
+				Group* group_create = new Group;
+				group_create->index = m_GroupIndex;
+				group_create->parent = m_GroupCurrent;
+				group_create->process_commands = &m_CommandHandlers;
+				group_create->process_value = &TextParserRtf::_ProcessValueDefault;
+
+				m_GroupCurrent = group_create;
+
+				m_Groups.push_back(group_create);
+
+			} break;
+
+		case eParseType_GroupClose:
+			{
+				m_GroupIndex--;
+
+				if (m_GroupCurrent != nullptr && m_GroupCurrent->parent != nullptr)
+				{
+					m_GroupCurrent = m_GroupCurrent->parent;
+				}
+
+			} break;
+
+		case eParseType_Command:
+			{
+				std::map<std::string, CommandHandler>::iterator found = m_GroupCurrent->process_commands->find(a_Token.value);
+
+				m_GroupCurrent->commands.push_back(a_Token.value);
+
+				if (found != m_GroupCurrent->process_commands->end())
+				{
+					CommandHandler handler = found->second;
+					if (!(this->*handler)(a_Token))
+					{
+						std::cerr << "Error while parsing command \"\\" << a_Token.value << "\"" << std::endl;
+					}
+				}
+				else
+				{
+					std::cout << "Unhandled command \"\\" << a_Token.value << "\"" << std::endl;
+				}
+
+			} break;
+
+		case eParseType_Value:
+			{
+				CommandHandler handler = m_GroupCurrent->process_value;
+				if (!(this->*handler)(a_Token))
+				{
+					std::cerr << "Error while parsing value \"\\" << a_Token.value << "\"" << std::endl;
+				}
+
+			} break;
+
+		}
+
+		return true;
+	}
+
+	bool TextParserRtf::_CommandCharacterSet(const RtfToken& a_Token)
+	{
+		if (a_Token.value == "ansi")
 		{
 			m_CharacterSet = eCharacterSet_ANSI;
 		}
-		else if (m_CommandCurrent == "mac")
+		else if (a_Token.value == "mac")
 		{
 			m_CharacterSet = eCharacterSet_AppleMacintosh;
 		}
-		else if (m_CommandCurrent == "pc")
+		else if (a_Token.value == "pc")
 		{
 			m_CharacterSet = eCharacterSet_IBMPCCodePage437;
 		}
-		else if (m_CommandCurrent == "pca")
+		else if (a_Token.value == "pca")
 		{
 			m_CharacterSet = eCharacterSet_IBMPCCodePage850;
 		}
@@ -281,41 +358,45 @@ namespace ExLibris
 		return true;
 	}
 
-	bool TextParserRtf::_CommandFontTable(const Token& a_Token)
+	bool TextParserRtf::_CommandFontTable(const RtfToken& a_Token)
 	{
-		m_GroupCurrent->handlers = &m_CommandHandlersFontTable;
+		m_GroupCurrent->process_commands = &m_CommandHandlersFontTable;
+		m_GroupCurrent->process_value = &TextParserRtf::_ProcessValueFontEntry;
 
 		return true;
 	}
 
-	bool TextParserRtf::_CommandFont(const Token& a_Token)
+	bool TextParserRtf::_CommandFontDefinition(const RtfToken& a_Token)
 	{
-		m_FontEntryCurrent = new FontEntry;
-		m_FontEntryCurrent->index = _ReadInteger();
-
-		m_FontEntries.insert(std::make_pair(m_FontEntryCurrent->index, m_FontEntryCurrent));
-
-		/*const Token& tk = m_Tokenizer->GetCurrentToken();
-
-		if (!m_Tokenizer->ReadToken() || tk.type != Token::eType_Whitespace || tk.text[0] != ' ')
+		if (a_Token.index == -1)
 		{
 			return false;
 		}
 
-		while (m_Tokenizer->ReadToken())
-		{
-			if (tk.type == Token::eType_Symbol && tk.text[0] == ';')
-			{
-				break;
-			}
+		m_FontEntryCurrent = new FontEntry;
+		m_FontEntryCurrent->index = a_Token.index;
 
-			m_FontEntryCurrent->name += tk.text;
-		}*/
+		m_FontEntries.insert(std::make_pair(m_FontEntryCurrent->index, m_FontEntryCurrent));
 
-		return (m_FontEntryCurrent->name.length() > 0);
+		return true;
 	}
 
-	bool TextParserRtf::_CommandFontFamily(const Token& a_Token)
+	bool TextParserRtf::_CommandUseFont(const RtfToken& a_Token)
+	{
+		std::map<int, FontEntry*>::iterator found = m_FontEntries.find(a_Token.index);
+		if (found == m_FontEntries.end())
+		{
+			std::cerr << "Could not find font entry with index " << a_Token.index << std::endl;
+
+			return false;
+		}
+		else
+		{
+			m_FontEntryCurrent = found->second;
+		}
+	}
+
+	bool TextParserRtf::_CommandFontFamily(const RtfToken& a_Token)
 	{
 		if (m_FontEntryCurrent == nullptr)
 		{
@@ -324,31 +405,31 @@ namespace ExLibris
 			return false;
 		}
 
-		if (a_Token.text == "froman")
+		if (a_Token.value == "froman")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Roman;
 		}
-		else if (a_Token.text == "fswiss")
+		else if (a_Token.value == "fswiss")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Swiss;
 		}
-		else if (a_Token.text == "fmodern")
+		else if (a_Token.value == "fmodern")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Modern;
 		}
-		else if (a_Token.text == "fscript")
+		else if (a_Token.value == "fscript")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Script;
 		}
-		else if (a_Token.text == "fdecor")
+		else if (a_Token.value == "fdecor")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Decor;
 		}
-		else if (a_Token.text == "ftech")
+		else if (a_Token.value == "ftech")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Tech;
 		}
-		else if (a_Token.text == "fbidi")
+		else if (a_Token.value == "fbidi")
 		{
 			m_FontEntryCurrent->family = eFamilyType_Bidi;
 		}
@@ -356,6 +437,35 @@ namespace ExLibris
 		{
 			m_FontEntryCurrent->family = eFamilyType_Nil;
 		}
+
+		return true;
+	}
+
+	bool TextParserRtf::_CommandParagraphResetToDefault(const RtfToken& a_Token)
+	{
+		return true;
+	}
+
+	bool TextParserRtf::_CommandParagraphEnd(const RtfToken& a_Token)
+	{
+		return true;
+	}
+
+	bool TextParserRtf::_ProcessValueDefault(const RtfToken& a_Token)
+	{
+		return true;
+	}
+
+	bool TextParserRtf::_ProcessValueFontEntry(const RtfToken& a_Token)
+	{
+		if (m_FontEntryCurrent == nullptr)
+		{
+			std::cerr << "Could not set font name: no font entry was specified." << std::endl;
+
+			return false;
+		}
+
+		m_FontEntryCurrent->name = a_Token.value;
 
 		return true;
 	}
