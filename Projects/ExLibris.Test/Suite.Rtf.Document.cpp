@@ -4,6 +4,22 @@
 
 using namespace ExLibris;
 
+TEST(RtfDomDocument, Construct)
+{
+	RtfDomDocument doc;
+
+	EXPECT_EQ(eRtfCharacterSet_Invalid, doc.GetCharacterSet());
+}
+
+TEST(RtfDomDocument, CharacterSet)
+{
+	RtfDomDocument doc;
+
+	doc.SetCharacterSet(eRtfCharacterSet_AppleMacintosh);
+
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintosh, doc.GetCharacterSet());
+}
+
 TEST(RtfDomDocument, GetFont)
 {
 	RtfDomDocument doc;
