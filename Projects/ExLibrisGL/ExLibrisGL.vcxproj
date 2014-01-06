@@ -133,6 +133,7 @@
     <ClInclude Include="Quad.h" />
     <ClInclude Include="RtfCharacterSet.h" />
     <ClInclude Include="RtfFont.h" />
+    <ClInclude Include="RtfTextFormat.h" />
     <ClInclude Include="SizePolicy.h" />
     <ClInclude Include="Style.h" />
     <ClInclude Include="TextCharacter.h" />

@@ -6,7 +6,6 @@ namespace ExLibris
 {
 
 	RtfDomDocument::RtfDomDocument()
-		: m_CharacterSet(eRtfCharacterSet_Invalid)
 	{
 	}
 
@@ -19,14 +18,9 @@ namespace ExLibris
 		m_FontTable.clear();
 	}
 
-	RtfCharacterSet RtfDomDocument::GetCharacterSet() const
+	RtfTextFormat& RtfDomDocument::GetTextFormat()
 	{
-		return m_CharacterSet;
-	}
-
-	void RtfDomDocument::SetCharacterSet(RtfCharacterSet a_CharacterSet)
-	{
-		m_CharacterSet = a_CharacterSet;
+		return m_TextFormat;
 	}
 
 	RtfFont& RtfDomDocument::GetFont(int a_Index)
