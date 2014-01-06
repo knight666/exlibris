@@ -18,12 +18,12 @@ TEST(RtfDomElement, ConstructWithParent)
 {
 	RtfDomElement root;
 
-	RtfDomElement e(&root);
+	RtfDomElement* e = root.AddChild();
 
-	EXPECT_EQ(&root, e.GetParent());
-	EXPECT_EQ(nullptr, e.GetSiblingPrevious());
-	EXPECT_EQ(nullptr, e.GetSiblingNext());
-	EXPECT_EQ(0, e.GetChildrenCount());
+	EXPECT_EQ(&root, e->GetParent());
+	EXPECT_EQ(nullptr, e->GetSiblingPrevious());
+	EXPECT_EQ(nullptr, e->GetSiblingNext());
+	EXPECT_EQ(0, e->GetChildrenCount());
 }
 
 TEST(RtfDomElement, AddChild)
