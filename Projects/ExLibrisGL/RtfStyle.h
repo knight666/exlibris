@@ -22,55 +22,43 @@
  * SOFTWARE.
  */
 
-#include "ExLibrisGL.PCH.h"
+#pragma once
 
-#include "RtfDomDocument.h"
+#include "RtfTextFormat.h"
 
-#include "RtfDomElement.h"
+namespace ExLibris
+{
+	struct RtfColor;
+}
 
 namespace ExLibris
 {
 
-	RtfDomDocument::RtfDomDocument()
-		: m_RootElement(new RtfDomElement())
-		, m_FontTable(new RtfFontTable())
-		, m_ColorTable(new RtfColorTable())
-		, m_StyleSheet(new RtfStyleSheet())
+	class RtfStyle
 	{
-	}
 
-	RtfDomDocument::~RtfDomDocument()
-	{
-		delete m_FontTable;
-		delete m_ColorTable;
-		delete m_StyleSheet;
+	public:
 
-		delete m_RootElement;
-	}
+		RtfStyle();
+		~RtfStyle();
 
-	RtfTextFormat& RtfDomDocument::GetTextFormat()
-	{
-		return m_TextFormat;
-	}
+		RtfStyle* GetNextParagraphStyle() const;
+		void SetNextParagraphStyle(RtfStyle* a_Style);
 
-	RtfDomElement* RtfDomDocument::GetRootElement() const
-	{
-		return m_RootElement;
-	}
+		RtfColor* GetColorBackground() const;
+		void SetColorBackground(RtfColor* a_Color);
 
-	RtfFontTable* RtfDomDocument::GetFontTable() const
-	{
-		return m_FontTable;
-	}
+		RtfColor* GetColorForeground() const;
+		void SetColorForeground(RtfColor* a_Color);
 
-	RtfColorTable* RtfDomDocument::GetColorTable() const
-	{
-		return m_ColorTable;
-	}
+		RtfTextFormat TextFormat;
 
-	RtfStyleSheet* RtfDomDocument::GetStyleSheet() const
-	{
-		return m_StyleSheet;
-	}
+	private:
+
+		RtfStyle* m_StyleNextParagraph;
+		RtfColor* m_ColorBackground;
+		RtfColor* m_ColorForeground;
+
+	}; // class RtfStyle
 
 }; // namespace ExLibris
