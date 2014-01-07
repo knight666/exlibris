@@ -18,8 +18,10 @@ TEST(TextParserRtf, HelloWorld)
 
 	ASSERT_NE(nullptr, doc);
 
-	EXPECT_EQ(RtfFont::eFamilyType_Swiss, doc->GetFont(0).family);
-	EXPECT_STREQ("Helvetica", doc->GetFont(0).name.c_str());
+	RtfFontTable* ft = doc->GetFontTable();
+
+	EXPECT_EQ(RtfFont::eFamilyType_Swiss, ft->GetFont(0)->family);
+	EXPECT_STREQ("Helvetica", ft->GetFont(0)->name.c_str());
 
 	RtfDomElement* root = doc->GetRootElement();
 
@@ -52,7 +54,7 @@ TEST(TextParserRtf, ExtendedControlSkipUnknownGroup)
 	EXPECT_STREQ("This text is totally rad.", root->InnerText.c_str());
 }
 
-TEST(TextParserRtf, UseDefaultFont)
+TEST(TextParserRtf, FontTableUseDefaultFont)
 {
 	TextParserRtf parser;
 
@@ -66,6 +68,9 @@ TEST(TextParserRtf, UseDefaultFont)
 
 	ASSERT_NE(nullptr, doc);
 
+	ASSERT_NE(nullptr, doc->GetFontTable()->GetDefault());
+	EXPECT_STREQ("Robotica", doc->GetFontTable()->GetDefault()->name.c_str());
+
 	RtfDomElement* root = doc->GetRootElement();
 
 	ASSERT_NE(nullptr, root->TextFormat.font);
@@ -75,7 +80,7 @@ TEST(TextParserRtf, UseDefaultFont)
 	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
 }
 
-TEST(TextParserRtf, FontSetPitch)
+TEST(TextParserRtf, FontTableSetPitch)
 {
 	TextParserRtf parser;
 
@@ -94,17 +99,19 @@ TEST(TextParserRtf, FontSetPitch)
 
 	ASSERT_NE(nullptr, doc);
 
-	EXPECT_STREQ("Magnified", doc->GetFont(0).name.c_str());
-	EXPECT_EQ(RtfFont::ePitch_Fixed, doc->GetFont(0).pitch);
+	RtfFontTable* ft = doc->GetFontTable();
 
-	EXPECT_STREQ("Simplified", doc->GetFont(1).name.c_str());
-	EXPECT_EQ(RtfFont::ePitch_Default, doc->GetFont(1).pitch);
+	EXPECT_STREQ("Magnified", ft->GetFont(0)->name.c_str());
+	EXPECT_EQ(RtfFont::ePitch_Fixed, ft->GetFont(0)->pitch);
 
-	EXPECT_STREQ("Testified", doc->GetFont(2).name.c_str());
-	EXPECT_EQ(RtfFont::ePitch_Variable, doc->GetFont(2).pitch);
+	EXPECT_STREQ("Simplified", ft->GetFont(1)->name.c_str());
+	EXPECT_EQ(RtfFont::ePitch_Default, ft->GetFont(1)->pitch);
+
+	EXPECT_STREQ("Testified", ft->GetFont(2)->name.c_str());
+	EXPECT_EQ(RtfFont::ePitch_Variable, ft->GetFont(2)->pitch);
 }
 
-TEST(TextParserRtf, FontSetCharacterSet)
+TEST(TextParserRtf, FontTableSetCharacterSet)
 {
 	TextParserRtf parser;
 
@@ -123,14 +130,16 @@ TEST(TextParserRtf, FontSetCharacterSet)
 
 	ASSERT_NE(nullptr, doc);
 
-	EXPECT_STREQ("Tester", doc->GetFont(0).name.c_str());
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, doc->GetFont(0).character_set);
+	RtfFontTable* ft = doc->GetFontTable();
 
-	EXPECT_STREQ("Band-Maid", doc->GetFont(1).name.c_str());
-	EXPECT_EQ(eRtfCharacterSet_Baltic, doc->GetFont(1).character_set);
+	EXPECT_STREQ("Tester", ft->GetFont(0)->name.c_str());
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, ft->GetFont(0)->character_set);
 
-	EXPECT_STREQ("Tingling", doc->GetFont(2).name.c_str());
-	EXPECT_EQ(eRtfCharacterSet_ShiftJis, doc->GetFont(2).character_set);
+	EXPECT_STREQ("Band-Maid", ft->GetFont(1)->name.c_str());
+	EXPECT_EQ(eRtfCharacterSet_Baltic, ft->GetFont(1)->character_set);
+
+	EXPECT_STREQ("Tingling", ft->GetFont(2)->name.c_str());
+	EXPECT_EQ(eRtfCharacterSet_ShiftJis, ft->GetFont(2)->character_set);
 }
 
 TEST(TextParserRtf, ColorTable)

@@ -1,3 +1,27 @@
+/*
+ * This file is a part of the ExLibris project.
+ *
+ * Copyright (C) 2013 Quinten Lansu
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to deal 
+ * in the Software without restriction, including without limitation the rights 
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all 
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+ * SOFTWARE.
+ */
+
 #include "ExLibrisGL.PCH.h"
 
 #include "RtfDomDocument.h"
@@ -9,18 +33,14 @@ namespace ExLibris
 
 	RtfDomDocument::RtfDomDocument()
 		: m_RootElement(new RtfDomElement())
+		, m_FontTable(new RtfFontTable())
 		, m_ColorTable(new RtfColorTable())
 	{
 	}
 
 	RtfDomDocument::~RtfDomDocument()
 	{
-		for (std::map<int, RtfFont*>::iterator font_it = m_FontTable.begin(); font_it != m_FontTable.end(); ++font_it)
-		{
-			delete font_it->second;
-		}
-		m_FontTable.clear();
-
+		delete m_FontTable;
 		delete m_ColorTable;
 
 		delete m_RootElement;
@@ -31,33 +51,19 @@ namespace ExLibris
 		return m_TextFormat;
 	}
 
-	RtfFont& RtfDomDocument::GetFont(int a_Index)
+	RtfDomElement* RtfDomDocument::GetRootElement() const
 	{
-		RtfFont* font = nullptr;
+		return m_RootElement;
+	}
 
-		std::map<int, RtfFont*>::iterator found = m_FontTable.find(a_Index);
-		if (found != m_FontTable.end())
-		{
-			font = found->second;
-		}
-		else
-		{
-			font = new RtfFont;
-
-			m_FontTable.insert(std::make_pair(a_Index, font));
-		}
-
-		return *font;
+	RtfFontTable* RtfDomDocument::GetFontTable() const
+	{
+		return m_FontTable;
 	}
 
 	RtfColorTable* RtfDomDocument::GetColorTable() const
 	{
 		return m_ColorTable;
-	}
-
-	RtfDomElement* RtfDomDocument::GetRootElement() const
-	{
-		return m_RootElement;
 	}
 
 }; // namespace ExLibris
