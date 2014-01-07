@@ -2,21 +2,113 @@
 
 #include <RtfColorTable.h>
 
+#include "Tools.Color.h"
+
 using namespace ExLibris;
 
 TEST(RtfColorTable, Construct)
 {
 	RtfColorTable ct;
 
-	EXPECT_EQ(0, ct.GetColorCount());
+	EXPECT_EQ(1, ct.GetColorCount());
+}
+
+TEST(RtfColorTable, GetDefaultColor)
+{
+	RtfColorTable ct;
+
+	ASSERT_NE(nullptr, ct.GetDefaultColor());
+	EXPECT_COLOR_RGB(0, 0, 0, *ct.GetDefaultColor());
+}
+
+TEST(RtfColorTable, SetDefaultColor)
+{
+	RtfColorTable ct;
+	RtfColor* c = ct.GetColor(43);
+
+	ct.SetDefaultColor(43);
+
+	ASSERT_NE(nullptr, ct.GetDefaultColor());
+	EXPECT_EQ(c, ct.GetDefaultColor());
+}
+
+TEST(RtfColorTable, SetDefaultColorNew)
+{
+	RtfColorTable ct;
+	*ct.GetDefaultColor() = RtfColor(54, 12, 99);
+
+	ct.SetDefaultColor(11);
+
+	ASSERT_NE(nullptr, ct.GetDefaultColor());
+	EXPECT_COLOR_RGB(54, 12, 99, *ct.GetDefaultColor());
+}
+
+TEST(RtfColorTable, SetDefaultColorInvalidIndex)
+{
+	RtfColorTable ct;
+	
+	ct.SetDefaultColor(-12);
+
+	ASSERT_NE(nullptr, ct.GetDefaultColor());
+	EXPECT_EQ(ct.GetDefaultColor(), ct.GetColor(0));
+}
+
+TEST(RtfColorTable, GetColor)
+{
+	RtfColorTable ct;
+
+	RtfColor* color = ct.GetColor(81);
+
+	ASSERT_NE(nullptr, color);
+	EXPECT_COLOR_RGB(0, 0, 0, *color);
+
+	EXPECT_EQ(2, ct.GetColorCount());
+}
+
+TEST(RtfColorTable, GetColorTwice)
+{
+	RtfColorTable ct;
+
+	RtfColor* c1 = ct.GetColor(81);
+	RtfColor* c2 = ct.GetColor(81);
+
+	EXPECT_EQ(c1, c2);
+
+	EXPECT_EQ(2, ct.GetColorCount());
+}
+
+TEST(RtfColorTable, GetColorSetToDefault)
+{
+	RtfColorTable ct;
+
+	*ct.GetDefaultColor() = RtfColor(16, 99, 12);
+
+	RtfColor* color = ct.GetColor(77);
+
+	ASSERT_NE(nullptr, color);
+	EXPECT_COLOR_RGB(16, 99, 12, *color);
+
+	EXPECT_EQ(2, ct.GetColorCount());
+}
+
+TEST(RtfColorTable, GetColorInvalidIndex)
+{
+	RtfColorTable ct;
+
+	EXPECT_EQ(nullptr, ct.GetColor(-112));
+
+	EXPECT_EQ(1, ct.GetColorCount());
 }
 
 TEST(RtfColorTable, AddColor)
 {
 	RtfColorTable ct;
-	ct.AddColor(RtfColor(126, 12, 88));
+	RtfColor* c = ct.AddColor(RtfColor(126, 12, 88));
 
-	EXPECT_EQ(1, ct.GetColorCount());
+	ASSERT_NE(nullptr, c);
+	EXPECT_COLOR_RGB(126, 12, 88, *c);
+	EXPECT_EQ(c, ct.GetColor(1));
+	EXPECT_EQ(2, ct.GetColorCount());
 }
 
 TEST(RtfColorTable, AddThreeColors)
@@ -26,92 +118,21 @@ TEST(RtfColorTable, AddThreeColors)
 	ct.AddColor(RtfColor(36, 77, 17));
 	ct.AddColor(RtfColor(5, 199, 204));
 
-	EXPECT_EQ(3, ct.GetColorCount());
+	EXPECT_EQ(4, ct.GetColorCount());
+	ASSERT_NE(nullptr, ct.GetColor(1));
+	EXPECT_COLOR_RGB(51, 18, 99, *ct.GetColor(1));
+	ASSERT_NE(nullptr, ct.GetColor(2));
+	EXPECT_COLOR_RGB(36, 77, 17, *ct.GetColor(2));
+	ASSERT_NE(nullptr, ct.GetColor(3));
+	EXPECT_COLOR_RGB(5, 199, 204, *ct.GetColor(3));
 }
 
-TEST(RtfColorTable, GetColor)
+TEST(RtfColorTable, AddColorNextIndex)
 {
 	RtfColorTable ct;
-	ct.AddColor(RtfColor(34, 12, 99));
+	ct.GetColor(117);
 
-	RtfColor c = ct.GetColor(0);
+	ct.AddColor(RtfColor(126, 12, 88));
 
-	EXPECT_EQ(34, c.r);
-	EXPECT_EQ(12, c.g);
-	EXPECT_EQ(99, c.b);
-}
-
-TEST(RtfColorTable, GetColorInvalidIndex)
-{
-	RtfColorTable ct;
-	ct.AddColor(RtfColor(138, 98, 115));
-	ct.AddColor(RtfColor(12, 12, 22));
-
-	RtfColor c = ct.GetColor(2);
-
-	EXPECT_EQ(0, c.r);
-	EXPECT_EQ(0, c.g);
-	EXPECT_EQ(0, c.b);
-}
-
-TEST(RtfColorTable, GetColorEmpty)
-{
-	RtfColorTable ct;
-
-	RtfColor c = ct.GetColor(11);
-
-	EXPECT_EQ(0, c.r);
-	EXPECT_EQ(0, c.g);
-	EXPECT_EQ(0, c.b);
-}
-
-TEST(RtfColorTable, GetColorDefault)
-{
-	RtfColorTable ct;
-
-	RtfColor default(117, 8, 88);
-	RtfColor c = ct.GetColor(11, default);
-
-	EXPECT_EQ(117, c.r);
-	EXPECT_EQ(8, c.g);
-	EXPECT_EQ(88, c.b);
-}
-
-TEST(RtfColorTable, TryGetColor)
-{
-	RtfColorTable ct;
-	ct.AddColor(RtfColor(17, 88, 12));
-
-	RtfColor c;
-	EXPECT_TRUE(ct.TryGetColor(c, 0));
-
-	EXPECT_EQ(17, c.r);
-	EXPECT_EQ(88, c.g);
-	EXPECT_EQ(12, c.b);
-}
-
-TEST(RtfColorTable, TryGetColorInvalidIndex)
-{
-	RtfColorTable ct;
-	ct.AddColor(RtfColor(44, 66, 44));
-	ct.AddColor(RtfColor(1, 3, 4));
-
-	RtfColor c;
-	EXPECT_FALSE(ct.TryGetColor(c, 15));
-
-	EXPECT_EQ(0, c.r);
-	EXPECT_EQ(0, c.g);
-	EXPECT_EQ(0, c.b);
-}
-
-TEST(RtfColorTable, TryGetColorEmpty)
-{
-	RtfColorTable ct;
-
-	RtfColor c;
-	EXPECT_FALSE(ct.TryGetColor(c, 1));
-
-	EXPECT_EQ(0, c.r);
-	EXPECT_EQ(0, c.g);
-	EXPECT_EQ(0, c.b);
+	EXPECT_COLOR_RGB(126, 12, 88, *ct.GetColor(118));
 }

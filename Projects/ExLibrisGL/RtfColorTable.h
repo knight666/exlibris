@@ -39,14 +39,19 @@ namespace ExLibris
 
 		size_t GetColorCount() const;
 
-		void AddColor(const RtfColor& a_Color);
-		RtfColor GetColor(int a_Index, const RtfColor& a_Default = RtfColor(0, 0, 0)) const;
+		RtfColor* GetColor(int a_Index);
 
-		bool TryGetColor(RtfColor& a_Target, int a_Index) const;
+		RtfColor* AddColor(const RtfColor& a_Color);
+
+		RtfColor* GetDefaultColor() const;
+		void SetDefaultColor(int a_Index);
 
 	private:
 
-		std::vector<RtfColor> m_Colors;
+		std::map<int, RtfColor*> m_Colors;
+		RtfColor* m_ColorDefault;
+		int m_IndexNext;
+		int m_IndexDefault;
 
 	}; // class RtfColorTable
 

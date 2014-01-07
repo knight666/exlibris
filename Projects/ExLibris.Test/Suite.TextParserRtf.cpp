@@ -2,6 +2,8 @@
 
 #include <TextParserRtf.h>
 
+#include "Tools.Color.h"
+
 using namespace ExLibris;
 
 TEST(TextParserRtf, HelloWorld)
@@ -149,7 +151,7 @@ TEST(TextParserRtf, ColorTable)
 	std::stringstream input;
 	input << "{\\rtf1\\ansi";
 	input << "{\\colortbl;";
-	input << "\\red0\\green0\\blue0;";
+	input << "\\red65\\green12\\blue78;";
 	input << "\\red128\\green128\\blue128;";
 	input << "}}";
 
@@ -160,19 +162,11 @@ TEST(TextParserRtf, ColorTable)
 
 	ASSERT_NE(nullptr, doc);
 
-	RtfColor color0;
-	EXPECT_TRUE(doc->GetColorTable()->TryGetColor(color0, 0));
-	EXPECT_EQ(0, color0.r);
-	EXPECT_EQ(0, color0.g);
-	EXPECT_EQ(0, color0.b);
-	EXPECT_EQ(255, color0.a);
+	RtfColorTable* ct = doc->GetColorTable();
 
-	RtfColor color1;
-	EXPECT_TRUE(doc->GetColorTable()->TryGetColor(color1, 1));
-	EXPECT_EQ(128, color1.r);
-	EXPECT_EQ(128, color1.g);
-	EXPECT_EQ(128, color1.b);
-	EXPECT_EQ(255, color1.a);
+	EXPECT_COLOR_RGBA(0, 0, 0, 255, *ct->GetColor(0));
+	EXPECT_COLOR_RGBA(65, 12, 78, 255, *ct->GetColor(1));
+	EXPECT_COLOR_RGBA(128, 128, 128, 255, *ct->GetColor(2));
 }
 
 TEST(TextParserRtf, ControlTrailingWhitespace)

@@ -30,11 +30,20 @@ namespace ExLibris
 {
 
 	RtfColorTable::RtfColorTable()
+		: m_IndexNext(1)
+		, m_IndexDefault(0)
+		, m_ColorDefault(new RtfColor(0, 0, 0))
 	{
+		m_Colors.insert(std::make_pair(0, m_ColorDefault));
 	}
 
 	RtfColorTable::~RtfColorTable()
 	{
+		for (std::map<int, RtfColor*>::iterator color_it = m_Colors.begin(); color_it != m_Colors.end(); ++color_it)
+		{
+			delete color_it->second;
+		}
+		m_Colors.clear();
 	}
 
 	size_t RtfColorTable::GetColorCount() const
@@ -42,31 +51,60 @@ namespace ExLibris
 		return m_Colors.size();
 	}
 
-	void RtfColorTable::AddColor(const RtfColor& a_Color)
+	RtfColor* RtfColorTable::GetColor(int a_Index)
 	{
-		m_Colors.push_back(a_Color);
+		RtfColor* color = nullptr;
+
+		if (a_Index < 0)
+		{
+			return nullptr;
+		}
+		else if (a_Index >= m_IndexNext)
+		{
+			color = new RtfColor(*GetDefaultColor());
+			m_Colors.insert(std::make_pair(a_Index, color));
+
+			m_IndexNext = a_Index + 1;
+		}
+		else
+		{
+			std::map<int, RtfColor*>::iterator found = m_Colors.find(a_Index);
+			if (found != m_Colors.end())
+			{
+				color = found->second;
+			}
+			else
+			{
+				color = new RtfColor(*GetDefaultColor());
+				m_Colors.insert(std::make_pair(a_Index, color));
+			}
+		}
+
+		return color;
 	}
 
-	RtfColor RtfColorTable::GetColor(int a_Index, const RtfColor& a_Default /*= RtfColor(0, 0, 0)*/) const
+	RtfColor* RtfColorTable::AddColor(const RtfColor& a_Color)
 	{
-		if (a_Index < 0 || a_Index >= (int)m_Colors.size())
-		{
-			return a_Default;
-		}
-		
-		return m_Colors[a_Index];
+		RtfColor* color = new RtfColor(a_Color);
+
+		m_Colors.insert(std::make_pair(m_IndexNext++, color));
+
+		return color;
 	}
 
-	bool RtfColorTable::TryGetColor(RtfColor& a_Target, int a_Index) const
+	RtfColor* RtfColorTable::GetDefaultColor() const
 	{
-		if (a_Index < 0 || a_Index >= (int)m_Colors.size())
+		return m_ColorDefault;
+	}
+
+	void RtfColorTable::SetDefaultColor(int a_Index)
+	{
+		if (a_Index < 0)
 		{
-			return false;
+			return;
 		}
 
-		a_Target = m_Colors[a_Index];
-
-		return true;
+		m_ColorDefault = GetColor(a_Index);
 	}
 
 }; // namespace ExLibris
