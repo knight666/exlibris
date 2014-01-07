@@ -80,6 +80,7 @@
     <ClCompile Include="Suite.Rtf.ColorTable.cpp" />
     <ClCompile Include="Suite.Rtf.Document.cpp" />
     <ClCompile Include="Suite.Rtf.Element.cpp" />
+    <ClCompile Include="Suite.Rtf.FontTable.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
     <ClCompile Include="Suite.Library.cpp" />
     <ClCompile Include="Suite.Line.cpp" />
