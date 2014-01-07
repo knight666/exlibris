@@ -737,8 +737,8 @@ namespace ExLibris
 			return false;
 		}
 
-		RtfColor color;
 		RtfColorTable* color_table = m_Document->GetColorTable();
+		RtfColor* color = color_table->AddColor(*color_table->GetDefaultColor());
 
 		token = _ReadNextToken();
 
@@ -748,15 +748,15 @@ namespace ExLibris
 			{
 				if (token.value == "red")
 				{
-					color.r = token.parameter;
+					color->r = token.parameter;
 				}
 				else if (token.value == "green")
 				{
-					color.g = token.parameter;
+					color->g = token.parameter;
 				}
 				else if (token.value == "blue")
 				{
-					color.b = token.parameter;
+					color->b = token.parameter;
 				}
 				else
 				{
@@ -765,12 +765,7 @@ namespace ExLibris
 			}
 			else if (token.type == eParseType_Value)
 			{
-				color_table->AddColor(color);
-
-				color.r = 0;
-				color.g = 0;
-				color.b = 0;
-				color.a = 255;
+				color = color_table->AddColor(*color_table->GetDefaultColor());
 			}
 			else
 			{
