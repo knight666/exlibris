@@ -652,6 +652,8 @@ namespace ExLibris
 						{
 							if (token.parameter < RtfFont::ePitch_Default || token.parameter > RtfFont::ePitch_Variable)
 							{
+								LOG_ERROR(a_Token) << "Invalid pitch (" << token.parameter << ") specified for font.";
+
 								return false;
 							}
 
@@ -666,7 +668,7 @@ namespace ExLibris
 
 							if (font->character_set == eRtfCharacterSet_Invalid)
 							{
-								LOG_ERROR(a_Token) << "Invalid character set " << token.parameter << " specified for font.";
+								LOG_ERROR(a_Token) << "Invalid character set (" << token.parameter << ") specified for font.";
 
 								return false;
 							}
