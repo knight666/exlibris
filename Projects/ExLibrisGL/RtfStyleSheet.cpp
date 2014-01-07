@@ -24,53 +24,42 @@
 
 #include "ExLibrisGL.PCH.h"
 
-#include "RtfDomDocument.h"
-
-#include "RtfDomElement.h"
+#include "RtfStyleSheet.h"
 
 namespace ExLibris
 {
 
-	RtfDomDocument::RtfDomDocument()
-		: m_RootElement(new RtfDomElement())
-		, m_FontTable(new RtfFontTable())
-		, m_ColorTable(new RtfColorTable())
-		, m_StyleSheet(new RtfStyleSheet())
+	RtfStyleSheet::RtfStyleSheet()
 	{
 	}
 
-	RtfDomDocument::~RtfDomDocument()
+	RtfStyleSheet::~RtfStyleSheet()
 	{
-		delete m_FontTable;
-		delete m_ColorTable;
-		delete m_StyleSheet;
-
-		delete m_RootElement;
+		for (std::map<int, RtfStyle*>::iterator style_it = m_Styles.begin(); style_it != m_Styles.end(); ++style_it)
+		{
+			delete style_it->second;
+		}
+		m_Styles.clear();
 	}
 
-	RtfTextFormat& RtfDomDocument::GetTextFormat()
+	size_t RtfStyleSheet::GetStyleCount() const
 	{
-		return m_TextFormat;
+		return m_Styles.size();
 	}
 
-	RtfDomElement* RtfDomDocument::GetRootElement() const
+	RtfStyle* RtfStyleSheet::GetStyle(int a_Index)
 	{
-		return m_RootElement;
-	}
+		std::map<int, RtfStyle*>::iterator found = m_Styles.find(a_Index);
+		if (found != m_Styles.end())
+		{
+			return found->second;
+		}
 
-	RtfFontTable* RtfDomDocument::GetFontTable() const
-	{
-		return m_FontTable;
-	}
+		RtfStyle* style = new RtfStyle();
+		
+		m_Styles.insert(std::make_pair(a_Index, style));
 
-	RtfColorTable* RtfDomDocument::GetColorTable() const
-	{
-		return m_ColorTable;
-	}
-
-	RtfStyleSheet* RtfDomDocument::GetStyleSheet() const
-	{
-		return m_StyleSheet;
+		return style;
 	}
 
 }; // namespace ExLibris

@@ -26,6 +26,7 @@
 
 #include "RtfColorTable.h"
 #include "RtfFontTable.h"
+#include "RtfStyleSheet.h"
 #include "RtfTextFormat.h"
 
 namespace ExLibris
@@ -50,6 +51,7 @@ namespace ExLibris
 
 		RtfFontTable* GetFontTable() const;
 		RtfColorTable* GetColorTable() const;
+		RtfStyleSheet* GetStyleSheet() const;
 
 	private:
 
@@ -59,6 +61,7 @@ namespace ExLibris
 
 		RtfFontTable* m_FontTable;
 		RtfColorTable* m_ColorTable;
+		RtfStyleSheet* m_StyleSheet;
 
 	}; // class RtfDomDocument
 

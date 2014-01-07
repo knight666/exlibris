@@ -22,55 +22,29 @@
  * SOFTWARE.
  */
 
-#include "ExLibrisGL.PCH.h"
+#pragma once
 
-#include "RtfDomDocument.h"
-
-#include "RtfDomElement.h"
+#include "RtfStyle.h"
 
 namespace ExLibris
 {
 
-	RtfDomDocument::RtfDomDocument()
-		: m_RootElement(new RtfDomElement())
-		, m_FontTable(new RtfFontTable())
-		, m_ColorTable(new RtfColorTable())
-		, m_StyleSheet(new RtfStyleSheet())
+	class RtfStyleSheet
 	{
-	}
 
-	RtfDomDocument::~RtfDomDocument()
-	{
-		delete m_FontTable;
-		delete m_ColorTable;
-		delete m_StyleSheet;
+	public:
 
-		delete m_RootElement;
-	}
+		RtfStyleSheet();
+		~RtfStyleSheet();
 
-	RtfTextFormat& RtfDomDocument::GetTextFormat()
-	{
-		return m_TextFormat;
-	}
+		size_t GetStyleCount() const;
 
-	RtfDomElement* RtfDomDocument::GetRootElement() const
-	{
-		return m_RootElement;
-	}
+		RtfStyle* GetStyle(int a_Index);
 
-	RtfFontTable* RtfDomDocument::GetFontTable() const
-	{
-		return m_FontTable;
-	}
+	private:
 
-	RtfColorTable* RtfDomDocument::GetColorTable() const
-	{
-		return m_ColorTable;
-	}
+		std::map<int, RtfStyle*> m_Styles;
 
-	RtfStyleSheet* RtfDomDocument::GetStyleSheet() const
-	{
-		return m_StyleSheet;
-	}
+	}; // class RtfStyleSheet
 
 }; // namespace ExLibris
