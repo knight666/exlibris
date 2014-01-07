@@ -65,6 +65,18 @@ TEST(RtfColorTable, GetColorEmpty)
 	EXPECT_EQ(0, c.b);
 }
 
+TEST(RtfColorTable, GetColorDefault)
+{
+	RtfColorTable ct;
+
+	RtfColor default(117, 8, 88);
+	RtfColor c = ct.GetColor(11, default);
+
+	EXPECT_EQ(117, c.r);
+	EXPECT_EQ(8, c.g);
+	EXPECT_EQ(88, c.b);
+}
+
 TEST(RtfColorTable, TryGetColor)
 {
 	RtfColorTable ct;
