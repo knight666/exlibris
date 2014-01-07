@@ -60,7 +60,6 @@ namespace ExLibris
 		, m_GroupIndex(0)
 		, m_Document(nullptr)
 		, m_ElementCurrent(nullptr)
-		, m_FontDefault(nullptr)
 	{
 		m_Tokenizer = new Tokenizer(nullptr);
 		m_Tokenizer->DisableOptions(Tokenizer::eOption_Identifiers);
@@ -116,7 +115,6 @@ namespace ExLibris
 		}
 
 		m_ElementCurrent = m_Document->GetRootElement();
-		m_FontDefault = nullptr;
 
 		RtfToken command = _ReadNextToken();
 		while (command.type != eParseType_Invalid)
@@ -568,6 +566,7 @@ namespace ExLibris
 			return false;
 		}
 
+		RtfFontTable* font_table = m_Document->GetFontTable();
 		RtfFont* font = nullptr;
 
 		RtfToken token = _ReadNextToken();
@@ -604,7 +603,7 @@ namespace ExLibris
 							return false;
 						}
 
-						font = &m_Document->GetFont(token.parameter);
+						font = font_table->GetFont(token.parameter);
 					}
 					else
 					{
@@ -705,7 +704,7 @@ namespace ExLibris
 			return false;
 		}
 
-		m_ElementCurrent->TextFormat.font = &m_Document->GetFont(a_Token.parameter);
+		m_ElementCurrent->TextFormat.font = m_Document->GetFontTable()->GetFont(a_Token.parameter);
 
 		return true;
 	}
@@ -717,11 +716,11 @@ namespace ExLibris
 			return false;
 		}
 
-		m_FontDefault = &m_Document->GetFont(a_Token.parameter);
+		m_Document->GetFontTable()->SetDefault(a_Token.parameter);
 
 		if (m_ElementCurrent->TextFormat.font == nullptr)
 		{
-			m_ElementCurrent->TextFormat.font = m_FontDefault;
+			m_ElementCurrent->TextFormat.font = m_Document->GetFontTable()->GetDefault();
 		}
 
 		return true;

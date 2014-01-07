@@ -142,7 +142,6 @@ namespace ExLibris
 
 		RtfDomDocument* m_Document;
 		RtfDomElement* m_ElementCurrent;
-		RtfFont* m_FontDefault;
 
 		std::map<std::string, CommandHandler> m_CommandHandlers;
 	
