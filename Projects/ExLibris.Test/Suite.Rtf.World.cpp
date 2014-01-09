@@ -51,7 +51,12 @@ TEST(RtfWorld, GetLanguagesForCountryNoneFound)
 
 	std::set<RtfLanguage> l = world.GetLanguagesForCountry(eRtfCountry_None);
 
-	EXPECT_EQ(0, l.size());
+	EXPECT_EQ(5, l.size());
+	EXPECT_NE(l.end(), l.find(eRtfLanguage_BosnianLatin));
+	EXPECT_NE(l.end(), l.find(eRtfLanguage_Burmese));
+	EXPECT_NE(l.end(), l.find(eRtfLanguage_Cherokee));
+	EXPECT_NE(l.end(), l.find(eRtfLanguage_Dzongkha));
+	EXPECT_NE(l.end(), l.find(eRtfLanguage_Fulfukle));
 }
 
 TEST(RtfWorld, GetCountriesForLanguage)
@@ -60,7 +65,8 @@ TEST(RtfWorld, GetCountriesForLanguage)
 
 	std::set<RtfCountry> l = world.GetCountriesForLanguage(eRtfLanguage_Dutch);
 
-	EXPECT_EQ(2, l.size());
+	EXPECT_EQ(3, l.size());
+	EXPECT_NE(l.end(), l.find(eRtfCountry_Preferred));
 	EXPECT_NE(l.end(), l.find(eRtfCountry_Netherlands));
 	EXPECT_NE(l.end(), l.find(eRtfCountry_Belgium));
 }
@@ -69,7 +75,8 @@ TEST(RtfWorld, GetCountriesForLanguageNoneFound)
 {
 	RtfWorld world;
 
-	std::set<RtfCountry> l = world.GetCountriesForLanguage(eRtfLanguage_None);
+	std::set<RtfCountry> l = world.GetCountriesForLanguage(eRtfLanguage_Cherokee);
 
-	EXPECT_EQ(0, l.size());
+	EXPECT_EQ(1, l.size());
+	EXPECT_NE(l.end(), l.find(eRtfCountry_None));
 }
