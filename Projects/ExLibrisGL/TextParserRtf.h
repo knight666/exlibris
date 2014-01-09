@@ -34,6 +34,7 @@
 namespace ExLibris
 {
 	class RtfDomElement;
+	class RtfWorld;
 	class Tokenizer;
 }
 
@@ -115,6 +116,8 @@ namespace ExLibris
 		bool _ProcessToken(const RtfToken& a_Token);
 		RtfCharacterSet _TokenToCharset(const RtfToken& a_Token);
 
+		bool _ProcessTextFormatToken(const RtfToken& a_Token, RtfTextFormat& a_TextFormat) const;
+
 	private:
 
 		bool _CommandExtended(const RtfToken& a_Token);
@@ -123,6 +126,7 @@ namespace ExLibris
 		bool _CommandFont(const RtfToken& a_Token);
 		bool _CommandFontDefault(const RtfToken& a_Token);
 		bool _CommandColorTable(const RtfToken& a_Token);
+		bool _CommandStyleSheet(const RtfToken& a_Token);
 		bool _CommandParagraphResetToDefault(const RtfToken& a_Token);
 		bool _CommandParagraph(const RtfToken& a_Token);
 
@@ -139,6 +143,8 @@ namespace ExLibris
 		std::vector<Group*> m_Groups;
 		Group* m_GroupCurrent;
 		int m_GroupIndex;
+
+		RtfWorld* m_World;
 
 		RtfDomDocument* m_Document;
 		RtfDomElement* m_ElementCurrent;

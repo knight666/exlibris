@@ -6,16 +6,16 @@ using namespace ExLibris;
 
 TEST(RtfDomDocument, Construct)
 {
-	RtfDomDocument doc;
+	RtfDomDocument doc(nullptr);
 
-	EXPECT_EQ(eRtfCharacterSet_Invalid, doc.GetTextFormat().character_set);
+	EXPECT_EQ(eRtfCharacterSet_Invalid, doc.GetTextFormat().GetCharacterSet());
 }
 
 TEST(RtfDomDocument, CharacterSet)
 {
-	RtfDomDocument doc;
+	RtfDomDocument doc(nullptr);
 
-	doc.GetTextFormat().character_set = eRtfCharacterSet_AppleMacintoshRoman;
+	doc.GetTextFormat().SetCharacterSet(eRtfCharacterSet_AppleMacintoshRoman);
 
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, doc.GetTextFormat().character_set);
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, doc.GetTextFormat().GetCharacterSet());
 }

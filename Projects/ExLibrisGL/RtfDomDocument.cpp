@@ -31,11 +31,13 @@
 namespace ExLibris
 {
 
-	RtfDomDocument::RtfDomDocument()
-		: m_RootElement(new RtfDomElement())
+	RtfDomDocument::RtfDomDocument(RtfWorld* a_World)
+		: m_World(a_World)
+		, m_RootElement(new RtfDomElement())
 		, m_FontTable(new RtfFontTable())
 		, m_ColorTable(new RtfColorTable())
 		, m_StyleSheet(new RtfStyleSheet())
+		, m_WidowControl(true)
 	{
 	}
 
@@ -51,6 +53,11 @@ namespace ExLibris
 	RtfTextFormat& RtfDomDocument::GetTextFormat()
 	{
 		return m_TextFormat;
+	}
+
+	RtfWorld* RtfDomDocument::GetWorld() const
+	{
+		return m_World;
 	}
 
 	RtfDomElement* RtfDomDocument::GetRootElement() const
@@ -71,6 +78,16 @@ namespace ExLibris
 	RtfStyleSheet* RtfDomDocument::GetStyleSheet() const
 	{
 		return m_StyleSheet;
+	}
+
+	bool RtfDomDocument::GetWidowControl() const
+	{
+		return m_WidowControl;
+	}
+
+	void RtfDomDocument::SetWidowControl(bool a_Value)
+	{
+		m_WidowControl = a_Value;
 	}
 
 }; // namespace ExLibris

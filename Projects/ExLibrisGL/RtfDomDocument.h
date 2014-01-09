@@ -28,6 +28,7 @@
 #include "RtfFontTable.h"
 #include "RtfStyleSheet.h"
 #include "RtfTextFormat.h"
+#include "RtfWorld.h"
 
 namespace ExLibris
 {
@@ -42,16 +43,20 @@ namespace ExLibris
 
 	public:
 
-		RtfDomDocument();
+		RtfDomDocument(RtfWorld* a_World);
 		~RtfDomDocument();
 
 		RtfTextFormat& GetTextFormat();
 
 		RtfDomElement* GetRootElement() const;
 
+		RtfWorld* GetWorld() const;
 		RtfFontTable* GetFontTable() const;
 		RtfColorTable* GetColorTable() const;
 		RtfStyleSheet* GetStyleSheet() const;
+
+		bool GetWidowControl() const;
+		void SetWidowControl(bool a_Value);
 
 	private:
 
@@ -59,9 +64,12 @@ namespace ExLibris
 
 		RtfDomElement* m_RootElement;
 
+		RtfWorld* m_World;
 		RtfFontTable* m_FontTable;
 		RtfColorTable* m_ColorTable;
 		RtfStyleSheet* m_StyleSheet;
+
+		bool m_WidowControl;
 
 	}; // class RtfDomDocument
 

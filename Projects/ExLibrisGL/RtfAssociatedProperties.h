@@ -24,28 +24,69 @@
 
 #pragma once
 
-#include "RtfStyle.h"
+#include "RtfCharacterEncoding.h"
+
+namespace ExLibris
+{
+	struct RtfFont;
+	struct RtfLocale;
+	class RtfTextFormat;
+}
 
 namespace ExLibris
 {
 
-	class RtfStyleSheet
+	class RtfAssociatedProperties
 	{
+
+		friend class RtfAssociatedProperties;
+
+		enum Specified
+		{
+			eSpecified_Font = (1 << 0),
+			eSpecified_FontSize = (1 << 1),
+			eSpecified_Locale = (1 << 2),
+			eSpecified_CharacterEncoding = (1 << 3),
+			eSpecified_Bold = (1 << 4),
+			eSpecified_Italic = (1 << 5),
+		};
 
 	public:
 
-		RtfStyleSheet();
-		~RtfStyleSheet();
+		RtfAssociatedProperties();
+		RtfAssociatedProperties(const RtfTextFormat& a_TextFormat);
+		~RtfAssociatedProperties();
 
-		size_t GetStyleCount() const;
+		RtfFont* GetFont() const;
+		void SetFont(RtfFont* a_Font);
 
-		RtfStyle* FindStyleByName(const std::string& a_Name) const;
-		RtfStyle* GetStyle(int a_Index);
+		float GetFontSize() const;
+		void SetFontSize(float a_Size);
+
+		const RtfLocale* GetLocale() const;
+		void SetLocale(const RtfLocale* a_Locale);
+
+		RtfCharacterEncoding GetCharacterEncoding() const;
+		void SetCharacterEncoding(RtfCharacterEncoding a_Encoding);
+
+		bool IsBold() const;
+		void SetBold(bool a_Value);
+
+		bool IsItalic() const;
+		void SetItalic(bool a_Italic);
+
+		void Combine(const RtfAssociatedProperties& a_Other);
 
 	private:
 
-		std::map<int, RtfStyle*> m_Styles;
+		RtfFont* m_Font;
+		float m_FontSize;
+		const RtfLocale* m_Locale;
+		RtfCharacterEncoding m_Encoding;
+		bool m_Bold;
+		bool m_Italic;
+		unsigned int m_Specified;
 
-	}; // class RtfStyleSheet
+	}; // class RtfAssociatedProperties
 
 }; // namespace ExLibris
