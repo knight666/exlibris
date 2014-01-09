@@ -24,28 +24,14 @@
 
 #pragma once
 
-#include "RtfStyle.h"
-
 namespace ExLibris
 {
 
-	class RtfStyleSheet
+	enum RtfCharacterEncoding
 	{
-
-	public:
-
-		RtfStyleSheet();
-		~RtfStyleSheet();
-
-		size_t GetStyleCount() const;
-
-		RtfStyle* FindStyleByName(const std::string& a_Name) const;
-		RtfStyle* GetStyle(int a_Index);
-
-	private:
-
-		std::map<int, RtfStyle*> m_Styles;
-
-	}; // class RtfStyleSheet
+		eRtfCharacterEncoding_SingleByteLowAnsi,
+		eRtfCharacterEncoding_SingleByteHighAnsi,
+		eRtfCharacterEncoding_DoubleByte
+	};
 
 }; // namespace ExLibris

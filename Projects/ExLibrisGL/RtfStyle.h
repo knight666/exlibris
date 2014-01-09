@@ -24,11 +24,13 @@
 
 #pragma once
 
+#include "RtfAssociatedProperties.h"
 #include "RtfTextFormat.h"
 
 namespace ExLibris
 {
 	struct RtfColor;
+	struct RtfLocale;
 }
 
 namespace ExLibris
@@ -42,22 +44,25 @@ namespace ExLibris
 		RtfStyle();
 		~RtfStyle();
 
+		const std::string& GetName() const;
+		void SetName(const std::string& a_Name);
+
 		RtfStyle* GetNextParagraphStyle() const;
 		void SetNextParagraphStyle(RtfStyle* a_Style);
 
-		RtfColor* GetColorBackground() const;
-		void SetColorBackground(RtfColor* a_Color);
+		RtfAssociatedProperties* GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding);
+		RtfAssociatedProperties GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding);
 
-		RtfColor* GetColorForeground() const;
-		void SetColorForeground(RtfColor* a_Color);
-
-		RtfTextFormat TextFormat;
+		RtfTextFormat& GetTextFormat();
 
 	private:
 
+		std::string m_Name;
 		RtfStyle* m_StyleNextParagraph;
-		RtfColor* m_ColorBackground;
-		RtfColor* m_ColorForeground;
+		RtfTextFormat m_TextFormat;
+		RtfAssociatedProperties* m_PropertiesLowAnsi;
+		RtfAssociatedProperties* m_PropertiesHighAnsi;
+		RtfAssociatedProperties* m_PropertiesDoubleByte;
 
 	}; // class RtfStyle
 

@@ -29,6 +29,7 @@
 #include "RtfColor.h"
 #include "RtfDomElement.h"
 #include "RtfTextFormat.h"
+#include "RtfWorld.h"
 #include "Tokenizer.h"
 
 namespace ExLibris
@@ -58,6 +59,7 @@ namespace ExLibris
 		: m_Tokenizer(nullptr)
 		, m_GroupCurrent(nullptr)
 		, m_GroupIndex(0)
+		, m_World(new RtfWorld())
 		, m_Document(nullptr)
 		, m_ElementCurrent(nullptr)
 	{
@@ -77,6 +79,8 @@ namespace ExLibris
 
 		m_CommandHandlers.insert(std::make_pair("colortbl", &TextParserRtf::_CommandColorTable));
 
+		m_CommandHandlers.insert(std::make_pair("stylesheet", &TextParserRtf::_CommandStyleSheet));
+
 		m_CommandHandlers.insert(std::make_pair("pard", &TextParserRtf::_CommandParagraphResetToDefault));
 		m_CommandHandlers.insert(std::make_pair("par", &TextParserRtf::_CommandParagraph));
 	}
@@ -90,6 +94,8 @@ namespace ExLibris
 			delete *group_it;
 		}
 		m_Groups.clear();
+
+		delete m_World;
 	}
 
 	RtfDomDocument* TextParserRtf::ParseDocument(std::basic_istream<char>* a_Stream)
@@ -102,7 +108,7 @@ namespace ExLibris
 		m_LogWarnings.clear();
 		m_LogErrors.clear();
 
-		m_Document = new RtfDomDocument;
+		m_Document = new RtfDomDocument(m_World);
 
 		m_Tokenizer->SetInput(a_Stream);
 
@@ -415,6 +421,55 @@ namespace ExLibris
 		return true;
 	}
 
+	bool TextParserRtf::_ProcessTextFormatToken(const RtfToken& a_Token, RtfTextFormat& a_TextFormat) const
+	{
+		if (a_Token.value == "f")
+		{
+			RtfFont* font = m_Document->GetFontTable()->GetFont(a_Token.parameter);
+
+			a_TextFormat.SetFont(font);
+
+			return true;
+		}
+		else if (a_Token.value == "fs")
+		{
+			a_TextFormat.SetFontSize((float)a_Token.parameter / 2.0f);
+
+			return true;
+		}
+		else if (a_Token.value == "kerning")
+		{
+			a_TextFormat.SetKerningEnabled((a_Token.parameter == 1) ? true : false);
+
+			return true;
+		}
+		else if (a_Token.value == "lang")
+		{
+			const RtfLocale* locale = m_Document->GetWorld()->GetLocaleByIdentifier(a_Token.parameter);
+
+			a_TextFormat.SetLocale(locale);
+
+			return true;
+		}
+		else if (a_Token.value == "cf")
+		{
+			RtfColor* color = m_Document->GetColorTable()->GetColor(a_Token.parameter);
+
+			a_TextFormat.SetForegroundColor(color);
+
+			return true;
+		}
+		else if (a_Token.value == "nowidctlpar")
+		{
+			a_TextFormat.SetParagraphWidowControl(false);
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	RtfCharacterSet TextParserRtf::_TokenToCharset(const RtfToken& a_Token)
 	{
@@ -551,9 +606,9 @@ namespace ExLibris
 
 	bool TextParserRtf::_CommandCharacterSet(const RtfToken& a_Token)
 	{
-		m_ElementCurrent->TextFormat.character_set = _TokenToCharset(a_Token);
+		m_ElementCurrent->TextFormat.SetCharacterSet(_TokenToCharset(a_Token));
 
-		return (m_ElementCurrent->TextFormat.character_set != eRtfCharacterSet_Invalid);
+		return (m_ElementCurrent->TextFormat.GetCharacterSet() != eRtfCharacterSet_Invalid);
 	}
 
 	bool TextParserRtf::_CommandFontTable(const RtfToken& a_Token)
@@ -704,7 +759,7 @@ namespace ExLibris
 			return false;
 		}
 
-		m_ElementCurrent->TextFormat.font = m_Document->GetFontTable()->GetFont(a_Token.parameter);
+		m_ElementCurrent->TextFormat.SetFont(m_Document->GetFontTable()->GetFont(a_Token.parameter));
 
 		return true;
 	}
@@ -718,9 +773,9 @@ namespace ExLibris
 
 		m_Document->GetFontTable()->SetDefault(a_Token.parameter);
 
-		if (m_ElementCurrent->TextFormat.font == nullptr)
+		if (m_ElementCurrent->TextFormat.GetFont() == nullptr)
 		{
-			m_ElementCurrent->TextFormat.font = m_Document->GetFontTable()->GetDefault();
+			m_ElementCurrent->TextFormat.SetFont(m_Document->GetFontTable()->GetDefault());
 		}
 
 		return true;
@@ -772,6 +827,134 @@ namespace ExLibris
 				m_Tokenizer->RevertToken();
 
 				break;
+			}
+
+			token = _ReadNextToken();
+		}
+
+		return true;
+	}
+
+	bool TextParserRtf::_CommandStyleSheet(const RtfToken& a_Token)
+	{
+		Group* group_stylesheet_parent = m_GroupCurrent->parent;
+		if (group_stylesheet_parent == nullptr)
+		{
+			LOG_ERROR(a_Token) << "Stylesheet must be inside a group.";
+
+			return false;
+		}
+
+		RtfAssociatedProperties* properties = nullptr;
+		RtfStyleSheet* stylesheet = m_Document->GetStyleSheet();
+		RtfStyle* style = nullptr;
+
+		RtfToken token = _ReadNextToken();
+		while (token.type != eParseType_Invalid)
+		{
+			switch (token.type)
+			{
+
+			case eParseType_GroupOpen:
+				{
+					_GroupOpen();
+
+				} break;
+
+			case eParseType_GroupClose:
+				{
+					_GroupClose();
+
+					if (m_GroupCurrent == group_stylesheet_parent)
+					{
+						return true;
+					}
+
+				} break;
+
+			case eParseType_Command:
+				{
+					if (token.value == "s")
+					{
+						if (token.parameter < 0)
+						{
+							LOG_ERROR(a_Token) << "Invalid parameter \"" << token.parameter << "\" for style control word.";
+
+							return false;
+						}
+
+						style = stylesheet->GetStyle(token.parameter);
+					}
+					else
+					{
+						if (style == nullptr)
+						{
+							LOG_ERROR(a_Token) << "Control word \\" << token.value << " is invalid because target style was not set.";
+
+							return false;
+						}
+
+						if (token.value == "snext")
+						{
+							if (token.parameter < 0)
+							{
+								LOG_ERROR(a_Token) << "Invalid parameter \"" << token.parameter << "\" for next paragraph style control word.";
+
+								return false;
+							}
+
+							RtfStyle* style_next = stylesheet->GetStyle(token.parameter);
+							style->SetNextParagraphStyle(style_next);
+						}
+						else if (token.value == "loch")
+						{
+							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+						}
+						else if (token.value == "hich")
+						{
+							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+						}
+						else if (token.value == "dbch")
+						{
+							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+						}
+						else if (token.value == "af")
+						{
+							RtfFont* font = m_Document->GetFontTable()->GetFont(token.parameter);
+
+							properties->SetFont(font);
+						}
+						else if (token.value == "afs")
+						{
+							properties->SetFontSize((float)token.parameter / 2.0f);
+						}
+						else if (token.value == "alang")
+						{
+							const RtfLocale* locale = m_Document->GetWorld()->GetLocaleByIdentifier(token.parameter);
+
+							properties->SetLocale(locale);
+						}
+						else if (!_ProcessTextFormatToken(token, style->GetTextFormat()))
+						{
+							LOG_ERROR(a_Token) << "Unhandled control word \\" << token.value << ".";
+						}
+					}
+
+				} break;
+
+			case eParseType_Value:
+				{
+					if (style == nullptr)
+					{
+						LOG_ERROR(a_Token) << "Value " << token.value << " is invalid because target style was not set.";
+
+						return false;
+					}
+
+					style->SetName(token.value);
+
+				} break;
+
 			}
 
 			token = _ReadNextToken();

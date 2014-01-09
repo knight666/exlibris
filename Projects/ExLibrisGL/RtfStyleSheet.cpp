@@ -47,6 +47,21 @@ namespace ExLibris
 		return m_Styles.size();
 	}
 
+	RtfStyle* RtfStyleSheet::FindStyleByName(const std::string& a_Name) const
+	{
+		for (std::map<int, RtfStyle*>::const_iterator style_it = m_Styles.begin(); style_it != m_Styles.end(); ++style_it)
+		{
+			RtfStyle* style = style_it->second;
+
+			if (style->GetName() == a_Name)
+			{
+				return style;
+			}
+		}
+		
+		return nullptr;
+	}
+
 	RtfStyle* RtfStyleSheet::GetStyle(int a_Index)
 	{
 		std::map<int, RtfStyle*>::iterator found = m_Styles.find(a_Index);

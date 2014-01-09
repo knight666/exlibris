@@ -30,14 +30,34 @@ namespace ExLibris
 {
 
 	RtfStyle::RtfStyle()
-		: m_ColorBackground(nullptr)
-		, m_ColorForeground(nullptr)
 	{
 		m_StyleNextParagraph = this;
+
+		m_PropertiesLowAnsi = new RtfAssociatedProperties();
+		m_PropertiesLowAnsi->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+
+		m_PropertiesHighAnsi = new RtfAssociatedProperties();
+		m_PropertiesHighAnsi->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+
+		m_PropertiesDoubleByte = new RtfAssociatedProperties();
+		m_PropertiesDoubleByte->SetCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
 	}
 
 	RtfStyle::~RtfStyle()
 	{
+		delete m_PropertiesLowAnsi;
+		delete m_PropertiesHighAnsi;
+		delete m_PropertiesDoubleByte;
+	}
+
+	const std::string& RtfStyle::GetName() const
+	{
+		return m_Name;
+	}
+
+	void RtfStyle::SetName(const std::string& a_Name)
+	{
+		m_Name = a_Name;
 	}
 
 	RtfStyle* RtfStyle::GetNextParagraphStyle() const
@@ -50,24 +70,49 @@ namespace ExLibris
 		m_StyleNextParagraph = a_Style;
 	}
 
-	RtfColor* RtfStyle::GetColorBackground() const
+	RtfAssociatedProperties* RtfStyle::GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding)
 	{
-		return m_ColorBackground;
+		switch (a_Encoding)
+		{
+
+		case eRtfCharacterEncoding_SingleByteLowAnsi:
+			{
+				return m_PropertiesLowAnsi;
+
+			} break;
+
+		case eRtfCharacterEncoding_SingleByteHighAnsi:
+			{
+				return m_PropertiesHighAnsi;
+
+			} break;
+
+		case eRtfCharacterEncoding_DoubleByte:
+			{
+				return m_PropertiesDoubleByte;
+
+			} break;
+		}
+
+		return nullptr;
 	}
 
-	void RtfStyle::SetColorBackground(RtfColor* a_Color)
+	RtfAssociatedProperties RtfStyle::GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding)
 	{
-		m_ColorBackground = a_Color;
+		RtfAssociatedProperties combined(m_TextFormat);
+
+		RtfAssociatedProperties* properties = GetPropertiesForCharacterEncoding(a_Encoding);
+		if (properties != nullptr)
+		{
+			combined.Combine(*properties);
+		}
+
+		return combined;
 	}
 
-	RtfColor* RtfStyle::GetColorForeground() const
+	RtfTextFormat& RtfStyle::GetTextFormat()
 	{
-		return m_ColorForeground;
-	}
-
-	void RtfStyle::SetColorForeground(RtfColor* a_Color)
-	{
-		m_ColorForeground = a_Color;
+		return m_TextFormat;
 	}
 
 }; // namespace ExLibris
