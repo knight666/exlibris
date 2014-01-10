@@ -37,7 +37,7 @@ namespace ExLibris
 		RtfWorld();
 		~RtfWorld();
 
-		RtfLocale* GetLocaleByIdentifier(unsigned int a_Index) const;
+		const RtfLocale* GetLocaleByIdentifier(unsigned int a_Index) const;
 
 		unsigned int GetLocaleIdentifierByLanguageAndCountry(RtfLanguage a_Language, RtfCountry a_Country) const;
 
@@ -46,7 +46,7 @@ namespace ExLibris
 
 	private:
 
-		std::map<unsigned int, RtfLocale*> m_Locales;
+		std::map<unsigned int, RtfLocale> m_Locales;
 
 	}; // class RtfWorld
 

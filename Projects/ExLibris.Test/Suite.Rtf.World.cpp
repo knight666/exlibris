@@ -8,7 +8,7 @@ TEST(RtfWorld, GetLocaleByIdentifier)
 {
 	RtfWorld world;
 
-	RtfLocale* i = world.GetLocaleByIdentifier(1043);
+	const RtfLocale* i = world.GetLocaleByIdentifier(1043);
 
 	ASSERT_NE(nullptr, i);
 	EXPECT_EQ(1043, i->identifier);
@@ -20,7 +20,7 @@ TEST(RtfWorld, GetLocaleByIdentifierInvalidIndex)
 {
 	RtfWorld world;
 
-	RtfLocale* i = world.GetLocaleByIdentifier(333);
+	const RtfLocale* i = world.GetLocaleByIdentifier(333);
 
 	EXPECT_EQ(nullptr, i);
 }
@@ -29,13 +29,13 @@ TEST(RtfWorld, GetLocaleByIdentifierZeroOrOneThousandTwentyFour)
 {
 	RtfWorld world;
 
-	RtfLocale* l0 = world.GetLocaleByIdentifier(0);
+	const RtfLocale* l0 = world.GetLocaleByIdentifier(0);
 
 	ASSERT_NE(nullptr, l0);
 	EXPECT_EQ(eRtfCountry_None, l0->country);
 	EXPECT_EQ(eRtfLanguage_None, l0->language);
 
-	RtfLocale* l1024 = world.GetLocaleByIdentifier(1024);
+	const RtfLocale* l1024 = world.GetLocaleByIdentifier(1024);
 
 	ASSERT_NE(nullptr, l1024);
 	EXPECT_EQ(eRtfCountry_None, l1024->country);

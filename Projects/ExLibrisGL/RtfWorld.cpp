@@ -31,7 +31,7 @@ namespace ExLibris
 
 	RtfWorld::RtfWorld()
 	{
-#define ADD_LOCALE(_id, _country, _language) m_Locales.insert(std::make_pair(_id, new RtfLocale(_id, _country, _language)));
+#define ADD_LOCALE(_id, _country, _language) m_Locales.insert(std::make_pair(_id, RtfLocale(_id, _country, _language)));
 
 		ADD_LOCALE(1078, eRtfCountry_SouthAfrica, eRtfLanguage_Afrikaans);
 		ADD_LOCALE(1052, eRtfCountry_Albania, eRtfLanguage_Albanian);
@@ -290,19 +290,15 @@ namespace ExLibris
 
 	RtfWorld::~RtfWorld()
 	{
-		for (std::map<unsigned int, RtfLocale*>::iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
-		{
-			delete entry_it->second;
-		}
 		m_Locales.clear();
 	}
 
-	RtfLocale* RtfWorld::GetLocaleByIdentifier(unsigned int a_Index) const
+	const RtfLocale* RtfWorld::GetLocaleByIdentifier(unsigned int a_Index) const
 	{
-		std::map<unsigned int, RtfLocale*>::const_iterator found = m_Locales.find(a_Index);
+		std::map<unsigned int, RtfLocale>::const_iterator found = m_Locales.find(a_Index);
 		if (found != m_Locales.end())
 		{
-			return found->second;
+			return &found->second;
 		}
 		else
 		{
@@ -312,12 +308,12 @@ namespace ExLibris
 
 	unsigned int RtfWorld::GetLocaleIdentifierByLanguageAndCountry(RtfLanguage a_Language, RtfCountry a_Country) const
 	{
-		for (std::map<unsigned int, RtfLocale*>::const_iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
+		for (std::map<unsigned int, RtfLocale>::const_iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
 		{
-			RtfLocale* entry = entry_it->second;
-			if (entry->country == a_Country && entry->language == a_Language)
+			const RtfLocale& entry = entry_it->second;
+			if (entry.country == a_Country && entry.language == a_Language)
 			{
-				return entry->identifier;
+				return entry.identifier;
 			}
 		}
 
@@ -328,12 +324,12 @@ namespace ExLibris
 	{
 		std::set<RtfLanguage> results;
 
-		for (std::map<unsigned int, RtfLocale*>::const_iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
+		for (std::map<unsigned int, RtfLocale>::const_iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
 		{
-			RtfLocale* entry = entry_it->second;
-			if (entry->country == a_Country)
+			const RtfLocale& entry = entry_it->second;
+			if (entry.country == a_Country)
 			{
-				results.insert(entry->language);
+				results.insert(entry.language);
 			}
 		}
 
@@ -344,12 +340,12 @@ namespace ExLibris
 	{
 		std::set<RtfCountry> results;
 
-		for (std::map<unsigned int, RtfLocale*>::const_iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
+		for (std::map<unsigned int, RtfLocale>::const_iterator entry_it = m_Locales.begin(); entry_it != m_Locales.end(); ++entry_it)
 		{
-			RtfLocale* entry = entry_it->second;
-			if (entry->language == a_Language)
+			const RtfLocale& entry = entry_it->second;
+			if (entry.language == a_Language)
 			{
-				results.insert(entry->country);
+				results.insert(entry.country);
 			}
 		}
 
