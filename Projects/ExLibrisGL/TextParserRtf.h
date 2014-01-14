@@ -29,6 +29,7 @@
 #include "RtfDomElement.h"
 #include "RtfDomDocument.h"
 #include "RtfLogMessage.h"
+#include "RtfToken.h"
 #include "Token.h"
 
 namespace ExLibris
@@ -62,31 +63,6 @@ namespace ExLibris
 		bool ReadToken();
 
 	private:
-
-		enum ParseType
-		{
-			eParseType_Invalid,
-			eParseType_GroupOpen,
-			eParseType_GroupClose,
-			eParseType_Command,
-			eParseType_Value,
-			eParseType_Text
-		};
-
-		struct RtfToken
-		{
-			RtfToken()
-				: type(eParseType_Invalid)
-				, parameter(-1)
-			{
-			}
-
-			int column;
-			int line;
-			ParseType type;
-			std::string value;
-			int parameter;
-		};
 
 		typedef bool (TextParserRtf::*CommandHandler)(const RtfToken&);
 
