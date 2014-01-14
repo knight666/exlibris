@@ -77,6 +77,11 @@
     <ClCompile Include="Suite.GlyphProvider.cpp" />
     <ClCompile Include="Suite.GlyphProviderFreetype.cpp" />
     <ClCompile Include="Suite.GlyphProviderSystem.cpp" />
+    <ClCompile Include="Suite.Rtf.ColorTable.cpp" />
+    <ClCompile Include="Suite.Rtf.Document.cpp" />
+    <ClCompile Include="Suite.Rtf.Element.cpp" />
+    <ClCompile Include="Suite.Rtf.FontTable.cpp" />
+    <ClCompile Include="Suite.Rtf.World.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
     <ClCompile Include="Suite.Library.cpp" />
     <ClCompile Include="Suite.Line.cpp" />
@@ -84,7 +89,10 @@
     <ClCompile Include="Suite.MeshBuilder.cpp" />
     <ClCompile Include="Suite.Polygon.cpp" />
     <ClCompile Include="Suite.TextLayout.cpp" />
+    <ClCompile Include="Suite.TextParser.cpp" />
+    <ClCompile Include="Suite.TextParserRtf.cpp" />
     <ClCompile Include="Suite.Tokenizer.cpp" />
+    <ClCompile Include="Suite.TextParserMarkdown.cpp" />
     <ClCompile Include="Suite.Tokenizer.Hexadecimal.cpp" />
     <ClCompile Include="Suite.Tokenizer.Identifier.cpp" />
     <ClCompile Include="Suite.Tokenizer.Integer.cpp" />
@@ -105,6 +113,8 @@
     <ClInclude Include="Mock.GlyphProvider.h" />
     <ClInclude Include="Mock.MeshVisitor.h" />
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
+    <ClInclude Include="Mock.TextParser.h" />
+    <ClInclude Include="Tools.Color.h" />
     <ClInclude Include="Tools.Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
