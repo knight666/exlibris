@@ -66,7 +66,7 @@ namespace ExLibris
 		c == '}' || c == '~'
 	));
 	TYPE_CLASS(Whitespace, (c == ' ' || c == '\t'));
-	TYPE_CLASS(NewLine, (c == '\r' || c == '\n'));
+	TYPE_CLASS(Unprintable, (c >= 1 && c <= 31));
 
 	Tokenizer::Tokenizer(std::basic_istream<char>* a_Stream)
 		: m_Options(eOption_Identifiers)
@@ -186,6 +186,10 @@ namespace ExLibris
 		{
 			m_TokenCurrent.type = Token::eType_Whitespace;
 		}
+		else if (_MatchType<CharacterTypeUnprintable>())
+		{
+			m_TokenCurrent.type = Token::eType_Unprintable;
+		}
 		else if (_MatchType<CharacterTypeDigit>())
 		{
 			m_TokenCurrent.type = Token::eType_Integer;
@@ -276,8 +280,15 @@ namespace ExLibris
 
 		case Token::eType_Text:
 			{
-				while (_ConsumeType<CharacterTypeAlphabetical>())
+				while (
+					!_MatchType<CharacterTypeUnprintable>() &&
+					!_MatchType<CharacterTypeSymbol>() &&
+					!_MatchType<CharacterTypeWhitespace>() &&
+					!_MatchType<CharacterTypeDigit>()
+				)
 				{
+					_AddCurrentToToken();
+
 					if (!_NextCharacter())
 					{
 						return true;
@@ -631,6 +642,12 @@ namespace ExLibris
 
 						handled = true;
 					}
+				}
+				else
+				{
+					_AddCurrentToToken();
+
+					return true;
 				}
 
 			} break;
