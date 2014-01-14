@@ -123,7 +123,7 @@ namespace ExLibris
 		m_ElementCurrent = m_Document->GetRootElement();
 
 		RtfToken command = _ReadNextToken();
-		while (command.type != eParseType_Invalid)
+		while (command.type != RtfToken::eParseType_Invalid)
 		{
 			if (!_ProcessToken(command))
 			{
@@ -165,7 +165,7 @@ namespace ExLibris
 		// document group
 
 		RtfToken document_group = _ReadNextToken();
-		if (document_group.type != eParseType_GroupOpen)
+		if (document_group.type != RtfToken::eParseType_GroupOpen)
 		{
 			return false;
 		}
@@ -183,7 +183,7 @@ namespace ExLibris
 		// rtf command
 
 		RtfToken header_command = _ReadNextToken();
-		if (header_command.type != eParseType_Command || header_command.value != "rtf" || header_command.parameter != 1)
+		if (header_command.type != RtfToken::eParseType_Command || header_command.value != "rtf" || header_command.parameter != 1)
 		{
 			return false;
 		}
@@ -191,10 +191,10 @@ namespace ExLibris
 		return true;
 	}
 
-	TextParserRtf::RtfToken TextParserRtf::_ReadNextToken()
+	RtfToken TextParserRtf::_ReadNextToken()
 	{
 		RtfToken token;
-		token.type = eParseType_Invalid;
+		token.type = RtfToken::eParseType_Invalid;
 
 		if (!m_Tokenizer->ReadToken())
 		{
@@ -213,13 +213,13 @@ namespace ExLibris
 
 			case '{':
 				{
-					token.type = eParseType_GroupOpen;
+					token.type = RtfToken::eParseType_GroupOpen;
 
 				} break;
 
 			case '}':
 				{
-					token.type = eParseType_GroupClose;
+					token.type = RtfToken::eParseType_GroupClose;
 
 				} break;
 
@@ -227,12 +227,12 @@ namespace ExLibris
 				{
 					if (!m_Tokenizer->ReadToken())
 					{
-						token.type = eParseType_Invalid;
+						token.type = RtfToken::eParseType_Invalid;
 
 						return token;
 					}
 
-					token.type = eParseType_Command;
+					token.type = RtfToken::eParseType_Command;
 
 					if (tk.type == Token::eType_Text)
 					{
@@ -256,7 +256,7 @@ namespace ExLibris
 					}
 					else
 					{
-						token.type = eParseType_Invalid;
+						token.type = RtfToken::eParseType_Invalid;
 					}
 
 					// read trailing space
@@ -272,14 +272,14 @@ namespace ExLibris
 
 			case ';':
 				{
-					token.type = eParseType_Value;
+					token.type = RtfToken::eParseType_Value;
 
 				} break;
 
 			default:
 				{
 					token.value += tk.text;
-					token.type = eParseType_Text;
+					token.type = RtfToken::eParseType_Text;
 
 				} break;
 			}
@@ -290,7 +290,7 @@ namespace ExLibris
 			{
 				if (!m_Tokenizer->ReadToken())
 				{
-					token.type = eParseType_Invalid;
+					token.type = RtfToken::eParseType_Invalid;
 
 					return token;
 				}
@@ -299,7 +299,7 @@ namespace ExLibris
 
 		if (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace)
 		{
-			token.type = eParseType_Text;
+			token.type = RtfToken::eParseType_Text;
 			token.value = tk.text;
 
 			while (m_Tokenizer->ReadToken() && (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace || tk.type == Token::eType_Symbol))
@@ -316,7 +316,7 @@ namespace ExLibris
 					}
 					else if (symbol == ';')
 					{
-						token.type = eParseType_Value;
+						token.type = RtfToken::eParseType_Value;
 
 						break;
 					}
@@ -368,19 +368,19 @@ namespace ExLibris
 		switch (a_Token.type)
 		{
 
-		case eParseType_GroupOpen:
+		case RtfToken::eParseType_GroupOpen:
 			{
 				_GroupOpen();
 
 			} break;
 
-		case eParseType_GroupClose:
+		case RtfToken::eParseType_GroupClose:
 			{
 				_GroupClose();
 
 			} break;
 
-		case eParseType_Command:
+		case RtfToken::eParseType_Command:
 			{
 				std::map<std::string, CommandHandler>::iterator found = m_GroupCurrent->process_commands->find(a_Token.value);
 
@@ -401,7 +401,7 @@ namespace ExLibris
 
 			} break;
 
-		case eParseType_Value:
+		case RtfToken::eParseType_Value:
 			{
 				CommandHandler handler = m_GroupCurrent->process_value;
 				if (!(this->*handler)(a_Token))
@@ -411,7 +411,7 @@ namespace ExLibris
 
 			} break;
 
-		case eParseType_Text:
+		case RtfToken::eParseType_Text:
 			{
 				m_ElementCurrent->InnerText += a_Token.value;
 
@@ -557,7 +557,7 @@ namespace ExLibris
 
 		RtfToken token = _ReadNextToken();
 
-		if (token.type != eParseType_Command)
+		if (token.type != RtfToken::eParseType_Command)
 		{
 			LOG_ERROR(a_Token) << "Extended control must be followed by another control.";
 
@@ -575,18 +575,18 @@ namespace ExLibris
 
 		// skip entire group
 
-		while (token.type != eParseType_Invalid)
+		while (token.type != RtfToken::eParseType_Invalid)
 		{
 			switch (token.type)
 			{
 
-			case eParseType_GroupOpen:
+			case RtfToken::eParseType_GroupOpen:
 				{
 					_GroupOpen();
 
 				} break;
 
-			case eParseType_GroupClose:
+			case RtfToken::eParseType_GroupClose:
 				{
 					_GroupClose();
 
@@ -625,18 +625,18 @@ namespace ExLibris
 		RtfFont* font = nullptr;
 
 		RtfToken token = _ReadNextToken();
-		while (token.type != eParseType_Invalid)
+		while (token.type != RtfToken::eParseType_Invalid)
 		{
 			switch (token.type)
 			{
 
-			case eParseType_GroupOpen:
+			case RtfToken::eParseType_GroupOpen:
 				{
 					_GroupOpen();
 
 				} break;
 
-			case eParseType_GroupClose:
+			case RtfToken::eParseType_GroupClose:
 				{
 					_GroupClose();
 
@@ -647,7 +647,7 @@ namespace ExLibris
 
 				} break;
 
-			case eParseType_Command:
+			case RtfToken::eParseType_Command:
 				{
 					if (token.value == "f")
 					{
@@ -738,7 +738,7 @@ namespace ExLibris
 
 				} break;
 
-			case eParseType_Value:
+			case RtfToken::eParseType_Value:
 				{
 					font->name = token.value;
 
@@ -787,7 +787,7 @@ namespace ExLibris
 
 		// first empty value indicator
 
-		if (token.type != eParseType_Value)
+		if (token.type != RtfToken::eParseType_Value)
 		{
 			return false;
 		}
@@ -797,9 +797,9 @@ namespace ExLibris
 
 		token = _ReadNextToken();
 
-		while (token.type != eParseType_Invalid)
+		while (token.type != RtfToken::eParseType_Invalid)
 		{
-			if (token.type == eParseType_Command)
+			if (token.type == RtfToken::eParseType_Command)
 			{
 				if (token.value == "red")
 				{
@@ -818,7 +818,7 @@ namespace ExLibris
 					LOG_ERROR(a_Token) << "Unknown color control \\" << token.parameter << "\\";
 				}
 			}
-			else if (token.type == eParseType_Value)
+			else if (token.type == RtfToken::eParseType_Value)
 			{
 				color = color_table->AddColor(*color_table->GetDefaultColor());
 			}
@@ -850,18 +850,18 @@ namespace ExLibris
 		RtfStyle* style = nullptr;
 
 		RtfToken token = _ReadNextToken();
-		while (token.type != eParseType_Invalid)
+		while (token.type != RtfToken::eParseType_Invalid)
 		{
 			switch (token.type)
 			{
 
-			case eParseType_GroupOpen:
+			case RtfToken::eParseType_GroupOpen:
 				{
 					_GroupOpen();
 
 				} break;
 
-			case eParseType_GroupClose:
+			case RtfToken::eParseType_GroupClose:
 				{
 					_GroupClose();
 
@@ -872,7 +872,7 @@ namespace ExLibris
 
 				} break;
 
-			case eParseType_Command:
+			case RtfToken::eParseType_Command:
 				{
 					if (token.value == "s")
 					{
@@ -942,7 +942,7 @@ namespace ExLibris
 
 				} break;
 
-			case eParseType_Value:
+			case RtfToken::eParseType_Value:
 				{
 					if (style == nullptr)
 					{
