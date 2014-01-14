@@ -174,3 +174,17 @@ TEST(TokenizerText, ReadInvalidHexadecimalNotEnoughValidCharacters)
 	EXPECT_TOKEN(Token::eType_Integer, "0", 5, 1);
 	EXPECT_END_TOKEN(6, 1);
 }
+
+TEST(TokenizerText, ReadWordWithUnprintableCharacter)
+{
+	std::stringstream ss;
+	ss << "Beep\5this";
+
+	Tokenizer tk(&ss);
+	tk.DisableOptions(Tokenizer::eOption_Identifiers);
+
+	EXPECT_TOKEN(Token::eType_Text, "Beep", 1, 1);
+	EXPECT_TOKEN(Token::eType_Unprintable, "\5", 5, 1);
+	EXPECT_TOKEN(Token::eType_Text, "this", 6, 1);
+	EXPECT_END_TOKEN(10, 1);
+}

@@ -95,6 +95,7 @@
     <ClCompile Include="Suite.Tokenizer.String.cpp" />
     <ClCompile Include="Suite.Tokenizer.Symbol.cpp" />
     <ClCompile Include="Suite.Tokenizer.Text.cpp" />
+    <ClCompile Include="Suite.Tokenizer.Unprintable.cpp" />
     <ClCompile Include="Suite.Tokenizer.Whitespace.cpp" />
     <ClCompile Include="Suite.Triangle.cpp" />
   </ItemGroup>
