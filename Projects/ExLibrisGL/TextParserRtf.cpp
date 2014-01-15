@@ -122,15 +122,15 @@ namespace ExLibris
 
 		m_ElementCurrent = m_Document->GetRootElement();
 
-		RtfToken command = _ReadNextToken();
-		while (command.type != RtfToken::eParseType_Invalid)
+		_ReadNextToken();
+		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			if (!_ProcessToken(command))
+			if (!_ProcessToken(m_TokenCurrent))
 			{
 				break;
 			}
 
-			command = _ReadNextToken();
+			_ReadNextToken();
 		}
 
 		return m_Document;
@@ -164,8 +164,8 @@ namespace ExLibris
 	{
 		// document group
 
-		RtfToken document_group = _ReadNextToken();
-		if (document_group.type != RtfToken::eParseType_GroupOpen)
+		_ReadNextToken();
+		if (m_TokenCurrent.type != RtfToken::eParseType_GroupOpen)
 		{
 			return false;
 		}
@@ -182,8 +182,8 @@ namespace ExLibris
 
 		// rtf command
 
-		RtfToken header_command = _ReadNextToken();
-		if (header_command.type != RtfToken::eParseType_Command || header_command.value != "rtf" || header_command.parameter != 1)
+		_ReadNextToken();
+		if (m_TokenCurrent.type != RtfToken::eParseType_Command || m_TokenCurrent.value != "rtf" || m_TokenCurrent.parameter != 1)
 		{
 			return false;
 		}
@@ -191,20 +191,22 @@ namespace ExLibris
 		return true;
 	}
 
-	RtfToken TextParserRtf::_ReadNextToken()
+	bool TextParserRtf::_ReadNextToken()
 	{
-		RtfToken token;
-		token.type = RtfToken::eParseType_Invalid;
+		m_TokenCurrent.type = RtfToken::eParseType_Invalid;
+		m_TokenCurrent.parameter = -1;
+		m_TokenCurrent.column = 0;
+		m_TokenCurrent.line = 0;
 
 		if (!m_Tokenizer->ReadToken())
 		{
-			return token;
+			return false;
 		}
 
 		const Token& tk = m_Tokenizer->GetCurrentToken();
 
-		token.column = tk.column;
-		token.line = tk.line;
+		m_TokenCurrent.column = tk.column;
+		m_TokenCurrent.line = tk.line;
 
 		if (tk.type == Token::eType_Symbol)
 		{
@@ -213,13 +215,13 @@ namespace ExLibris
 
 			case '{':
 				{
-					token.type = RtfToken::eParseType_GroupOpen;
+					m_TokenCurrent.type = RtfToken::eParseType_GroupOpen;
 
 				} break;
 
 			case '}':
 				{
-					token.type = RtfToken::eParseType_GroupClose;
+					m_TokenCurrent.type = RtfToken::eParseType_GroupClose;
 
 				} break;
 
@@ -227,22 +229,22 @@ namespace ExLibris
 				{
 					if (!m_Tokenizer->ReadToken())
 					{
-						token.type = RtfToken::eParseType_Invalid;
+						m_TokenCurrent.type = RtfToken::eParseType_Invalid;
 
-						return token;
+						return false;
 					}
 
-					token.type = RtfToken::eParseType_Command;
+					m_TokenCurrent.type = RtfToken::eParseType_Command;
 
 					if (tk.type == Token::eType_Text)
 					{
-						token.value = tk.text;
+						m_TokenCurrent.value = tk.text;
 
 						if (m_Tokenizer->ReadToken())
 						{
 							if (tk.type == Token::eType_Integer)
 							{
-								token.parameter = atoi(tk.text.c_str());
+								m_TokenCurrent.parameter = atoi(tk.text.c_str());
 							}
 							else
 							{
@@ -252,11 +254,11 @@ namespace ExLibris
 					}
 					else if (tk.type == Token::eType_Symbol && tk.text[0] == '*')
 					{
-						token.value = tk.text;
+						m_TokenCurrent.value = tk.text;
 					}
 					else
 					{
-						token.type = RtfToken::eParseType_Invalid;
+						m_TokenCurrent.type = RtfToken::eParseType_Invalid;
 					}
 
 					// read trailing space
@@ -266,20 +268,20 @@ namespace ExLibris
 						m_Tokenizer->RevertToken();
 					}
 
-					return token;
+					return false;
 
 				} break;
 
 			case ';':
 				{
-					token.type = RtfToken::eParseType_Value;
+					m_TokenCurrent.type = RtfToken::eParseType_Value;
 
 				} break;
 
 			default:
 				{
-					token.value += tk.text;
-					token.type = RtfToken::eParseType_Text;
+					m_TokenCurrent.value += tk.text;
+					m_TokenCurrent.type = RtfToken::eParseType_Text;
 
 				} break;
 			}
@@ -290,17 +292,17 @@ namespace ExLibris
 			{
 				if (!m_Tokenizer->ReadToken())
 				{
-					token.type = RtfToken::eParseType_Invalid;
+					m_TokenCurrent.type = RtfToken::eParseType_Invalid;
 
-					return token;
+					return false;
 				}
 			}
 		}
 
 		if (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace)
 		{
-			token.type = RtfToken::eParseType_Text;
-			token.value = tk.text;
+			m_TokenCurrent.type = RtfToken::eParseType_Text;
+			m_TokenCurrent.value = tk.text;
 
 			while (m_Tokenizer->ReadToken() && (tk.type == Token::eType_Text || tk.type == Token::eType_Whitespace || tk.type == Token::eType_Symbol))
 			{
@@ -316,17 +318,17 @@ namespace ExLibris
 					}
 					else if (symbol == ';')
 					{
-						token.type = RtfToken::eParseType_Value;
+						m_TokenCurrent.type = RtfToken::eParseType_Value;
 
 						break;
 					}
 				}
 
-				token.value += tk.text;
+				m_TokenCurrent.value += tk.text;
 			}
 		}
 
-		return token;
+		return true;
 	}
 
 	void TextParserRtf::_GroupOpen()
@@ -555,9 +557,8 @@ namespace ExLibris
 			return false;
 		}
 
-		RtfToken token = _ReadNextToken();
-
-		if (token.type != RtfToken::eParseType_Command)
+		_ReadNextToken();
+		if (m_TokenCurrent.type != RtfToken::eParseType_Command)
 		{
 			LOG_ERROR(a_Token) << "Extended control must be followed by another control.";
 
@@ -566,18 +567,18 @@ namespace ExLibris
 
 		// check if command is known
 
-		std::map<std::string, CommandHandler>::iterator found = m_GroupCurrent->process_commands->find(token.value);
+		std::map<std::string, CommandHandler>::iterator found = m_GroupCurrent->process_commands->find(m_TokenCurrent.value);
 
 		if (found != m_GroupCurrent->process_commands->end())
 		{
-			return _ProcessToken(token);
+			return _ProcessToken(m_TokenCurrent);
 		}
 
 		// skip entire group
 
-		while (token.type != RtfToken::eParseType_Invalid)
+		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			switch (token.type)
+			switch (m_TokenCurrent.type)
 			{
 
 			case RtfToken::eParseType_GroupOpen:
@@ -598,7 +599,7 @@ namespace ExLibris
 				} break;
 			}
 
-			token = _ReadNextToken();
+			_ReadNextToken();
 		}
 
 		return true;
@@ -624,10 +625,10 @@ namespace ExLibris
 		RtfFontTable* font_table = m_Document->GetFontTable();
 		RtfFont* font = nullptr;
 
-		RtfToken token = _ReadNextToken();
-		while (token.type != RtfToken::eParseType_Invalid)
+		_ReadNextToken();
+		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			switch (token.type)
+			switch (m_TokenCurrent.type)
 			{
 
 			case RtfToken::eParseType_GroupOpen:
@@ -649,80 +650,80 @@ namespace ExLibris
 
 			case RtfToken::eParseType_Command:
 				{
-					if (token.value == "f")
+					if (m_TokenCurrent.value == "f")
 					{
-						if (token.parameter < 0)
+						if (m_TokenCurrent.parameter < 0)
 						{
-							LOG_ERROR(a_Token) << "Invalid parameter \"" << token.parameter << "\" for font control.";
+							LOG_ERROR(m_TokenCurrent) << "Invalid parameter \"" << m_TokenCurrent.parameter << "\" for font control.";
 
 							return false;
 						}
 
-						font = font_table->GetFont(token.parameter);
+						font = font_table->GetFont(m_TokenCurrent.parameter);
 					}
 					else
 					{
 						if (font == nullptr)
 						{
-							LOG_ERROR(a_Token) << "Invalid control \\" << token.value << " because target font was not set.";
+							LOG_ERROR(m_TokenCurrent) << "Invalid control \\" << m_TokenCurrent.value << " because target font was not set.";
 
 							return false;
 						}
 
 						// family
 
-						if (token.value == "froman")
+						if (m_TokenCurrent.value == "froman")
 						{
 							font->family = RtfFont::eFamilyType_Roman;
 						}
-						else if (token.value == "fswiss")
+						else if (m_TokenCurrent.value == "fswiss")
 						{
 							font->family = RtfFont::eFamilyType_Swiss;
 						}
-						else if (token.value == "fmodern")
+						else if (m_TokenCurrent.value == "fmodern")
 						{
 							font->family = RtfFont::eFamilyType_Modern;
 						}
-						else if (token.value == "fscript")
+						else if (m_TokenCurrent.value == "fscript")
 						{
 							font->family = RtfFont::eFamilyType_Script;
 						}
-						else if (token.value == "fdecor")
+						else if (m_TokenCurrent.value == "fdecor")
 						{
 							font->family = RtfFont::eFamilyType_Decor;
 						}
-						else if (token.value == "ftech")
+						else if (m_TokenCurrent.value == "ftech")
 						{
 							font->family = RtfFont::eFamilyType_Tech;
 						}
-						else if (token.value == "fbidi")
+						else if (m_TokenCurrent.value == "fbidi")
 						{
 							font->family = RtfFont::eFamilyType_Bidi;
 						}
 
 						// pitch
 
-						else if (token.value == "fprq")
+						else if (m_TokenCurrent.value == "fprq")
 						{
-							if (token.parameter < RtfFont::ePitch_Default || token.parameter > RtfFont::ePitch_Variable)
+							if (m_TokenCurrent.parameter < RtfFont::ePitch_Default || m_TokenCurrent.parameter > RtfFont::ePitch_Variable)
 							{
-								LOG_ERROR(a_Token) << "Invalid pitch (" << token.parameter << ") specified for font.";
+								LOG_ERROR(m_TokenCurrent) << "Invalid pitch (" << m_TokenCurrent.parameter << ") specified for font.";
 
 								return false;
 							}
 
-							font->pitch = (RtfFont::Pitch)token.parameter;
+							font->pitch = (RtfFont::Pitch)m_TokenCurrent.parameter;
 						}
 
 						// characterset
 
-						else if (token.value == "fcharset")
+						else if (m_TokenCurrent.value == "fcharset")
 						{
-							font->character_set = _TokenToCharset(token);
+							font->character_set = _TokenToCharset(m_TokenCurrent);
 
 							if (font->character_set == eRtfCharacterSet_Invalid)
 							{
-								LOG_ERROR(a_Token) << "Invalid character set (" << token.parameter << ") specified for font.";
+								LOG_ERROR(m_TokenCurrent) << "Invalid character set (" << m_TokenCurrent.parameter << ") specified for font.";
 
 								return false;
 							}
@@ -732,7 +733,7 @@ namespace ExLibris
 
 						else
 						{
-							LOG_WARNING(a_Token) << "Unhandled control \"\\" << token.value << "\"";
+							LOG_WARNING(m_TokenCurrent) << "Unhandled control \"\\" << m_TokenCurrent.value << "\"";
 						}
 					}
 
@@ -740,13 +741,13 @@ namespace ExLibris
 
 			case RtfToken::eParseType_Value:
 				{
-					font->name = token.value;
+					font->name = m_TokenCurrent.value;
 
 				} break;
 
 			}
 
-			token = _ReadNextToken();
+			_ReadNextToken();
 		}
 
 		return true;
@@ -783,11 +784,11 @@ namespace ExLibris
 
 	bool TextParserRtf::_CommandColorTable(const RtfToken& a_Token)
 	{
-		RtfToken token = _ReadNextToken();
+		_ReadNextToken();
 
 		// first empty value indicator
 
-		if (token.type != RtfToken::eParseType_Value)
+		if (m_TokenCurrent.type != RtfToken::eParseType_Value)
 		{
 			return false;
 		}
@@ -795,30 +796,30 @@ namespace ExLibris
 		RtfColorTable* color_table = m_Document->GetColorTable();
 		RtfColor* color = color_table->AddColor(*color_table->GetDefaultColor());
 
-		token = _ReadNextToken();
+		_ReadNextToken();
 
-		while (token.type != RtfToken::eParseType_Invalid)
+		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			if (token.type == RtfToken::eParseType_Command)
+			if (m_TokenCurrent.type == RtfToken::eParseType_Command)
 			{
-				if (token.value == "red")
+				if (m_TokenCurrent.value == "red")
 				{
-					color->r = token.parameter;
+					color->r = m_TokenCurrent.parameter;
 				}
-				else if (token.value == "green")
+				else if (m_TokenCurrent.value == "green")
 				{
-					color->g = token.parameter;
+					color->g = m_TokenCurrent.parameter;
 				}
-				else if (token.value == "blue")
+				else if (m_TokenCurrent.value == "blue")
 				{
-					color->b = token.parameter;
+					color->b = m_TokenCurrent.parameter;
 				}
 				else
 				{
-					LOG_ERROR(a_Token) << "Unknown color control \\" << token.parameter << "\\";
+					LOG_ERROR(m_TokenCurrent) << "Unknown color control \\" << m_TokenCurrent.parameter << "\\";
 				}
 			}
-			else if (token.type == RtfToken::eParseType_Value)
+			else if (m_TokenCurrent.type == RtfToken::eParseType_Value)
 			{
 				color = color_table->AddColor(*color_table->GetDefaultColor());
 			}
@@ -829,7 +830,7 @@ namespace ExLibris
 				break;
 			}
 
-			token = _ReadNextToken();
+			_ReadNextToken();
 		}
 
 		return true;
@@ -849,10 +850,10 @@ namespace ExLibris
 		RtfStyleSheet* stylesheet = m_Document->GetStyleSheet();
 		RtfStyle* style = nullptr;
 
-		RtfToken token = _ReadNextToken();
-		while (token.type != RtfToken::eParseType_Invalid)
+		_ReadNextToken();
+		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			switch (token.type)
+			switch (m_TokenCurrent.type)
 			{
 
 			case RtfToken::eParseType_GroupOpen:
@@ -874,69 +875,69 @@ namespace ExLibris
 
 			case RtfToken::eParseType_Command:
 				{
-					if (token.value == "s")
+					if (m_TokenCurrent.value == "s")
 					{
-						if (token.parameter < 0)
+						if (m_TokenCurrent.parameter < 0)
 						{
-							LOG_ERROR(a_Token) << "Invalid parameter \"" << token.parameter << "\" for style control word.";
+							LOG_ERROR(m_TokenCurrent) << "Invalid parameter \"" << m_TokenCurrent.parameter << "\" for style control word.";
 
 							return false;
 						}
 
-						style = stylesheet->GetStyle(token.parameter);
+						style = stylesheet->GetStyle(m_TokenCurrent.parameter);
 					}
 					else
 					{
 						if (style == nullptr)
 						{
-							LOG_ERROR(a_Token) << "Control word \\" << token.value << " is invalid because target style was not set.";
+							LOG_ERROR(m_TokenCurrent) << "Control word \\" << m_TokenCurrent.value << " is invalid because target style was not set.";
 
 							return false;
 						}
 
-						if (token.value == "snext")
+						if (m_TokenCurrent.value == "snext")
 						{
-							if (token.parameter < 0)
+							if (m_TokenCurrent.parameter < 0)
 							{
-								LOG_ERROR(a_Token) << "Invalid parameter \"" << token.parameter << "\" for next paragraph style control word.";
+								LOG_ERROR(m_TokenCurrent) << "Invalid parameter \"" << m_TokenCurrent.parameter << "\" for next paragraph style control word.";
 
 								return false;
 							}
 
-							RtfStyle* style_next = stylesheet->GetStyle(token.parameter);
+							RtfStyle* style_next = stylesheet->GetStyle(m_TokenCurrent.parameter);
 							style->SetNextParagraphStyle(style_next);
 						}
-						else if (token.value == "loch")
+						else if (m_TokenCurrent.value == "loch")
 						{
 							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
 						}
-						else if (token.value == "hich")
+						else if (m_TokenCurrent.value == "hich")
 						{
 							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
 						}
-						else if (token.value == "dbch")
+						else if (m_TokenCurrent.value == "dbch")
 						{
 							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
 						}
-						else if (token.value == "af")
+						else if (m_TokenCurrent.value == "af")
 						{
-							RtfFont* font = m_Document->GetFontTable()->GetFont(token.parameter);
+							RtfFont* font = m_Document->GetFontTable()->GetFont(m_TokenCurrent.parameter);
 
 							properties->SetFont(font);
 						}
-						else if (token.value == "afs")
+						else if (m_TokenCurrent.value == "afs")
 						{
-							properties->SetFontSize((float)token.parameter / 2.0f);
+							properties->SetFontSize((float)m_TokenCurrent.parameter / 2.0f);
 						}
-						else if (token.value == "alang")
+						else if (m_TokenCurrent.value == "alang")
 						{
-							const RtfLocale* locale = m_Document->GetWorld()->GetLocaleByIdentifier(token.parameter);
+							const RtfLocale* locale = m_Document->GetWorld()->GetLocaleByIdentifier(m_TokenCurrent.parameter);
 
 							properties->SetLocale(locale);
 						}
-						else if (!_ProcessTextFormatToken(token, style->GetTextFormat()))
+						else if (!_ProcessTextFormatToken(m_TokenCurrent, style->GetTextFormat()))
 						{
-							LOG_ERROR(a_Token) << "Unhandled control word \\" << token.value << ".";
+							LOG_ERROR(m_TokenCurrent) << "Unhandled control word \\" << m_TokenCurrent.value << ".";
 						}
 					}
 
@@ -946,18 +947,18 @@ namespace ExLibris
 				{
 					if (style == nullptr)
 					{
-						LOG_ERROR(a_Token) << "Value " << token.value << " is invalid because target style was not set.";
+						LOG_ERROR(m_TokenCurrent) << "Value " << m_TokenCurrent.value << " is invalid because target style was not set.";
 
 						return false;
 					}
 
-					style->SetName(token.value);
+					style->SetName(m_TokenCurrent.value);
 
 				} break;
 
 			}
 
-			token = _ReadNextToken();
+			_ReadNextToken();
 		}
 
 		return true;
