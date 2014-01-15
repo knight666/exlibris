@@ -86,7 +86,7 @@ namespace ExLibris
 
 		bool _ParseHeader();
 
-		RtfToken _ReadNextToken();
+		bool _ReadNextToken();
 		void _GroupOpen();
 		void _GroupClose();
 		bool _ProcessToken(const RtfToken& a_Token);
@@ -112,6 +112,7 @@ namespace ExLibris
 
 		std::stringstream m_Input;
 		Tokenizer* m_Tokenizer;
+		RtfToken m_TokenCurrent;
 
 		std::vector<RtfLogMessage> m_LogWarnings;
 		std::vector<RtfLogMessage> m_LogErrors;
