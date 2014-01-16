@@ -5,7 +5,7 @@
 namespace ExLibris
 {
 
-	struct RtfFont
+	class RtfFont
 	{
 
 	public:
@@ -31,17 +31,26 @@ namespace ExLibris
 
 	public:
 
-		RtfFont()
-			: family(eFamilyType_Nil)
-			, pitch(ePitch_Default)
-			, character_set(eRtfCharacterSet_Default)
-		{
-		}
+		RtfFont();
 
-		std::string name;
-		FamilyType family;
-		Pitch pitch;
-		RtfCharacterSet character_set;
+		const std::string& GetName() const;
+		void SetName(const std::string& a_Name);
+
+		FamilyType GetFamilyType() const;
+		void SetFamilyType(FamilyType a_Type);
+
+		Pitch GetPitch() const;
+		void SetPitch(Pitch a_Pitch);
+
+		RtfCharacterSet GetCharacterSet() const;
+		void SetCharacterSet(RtfCharacterSet a_CharacterSet);
+
+	private:
+
+		std::string m_Name;
+		FamilyType m_Family;
+		Pitch m_Pitch;
+		RtfCharacterSet m_CharacterSet;
 
 	}; // struct RtfFont
 

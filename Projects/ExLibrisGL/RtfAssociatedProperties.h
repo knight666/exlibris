@@ -30,7 +30,7 @@
 namespace ExLibris
 {
 	class RtfDomDocument;
-	struct RtfFont;
+	class RtfFont;
 	struct RtfLocale;
 	class RtfTextFormat;
 }

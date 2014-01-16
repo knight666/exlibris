@@ -671,31 +671,31 @@ namespace ExLibris
 
 						if (m_TokenCurrent.value == "froman")
 						{
-							font->family = RtfFont::eFamilyType_Roman;
+							font->SetFamilyType(RtfFont::eFamilyType_Roman);
 						}
 						else if (m_TokenCurrent.value == "fswiss")
 						{
-							font->family = RtfFont::eFamilyType_Swiss;
+							font->SetFamilyType(RtfFont::eFamilyType_Swiss);
 						}
 						else if (m_TokenCurrent.value == "fmodern")
 						{
-							font->family = RtfFont::eFamilyType_Modern;
+							font->SetFamilyType(RtfFont::eFamilyType_Modern);
 						}
 						else if (m_TokenCurrent.value == "fscript")
 						{
-							font->family = RtfFont::eFamilyType_Script;
+							font->SetFamilyType(RtfFont::eFamilyType_Script);
 						}
 						else if (m_TokenCurrent.value == "fdecor")
 						{
-							font->family = RtfFont::eFamilyType_Decor;
+							font->SetFamilyType(RtfFont::eFamilyType_Decor);
 						}
 						else if (m_TokenCurrent.value == "ftech")
 						{
-							font->family = RtfFont::eFamilyType_Tech;
+							font->SetFamilyType(RtfFont::eFamilyType_Tech);
 						}
 						else if (m_TokenCurrent.value == "fbidi")
 						{
-							font->family = RtfFont::eFamilyType_Bidi;
+							font->SetFamilyType(RtfFont::eFamilyType_Bidi);
 						}
 
 						// pitch
@@ -709,16 +709,16 @@ namespace ExLibris
 								return false;
 							}
 
-							font->pitch = (RtfFont::Pitch)m_TokenCurrent.parameter;
+							font->SetPitch((RtfFont::Pitch)m_TokenCurrent.parameter);
 						}
 
 						// characterset
 
 						else if (m_TokenCurrent.value == "fcharset")
 						{
-							font->character_set = _TokenToCharset(m_TokenCurrent);
+							font->SetCharacterSet(_TokenToCharset(m_TokenCurrent));
 
-							if (font->character_set == eRtfCharacterSet_Invalid)
+							if (font->GetCharacterSet() == eRtfCharacterSet_Invalid)
 							{
 								LOG_ERROR(m_TokenCurrent) << "Invalid character set (" << m_TokenCurrent.parameter << ") specified for font.";
 
@@ -738,7 +738,7 @@ namespace ExLibris
 
 			case RtfToken::eParseType_Value:
 				{
-					font->name = m_TokenCurrent.value;
+					font->SetName(m_TokenCurrent.value);
 
 				} break;
 
