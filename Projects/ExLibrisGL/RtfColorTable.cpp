@@ -29,8 +29,9 @@
 namespace ExLibris
 {
 
-	RtfColorTable::RtfColorTable()
-		: m_IndexNext(1)
+	RtfColorTable::RtfColorTable(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
+		, m_IndexNext(1)
 		, m_IndexDefault(0)
 		, m_ColorDefault(new RtfColor(0, 0, 0))
 	{

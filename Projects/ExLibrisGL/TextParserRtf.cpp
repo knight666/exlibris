@@ -122,15 +122,12 @@ namespace ExLibris
 
 		m_ElementCurrent = m_Document->GetRootElement();
 
-		_ReadNextToken();
-		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
+		while (_ReadNextToken() && m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
 			if (!_ProcessToken(m_TokenCurrent))
 			{
 				break;
 			}
-
-			_ReadNextToken();
 		}
 
 		return m_Document;
@@ -268,7 +265,7 @@ namespace ExLibris
 						m_Tokenizer->RevertToken();
 					}
 
-					return false;
+					return true;
 
 				} break;
 
@@ -607,9 +604,9 @@ namespace ExLibris
 
 	bool TextParserRtf::_CommandCharacterSet(const RtfToken& a_Token)
 	{
-		m_ElementCurrent->TextFormat.SetCharacterSet(_TokenToCharset(a_Token));
+		m_ElementCurrent->GetTextFormat().SetCharacterSet(_TokenToCharset(a_Token));
 
-		return (m_ElementCurrent->TextFormat.GetCharacterSet() != eRtfCharacterSet_Invalid);
+		return (m_ElementCurrent->GetTextFormat().GetCharacterSet() != eRtfCharacterSet_Invalid);
 	}
 
 	bool TextParserRtf::_CommandFontTable(const RtfToken& a_Token)
@@ -760,7 +757,7 @@ namespace ExLibris
 			return false;
 		}
 
-		m_ElementCurrent->TextFormat.SetFont(m_Document->GetFontTable()->GetFont(a_Token.parameter));
+		m_ElementCurrent->GetTextFormat().SetFont(m_Document->GetFontTable()->GetFont(a_Token.parameter));
 
 		return true;
 	}
@@ -774,9 +771,9 @@ namespace ExLibris
 
 		m_Document->GetFontTable()->SetDefault(a_Token.parameter);
 
-		if (m_ElementCurrent->TextFormat.GetFont() == nullptr)
+		if (m_ElementCurrent->GetTextFormat().GetFont() == nullptr)
 		{
-			m_ElementCurrent->TextFormat.SetFont(m_Document->GetFontTable()->GetDefault());
+			m_ElementCurrent->GetTextFormat().SetFont(m_Document->GetFontTable()->GetDefault());
 		}
 
 		return true;
@@ -850,8 +847,7 @@ namespace ExLibris
 		RtfStyleSheet* stylesheet = m_Document->GetStyleSheet();
 		RtfStyle* style = nullptr;
 
-		_ReadNextToken();
-		while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
+		while (_ReadNextToken() && m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
 			switch (m_TokenCurrent.type)
 			{
@@ -957,8 +953,6 @@ namespace ExLibris
 				} break;
 
 			}
-
-			_ReadNextToken();
 		}
 
 		return true;

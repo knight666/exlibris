@@ -28,13 +28,18 @@
 
 namespace ExLibris
 {
+	class RtfDomDocument;
+}
+
+namespace ExLibris
+{
 
 	class RtfColorTable
 	{
 
 	public:
 
-		RtfColorTable();
+		RtfColorTable(RtfDomDocument& a_Document);
 		~RtfColorTable();
 
 		size_t GetColorCount() const;
@@ -48,6 +53,7 @@ namespace ExLibris
 
 	private:
 
+		RtfDomDocument& m_Document;
 		std::map<int, RtfColor*> m_Colors;
 		RtfColor* m_ColorDefault;
 		int m_IndexNext;

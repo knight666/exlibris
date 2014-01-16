@@ -60,7 +60,7 @@ namespace ExLibris
 
 	private:
 
-		RtfTextFormat m_TextFormat;
+		RtfTextFormat* m_TextFormat;
 
 		RtfDomElement* m_RootElement;
 

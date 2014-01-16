@@ -4,6 +4,11 @@
 
 namespace ExLibris
 {
+	class RtfDomDocument;
+}
+
+namespace ExLibris
+{
 
 	class RtfDomElement
 	{
@@ -12,12 +17,12 @@ namespace ExLibris
 
 	public:
 
-		RtfDomElement();
+		RtfDomElement(RtfDomDocument& a_Document);
 		~RtfDomElement();
 
-		RtfTextFormat TextFormat;
-
 		std::string InnerText;
+
+		RtfTextFormat& GetTextFormat() const;
 
 		RtfDomElement* GetParent() const;
 
@@ -30,6 +35,8 @@ namespace ExLibris
 
 	private:
 
+		RtfDomDocument& m_Document;
+		RtfTextFormat* m_TextFormat;
 		RtfDomElement* m_Parent;
 		RtfDomElement* m_SiblingPrevious;
 		RtfDomElement* m_SiblingNext;

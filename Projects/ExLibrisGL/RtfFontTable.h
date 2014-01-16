@@ -28,13 +28,18 @@
 
 namespace ExLibris
 {
+	class RtfDomDocument;
+}
+
+namespace ExLibris
+{
 
 	class RtfFontTable
 	{
 
 	public:
 
-		RtfFontTable();
+		RtfFontTable(RtfDomDocument& a_Document);
 		~RtfFontTable();
 
 		size_t GetFontCount() const;
@@ -46,6 +51,7 @@ namespace ExLibris
 
 	private:
 
+		RtfDomDocument& m_Document;
 		std::map<int, RtfFont*> m_Fonts;
 		RtfFont* m_Default;
 

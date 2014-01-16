@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "IRtfParseable.h"
 #include "RtfCharacterEncoding.h"
 #include "RtfCharacterSet.h"
 
@@ -39,11 +40,15 @@ namespace ExLibris
 {
 
 	class RtfTextFormat
+		: public IRtfParseable
 	{
 
 	public:
 
-		RtfTextFormat();
+		RtfTextFormat(RtfDomDocument& a_Document);
+		RtfTextFormat(const RtfTextFormat& a_Other);
+
+		RtfDomDocument& GetDocument() const;
 
 		RtfCharacterSet GetCharacterSet() const;
 		void SetCharacterSet(RtfCharacterSet a_CharacterSet);
@@ -77,7 +82,11 @@ namespace ExLibris
 
 	private:
 
-		RtfDomDocument* m_Document;
+		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
+
+	private:
+
+		RtfDomDocument& m_Document;
 		RtfCharacterSet m_CharacterSet;
 		RtfCharacterEncoding m_CharacterEncoding;
 		const RtfLocale* m_Locale;

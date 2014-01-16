@@ -27,7 +27,7 @@ TEST(TextParserRtf, HelloWorld)
 
 	RtfDomElement* root = doc->GetRootElement();
 
-	EXPECT_EQ(eRtfCharacterSet_Ansi, root->TextFormat.GetCharacterSet());
+	EXPECT_EQ(eRtfCharacterSet_Ansi, root->GetTextFormat().GetCharacterSet());
 	EXPECT_STREQ("Hello World!", root->InnerText.c_str());
 
 	EXPECT_EQ(1, root->GetChildrenCount());
@@ -75,10 +75,10 @@ TEST(TextParserRtf, FontTableUseDefaultFont)
 
 	RtfDomElement* root = doc->GetRootElement();
 
-	ASSERT_NE(nullptr, root->TextFormat.GetFont());
+	ASSERT_NE(nullptr, root->GetTextFormat().GetFont());
 
-	EXPECT_EQ(RtfFont::eFamilyType_Nil, root->TextFormat.GetFont()->family);
-	EXPECT_STREQ("Robotica", root->TextFormat.GetFont()->name.c_str());
+	EXPECT_EQ(RtfFont::eFamilyType_Nil, root->GetTextFormat().GetFont()->family);
+	EXPECT_STREQ("Robotica", root->GetTextFormat().GetFont()->name.c_str());
 	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
 }
 
@@ -197,7 +197,8 @@ TEST(TextParserRtf, StyleSheet)
 	ASSERT_NE(nullptr, tf.GetFont());
 	EXPECT_STREQ("Times New Roman", tf.GetFont()->name.c_str());
 	EXPECT_FLOAT_EQ(8.0f, tf.GetFontSize());
-	EXPECT_EQ(nullptr, tf.GetBackgroundColor());
+	ASSERT_NE(nullptr, tf.GetBackgroundColor());
+	EXPECT_COLOR_RGB(0, 0, 0, *tf.GetBackgroundColor());
 	ASSERT_NE(nullptr, tf.GetForegroundColor());
 	EXPECT_COLOR_RGB(65, 12, 78, *tf.GetForegroundColor());
 	EXPECT_TRUE(tf.GetParagraphWidowControl());

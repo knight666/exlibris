@@ -26,13 +26,17 @@
 
 #include "RtfAssociatedProperties.h"
 
+#include "RtfDomDocument.h"
+#include "RtfFontTable.h"
 #include "RtfTextFormat.h"
+#include "RtfWorld.h"
 
 namespace ExLibris
 {
 
-	RtfAssociatedProperties::RtfAssociatedProperties()
-		: m_Font(nullptr)
+	RtfAssociatedProperties::RtfAssociatedProperties(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
+		, m_Font(nullptr)
 		, m_FontSize(12.0f)
 		, m_Locale(nullptr)
 		, m_Encoding(eRtfCharacterEncoding_SingleByteLowAnsi)
@@ -42,19 +46,18 @@ namespace ExLibris
 	{
 	}
 
-	RtfAssociatedProperties::RtfAssociatedProperties(const RtfTextFormat& a_TextFormat)
-		: m_Font(a_TextFormat.GetFont())
-		, m_FontSize(a_TextFormat.GetFontSize())
-		, m_Locale(a_TextFormat.GetLocale())
-		, m_Encoding(a_TextFormat.GetCharacterEncoding())
-		, m_Bold(false)
-		, m_Italic(false)
-	{
-		m_Specified = eSpecified_Font | eSpecified_FontSize | eSpecified_Locale | eSpecified_CharacterEncoding;
-	}
-
 	RtfAssociatedProperties::~RtfAssociatedProperties()
 	{
+	}
+
+	void RtfAssociatedProperties::FromTextFormat(const RtfTextFormat& a_TextFormat)
+	{
+		m_Font = a_TextFormat.GetFont();
+		m_FontSize = a_TextFormat.GetFontSize();
+		m_Locale = a_TextFormat.GetLocale();
+		m_Encoding = a_TextFormat.GetCharacterEncoding();
+
+		m_Specified = eSpecified_Font | eSpecified_FontSize | eSpecified_Locale | eSpecified_CharacterEncoding;
 	}
 
 	RtfFont* RtfAssociatedProperties::GetFont() const
@@ -148,6 +151,45 @@ namespace ExLibris
 		if (a_Other.m_Specified & eSpecified_Italic)
 		{
 			SetItalic(a_Other.IsItalic());
+		}
+	}
+
+	IRtfParseable::Result RtfAssociatedProperties::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (a_Token.value == "af")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			RtfFont* font = m_Document.GetFontTable()->GetFont(a_Token.parameter);
+			SetFont(font);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "afs")
+		{
+			float font_size = (float)a_Token.parameter / 2.0f;
+			SetFontSize(font_size);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "alang")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			const RtfLocale* locale = m_Document.GetWorld()->GetLocaleByIdentifier(a_Token.parameter);
+			SetLocale(locale);
+
+			return eResult_Handled;
+		}
+		else
+		{
+			return eResult_Propagate;
 		}
 	}
 

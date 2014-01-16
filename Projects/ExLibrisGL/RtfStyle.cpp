@@ -26,20 +26,37 @@
 
 #include "RtfStyle.h"
 
+#include "RtfStyleSheet.h"
+
 namespace ExLibris
 {
 
-	RtfStyle::RtfStyle()
+	struct RtfStyle::ParseState
+	{
+		ParseState()
+			: parent(nullptr)
+			, properties(nullptr)
+		{
+		}
+
+		RtfParserGroup* parent;
+		RtfAssociatedProperties* properties;
+	};
+
+	RtfStyle::RtfStyle(RtfStyleSheet& a_Parent, RtfDomDocument& a_Document)
+		: m_Parent(a_Parent)
+		, m_Document(a_Document)
+		, m_TextFormat(new RtfTextFormat(m_Document))
 	{
 		m_StyleNextParagraph = this;
 
-		m_PropertiesLowAnsi = new RtfAssociatedProperties();
+		m_PropertiesLowAnsi = new RtfAssociatedProperties(m_Document);
 		m_PropertiesLowAnsi->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
 
-		m_PropertiesHighAnsi = new RtfAssociatedProperties();
+		m_PropertiesHighAnsi = new RtfAssociatedProperties(m_Document);
 		m_PropertiesHighAnsi->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
 
-		m_PropertiesDoubleByte = new RtfAssociatedProperties();
+		m_PropertiesDoubleByte = new RtfAssociatedProperties(m_Document);
 		m_PropertiesDoubleByte->SetCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
 	}
 
@@ -48,6 +65,7 @@ namespace ExLibris
 		delete m_PropertiesLowAnsi;
 		delete m_PropertiesHighAnsi;
 		delete m_PropertiesDoubleByte;
+		delete m_TextFormat;
 	}
 
 	const std::string& RtfStyle::GetName() const
@@ -99,7 +117,8 @@ namespace ExLibris
 
 	RtfAssociatedProperties RtfStyle::GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding)
 	{
-		RtfAssociatedProperties combined(m_TextFormat);
+		RtfAssociatedProperties combined(m_Document);
+		combined.FromTextFormat(*m_TextFormat);
 
 		RtfAssociatedProperties* properties = GetPropertiesForCharacterEncoding(a_Encoding);
 		if (properties != nullptr)
@@ -112,7 +131,77 @@ namespace ExLibris
 
 	RtfTextFormat& RtfStyle::GetTextFormat()
 	{
-		return m_TextFormat;
+		return *m_TextFormat;
+	}
+
+	IRtfParseable::Result RtfStyle::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (a_Token.value == "s")
+		{
+			m_State->parent = a_State.group_current;
+			m_State->properties = nullptr;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "snext")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			RtfStyle* style_next = m_Parent.GetStyle(a_Token.parameter);
+			SetNextParagraphStyle(style_next);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "loch")
+		{
+			m_State->properties = GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "hich")
+		{
+			m_State->properties = GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "dbch")
+		{
+			m_State->properties = GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+
+			return eResult_Handled;
+		}
+		else
+		{
+			if (m_State->properties != nullptr && m_State->properties->Parse(a_State, a_Token) == eResult_Handled)
+			{
+				return eResult_Handled;
+			}
+			else if (m_TextFormat->Parse(a_State, a_Token) == eResult_Handled)
+			{
+				return eResult_Handled;
+			}
+			else
+			{
+				return eResult_Invalid;
+			}
+		}
+	}
+
+	IRtfParseable::Result RtfStyle::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		IRtfParseable::_ParseGroupClose(a_State, a_Token);
+
+		if (a_State.group_current == m_State->parent)
+		{
+			return eResult_Finished;
+		}
+		else
+		{
+			return eResult_Handled;
+		}
 	}
 
 }; // namespace ExLibris

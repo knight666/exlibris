@@ -130,6 +130,7 @@
     <ClInclude Include="IFontLoader.h" />
     <ClInclude Include="IGlyphProvider.h" />
     <ClInclude Include="IMeshVisitor.h" />
+    <ClInclude Include="IRtfParseable.h" />
     <ClInclude Include="ITextLayoutVisitor.h" />
     <ClInclude Include="ITextParser.h" />
     <ClInclude Include="Library.h" />
@@ -152,6 +153,8 @@
     <ClInclude Include="RtfLanguage.h" />
     <ClInclude Include="RtfLocale.h" />
     <ClInclude Include="RtfLogMessage.h" />
+    <ClInclude Include="RtfParserGroup.h" />
+    <ClInclude Include="RtfParserState.h" />
     <ClInclude Include="RtfStyle.h" />
     <ClInclude Include="RtfStyleSheet.h" />
     <ClInclude Include="RtfTextFormat.h" />

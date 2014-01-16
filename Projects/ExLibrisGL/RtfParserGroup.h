@@ -24,40 +24,22 @@
 
 #pragma once
 
-#include "IRtfParseable.h"
-#include "RtfStyle.h"
-
 namespace ExLibris
 {
 
-	class RtfStyleSheet
-		: public IRtfParseable
+	struct RtfParserGroup
 	{
+	
+		RtfParserGroup()
+			: parent(nullptr)
+			, index(0)
+		{
+		}
 
-	public:
-
-		RtfStyleSheet(RtfDomDocument& a_Document);
-		~RtfStyleSheet();
-
-		size_t GetStyleCount() const;
-
-		RtfStyle* FindStyleByName(const std::string& a_Name) const;
-		RtfStyle* GetStyle(int a_Index);
-
-	private:
-
-		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
-		IRtfParseable::Result _ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token);
-
-	private:
-
-		RtfDomDocument& m_Document;
-
-		std::map<int, RtfStyle*> m_Styles;
-
-		struct ParseState;
-		ParseState* m_State;
-
-	}; // class RtfStyleSheet
+		RtfParserGroup* parent;
+		int index;
+		std::vector<std::string> commands;
+	
+	}; // struct RtfParserGroup
 
 }; // namespace ExLibris
