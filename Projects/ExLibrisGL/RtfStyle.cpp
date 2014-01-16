@@ -47,6 +47,7 @@ namespace ExLibris
 		: m_Parent(a_Parent)
 		, m_Document(a_Document)
 		, m_TextFormat(new RtfTextFormat(m_Document))
+		, m_State(new ParseState)
 	{
 		m_StyleNextParagraph = this;
 
@@ -66,6 +67,7 @@ namespace ExLibris
 		delete m_PropertiesHighAnsi;
 		delete m_PropertiesDoubleByte;
 		delete m_TextFormat;
+		delete m_State;
 	}
 
 	const std::string& RtfStyle::GetName() const
@@ -175,18 +177,27 @@ namespace ExLibris
 		}
 		else
 		{
-			if (m_State->properties != nullptr && m_State->properties->Parse(a_State, a_Token) == eResult_Handled)
+			Result result = eResult_Invalid;
+
+			if (m_State->properties != nullptr)
 			{
-				return eResult_Handled;
+				result = m_State->properties->Parse(a_State, a_Token);
+				if (result != eResult_Propagate)
+				{
+					return result;
+				}
 			}
-			else if (m_TextFormat->Parse(a_State, a_Token) == eResult_Handled)
+
+			if (result == eResult_Invalid)
 			{
-				return eResult_Handled;
+				result = m_TextFormat->Parse(a_State, a_Token);
+				if (result == eResult_Propagate)
+				{
+					result = eResult_Invalid;
+				}
 			}
-			else
-			{
-				return eResult_Invalid;
-			}
+			
+			return result;
 		}
 	}
 
