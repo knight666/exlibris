@@ -97,7 +97,7 @@ namespace ExLibris
 	{
 		if (a_Token.value == "stylesheet")
 		{
-			m_State->parent = a_State.group_current;
+			m_State->parent = a_State.group_current ? a_State.group_current->parent : nullptr;
 			m_State->style = nullptr;
 
 			return eResult_Handled;
@@ -109,13 +109,14 @@ namespace ExLibris
 				return eResult_Invalid;
 			}
 
-			_PushTarget(a_State, GetStyle(a_Token.parameter));
+			RtfStyle* style = GetStyle(a_Token.parameter);
+			_PushTarget(a_State, style);
 
 			return eResult_Handled;
 		}
 		else
 		{
-			return eResult_Invalid;
+			return eResult_Propagate;
 		}
 	}
 

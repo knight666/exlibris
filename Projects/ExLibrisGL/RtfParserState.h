@@ -35,10 +35,26 @@ namespace ExLibris
 
 	struct RtfParserState
 	{
-		RtfParserGroup* group_current;
+		RtfParserState()
+			: group_current(nullptr)
+			, group_index(0)
+			, target_current(nullptr)
+		{
+		}
+
+		~RtfParserState()
+		{
+			for (std::vector<RtfParserGroup*>::iterator group_it = groups.begin(); group_it != groups.end(); ++group_it)
+			{
+				delete *group_it;
+			}
+		}
+
 		int group_index;
-		std::stack<IRtfParseable*> parseables;
-		IRtfParseable* target;
+		std::vector<RtfParserGroup*> groups;
+		RtfParserGroup* group_current;
+		std::stack<IRtfParseable*> targets;
+		IRtfParseable* target_current;
 	};
 
 }; // namespace ExLibris
