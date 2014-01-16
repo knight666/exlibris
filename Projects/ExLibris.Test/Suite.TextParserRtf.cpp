@@ -22,8 +22,8 @@ TEST(TextParserRtf, HelloWorld)
 
 	RtfFontTable* ft = doc->GetFontTable();
 
-	EXPECT_EQ(RtfFont::eFamilyType_Swiss, ft->GetFont(0)->family);
-	EXPECT_STREQ("Helvetica", ft->GetFont(0)->name.c_str());
+	EXPECT_EQ(RtfFont::eFamilyType_Swiss, ft->GetFont(0)->GetFamilyType());
+	EXPECT_STREQ("Helvetica", ft->GetFont(0)->GetName().c_str());
 
 	RtfDomElement* root = doc->GetRootElement();
 
@@ -71,14 +71,14 @@ TEST(TextParserRtf, FontTableUseDefaultFont)
 	ASSERT_NE(nullptr, doc);
 
 	ASSERT_NE(nullptr, doc->GetFontTable()->GetDefault());
-	EXPECT_STREQ("Robotica", doc->GetFontTable()->GetDefault()->name.c_str());
+	EXPECT_STREQ("Robotica", doc->GetFontTable()->GetDefault()->GetName().c_str());
 
 	RtfDomElement* root = doc->GetRootElement();
 
 	ASSERT_NE(nullptr, root->GetTextFormat().GetFont());
 
-	EXPECT_EQ(RtfFont::eFamilyType_Nil, root->GetTextFormat().GetFont()->family);
-	EXPECT_STREQ("Robotica", root->GetTextFormat().GetFont()->name.c_str());
+	EXPECT_EQ(RtfFont::eFamilyType_Nil, root->GetTextFormat().GetFont()->GetFamilyType());
+	EXPECT_STREQ("Robotica", root->GetTextFormat().GetFont()->GetName().c_str());
 	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
 }
 
@@ -103,14 +103,14 @@ TEST(TextParserRtf, FontTableSetPitch)
 
 	RtfFontTable* ft = doc->GetFontTable();
 
-	EXPECT_STREQ("Magnified", ft->GetFont(0)->name.c_str());
-	EXPECT_EQ(RtfFont::ePitch_Fixed, ft->GetFont(0)->pitch);
+	EXPECT_STREQ("Magnified", ft->GetFont(0)->GetName().c_str());
+	EXPECT_EQ(RtfFont::ePitch_Fixed, ft->GetFont(0)->GetPitch());
 
-	EXPECT_STREQ("Simplified", ft->GetFont(1)->name.c_str());
-	EXPECT_EQ(RtfFont::ePitch_Default, ft->GetFont(1)->pitch);
+	EXPECT_STREQ("Simplified", ft->GetFont(1)->GetName().c_str());
+	EXPECT_EQ(RtfFont::ePitch_Default, ft->GetFont(1)->GetPitch());
 
-	EXPECT_STREQ("Testified", ft->GetFont(2)->name.c_str());
-	EXPECT_EQ(RtfFont::ePitch_Variable, ft->GetFont(2)->pitch);
+	EXPECT_STREQ("Testified", ft->GetFont(2)->GetName().c_str());
+	EXPECT_EQ(RtfFont::ePitch_Variable, ft->GetFont(2)->GetPitch());
 }
 
 TEST(TextParserRtf, FontTableSetCharacterSet)
@@ -134,14 +134,14 @@ TEST(TextParserRtf, FontTableSetCharacterSet)
 
 	RtfFontTable* ft = doc->GetFontTable();
 
-	EXPECT_STREQ("Tester", ft->GetFont(0)->name.c_str());
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, ft->GetFont(0)->character_set);
+	EXPECT_STREQ("Tester", ft->GetFont(0)->GetName().c_str());
+	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, ft->GetFont(0)->GetCharacterSet());
 
-	EXPECT_STREQ("Band-Maid", ft->GetFont(1)->name.c_str());
-	EXPECT_EQ(eRtfCharacterSet_Baltic, ft->GetFont(1)->character_set);
+	EXPECT_STREQ("Band-Maid", ft->GetFont(1)->GetName().c_str());
+	EXPECT_EQ(eRtfCharacterSet_Baltic, ft->GetFont(1)->GetCharacterSet());
 
-	EXPECT_STREQ("Tingling", ft->GetFont(2)->name.c_str());
-	EXPECT_EQ(eRtfCharacterSet_ShiftJis, ft->GetFont(2)->character_set);
+	EXPECT_STREQ("Tingling", ft->GetFont(2)->GetName().c_str());
+	EXPECT_EQ(eRtfCharacterSet_ShiftJis, ft->GetFont(2)->GetCharacterSet());
 }
 
 TEST(TextParserRtf, ColorTable)
@@ -195,7 +195,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_EQ(eRtfCountry_Netherlands, tf.GetLocale()->country);
 	EXPECT_EQ(eRtfLanguage_Dutch, tf.GetLocale()->language);
 	ASSERT_NE(nullptr, tf.GetFont());
-	EXPECT_STREQ("Times New Roman", tf.GetFont()->name.c_str());
+	EXPECT_STREQ("Times New Roman", tf.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(8.0f, tf.GetFontSize());
 	ASSERT_NE(nullptr, tf.GetBackgroundColor());
 	EXPECT_COLOR_RGB(0, 0, 0, *tf.GetBackgroundColor());
@@ -208,7 +208,7 @@ TEST(TextParserRtf, StyleSheet)
 	RtfAssociatedProperties p0 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, p0.GetCharacterEncoding());
 	ASSERT_NE(nullptr, p0.GetFont());
-	EXPECT_STREQ("Times New Roman", p0.GetFont()->name.c_str());
+	EXPECT_STREQ("Times New Roman", p0.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(8.0f, p0.GetFontSize());
 	ASSERT_NE(nullptr, p0.GetLocale());
 	EXPECT_EQ(eRtfCountry_Netherlands, p0.GetLocale()->country);
@@ -217,7 +217,7 @@ TEST(TextParserRtf, StyleSheet)
 	RtfAssociatedProperties p1 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteHighAnsi, p1.GetCharacterEncoding());
 	ASSERT_NE(nullptr, p1.GetFont());
-	EXPECT_STREQ("Times New Roman", p1.GetFont()->name.c_str());
+	EXPECT_STREQ("Times New Roman", p1.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(8.0f, p1.GetFontSize());
 	ASSERT_NE(nullptr, p1.GetLocale());
 	EXPECT_EQ(eRtfCountry_Netherlands, p1.GetLocale()->country);
@@ -226,7 +226,7 @@ TEST(TextParserRtf, StyleSheet)
 	RtfAssociatedProperties p2 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
 	EXPECT_EQ(eRtfCharacterEncoding_DoubleByte, p2.GetCharacterEncoding());
 	ASSERT_NE(nullptr, p2.GetFont());
-	EXPECT_STREQ("Symbol", p2.GetFont()->name.c_str());
+	EXPECT_STREQ("Symbol", p2.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(16.0f, p2.GetFontSize());
 	ASSERT_NE(nullptr, p2.GetLocale());
 	EXPECT_EQ(eRtfCountry_India, p2.GetLocale()->country);

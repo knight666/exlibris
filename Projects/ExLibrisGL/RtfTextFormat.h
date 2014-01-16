@@ -32,7 +32,7 @@ namespace ExLibris
 {
 	struct RtfColor;
 	class RtfDomDocument;
-	struct RtfFont;
+	class RtfFont;
 	struct RtfLocale;
 }
 
