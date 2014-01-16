@@ -27,13 +27,15 @@
 #include "RtfTextFormat.h"
 
 #include "RtfColorTable.h"
+#include "RtfFontTable.h"
 #include "RtfDomDocument.h"
+#include "RtfWorld.h"
 
 namespace ExLibris
 {
 
-	RtfTextFormat::RtfTextFormat()
-		: m_Document(nullptr)
+	RtfTextFormat::RtfTextFormat(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
 		, m_CharacterSet(eRtfCharacterSet_Invalid)
 		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi)
 		, m_Font(nullptr)
@@ -45,13 +47,30 @@ namespace ExLibris
 		, m_KerningEnabled(true)
 		, m_KerningMinimumSize(1)
 	{
-		if (m_Document != nullptr)
-		{
-			m_BackgroundColor = m_Document->GetColorTable()->GetDefaultColor();
-			m_ForegroundColor = m_BackgroundColor;
+		m_BackgroundColor = m_Document.GetColorTable()->GetDefaultColor();
+		m_ForegroundColor = m_BackgroundColor;
 
-			m_ParagraphWidowControl = m_Document->GetWidowControl();
-		}
+		m_ParagraphWidowControl = m_Document.GetWidowControl();
+	}
+
+	RtfTextFormat::RtfTextFormat(const RtfTextFormat& a_Other)
+		: m_Document(a_Other.GetDocument())
+		, m_CharacterSet(a_Other.GetCharacterSet())
+		, m_CharacterEncoding(a_Other.GetCharacterEncoding())
+		, m_Font(a_Other.GetFont())
+		, m_FontSize(a_Other.GetFontSize())
+		, m_Locale(a_Other.GetLocale())
+		, m_BackgroundColor(a_Other.GetBackgroundColor())
+		, m_ForegroundColor(a_Other.GetForegroundColor())
+		, m_ParagraphWidowControl(a_Other.GetParagraphWidowControl())
+		, m_KerningEnabled(a_Other.IsKerningEnabled())
+		, m_KerningMinimumSize(a_Other.GetMinimumKerningSize())
+	{
+	}
+
+	RtfDomDocument& RtfTextFormat::GetDocument() const
+	{
+		return m_Document;
 	}
 
 	RtfCharacterSet RtfTextFormat::GetCharacterSet() const
@@ -152,6 +171,70 @@ namespace ExLibris
 	void RtfTextFormat::SetMinimumKerningSize(int a_Size)
 	{
 		m_KerningMinimumSize = a_Size;
+	}
+
+	IRtfParseable::Result RtfTextFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (a_Token.value == "f")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			RtfFont* font = m_Document.GetFontTable()->GetFont(a_Token.parameter);
+			SetFont(font);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "fs")
+		{
+			float font_size = (float)a_Token.parameter / 2.0f;
+			SetFontSize(font_size);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "kerning")
+		{
+			bool kerning_enabled = (a_Token.parameter == 1);
+			SetKerningEnabled(kerning_enabled);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "lang")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			const RtfLocale* locale = m_Document.GetWorld()->GetLocaleByIdentifier(a_Token.parameter);
+			SetLocale(locale);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "cf")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			RtfColor* color = m_Document.GetColorTable()->GetColor(a_Token.parameter);
+			SetForegroundColor(color);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "nowidctlpar")
+		{
+			SetParagraphWidowControl(false);
+
+			return eResult_Handled;
+		}
+		else
+		{
+			return eResult_Propagate;
+		}
 	}
 
 }; // namespace ExLibris

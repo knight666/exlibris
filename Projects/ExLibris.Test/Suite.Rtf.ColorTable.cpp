@@ -2,20 +2,24 @@
 
 #include <RtfColorTable.h>
 
+#include <RtfDomDocument.h>
+
 #include "Tools.Color.h"
 
 using namespace ExLibris;
 
 TEST(RtfColorTable, Construct)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 
 	EXPECT_EQ(1, ct.GetColorCount());
 }
 
 TEST(RtfColorTable, GetDefaultColor)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 
 	ASSERT_NE(nullptr, ct.GetDefaultColor());
 	EXPECT_COLOR_RGB(0, 0, 0, *ct.GetDefaultColor());
@@ -23,7 +27,8 @@ TEST(RtfColorTable, GetDefaultColor)
 
 TEST(RtfColorTable, SetDefaultColor)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 	RtfColor* c = ct.GetColor(43);
 
 	ct.SetDefaultColor(43);
@@ -34,7 +39,8 @@ TEST(RtfColorTable, SetDefaultColor)
 
 TEST(RtfColorTable, SetDefaultColorNew)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 	*ct.GetDefaultColor() = RtfColor(54, 12, 99);
 
 	ct.SetDefaultColor(11);
@@ -45,7 +51,8 @@ TEST(RtfColorTable, SetDefaultColorNew)
 
 TEST(RtfColorTable, SetDefaultColorInvalidIndex)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 	
 	ct.SetDefaultColor(-12);
 
@@ -55,7 +62,8 @@ TEST(RtfColorTable, SetDefaultColorInvalidIndex)
 
 TEST(RtfColorTable, GetColor)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 
 	RtfColor* color = ct.GetColor(81);
 
@@ -67,7 +75,8 @@ TEST(RtfColorTable, GetColor)
 
 TEST(RtfColorTable, GetColorTwice)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 
 	RtfColor* c1 = ct.GetColor(81);
 	RtfColor* c2 = ct.GetColor(81);
@@ -79,7 +88,8 @@ TEST(RtfColorTable, GetColorTwice)
 
 TEST(RtfColorTable, GetColorSetToDefault)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 
 	*ct.GetDefaultColor() = RtfColor(16, 99, 12);
 
@@ -93,7 +103,8 @@ TEST(RtfColorTable, GetColorSetToDefault)
 
 TEST(RtfColorTable, GetColorInvalidIndex)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 
 	EXPECT_EQ(nullptr, ct.GetColor(-112));
 
@@ -102,7 +113,8 @@ TEST(RtfColorTable, GetColorInvalidIndex)
 
 TEST(RtfColorTable, AddColor)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 	RtfColor* c = ct.AddColor(RtfColor(126, 12, 88));
 
 	ASSERT_NE(nullptr, c);
@@ -113,7 +125,8 @@ TEST(RtfColorTable, AddColor)
 
 TEST(RtfColorTable, AddThreeColors)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 	ct.AddColor(RtfColor(51, 18, 99));
 	ct.AddColor(RtfColor(36, 77, 17));
 	ct.AddColor(RtfColor(5, 199, 204));
@@ -129,7 +142,8 @@ TEST(RtfColorTable, AddThreeColors)
 
 TEST(RtfColorTable, AddColorNextIndex)
 {
-	RtfColorTable ct;
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
 	ct.GetColor(117);
 
 	ct.AddColor(RtfColor(126, 12, 88));

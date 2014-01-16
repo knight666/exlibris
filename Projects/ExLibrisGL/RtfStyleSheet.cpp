@@ -29,7 +29,21 @@
 namespace ExLibris
 {
 
-	RtfStyleSheet::RtfStyleSheet()
+	struct RtfStyleSheet::ParseState
+	{
+		ParseState()
+			: parent(nullptr)
+			, style(nullptr)
+		{
+		}
+
+		RtfParserGroup* parent;
+		RtfStyle* style;
+	};
+
+	RtfStyleSheet::RtfStyleSheet(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
+		, m_State(new ParseState)
 	{
 	}
 
@@ -40,6 +54,8 @@ namespace ExLibris
 			delete style_it->second;
 		}
 		m_Styles.clear();
+
+		delete m_State;
 	}
 
 	size_t RtfStyleSheet::GetStyleCount() const
@@ -70,11 +86,51 @@ namespace ExLibris
 			return found->second;
 		}
 
-		RtfStyle* style = new RtfStyle();
+		RtfStyle* style = new RtfStyle(*this, m_Document);
 		
 		m_Styles.insert(std::make_pair(a_Index, style));
 
 		return style;
+	}
+
+	IRtfParseable::Result RtfStyleSheet::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (a_Token.value == "stylesheet")
+		{
+			m_State->parent = a_State.group_current;
+			m_State->style = nullptr;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "s")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			_PushTarget(a_State, GetStyle(a_Token.parameter));
+
+			return eResult_Handled;
+		}
+		else
+		{
+			return eResult_Invalid;
+		}
+	}
+
+	IRtfParseable::Result RtfStyleSheet::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		IRtfParseable::_ParseGroupClose(a_State, a_Token);
+
+		if (a_State.group_current == m_State->parent)
+		{
+			return eResult_Finished;
+		}
+		else
+		{
+			return eResult_Handled;
+		}
 	}
 
 }; // namespace ExLibris

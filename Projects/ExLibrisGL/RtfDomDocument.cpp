@@ -33,12 +33,14 @@ namespace ExLibris
 
 	RtfDomDocument::RtfDomDocument(RtfWorld* a_World)
 		: m_World(a_World)
-		, m_RootElement(new RtfDomElement())
-		, m_FontTable(new RtfFontTable())
-		, m_ColorTable(new RtfColorTable())
-		, m_StyleSheet(new RtfStyleSheet())
+		, m_TextFormat(nullptr)
 		, m_WidowControl(true)
 	{
+		m_FontTable = new RtfFontTable(*this);
+		m_ColorTable = new RtfColorTable(*this);
+		m_StyleSheet = new RtfStyleSheet(*this);
+		m_TextFormat = new RtfTextFormat(*this);
+		m_RootElement = new RtfDomElement(*this);
 	}
 
 	RtfDomDocument::~RtfDomDocument()
@@ -46,13 +48,13 @@ namespace ExLibris
 		delete m_FontTable;
 		delete m_ColorTable;
 		delete m_StyleSheet;
-
+		delete m_TextFormat;
 		delete m_RootElement;
 	}
 
 	RtfTextFormat& RtfDomDocument::GetTextFormat()
 	{
-		return m_TextFormat;
+		return *m_TextFormat;
 	}
 
 	RtfWorld* RtfDomDocument::GetWorld() const

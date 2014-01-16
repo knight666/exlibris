@@ -24,10 +24,12 @@
 
 #pragma once
 
+#include "IRtfParseable.h"
 #include "RtfCharacterEncoding.h"
 
 namespace ExLibris
 {
+	class RtfDomDocument;
 	struct RtfFont;
 	struct RtfLocale;
 	class RtfTextFormat;
@@ -37,6 +39,7 @@ namespace ExLibris
 {
 
 	class RtfAssociatedProperties
+		: public IRtfParseable
 	{
 
 		friend class RtfAssociatedProperties;
@@ -53,9 +56,10 @@ namespace ExLibris
 
 	public:
 
-		RtfAssociatedProperties();
-		RtfAssociatedProperties(const RtfTextFormat& a_TextFormat);
+		RtfAssociatedProperties(RtfDomDocument& a_Document);
 		~RtfAssociatedProperties();
+
+		void FromTextFormat(const RtfTextFormat& a_TextFormat);
 
 		RtfFont* GetFont() const;
 		void SetFont(RtfFont* a_Font);
@@ -79,6 +83,11 @@ namespace ExLibris
 
 	private:
 
+		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
+
+	private:
+
+		RtfDomDocument& m_Document;
 		RtfFont* m_Font;
 		float m_FontSize;
 		const RtfLocale* m_Locale;

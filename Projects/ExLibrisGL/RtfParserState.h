@@ -24,59 +24,21 @@
 
 #pragma once
 
-#include "IRtfParseable.h"
-#include "RtfAssociatedProperties.h"
-#include "RtfTextFormat.h"
-
 namespace ExLibris
 {
-	struct RtfColor;
-	struct RtfLocale;
-	class RtfStyleSheet;
+	struct RtfParserGroup;
+	class IRtfParseable;
 }
 
 namespace ExLibris
 {
 
-	class RtfStyle
-		: public IRtfParseable
+	struct RtfParserState
 	{
-
-	public:
-
-		RtfStyle(RtfStyleSheet& a_Parent, RtfDomDocument& a_Document);
-		~RtfStyle();
-
-		const std::string& GetName() const;
-		void SetName(const std::string& a_Name);
-
-		RtfStyle* GetNextParagraphStyle() const;
-		void SetNextParagraphStyle(RtfStyle* a_Style);
-
-		RtfAssociatedProperties* GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding);
-		RtfAssociatedProperties GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding);
-
-		RtfTextFormat& GetTextFormat();
-
-	private:
-
-		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
-		IRtfParseable::Result _ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token);
-
-	private:
-
-		RtfStyleSheet& m_Parent;
-		RtfDomDocument& m_Document;
-		std::string m_Name;
-		RtfStyle* m_StyleNextParagraph;
-		RtfTextFormat* m_TextFormat;
-		RtfAssociatedProperties* m_PropertiesLowAnsi;
-		RtfAssociatedProperties* m_PropertiesHighAnsi;
-		RtfAssociatedProperties* m_PropertiesDoubleByte;
-
-		struct ParseState;
-		ParseState* m_State;
-
-	}; // class RtfStyle
+		RtfParserGroup* group_current;
+		int group_index;
+		std::stack<IRtfParseable*> parseables;
+		IRtfParseable* target;
+	};
 
 }; // namespace ExLibris

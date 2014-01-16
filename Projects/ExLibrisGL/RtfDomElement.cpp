@@ -5,8 +5,10 @@
 namespace ExLibris
 {
 
-	RtfDomElement::RtfDomElement()
-		: m_Parent(nullptr)
+	RtfDomElement::RtfDomElement(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
+		, m_TextFormat(new RtfTextFormat(m_Document))
+		, m_Parent(nullptr)
 		, m_SiblingPrevious(nullptr)
 		, m_SiblingNext(nullptr)
 		, m_ChildPrevious(nullptr)
@@ -15,11 +17,18 @@ namespace ExLibris
 
 	RtfDomElement::~RtfDomElement()
 	{
+		delete m_TextFormat;
+
 		for (std::vector<RtfDomElement*>::iterator child_it = m_Children.begin(); child_it != m_Children.end(); ++child_it)
 		{
 			delete *child_it;
 		}
 		m_Children.clear();
+	}
+
+	RtfTextFormat& RtfDomElement::GetTextFormat() const
+	{
+		return *m_TextFormat;
 	}
 
 	RtfDomElement* RtfDomElement::GetParent() const
@@ -56,9 +65,9 @@ namespace ExLibris
 
 	RtfDomElement* RtfDomElement::AddChild()
 	{
-		RtfDomElement* child = new RtfDomElement;
+		RtfDomElement* child = new RtfDomElement(m_Document);
 		child->m_Parent = this;
-		child->TextFormat = TextFormat;
+		child->m_TextFormat = new RtfTextFormat(*m_TextFormat);
 		child->m_SiblingPrevious = m_ChildPrevious;
 
 		if (m_ChildPrevious != nullptr)

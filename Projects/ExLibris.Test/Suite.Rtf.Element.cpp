@@ -2,11 +2,14 @@
 
 #include <RtfDomElement.h>
 
+#include <RtfDomDocument.h>
+
 using namespace ExLibris;
 
 TEST(RtfDomElement, Construct)
 {
-	RtfDomElement e;
+	RtfDomDocument doc(nullptr);
+	RtfDomElement e(doc);
 
 	EXPECT_EQ(nullptr, e.GetParent());
 	EXPECT_EQ(nullptr, e.GetSiblingNext());
@@ -16,7 +19,8 @@ TEST(RtfDomElement, Construct)
 
 TEST(RtfDomElement, ConstructWithParent)
 {
-	RtfDomElement root;
+	RtfDomDocument doc(nullptr);
+	RtfDomElement root(doc);
 
 	RtfDomElement* e = root.AddChild();
 
@@ -28,7 +32,8 @@ TEST(RtfDomElement, ConstructWithParent)
 
 TEST(RtfDomElement, AddChild)
 {
-	RtfDomElement root;
+	RtfDomDocument doc(nullptr);
+	RtfDomElement root(doc);
 
 	RtfDomElement* c = root.AddChild();
 
@@ -41,7 +46,8 @@ TEST(RtfDomElement, AddChild)
 
 TEST(RtfDomElement, AddTwoChildren)
 {
-	RtfDomElement root;
+	RtfDomDocument doc(nullptr);
+	RtfDomElement root(doc);
 
 	RtfDomElement* c1 = root.AddChild();
 	RtfDomElement* c2 = root.AddChild();
@@ -57,7 +63,8 @@ TEST(RtfDomElement, AddTwoChildren)
 
 TEST(RtfDomElement, AddGrandChild)
 {
-	RtfDomElement root;
+	RtfDomDocument doc(nullptr);
+	RtfDomElement root(doc);
 
 	RtfDomElement* c1 = root.AddChild();
 	RtfDomElement* c2 = root.AddChild();

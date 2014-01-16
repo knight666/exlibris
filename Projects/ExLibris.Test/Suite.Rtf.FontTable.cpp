@@ -2,18 +2,22 @@
 
 #include <RtfFontTable.h>
 
+#include <RtfDomDocument.h>
+
 using namespace ExLibris;
 
 TEST(RtfFontTable, Construct)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 
 	EXPECT_EQ(0, ft.GetFontCount());
 }
 
 TEST(RtfFontTable, GetFont)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 
 	RtfFont* f = ft.GetFont(16);
 
@@ -22,7 +26,8 @@ TEST(RtfFontTable, GetFont)
 
 TEST(RtfFontTable, GetThreeFonts)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 
 	RtfFont* f1 = ft.GetFont(8);
 	RtfFont* f2 = ft.GetFont(15);
@@ -33,7 +38,8 @@ TEST(RtfFontTable, GetThreeFonts)
 
 TEST(RtfFontTable, GetFontTwice)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 
 	RtfFont* f1 = ft.GetFont(5);
 	RtfFont* f2 = ft.GetFont(5);
@@ -44,7 +50,8 @@ TEST(RtfFontTable, GetFontTwice)
 
 TEST(RtfFontTable, GetFontInvalid)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 
 	RtfFont* f = ft.GetFont(-5);
 
@@ -54,7 +61,8 @@ TEST(RtfFontTable, GetFontInvalid)
 
 TEST(RtfFontTable, Default)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 	ft.SetDefault(21);
 
 	RtfFont* f = ft.GetFont(21);
@@ -65,7 +73,8 @@ TEST(RtfFontTable, Default)
 
 TEST(RtfFontTable, DefaultEmpty)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 
 	RtfFont* f = ft.GetDefault();
 
@@ -74,7 +83,8 @@ TEST(RtfFontTable, DefaultEmpty)
 
 TEST(RtfFontTable, DefaultInvalid)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 	ft.SetDefault(-2);
 
 	RtfFont* f = ft.GetDefault();
@@ -84,7 +94,8 @@ TEST(RtfFontTable, DefaultInvalid)
 
 TEST(RtfFontTable, DefaultValidAndThenInvalid)
 {
-	RtfFontTable ft;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
 	ft.SetDefault(5);
 	ft.SetDefault(-2);
 

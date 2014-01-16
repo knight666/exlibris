@@ -29,8 +29,9 @@
 namespace ExLibris
 {
 
-	RtfFontTable::RtfFontTable()
-		: m_Default(nullptr)
+	RtfFontTable::RtfFontTable(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
+		, m_Default(nullptr)
 	{
 	}
 

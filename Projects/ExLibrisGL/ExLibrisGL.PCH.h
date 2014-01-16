@@ -34,6 +34,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <stack>
 #include <vector>
 #include <xutility>
 
