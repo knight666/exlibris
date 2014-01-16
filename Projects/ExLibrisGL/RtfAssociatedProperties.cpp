@@ -170,6 +170,11 @@ namespace ExLibris
 		}
 		else if (a_Token.value == "afs")
 		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
 			float font_size = (float)a_Token.parameter / 2.0f;
 			SetFontSize(font_size);
 
@@ -177,12 +182,17 @@ namespace ExLibris
 		}
 		else if (a_Token.value == "alang")
 		{
-			if (a_Token.parameter < 0)
+			if (a_Token.parameter < 0 || m_Document.GetWorld() == nullptr)
 			{
 				return eResult_Invalid;
 			}
 
 			const RtfLocale* locale = m_Document.GetWorld()->GetLocaleByIdentifier(a_Token.parameter);
+			if (locale == nullptr)
+			{
+				return eResult_Invalid;
+			}
+
 			SetLocale(locale);
 
 			return eResult_Handled;
