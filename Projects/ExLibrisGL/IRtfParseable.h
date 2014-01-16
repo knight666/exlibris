@@ -103,6 +103,7 @@ namespace ExLibris
 			group_create->index = ++a_State.group_index;
 			group_create->parent = a_State.group_current;
 
+			a_State.groups.push_back(group_create);
 			a_State.group_current = group_create;
 
 			return eResult_Handled;
@@ -137,19 +138,19 @@ namespace ExLibris
 				return;
 			}
 
-			a_State.target = a_Target;
-			a_State.parseables.push(this);
+			a_State.target_current = a_Target;
+			a_State.targets.push(this);
 		}
 
 		void _PopTarget(RtfParserState& a_State)
 		{
-			if (a_State.parseables.size() == 0)
+			if (a_State.targets.size() == 0)
 			{
 				return;
 			}
 
-			a_State.target = a_State.parseables.top();
-			a_State.parseables.pop();
+			a_State.target_current = a_State.targets.top();
+			a_State.targets.pop();
 		}
 
 	}; // class IRtfParseable

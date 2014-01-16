@@ -34,6 +34,37 @@ TEST(RtfStyle, ParseStyle)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
 }
 
+TEST(RtfStyleSheet, ParseStyleAndClose)
+{
+	RtfDomDocument doc(nullptr);
+	RtfStyleSheet ss(doc);
+	RtfStyle st(ss, doc);
+
+	RtfParserGroup root;
+	root.index = 0;
+
+	RtfParserState s;
+	s.group_current = &root;
+
+	RtfToken t;
+
+	t.type = RtfToken::eParseType_GroupOpen;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+
+	t.type = RtfToken::eParseType_Command;
+	t.value = "s";
+	t.parameter = 1;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+
+	t.type = RtfToken::eParseType_GroupClose;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+
+	EXPECT_EQ(0, s.targets.size());
+	EXPECT_EQ(nullptr, s.target_current);
+	EXPECT_EQ(0, s.group_index);
+	EXPECT_EQ(&root, s.group_current);
+}
+
 TEST(RtfStyle, ParseNextParagraphStyle)
 {
 	RtfDomDocument doc(nullptr);
