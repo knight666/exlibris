@@ -105,3 +105,114 @@ TEST(RtfFontTable, DefaultValidAndThenInvalid)
 	EXPECT_NE(nullptr, f_default);
 	EXPECT_EQ(f, f_default);
 }
+
+TEST(RtfFontTable, ParseFontTable)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "fonttbl";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+}
+
+TEST(RtfStyleSheet, ParseFontTableAndClose)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserGroup root;
+	root.index = 0;
+
+	RtfParserState s;
+	s.group_current = &root;
+
+	RtfToken t;
+
+	t.type = RtfToken::eParseType_GroupOpen;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	t.type = RtfToken::eParseType_Command;
+	t.value = "fonttbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	t.type = RtfToken::eParseType_GroupClose;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	EXPECT_EQ(0, s.targets.size());
+	EXPECT_EQ(nullptr, s.target_current);
+	EXPECT_EQ(0, s.group_index);
+	EXPECT_EQ(&root, s.group_current);
+}
+
+TEST(RtfFontTable, ParseFont)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "fonttbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	t.value = "f";
+	t.parameter = 5;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	EXPECT_EQ(1, s.targets.size());
+	EXPECT_EQ(ft.GetFont(5), s.target_current);
+}
+
+TEST(RtfFontTable, ParseFontInvalid)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	
+	t.value = "fonttbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	t.value = "f";
+	t.parameter = -12;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ft.Parse(s, t));
+}
+
+TEST(RtfFontTable, ParseFontWithoutTable)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "f";
+	t.parameter = 12;
+
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ft.Parse(s, t));
+}
+
+TEST(RtfFontTable, ParseUnhandled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "b";
+	EXPECT_EQ(IRtfParseable::eResult_Propagate, ft.Parse(s, t));
+}
