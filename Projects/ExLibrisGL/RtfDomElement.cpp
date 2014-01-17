@@ -5,6 +5,16 @@
 namespace ExLibris
 {
 
+	struct RtfDomElement::ParseState
+	{
+		ParseState()
+			: character_encoding_found(false)
+		{
+		}
+
+		bool character_encoding_found;
+	};
+
 	RtfDomElement::RtfDomElement(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
 		, m_TextFormat(new RtfTextFormat(m_Document))
@@ -80,6 +90,26 @@ namespace ExLibris
 		m_Children.push_back(child);
 
 		return child;
+	}
+
+	IRtfParseable::Result RtfDomElement::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		IRtfParseable::Result result = IRtfParseable::eResult_Invalid;
+
+		result = m_TextFormat->Parse(a_State, a_Token);
+		if (result != IRtfParseable::eResult_Propagate)
+		{
+			return result;
+		}
+
+		return IRtfParseable::eResult_Propagate;
+	}
+
+	IRtfParseable::Result RtfDomElement::_ParseText(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		InnerText += a_Token.value;
+
+		return eResult_Handled;
 	}
 
 }; // namespace ExLibris
