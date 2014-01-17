@@ -47,6 +47,7 @@ namespace ExLibris
 
 		RtfTextFormat(RtfDomDocument& a_Document);
 		RtfTextFormat(const RtfTextFormat& a_Other);
+		~RtfTextFormat();
 
 		RtfDomDocument& GetDocument() const;
 
@@ -97,6 +98,9 @@ namespace ExLibris
 		bool m_ParagraphWidowControl;
 		bool m_KerningEnabled;
 		int m_KerningMinimumSize;
+
+		struct ParseState;
+		ParseState* m_State;
 
 	}; // class RtfFormat
 
