@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "IRtfParseable.h"
 #include "RtfColor.h"
 
 namespace ExLibris
@@ -35,6 +36,7 @@ namespace ExLibris
 {
 
 	class RtfColorTable
+		: public IRtfParseable
 	{
 
 	public:
@@ -53,11 +55,20 @@ namespace ExLibris
 
 	private:
 
+		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
+		IRtfParseable::Result _ParseValue(RtfParserState& a_State, const RtfToken& a_Token);
+		IRtfParseable::Result _ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token);
+
+	private:
+
 		RtfDomDocument& m_Document;
 		std::map<int, RtfColor*> m_Colors;
 		RtfColor* m_ColorDefault;
 		int m_IndexNext;
 		int m_IndexDefault;
+
+		struct ParseState;
+		ParseState* m_State;
 
 	}; // class RtfColorTable
 
