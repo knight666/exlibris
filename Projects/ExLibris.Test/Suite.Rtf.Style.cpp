@@ -208,7 +208,7 @@ TEST(RtfStyle, ParseUnhandled)
 
 	RtfToken t;
 	t.type = RtfToken::eParseType_Command;
-	t.value = "ansi";
+	t.value = "brillo";
 	t.parameter = -1;
 
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, st.Parse(s, t));

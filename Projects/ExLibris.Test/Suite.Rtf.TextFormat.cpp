@@ -28,6 +28,41 @@ TEST(RtfTextFormat, Construct)
 	EXPECT_TRUE(tf.GetParagraphWidowControl());
 }
 
+TEST(RtfTextFormat, ParseCharacterSet)
+{
+	RtfDomDocument doc(nullptr);
+	RtfTextFormat tf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "ansi";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, tf.Parse(s, t));
+
+	EXPECT_EQ(eRtfCharacterSet_Ansi, tf.GetCharacterSet());
+}
+
+TEST(RtfTextFormat, ParseCharacterSetTwice)
+{
+	RtfDomDocument doc(nullptr);
+	RtfTextFormat tf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "pc";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, tf.Parse(s, t));
+
+	t.value = "pca";
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, tf.Parse(s, t));
+
+	EXPECT_EQ(eRtfCharacterSet_IbmPcCodePage437, tf.GetCharacterSet());
+}
+
 TEST(RtfTextFormat, ParseFont)
 {
 	RtfDomDocument doc(nullptr);

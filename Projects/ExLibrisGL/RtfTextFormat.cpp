@@ -34,6 +34,16 @@
 namespace ExLibris
 {
 
+	struct RtfTextFormat::ParseState
+	{
+		ParseState()
+			: character_encoding_found(false)
+		{
+		}
+
+		bool character_encoding_found;
+	};
+
 	RtfTextFormat::RtfTextFormat(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
 		, m_CharacterSet(eRtfCharacterSet_Invalid)
@@ -46,6 +56,7 @@ namespace ExLibris
 		, m_ParagraphWidowControl(true)
 		, m_KerningEnabled(true)
 		, m_KerningMinimumSize(1)
+		, m_State(new ParseState)
 	{
 		m_BackgroundColor = m_Document.GetColorTable()->GetDefaultColor();
 		m_ForegroundColor = m_BackgroundColor;
@@ -65,7 +76,13 @@ namespace ExLibris
 		, m_ParagraphWidowControl(a_Other.GetParagraphWidowControl())
 		, m_KerningEnabled(a_Other.IsKerningEnabled())
 		, m_KerningMinimumSize(a_Other.GetMinimumKerningSize())
+		, m_State(new ParseState)
 	{
+	}
+
+	RtfTextFormat::~RtfTextFormat()
+	{
+		delete m_State;
 	}
 
 	RtfDomDocument& RtfTextFormat::GetDocument() const
@@ -175,7 +192,64 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfTextFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		if (a_Token.value == "f")
+		// character set
+
+		if (a_Token.value == "ansi")
+		{
+			if (m_State->character_encoding_found)
+			{
+				return eResult_Invalid;
+			}
+
+			SetCharacterSet(eRtfCharacterSet_Ansi);
+
+			m_State->character_encoding_found = true;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "mac")
+		{
+			if (m_State->character_encoding_found)
+			{
+				return eResult_Invalid;
+			}
+
+			SetCharacterSet(eRtfCharacterSet_AppleMacintoshRoman);
+
+			m_State->character_encoding_found = true;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "pc")
+		{
+			if (m_State->character_encoding_found)
+			{
+				return eResult_Invalid;
+			}
+
+			SetCharacterSet(eRtfCharacterSet_IbmPcCodePage437);
+
+			m_State->character_encoding_found = true;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "pca")
+		{
+			if (m_State->character_encoding_found)
+			{
+				return eResult_Invalid;
+			}
+
+			SetCharacterSet(eRtfCharacterSet_Oem);
+
+			m_State->character_encoding_found = true;
+
+			return eResult_Handled;
+		}
+
+		// font
+
+		else if (a_Token.value == "f")
 		{
 			if (a_Token.parameter < 0)
 			{
@@ -187,6 +261,9 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+		
+		// font size
+
 		else if (a_Token.value == "fs")
 		{
 			if (a_Token.parameter < 0)
@@ -199,6 +276,9 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+
+		// kerning
+
 		else if (a_Token.value == "kerning")
 		{
 			bool kerning_enabled = (a_Token.parameter == 1);
@@ -206,6 +286,9 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+
+		// language
+
 		else if (a_Token.value == "lang")
 		{
 			if (a_Token.parameter < 0 || m_Document.GetWorld() == nullptr)
@@ -223,6 +306,9 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+
+		// foreground color
+
 		else if (a_Token.value == "cf")
 		{
 			if (a_Token.parameter < 0)
@@ -235,6 +321,9 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+
+		// paragraph widow control
+
 		else if (a_Token.value == "nowidctlpar")
 		{
 			SetParagraphWidowControl(false);
