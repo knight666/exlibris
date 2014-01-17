@@ -29,11 +29,28 @@
 namespace ExLibris
 {
 
+	struct RtfColorTable::ParseState
+	{
+		ParseState()
+			: parent(nullptr)
+			, color(nullptr)
+			, color_index(0)
+			, table_started(false)
+		{
+		}
+
+		RtfParserGroup* parent;
+		RtfColor* color;
+		int color_index;
+		bool table_started;
+	};
+
 	RtfColorTable::RtfColorTable(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
 		, m_IndexNext(1)
 		, m_IndexDefault(0)
 		, m_ColorDefault(new RtfColor(0, 0, 0))
+		, m_State(new ParseState)
 	{
 		m_Colors.insert(std::make_pair(0, m_ColorDefault));
 	}
@@ -45,6 +62,8 @@ namespace ExLibris
 			delete color_it->second;
 		}
 		m_Colors.clear();
+
+		delete m_State;
 	}
 
 	size_t RtfColorTable::GetColorCount() const
@@ -106,6 +125,86 @@ namespace ExLibris
 		}
 
 		m_ColorDefault = GetColor(a_Index);
+	}
+
+	IRtfParseable::Result RtfColorTable::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (a_Token.value == "colortbl")
+		{
+			m_State->parent = a_State.group_current ? a_State.group_current->parent : nullptr;
+			m_State->color_index = 0;
+			m_State->color = GetColor(0);
+			m_State->table_started = true;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "red")
+		{
+			if (!m_State->table_started || a_Token.parameter < 0 || a_Token.parameter > 255)
+			{
+				return eResult_Invalid;
+			}
+
+			m_State->color->r = a_Token.parameter;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "green")
+		{
+			if (!m_State->table_started || a_Token.parameter < 0 || a_Token.parameter > 255)
+			{
+				return eResult_Invalid;
+			}
+
+			m_State->color->g = a_Token.parameter;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "blue")
+		{
+			if (!m_State->table_started || a_Token.parameter < 0 || a_Token.parameter > 255)
+			{
+				return eResult_Invalid;
+			}
+
+			m_State->color->b = a_Token.parameter;
+
+			return eResult_Handled;
+		}
+		else
+		{
+			return (m_State->table_started) ? eResult_Invalid : eResult_Propagate;
+		}
+	}
+
+	IRtfParseable::Result RtfColorTable::_ParseValue(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (m_State->table_started)
+		{
+			m_State->color = GetColor(++m_State->color_index);
+
+			return eResult_Handled;
+		}
+		else
+		{
+			return eResult_Invalid;
+		}
+	}
+
+	IRtfParseable::Result RtfColorTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		IRtfParseable::_ParseGroupClose(a_State, a_Token);
+
+		if (a_State.group_current == m_State->parent)
+		{
+			m_State->table_started = false;
+
+			return eResult_Finished;
+		}
+		else
+		{
+			return eResult_Handled;
+		}
 	}
 
 }; // namespace ExLibris

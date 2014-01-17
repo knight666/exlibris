@@ -150,3 +150,175 @@ TEST(RtfColorTable, AddColorNextIndex)
 
 	EXPECT_COLOR_RGB(126, 12, 88, *ct.GetColor(118));
 }
+
+TEST(RtfColorTable, ParseColorTable)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "colortbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+}
+
+TEST(RtfColorTable, ParseColorTableAndClose)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserGroup root;
+	root.index = 0;
+
+	RtfParserState s;
+	s.group_current = &root;
+
+	RtfToken t;
+
+	t.type = RtfToken::eParseType_GroupOpen;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.type = RtfToken::eParseType_Command;
+	t.value = "colortbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.type = RtfToken::eParseType_GroupClose;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	EXPECT_EQ(0, s.targets.size());
+	EXPECT_EQ(nullptr, s.target_current);
+	EXPECT_EQ(0, s.group_index);
+	EXPECT_EQ(&root, s.group_current);
+}
+
+TEST(RtfColorTable, ParseColorTableUnhandled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "colortbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.value = "fblah";
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+}
+
+TEST(RtfColorTable, ParseColor)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "colortbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.value = "red";
+	t.parameter = 12;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.value = "green";
+	t.parameter = 133;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.value = "blue";
+	t.parameter = 15;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	EXPECT_COLOR_RGB(12, 133, 15, *ct.GetColor(0));
+}
+
+TEST(RtfColorTable, ParseColorInvalid)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "colortbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.value = "red";
+	t.parameter = -15;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+
+	t.value = "red";
+	t.parameter = 1239;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+
+	t.value = "green";
+	t.parameter = -98;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+
+	t.value = "green";
+	t.parameter = 977;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+
+	t.value = "blue";
+	t.parameter = -6;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+
+	t.value = "blue";
+	t.parameter = 531;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+}
+
+TEST(RtfColorTable, ParseColorWithoutColorTable)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "red";
+	t.parameter = 125;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+}
+
+TEST(RtfColorTable, ParseUnhandled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "colortbl";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
+
+	t.value = "awesomium";
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ct.Parse(s, t));
+}
+
+TEST(RtfColorTable, ParseUnhandledWithoutColorTable)
+{
+	RtfDomDocument doc(nullptr);
+	RtfColorTable ct(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "magnificent";
+	EXPECT_EQ(IRtfParseable::eResult_Propagate, ct.Parse(s, t));
+}
