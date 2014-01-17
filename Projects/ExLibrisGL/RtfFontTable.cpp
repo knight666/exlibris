@@ -29,9 +29,22 @@
 namespace ExLibris
 {
 
+	struct RtfFontTable::ParseState
+	{
+		ParseState()
+			: parent(nullptr)
+			, table_started(false)
+		{
+		}
+
+		RtfParserGroup* parent;
+		bool table_started;
+	};
+
 	RtfFontTable::RtfFontTable(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
 		, m_Default(nullptr)
+		, m_State(new ParseState)
 	{
 	}
 
@@ -42,6 +55,8 @@ namespace ExLibris
 			delete font_it->second;
 		}
 		m_Fonts.clear();
+
+		delete m_State;
 	}
 
 	size_t RtfFontTable::GetFontCount() const
@@ -84,6 +99,49 @@ namespace ExLibris
 		if (font != nullptr)
 		{
 			m_Default = font;
+		}
+	}
+
+	IRtfParseable::Result RtfFontTable::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (a_Token.value == "fonttbl")
+		{
+			m_State->parent = a_State.group_current ? a_State.group_current->parent : nullptr;
+			m_State->table_started = true;
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "f")
+		{
+			if (!m_State->table_started || a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			RtfFont* font = GetFont(a_Token.parameter);
+			_PushTarget(a_State, font);
+
+			return eResult_Handled;
+		}
+		else
+		{
+			return eResult_Propagate;
+		}
+	}
+
+	IRtfParseable::Result RtfFontTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		IRtfParseable::_ParseGroupClose(a_State, a_Token);
+
+		if (a_State.group_current == m_State->parent)
+		{
+			m_State->table_started = false;
+
+			return eResult_Finished;
+		}
+		else
+		{
+			return eResult_Handled;
 		}
 	}
 

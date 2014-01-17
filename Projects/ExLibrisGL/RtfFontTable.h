@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "IRtfParseable.h"
 #include "RtfFont.h"
 
 namespace ExLibris
@@ -35,6 +36,7 @@ namespace ExLibris
 {
 
 	class RtfFontTable
+		: public IRtfParseable
 	{
 
 	public:
@@ -51,9 +53,17 @@ namespace ExLibris
 
 	private:
 
+		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
+		IRtfParseable::Result _ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token);
+
+	private:
+
 		RtfDomDocument& m_Document;
 		std::map<int, RtfFont*> m_Fonts;
 		RtfFont* m_Default;
+
+		struct ParseState;
+		ParseState* m_State;
 
 	}; // class RtfFontTable
 
