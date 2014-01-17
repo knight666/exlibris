@@ -59,9 +59,12 @@ TEST(RtfStyleSheet, ParseStyle)
 
 	RtfToken t;
 	t.type = RtfToken::eParseType_Command;
+
+	t.value = "stylesheet";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ss.Parse(s, t));
+
 	t.value = "s";
 	t.parameter = 0;
-
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ss.Parse(s, t));
 
 	EXPECT_EQ(1, s.targets.size());
@@ -77,8 +80,26 @@ TEST(RtfStyleSheet, ParseStyleInvalid)
 
 	RtfToken t;
 	t.type = RtfToken::eParseType_Command;
+
+	t.value = "stylesheet";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ss.Parse(s, t));
+
 	t.value = "s";
 	t.parameter = -97;
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ss.Parse(s, t));
+}
+
+TEST(RtfStyleSheet, ParseStyleWithoutSheet)
+{
+	RtfDomDocument doc(nullptr);
+	RtfStyleSheet ss(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "s";
+	t.parameter = 5;
 
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, ss.Parse(s, t));
 }

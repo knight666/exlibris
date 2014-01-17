@@ -33,12 +33,12 @@ namespace ExLibris
 	{
 		ParseState()
 			: parent(nullptr)
-			, style(nullptr)
+			, sheet_started(false)
 		{
 		}
 
 		RtfParserGroup* parent;
-		RtfStyle* style;
+		bool sheet_started;
 	};
 
 	RtfStyleSheet::RtfStyleSheet(RtfDomDocument& a_Document)
@@ -98,13 +98,13 @@ namespace ExLibris
 		if (a_Token.value == "stylesheet")
 		{
 			m_State->parent = a_State.group_current ? a_State.group_current->parent : nullptr;
-			m_State->style = nullptr;
+			m_State->sheet_started = true;
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "s")
 		{
-			if (a_Token.parameter < 0)
+			if (!m_State->sheet_started || a_Token.parameter < 0)
 			{
 				return eResult_Invalid;
 			}
@@ -126,6 +126,8 @@ namespace ExLibris
 
 		if (a_State.group_current == m_State->parent)
 		{
+			m_State->sheet_started = false;
+
 			return eResult_Finished;
 		}
 		else
