@@ -81,6 +81,12 @@ namespace ExLibris
 
 				} break;
 
+			case RtfToken::eParseType_Text:
+				{
+					result = _ParseText(a_State, a_Token);
+
+				} break;
+
 			}
 
 			if (result == eResult_Finished)
@@ -128,7 +134,12 @@ namespace ExLibris
 
 		virtual Result _ParseValue(RtfParserState& a_State, const RtfToken& a_Token)
 		{
-			return eResult_Handled;
+			return eResult_Propagate;
+		}
+
+		virtual Result _ParseText(RtfParserState& a_State, const RtfToken& a_Token)
+		{
+			return eResult_Propagate;
 		}
 
 		void _PushTarget(RtfParserState& a_State, IRtfParseable* a_Target)
