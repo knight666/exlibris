@@ -94,7 +94,7 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfDomElement::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		IRtfParseable::Result result = IRtfParseable::eResult_Invalid;
+		IRtfParseable::Result result = IRtfParseable::eResult_Propagate;
 
 		result = m_TextFormat->Parse(a_State, a_Token);
 		if (result != IRtfParseable::eResult_Propagate)
@@ -102,7 +102,7 @@ namespace ExLibris
 			return result;
 		}
 
-		return IRtfParseable::eResult_Propagate;
+		return result;
 	}
 
 	IRtfParseable::Result RtfDomElement::_ParseText(RtfParserState& a_State, const RtfToken& a_Token)
