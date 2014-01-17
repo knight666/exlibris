@@ -1,11 +1,13 @@
 #pragma once
 
+#include "IRtfParseable.h"
 #include "RtfCharacterSet.h"
 
 namespace ExLibris
 {
 
 	class RtfFont
+		: public IRtfParseable
 	{
 
 	public:
@@ -44,6 +46,11 @@ namespace ExLibris
 
 		RtfCharacterSet GetCharacterSet() const;
 		void SetCharacterSet(RtfCharacterSet a_CharacterSet);
+
+	private:
+
+		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
+		IRtfParseable::Result _ParseValue(RtfParserState& a_State, const RtfToken& a_Token);
 
 	private:
 
