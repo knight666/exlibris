@@ -111,6 +111,17 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+		else if (a_Token.value == "deff")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			SetDefault(a_Token.parameter);
+
+			return eResult_Handled;
+		}
 		else if (a_Token.value == "f")
 		{
 			if (!m_State->table_started || a_Token.parameter < 0)

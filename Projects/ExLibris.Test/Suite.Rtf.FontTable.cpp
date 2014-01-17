@@ -203,6 +203,38 @@ TEST(RtfFontTable, ParseFontWithoutTable)
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, ft.Parse(s, t));
 }
 
+TEST(RtfFontTable, ParseDefaultFont)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "deff";
+	t.parameter = 12;
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
+
+	EXPECT_EQ(ft.GetFont(12), ft.GetDefault());
+}
+
+TEST(RtfFontTable, ParseDefaultFontInvalid)
+{
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "deff";
+	t.parameter = -18;
+
+	EXPECT_EQ(IRtfParseable::eResult_Invalid, ft.Parse(s, t));
+}
+
 TEST(RtfFontTable, ParseUnhandled)
 {
 	RtfDomDocument doc(nullptr);
