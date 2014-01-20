@@ -43,6 +43,22 @@ namespace ExLibris
 		: public IRtfParseable
 	{
 
+	private:
+
+		enum Property
+		{
+			eProperty_CharacterSet = (1 << 0),
+			eProperty_CharacterEncoding = (1 << 1),
+			eProperty_Locale = (1 << 2),
+			eProperty_Font = (1 << 3),
+			eProperty_FontSize = (1 << 4),
+			eProperty_BackgroundColor = (1 << 5),
+			eProperty_ForegroundColor = (1 << 6),
+			eProperty_ParagraphWidowControl = (1 << 7),
+			eProperty_KerningEnabled = (1 << 8),
+			eProperty_MinimumKerningSize = (1 << 9),
+		};
+
 	public:
 
 		RtfTextFormat(RtfDomDocument& a_Document);
@@ -88,6 +104,7 @@ namespace ExLibris
 	private:
 
 		RtfDomDocument& m_Document;
+		unsigned int m_Properties;
 		RtfCharacterSet m_CharacterSet;
 		RtfCharacterEncoding m_CharacterEncoding;
 		const RtfLocale* m_Locale;

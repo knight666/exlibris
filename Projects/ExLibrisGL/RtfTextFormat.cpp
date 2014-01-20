@@ -46,6 +46,7 @@ namespace ExLibris
 
 	RtfTextFormat::RtfTextFormat(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
+		, m_Properties(0)
 		, m_CharacterSet(eRtfCharacterSet_Invalid)
 		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi)
 		, m_Font(nullptr)
@@ -66,6 +67,7 @@ namespace ExLibris
 
 	RtfTextFormat::RtfTextFormat(const RtfTextFormat& a_Other)
 		: m_Document(a_Other.GetDocument())
+		, m_Properties(a_Other.m_Properties)
 		, m_CharacterSet(a_Other.GetCharacterSet())
 		, m_CharacterEncoding(a_Other.GetCharacterEncoding())
 		, m_Font(a_Other.GetFont())
@@ -98,6 +100,8 @@ namespace ExLibris
 	void RtfTextFormat::SetCharacterSet(RtfCharacterSet a_CharacterSet)
 	{
 		m_CharacterSet = a_CharacterSet;
+
+		m_Properties |= eProperty_CharacterSet;
 	}
 
 	RtfCharacterEncoding RtfTextFormat::GetCharacterEncoding() const
@@ -108,6 +112,8 @@ namespace ExLibris
 	void RtfTextFormat::SetCharacterEncoding(RtfCharacterEncoding a_Encoding)
 	{
 		m_CharacterEncoding = a_Encoding;
+
+		m_Properties |= eProperty_CharacterEncoding;
 	}
 
 	const RtfLocale* RtfTextFormat::GetLocale() const
@@ -118,16 +124,27 @@ namespace ExLibris
 	void RtfTextFormat::SetLocale(const RtfLocale* a_Locale)
 	{
 		m_Locale = a_Locale;
+
+		m_Properties |= eProperty_Locale;
 	}
 
 	RtfFont* RtfTextFormat::GetFont() const
 	{
-		return m_Font;
+		if ((m_Properties & eProperty_Font) == 0)
+		{
+			return m_Document.GetFontTable()->GetDefault();
+		}
+		else
+		{
+			return m_Font;
+		}
 	}
 
 	void RtfTextFormat::SetFont(RtfFont* a_Font)
 	{
 		m_Font = a_Font;
+
+		m_Properties |= eProperty_Font;
 	}
 
 	float RtfTextFormat::GetFontSize() const
@@ -138,6 +155,8 @@ namespace ExLibris
 	void RtfTextFormat::SetFontSize(float a_Size)
 	{
 		m_FontSize = a_Size;
+
+		m_Properties |= eProperty_FontSize;
 	}
 
 	RtfColor* RtfTextFormat::GetBackgroundColor() const
@@ -148,6 +167,8 @@ namespace ExLibris
 	void RtfTextFormat::SetBackgroundColor(RtfColor* a_Color)
 	{
 		m_BackgroundColor = a_Color;
+
+		m_Properties |= eProperty_BackgroundColor;
 	}
 
 	RtfColor* RtfTextFormat::GetForegroundColor() const
@@ -158,6 +179,8 @@ namespace ExLibris
 	void RtfTextFormat::SetForegroundColor(RtfColor* a_Color)
 	{
 		m_ForegroundColor = a_Color;
+
+		m_Properties |= eProperty_ForegroundColor;
 	}
 
 	bool RtfTextFormat::GetParagraphWidowControl() const
@@ -168,6 +191,8 @@ namespace ExLibris
 	void RtfTextFormat::SetParagraphWidowControl(bool a_Value)
 	{
 		m_ParagraphWidowControl = a_Value;
+
+		m_Properties |= eProperty_ParagraphWidowControl;
 	}
 
 	bool RtfTextFormat::IsKerningEnabled() const
@@ -178,6 +203,8 @@ namespace ExLibris
 	void RtfTextFormat::SetKerningEnabled(bool a_Value)
 	{
 		m_KerningEnabled = a_Value;
+
+		m_Properties |= eProperty_KerningEnabled;
 	}
 
 	int RtfTextFormat::GetMinimumKerningSize() const
@@ -188,6 +215,8 @@ namespace ExLibris
 	void RtfTextFormat::SetMinimumKerningSize(int a_Size)
 	{
 		m_KerningMinimumSize = a_Size;
+
+		m_Properties |= eProperty_MinimumKerningSize;
 	}
 
 	IRtfParseable::Result RtfTextFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
