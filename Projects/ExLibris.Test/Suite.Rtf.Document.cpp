@@ -106,3 +106,37 @@ TEST(RtfDomDocument, ParseColorTable)
 	RtfColor* color = doc.GetColorTable()->GetColor(0);
 	EXPECT_COLOR_RGB(128, 128, 128, *color);
 }
+
+TEST(RtfDomDocument, ParseStyleSheet)
+{
+	RtfDomDocument doc(nullptr);
+
+	RtfParserState s;
+
+	RtfToken t;
+
+	t.type = RtfToken::eParseType_GroupOpen;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+
+	t.type = RtfToken::eParseType_Command;
+	t.value = "stylesheet";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+
+	EXPECT_EQ(doc.GetStyleSheet(), s.target_current);
+
+	t.value = "s";
+	t.parameter = 0;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+
+	t.value = "kerning";
+	t.parameter = 1;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+
+	t.type = RtfToken::eParseType_Value;
+	t.value = "Awesome";
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+
+	RtfStyle* st = doc.GetStyleSheet()->GetStyle(0);
+	EXPECT_STREQ("Awesome", st->GetName().c_str());
+	EXPECT_TRUE(st->GetTextFormat().IsKerningEnabled());
+}

@@ -198,6 +198,23 @@ TEST(RtfStyle, ParseTextFormatPropertyInvalid)
 	EXPECT_FLOAT_EQ(12.0f, st.GetTextFormat().GetFontSize());
 }
 
+TEST(RtfStyle, ParseName)
+{
+	RtfDomDocument doc(nullptr);
+	RtfStyleSheet ss(doc);
+	RtfStyle st(ss, doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Value;
+	t.value = "Ring-a-ding";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+
+	EXPECT_STREQ("Ring-a-ding", st.GetName().c_str());
+}
+
 TEST(RtfStyle, ParseUnhandled)
 {
 	RtfDomDocument doc(nullptr);
