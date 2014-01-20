@@ -112,7 +112,9 @@ namespace ExLibris
 
 		m_Tokenizer->SetInput(a_Stream);
 
-		if (!_ParseHeader())
+		RtfParserState state;
+
+		if (!_ParseHeader(state))
 		{
 			delete m_Document;
 			m_Document = nullptr;
@@ -120,12 +122,29 @@ namespace ExLibris
 			return nullptr;
 		}
 
-		m_ElementCurrent = m_Document->GetRootElement();
-
 		while (_ReadNextToken() && m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			if (!_ProcessToken(m_TokenCurrent))
+			if (state.target_current == nullptr)
 			{
+				LOG_ERROR(m_TokenCurrent) << "Target was invalidated.";
+			}
+
+			IRtfParseable::Result result = state.target_current->Parse(state, m_TokenCurrent);
+
+			if (result == IRtfParseable::eResult_Finished)
+			{
+				break;
+			}
+			else if (result == IRtfParseable::eResult_Invalid)
+			{
+				LOG_ERROR(m_TokenCurrent) << "Invalid token.";
+
+				break;
+			}
+			else if (result == IRtfParseable::eResult_Propagate)
+			{
+				LOG_WARNING(m_TokenCurrent) << "Unhandled token \"" << m_TokenCurrent.value << "\" of type " << m_TokenCurrent.type << ".";
+
 				break;
 			}
 		}
@@ -157,15 +176,20 @@ namespace ExLibris
 		return false;
 	}
 
-	bool TextParserRtf::_ParseHeader()
+	bool TextParserRtf::_ParseHeader(RtfParserState& a_State)
 	{
 		// document group
 
-		_ReadNextToken();
-		if (m_TokenCurrent.type != RtfToken::eParseType_GroupOpen)
+		if (!_ReadNextToken() || m_TokenCurrent.type != RtfToken::eParseType_GroupOpen)
 		{
 			return false;
 		}
+
+		a_State.group_current = new RtfParserGroup;
+		a_State.group_index = 0;
+		a_State.group_current->index = a_State.group_index;
+
+		a_State.groups.push_back(a_State.group_current);
 
 		m_GroupIndex = 0;
 
@@ -179,11 +203,12 @@ namespace ExLibris
 
 		// rtf command
 
-		_ReadNextToken();
-		if (m_TokenCurrent.type != RtfToken::eParseType_Command || m_TokenCurrent.value != "rtf" || m_TokenCurrent.parameter != 1)
+		if (!_ReadNextToken() || m_TokenCurrent.type != RtfToken::eParseType_Command || m_TokenCurrent.value != "rtf" || m_TokenCurrent.parameter != 1)
 		{
 			return false;
 		}
+
+		a_State.target_current = m_Document;
 
 		return true;
 	}
@@ -191,6 +216,7 @@ namespace ExLibris
 	bool TextParserRtf::_ReadNextToken()
 	{
 		m_TokenCurrent.type = RtfToken::eParseType_Invalid;
+		m_TokenCurrent.value.clear();
 		m_TokenCurrent.parameter = -1;
 		m_TokenCurrent.column = 0;
 		m_TokenCurrent.line = 0;

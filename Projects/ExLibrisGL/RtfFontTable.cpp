@@ -26,6 +26,8 @@
 
 #include "RtfFontTable.h"
 
+#include "RtfDomDocument.h"
+
 namespace ExLibris
 {
 
@@ -42,7 +44,8 @@ namespace ExLibris
 	};
 
 	RtfFontTable::RtfFontTable(RtfDomDocument& a_Document)
-		: m_Document(a_Document)
+		: IRtfParseable(&a_Document)
+		, m_Document(a_Document)
 		, m_Default(nullptr)
 		, m_State(new ParseState)
 	{
@@ -80,7 +83,7 @@ namespace ExLibris
 		}
 		else
 		{
-			font = new RtfFont;
+			font = new RtfFont(*this);
 
 			m_Fonts.insert(std::make_pair(a_Index, font));
 		}
@@ -142,8 +145,6 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfFontTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		IRtfParseable::_ParseGroupClose(a_State, a_Token);
-
 		if (a_State.group_current == m_State->parent)
 		{
 			m_State->table_started = false;
@@ -152,7 +153,7 @@ namespace ExLibris
 		}
 		else
 		{
-			return eResult_Handled;
+			return eResult_Propagate;
 		}
 	}
 

@@ -84,7 +84,7 @@ namespace ExLibris
 
 	private:
 
-		bool _ParseHeader();
+		bool _ParseHeader(RtfParserState& a_State);
 
 		bool _ReadNextToken();
 		void _GroupOpen();
