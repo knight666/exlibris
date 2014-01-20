@@ -129,7 +129,49 @@ namespace ExLibris
 				LOG_ERROR(m_TokenCurrent) << "Target was invalidated.";
 			}
 
+			if (m_TokenCurrent.type == RtfToken::eParseType_Command && m_TokenCurrent.value == "*")
+			{
+				if (!_ReadNextToken() || m_TokenCurrent.type != RtfToken::eParseType_Command)
+				{
+					LOG_ERROR(m_TokenCurrent) << "Extension command without a command value.";
+
+					break;
+				}
+
+				m_TokenCurrent.type = RtfToken::eParseType_CommandExtended;
+			}
+
 			IRtfParseable::Result result = state.target_current->Parse(state, m_TokenCurrent);
+
+			if (m_TokenCurrent.type == RtfToken::eParseType_CommandExtended && result == IRtfParseable::eResult_Propagate)
+			{
+				// skip until next group
+
+				int group_previous = state.group_index - 1;
+
+				while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
+				{
+					if (m_TokenCurrent.type == RtfToken::eParseType_GroupOpen)
+					{
+						state.group_index++;
+					}
+					else if (m_TokenCurrent.type == RtfToken::eParseType_GroupClose)
+					{
+						state.group_index--;
+						if (state.group_index == group_previous)
+						{
+							result = IRtfParseable::eResult_Handled;
+
+							break;
+						}
+					}
+
+					if (!_ReadNextToken())
+					{
+						break;
+					}
+				}
+			}
 
 			if (result == IRtfParseable::eResult_Finished)
 			{

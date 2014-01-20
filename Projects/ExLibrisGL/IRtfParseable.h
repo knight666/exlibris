@@ -112,6 +112,12 @@ namespace ExLibris
 
 				} break;
 
+			case RtfToken::eParseType_CommandExtended:
+				{
+					result = _ParseCommandExtended(a_State, a_Token);
+
+				} break;
+
 			case RtfToken::eParseType_Value:
 				{
 					result = _ParseValue(a_State, a_Token);
@@ -156,6 +162,11 @@ namespace ExLibris
 		}
 
 		virtual Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+		{
+			return eResult_Propagate;
+		}
+
+		virtual Result _ParseCommandExtended(RtfParserState& a_State, const RtfToken& a_Token)
 		{
 			return eResult_Propagate;
 		}
