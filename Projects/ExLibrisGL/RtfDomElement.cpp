@@ -2,6 +2,8 @@
 
 #include "RtfDomElement.h"
 
+#include "RtfDomDocument.h"
+
 namespace ExLibris
 {
 
@@ -17,7 +19,7 @@ namespace ExLibris
 
 	RtfDomElement::RtfDomElement(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
-		, m_TextFormat(new RtfTextFormat(m_Document))
+		, m_TextFormat(new RtfTextFormat(m_Document, &m_Document.GetTextFormat()))
 		, m_Parent(nullptr)
 		, m_SiblingPrevious(nullptr)
 		, m_SiblingNext(nullptr)
