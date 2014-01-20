@@ -45,6 +45,7 @@ namespace ExLibris
 
 	RtfDomDocument::RtfDomDocument(RtfWorld* a_World)
 		: m_World(a_World)
+		, m_RootElement(nullptr)
 		, m_TextFormat(nullptr)
 		, m_WidowControl(true)
 		, m_State(new ParseState)
@@ -52,9 +53,17 @@ namespace ExLibris
 		m_FontTable = new RtfFontTable(*this);
 		m_ColorTable = new RtfColorTable(*this);
 		m_StyleSheet = new RtfStyleSheet(*this);
+
 		m_TextFormat = new RtfTextFormat(*this);
-		m_RootElement = new RtfDomElement(*this);
-		m_State->element = m_RootElement;
+		m_TextFormat->SetCharacterSet(eRtfCharacterSet_Invalid);
+		m_TextFormat->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+		m_TextFormat->SetFont(m_FontTable->GetFont(0));
+		m_TextFormat->SetLocale(nullptr);
+		m_TextFormat->SetBackgroundColor(m_ColorTable->GetColor(0));
+		m_TextFormat->SetForegroundColor(m_ColorTable->GetColor(0));
+		m_TextFormat->SetParagraphWidowControl(true);
+		m_TextFormat->SetKerningEnabled(true);
+		m_TextFormat->SetMinimumKerningSize(1);
 	}
 
 	RtfDomDocument::~RtfDomDocument()
@@ -63,7 +72,10 @@ namespace ExLibris
 		delete m_ColorTable;
 		delete m_StyleSheet;
 		delete m_TextFormat;
-		delete m_RootElement;
+		if (m_RootElement != nullptr)
+		{
+			delete m_RootElement;
+		}
 		delete m_State;
 	}
 
@@ -111,7 +123,15 @@ namespace ExLibris
 	{
 		IRtfParseable::Result result = IRtfParseable::eResult_Propagate;
 
-		result = m_State->element->Parse(a_State, a_Token);
+		if (m_State->element != nullptr)
+		{
+			result = m_State->element->Parse(a_State, a_Token);
+		}
+		else
+		{
+			result = m_TextFormat->Parse(a_State, a_Token);
+		}
+
 		if (result != IRtfParseable::eResult_Propagate)
 		{
 			return result;
@@ -125,6 +145,7 @@ namespace ExLibris
 			}
 
 			m_FontTable->SetDefault(a_Token.parameter);
+			m_TextFormat->SetFont(m_FontTable->GetFont(a_Token.parameter));
 
 			return eResult_Handled;
 		}
@@ -164,6 +185,12 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfDomDocument::_ParseText(RtfParserState& a_State, const RtfToken& a_Token)
 	{
+		if (m_RootElement == nullptr)
+		{
+			m_RootElement = new RtfDomElement(*this);
+			m_State->element = m_RootElement;
+		}
+
 		return m_State->element->Parse(a_State, a_Token);
 	}
 

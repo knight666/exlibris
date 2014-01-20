@@ -61,7 +61,7 @@ namespace ExLibris
 
 	public:
 
-		RtfTextFormat(RtfDomDocument& a_Document);
+		RtfTextFormat(RtfDomDocument& a_Document, RtfTextFormat* a_Parent = nullptr);
 		RtfTextFormat(const RtfTextFormat& a_Other);
 		~RtfTextFormat();
 
@@ -104,6 +104,7 @@ namespace ExLibris
 	private:
 
 		RtfDomDocument& m_Document;
+		RtfTextFormat* m_Parent;
 		unsigned int m_Properties;
 		RtfCharacterSet m_CharacterSet;
 		RtfCharacterEncoding m_CharacterEncoding;

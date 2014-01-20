@@ -44,8 +44,9 @@ namespace ExLibris
 		bool character_encoding_found;
 	};
 
-	RtfTextFormat::RtfTextFormat(RtfDomDocument& a_Document)
+	RtfTextFormat::RtfTextFormat(RtfDomDocument& a_Document, RtfTextFormat* a_Parent /*= nullptr*/)
 		: m_Document(a_Document)
+		, m_Parent(a_Parent)
 		, m_Properties(0)
 		, m_CharacterSet(eRtfCharacterSet_Invalid)
 		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi)
@@ -59,10 +60,6 @@ namespace ExLibris
 		, m_KerningMinimumSize(1)
 		, m_State(new ParseState)
 	{
-		m_BackgroundColor = m_Document.GetColorTable()->GetDefaultColor();
-		m_ForegroundColor = m_BackgroundColor;
-
-		m_ParagraphWidowControl = m_Document.GetWidowControl();
 	}
 
 	RtfTextFormat::RtfTextFormat(const RtfTextFormat& a_Other)
@@ -94,7 +91,14 @@ namespace ExLibris
 
 	RtfCharacterSet RtfTextFormat::GetCharacterSet() const
 	{
-		return m_CharacterSet;
+		if ((m_Properties & eProperty_CharacterSet) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetCharacterSet();
+		}
+		else
+		{
+			return m_CharacterSet;
+		}
 	}
 
 	void RtfTextFormat::SetCharacterSet(RtfCharacterSet a_CharacterSet)
@@ -106,7 +110,14 @@ namespace ExLibris
 
 	RtfCharacterEncoding RtfTextFormat::GetCharacterEncoding() const
 	{
-		return m_CharacterEncoding;
+		if ((m_Properties & eProperty_CharacterEncoding) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetCharacterEncoding();
+		}
+		else
+		{
+			return m_CharacterEncoding;
+		}
 	}
 
 	void RtfTextFormat::SetCharacterEncoding(RtfCharacterEncoding a_Encoding)
@@ -118,7 +129,14 @@ namespace ExLibris
 
 	const RtfLocale* RtfTextFormat::GetLocale() const
 	{
-		return m_Locale;
+		if ((m_Properties & eProperty_Locale) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetLocale();
+		}
+		else
+		{
+			return m_Locale;
+		}
 	}
 
 	void RtfTextFormat::SetLocale(const RtfLocale* a_Locale)
@@ -130,9 +148,9 @@ namespace ExLibris
 
 	RtfFont* RtfTextFormat::GetFont() const
 	{
-		if ((m_Properties & eProperty_Font) == 0)
+		if ((m_Properties & eProperty_Font) == 0 && m_Parent != nullptr)
 		{
-			return m_Document.GetFontTable()->GetDefault();
+			return m_Parent->GetFont();
 		}
 		else
 		{
@@ -149,7 +167,14 @@ namespace ExLibris
 
 	float RtfTextFormat::GetFontSize() const
 	{
-		return m_FontSize;
+		if ((m_Properties & eProperty_FontSize) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetFontSize();
+		}
+		else
+		{
+			return m_FontSize;
+		}
 	}
 
 	void RtfTextFormat::SetFontSize(float a_Size)
@@ -161,7 +186,14 @@ namespace ExLibris
 
 	RtfColor* RtfTextFormat::GetBackgroundColor() const
 	{
-		return m_BackgroundColor;
+		if ((m_Properties & eProperty_BackgroundColor) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetBackgroundColor();
+		}
+		else
+		{
+			return m_BackgroundColor;
+		}
 	}
 
 	void RtfTextFormat::SetBackgroundColor(RtfColor* a_Color)
@@ -173,7 +205,14 @@ namespace ExLibris
 
 	RtfColor* RtfTextFormat::GetForegroundColor() const
 	{
-		return m_ForegroundColor;
+		if ((m_Properties & eProperty_ForegroundColor) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetForegroundColor();
+		}
+		else
+		{
+			return m_ForegroundColor;
+		}
 	}
 
 	void RtfTextFormat::SetForegroundColor(RtfColor* a_Color)
@@ -185,7 +224,14 @@ namespace ExLibris
 
 	bool RtfTextFormat::GetParagraphWidowControl() const
 	{
-		return m_ParagraphWidowControl;
+		if ((m_Properties & eProperty_ParagraphWidowControl) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetParagraphWidowControl();
+		}
+		else
+		{
+			return m_ParagraphWidowControl;
+		}
 	}
 
 	void RtfTextFormat::SetParagraphWidowControl(bool a_Value)
@@ -197,7 +243,14 @@ namespace ExLibris
 
 	bool RtfTextFormat::IsKerningEnabled() const
 	{
-		return m_KerningEnabled;
+		if ((m_Properties & eProperty_KerningEnabled) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->IsKerningEnabled();
+		}
+		else
+		{
+			return m_KerningEnabled;
+		}
 	}
 
 	void RtfTextFormat::SetKerningEnabled(bool a_Value)
@@ -209,7 +262,14 @@ namespace ExLibris
 
 	int RtfTextFormat::GetMinimumKerningSize() const
 	{
-		return m_KerningMinimumSize;
+		if ((m_Properties & eProperty_MinimumKerningSize) == 0 && m_Parent != nullptr)
+		{
+			return m_Parent->GetMinimumKerningSize();
+		}
+		else
+		{
+			return m_KerningMinimumSize;
+		}
 	}
 
 	void RtfTextFormat::SetMinimumKerningSize(int a_Size)
