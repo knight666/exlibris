@@ -193,8 +193,6 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfColorTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		IRtfParseable::_ParseGroupClose(a_State, a_Token);
-
 		if (a_State.group_current == m_State->parent)
 		{
 			m_State->table_started = false;

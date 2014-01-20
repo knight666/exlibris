@@ -26,15 +26,23 @@
 
 #include "RtfFont.h"
 
+#include "RtfFontTable.h"
+
 namespace ExLibris
 {
 
-	RtfFont::RtfFont()
-		: m_Family(eFamilyType_Nil)
+	RtfFont::RtfFont(RtfFontTable& a_FontTable)
+		: IRtfParseable(&a_FontTable)
+		, m_FontTable(a_FontTable)
+		, m_Family(eFamilyType_Nil)
 		, m_Pitch(ePitch_Default)
 		, m_CharacterSet(eRtfCharacterSet_Default)
 	{
+	}
 
+	RtfFontTable& RtfFont::GetFontTable() const
+	{
+		return m_FontTable;
 	}
 
 	const std::string& RtfFont::GetName() const

@@ -10,7 +10,9 @@ using namespace ExLibris;
 
 TEST(RtfFont, ParseFamilyType)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -52,7 +54,9 @@ TEST(RtfFont, ParseFamilyType)
 
 TEST(RtfFont, ParseFamilyTypeInvalid)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -65,7 +69,9 @@ TEST(RtfFont, ParseFamilyTypeInvalid)
 
 TEST(RtfFont, ParsePitch)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -88,7 +94,9 @@ TEST(RtfFont, ParsePitch)
 
 TEST(RtfFont, ParsePitchInvalid)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -107,7 +115,9 @@ TEST(RtfFont, ParsePitchInvalid)
 
 TEST(RtfFont, ParseCharacterSet)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -130,7 +140,9 @@ TEST(RtfFont, ParseCharacterSet)
 
 TEST(RtfFont, ParseCharacterSetUnknown)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -145,7 +157,9 @@ TEST(RtfFont, ParseCharacterSetUnknown)
 
 TEST(RtfFont, ParseCharacterSetInvalid)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 
@@ -164,7 +178,9 @@ TEST(RtfFont, ParseCharacterSetInvalid)
 
 TEST(RtfFont, ParseValue)
 {
-	RtfFont f;
+	RtfDomDocument doc(nullptr);
+	RtfFontTable ft(doc);
+	RtfFont f(ft);
 
 	RtfParserState s;
 

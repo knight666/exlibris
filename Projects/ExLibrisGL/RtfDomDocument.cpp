@@ -128,6 +128,18 @@ namespace ExLibris
 
 			return eResult_Handled;
 		}
+		else if (a_Token.value == "pard")
+		{
+			// restore default paragraph parameters
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "par")
+		{
+			m_State->element = m_State->element->AddChild();
+
+			return eResult_Handled;
+		}
 		else if (a_Token.value == "fonttbl")
 		{
 			_PushTarget(a_State, m_FontTable);
