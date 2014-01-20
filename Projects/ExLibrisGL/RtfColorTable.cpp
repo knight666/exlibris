@@ -32,14 +32,16 @@ namespace ExLibris
 	struct RtfColorTable::ParseState
 	{
 		ParseState()
-			: parent(nullptr)
+			: group_container(nullptr)
+			, group_parent(nullptr)
 			, color(nullptr)
 			, color_index(0)
 			, table_started(false)
 		{
 		}
 
-		RtfParserGroup* parent;
+		RtfParserGroup* group_container;
+		RtfParserGroup* group_parent;
 		RtfColor* color;
 		int color_index;
 		bool table_started;
@@ -131,7 +133,8 @@ namespace ExLibris
 	{
 		if (a_Token.value == "colortbl")
 		{
-			m_State->parent = a_State.group_current ? a_State.group_current->parent : nullptr;
+			m_State->group_container = a_State.group_current;
+			m_State->group_parent = a_State.group_current ? a_State.group_current->parent : nullptr;
 			m_State->color_index = 0;
 			m_State->color = GetColor(0);
 			m_State->table_started = true;
@@ -193,11 +196,17 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfColorTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		if (a_State.group_current == m_State->parent)
+		if (a_State.group_current == m_State->group_parent)
 		{
 			m_State->table_started = false;
 
 			return eResult_Finished;
+		}
+		else if (a_State.group_current == m_State->group_container)
+		{
+			a_State.target_current = this;
+
+			return eResult_Handled;
 		}
 		else
 		{

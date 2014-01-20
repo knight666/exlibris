@@ -126,7 +126,7 @@ namespace ExLibris
 		{
 			if (state.target_current == nullptr)
 			{
-				LOG_ERROR(m_TokenCurrent) << "Target was invalidated.";
+				break;
 			}
 
 			if (m_TokenCurrent.type == RtfToken::eParseType_Command && m_TokenCurrent.value == "*")
