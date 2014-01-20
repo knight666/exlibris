@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "IRtfParseable.h"
 #include "RtfColorTable.h"
 #include "RtfFontTable.h"
 #include "RtfStyleSheet.h"
@@ -39,6 +40,7 @@ namespace ExLibris
 {
 
 	class RtfDomDocument
+		: public IRtfParseable
 	{
 
 	public:
@@ -60,6 +62,11 @@ namespace ExLibris
 
 	private:
 
+		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
+		IRtfParseable::Result _ParseText(RtfParserState& a_State, const RtfToken& a_Token);
+
+	private:
+
 		RtfTextFormat* m_TextFormat;
 
 		RtfDomElement* m_RootElement;
@@ -70,6 +77,9 @@ namespace ExLibris
 		RtfStyleSheet* m_StyleSheet;
 
 		bool m_WidowControl;
+
+		struct ParseState;
+		ParseState* m_State;
 
 	}; // class RtfDomDocument
 
