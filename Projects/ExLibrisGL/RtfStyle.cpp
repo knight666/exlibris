@@ -215,4 +215,11 @@ namespace ExLibris
 		}
 	}
 
+	IRtfParseable::Result RtfStyle::_ParseValue(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		SetName(a_Token.value);
+
+		return eResult_Handled;
+	}
+
 }; // namespace ExLibris
