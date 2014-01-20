@@ -31,16 +31,30 @@
 namespace ExLibris
 {
 
+	struct RtfDomDocument::ParseState
+	{
+		ParseState()
+			: element(nullptr)
+			, character_set_found(false)
+		{
+		}
+
+		RtfDomElement* element;
+		bool character_set_found;
+	};
+
 	RtfDomDocument::RtfDomDocument(RtfWorld* a_World)
 		: m_World(a_World)
 		, m_TextFormat(nullptr)
 		, m_WidowControl(true)
+		, m_State(new ParseState)
 	{
 		m_FontTable = new RtfFontTable(*this);
 		m_ColorTable = new RtfColorTable(*this);
 		m_StyleSheet = new RtfStyleSheet(*this);
 		m_TextFormat = new RtfTextFormat(*this);
 		m_RootElement = new RtfDomElement(*this);
+		m_State->element = m_RootElement;
 	}
 
 	RtfDomDocument::~RtfDomDocument()
@@ -50,6 +64,7 @@ namespace ExLibris
 		delete m_StyleSheet;
 		delete m_TextFormat;
 		delete m_RootElement;
+		delete m_State;
 	}
 
 	RtfTextFormat& RtfDomDocument::GetTextFormat()
@@ -90,6 +105,54 @@ namespace ExLibris
 	void RtfDomDocument::SetWidowControl(bool a_Value)
 	{
 		m_WidowControl = a_Value;
+	}
+
+	IRtfParseable::Result RtfDomDocument::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		IRtfParseable::Result result = IRtfParseable::eResult_Propagate;
+
+		result = m_State->element->Parse(a_State, a_Token);
+		if (result != IRtfParseable::eResult_Propagate)
+		{
+			return result;
+		}
+
+		if (a_Token.value == "deff")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			m_FontTable->SetDefault(a_Token.parameter);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "fonttbl")
+		{
+			_PushTarget(a_State, m_FontTable);
+
+			return a_State.target_current->Parse(a_State, a_Token);
+		}
+		else if (a_Token.value == "colortbl")
+		{
+			_PushTarget(a_State, m_ColorTable);
+
+			return a_State.target_current->Parse(a_State, a_Token);
+		}
+		else if (a_Token.value == "stylesheet")
+		{
+			_PushTarget(a_State, m_StyleSheet);
+
+			return a_State.target_current->Parse(a_State, a_Token);
+		}
+
+		return result;
+	}
+
+	IRtfParseable::Result RtfDomDocument::_ParseText(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		return m_State->element->Parse(a_State, a_Token);
 	}
 
 }; // namespace ExLibris

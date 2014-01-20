@@ -80,7 +80,6 @@
     <ClCompile Include="Suite.Rtf.AssociatedProperties.cpp" />
     <ClCompile Include="Suite.Rtf.ColorTable.cpp" />
     <ClCompile Include="Suite.Rtf.Document.cpp" />
-    <ClCompile Include="Suite.Rtf.DomElement.cpp" />
     <ClCompile Include="Suite.Rtf.Element.cpp" />
     <ClCompile Include="Suite.Rtf.Font.cpp" />
     <ClCompile Include="Suite.Rtf.FontTable.cpp" />
