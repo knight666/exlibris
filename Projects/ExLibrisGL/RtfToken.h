@@ -36,6 +36,7 @@ namespace ExLibris
 			eParseType_GroupOpen,
 			eParseType_GroupClose,
 			eParseType_Command,
+			eParseType_CommandExtended,
 			eParseType_Value,
 			eParseType_Text
 		};
