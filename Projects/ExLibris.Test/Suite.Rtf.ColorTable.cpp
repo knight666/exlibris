@@ -171,7 +171,6 @@ TEST(RtfColorTable, ParseColorTableAndClose)
 	RtfColorTable ct(doc);
 
 	RtfParserState s;
-	s.PushGroup();
 
 	RtfToken t;
 
