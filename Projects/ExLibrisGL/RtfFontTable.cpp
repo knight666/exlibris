@@ -136,27 +136,7 @@ namespace ExLibris
 			}
 
 			RtfFont* font = GetFont(a_Token.parameter);
-			_PushTarget(a_State, font);
-
-			return eResult_Handled;
-		}
-		else
-		{
-			return eResult_Propagate;
-		}
-	}
-
-	IRtfParseable::Result RtfFontTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
-	{
-		if (a_State.group_current == m_State->group_parent)
-		{
-			m_State->table_started = false;
-
-			return eResult_Finished;
-		}
-		else if (a_State.group_current == m_State->group_container)
-		{
-			a_State.target_current = this;
+			a_State.target_current = font;
 
 			return eResult_Handled;
 		}

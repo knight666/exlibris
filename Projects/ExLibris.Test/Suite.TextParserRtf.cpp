@@ -189,7 +189,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_STREQ("Standaard", style->GetName().c_str());
 
 	RtfTextFormat& tf = style->GetTextFormat();
-	EXPECT_EQ(eRtfCharacterSet_Invalid, tf.GetCharacterSet());
+	EXPECT_EQ(eRtfCharacterSet_Ansi, tf.GetCharacterSet());
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
 	ASSERT_NE(nullptr, tf.GetLocale());
 	EXPECT_EQ(eRtfCountry_Netherlands, tf.GetLocale()->country);
