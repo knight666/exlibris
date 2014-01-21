@@ -34,24 +34,19 @@ namespace ExLibris
 	struct RtfColorTable::ParseState
 	{
 		ParseState()
-			: group_container(nullptr)
-			, group_parent(nullptr)
-			, color(nullptr)
+			: color(nullptr)
 			, color_index(0)
 			, table_started(false)
 		{
 		}
 
-		RtfParserGroup* group_container;
-		RtfParserGroup* group_parent;
 		RtfColor* color;
 		int color_index;
 		bool table_started;
 	};
 
 	RtfColorTable::RtfColorTable(RtfDomDocument& a_Document)
-		: IRtfParseable(&m_Document)
-		, m_Document(a_Document)
+		: m_Document(a_Document)
 		, m_IndexNext(1)
 		, m_IndexDefault(0)
 		, m_ColorDefault(new RtfColor(0, 0, 0))
@@ -136,8 +131,6 @@ namespace ExLibris
 	{
 		if (a_Token.value == "colortbl")
 		{
-			m_State->group_container = a_State.group_current;
-			m_State->group_parent = a_State.group_current ? a_State.group_current->parent : nullptr;
 			m_State->color_index = 0;
 			m_State->color = GetColor(0);
 			m_State->table_started = true;

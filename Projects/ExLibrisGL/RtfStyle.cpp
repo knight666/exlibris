@@ -202,18 +202,6 @@ namespace ExLibris
 		}
 	}
 
-	IRtfParseable::Result RtfStyle::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
-	{
-		if (a_State.group_current == m_State->parent)
-		{
-			return eResult_Finished;
-		}
-		else
-		{
-			return eResult_Handled;
-		}
-	}
-
 	IRtfParseable::Result RtfStyle::_ParseValue(RtfParserState& a_State, const RtfToken& a_Token)
 	{
 		SetName(a_Token.value);

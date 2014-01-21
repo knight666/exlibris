@@ -41,15 +41,10 @@ namespace ExLibris
 			eResult_Invalid,
 			eResult_Propagate,
 			eResult_Handled,
-			eResult_Finished,
 		};
 
 	public:
 
-		IRtfParseable(IRtfParseable* a_ParserParent = nullptr)
-			: m_ParserParent(a_ParserParent)
-		{
-		}
 		virtual ~IRtfParseable()
 		{
 		}
@@ -106,11 +101,6 @@ namespace ExLibris
 			return result;
 		}
 
-		IRtfParseable* GetParserParent() const
-		{
-			return m_ParserParent;
-		}
-
 	protected:
 
 		virtual Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
@@ -132,8 +122,6 @@ namespace ExLibris
 		{
 			return eResult_Propagate;
 		}
-
-		IRtfParseable* m_ParserParent;
 
 	}; // class IRtfParseable
 
