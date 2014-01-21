@@ -27,7 +27,6 @@ TEST(RtfStyleSheet, ParseStylesheetAndClose)
 	RtfStyleSheet ss(doc);
 
 	RtfParserState s;
-	s.PushGroup();
 
 	RtfToken t;
 

@@ -120,13 +120,12 @@ TEST(RtfFontTable, ParseFontTable)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
 }
 
-TEST(RtfStyleSheet, ParseFontTableAndClose)
+TEST(RtfFontTable, ParseFontTableAndClose)
 {
 	RtfDomDocument doc(nullptr);
 	RtfFontTable ft(doc);
 
 	RtfParserState s;
-	s.PushGroup();
 
 	RtfToken t;
 

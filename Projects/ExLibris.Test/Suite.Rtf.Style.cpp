@@ -34,14 +34,13 @@ TEST(RtfStyle, ParseStyle)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
 }
 
-TEST(RtfStyleSheet, ParseStyleAndClose)
+TEST(RtfStyle, ParseStyleAndClose)
 {
 	RtfDomDocument doc(nullptr);
 	RtfStyleSheet ss(doc);
 	RtfStyle st(ss, doc);
 
 	RtfParserState s;
-	s.PushGroup();
 
 	RtfToken t;
 

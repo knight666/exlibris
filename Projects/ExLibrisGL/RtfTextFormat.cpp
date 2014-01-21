@@ -60,6 +60,8 @@ namespace ExLibris
 		, m_KerningMinimumSize(1)
 		, m_State(new ParseState)
 	{
+		m_BackgroundColor = a_Document.GetColorTable()->GetColor(0);
+		m_ForegroundColor = m_BackgroundColor;
 	}
 
 	RtfTextFormat::RtfTextFormat(const RtfTextFormat& a_Other)
