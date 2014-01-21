@@ -107,7 +107,7 @@ namespace ExLibris
 			}
 
 			RtfStyle* style = GetStyle(a_Token.parameter);
-			a_State.target_current = style;
+			a_State.SetTarget(style);
 
 			return eResult_Handled;
 		}

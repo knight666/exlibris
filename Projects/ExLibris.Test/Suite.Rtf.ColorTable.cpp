@@ -170,11 +170,8 @@ TEST(RtfColorTable, ParseColorTableAndClose)
 	RtfDomDocument doc(nullptr);
 	RtfColorTable ct(doc);
 
-	RtfParserGroup root;
-	root.index = 0;
-
 	RtfParserState s;
-	s.group_current = &root;
+	s.PushGroup();
 
 	RtfToken t;
 
@@ -188,10 +185,8 @@ TEST(RtfColorTable, ParseColorTableAndClose)
 	t.type = RtfToken::eParseType_GroupClose;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ct.Parse(s, t));
 
-	EXPECT_EQ(0, s.targets.size());
-	EXPECT_EQ(nullptr, s.target_current);
-	EXPECT_EQ(0, s.group_index);
-	EXPECT_EQ(&root, s.group_current);
+	EXPECT_EQ(nullptr, s.GetTarget());
+	EXPECT_EQ(0, s.GetGroupIndex());
 }
 
 TEST(RtfColorTable, ParseColorTableUnhandled)

@@ -125,11 +125,8 @@ TEST(RtfStyleSheet, ParseFontTableAndClose)
 	RtfDomDocument doc(nullptr);
 	RtfFontTable ft(doc);
 
-	RtfParserGroup root;
-	root.index = 0;
-
 	RtfParserState s;
-	s.group_current = &root;
+	s.PushGroup();
 
 	RtfToken t;
 
@@ -143,10 +140,8 @@ TEST(RtfStyleSheet, ParseFontTableAndClose)
 	t.type = RtfToken::eParseType_GroupClose;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
 
-	EXPECT_EQ(0, s.targets.size());
-	EXPECT_EQ(nullptr, s.target_current);
-	EXPECT_EQ(0, s.group_index);
-	EXPECT_EQ(&root, s.group_current);
+	EXPECT_EQ(nullptr, s.GetTarget());
+	EXPECT_EQ(0, s.GetGroupIndex());
 }
 
 TEST(RtfFontTable, ParseFont)
@@ -166,8 +161,7 @@ TEST(RtfFontTable, ParseFont)
 	t.parameter = 5;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ft.Parse(s, t));
 
-	EXPECT_EQ(1, s.targets.size());
-	EXPECT_EQ(ft.GetFont(5), s.target_current);
+	EXPECT_EQ(ft.GetFont(5), s.GetTarget());
 }
 
 TEST(RtfFontTable, ParseFontInvalid)

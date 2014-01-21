@@ -163,21 +163,21 @@ namespace ExLibris
 		}
 		else if (a_Token.value == "fonttbl")
 		{
-			a_State.target_current = m_FontTable;
+			a_State.SetTarget(m_FontTable);
 
-			return a_State.target_current->Parse(a_State, a_Token);
+			return m_FontTable->Parse(a_State, a_Token);
 		}
 		else if (a_Token.value == "colortbl")
 		{
-			a_State.target_current = m_ColorTable;
+			a_State.SetTarget(m_ColorTable);
 
-			return a_State.target_current->Parse(a_State, a_Token);
+			return m_ColorTable->Parse(a_State, a_Token);
 		}
 		else if (a_Token.value == "stylesheet")
 		{
-			a_State.target_current = m_StyleSheet;
+			a_State.SetTarget(m_StyleSheet);
 
-			return a_State.target_current->Parse(a_State, a_Token);
+			return m_StyleSheet->Parse(a_State, a_Token);
 		}
 
 		return result;

@@ -124,7 +124,7 @@ namespace ExLibris
 
 		while (_ReadNextToken() && m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 		{
-			if (state.target_current == nullptr)
+			if (state.GetTarget() == nullptr)
 			{
 				break;
 			}
@@ -141,24 +141,25 @@ namespace ExLibris
 				m_TokenCurrent.type = RtfToken::eParseType_CommandExtended;
 			}
 
-			IRtfParseable::Result result = state.target_current->Parse(state, m_TokenCurrent);
+			IRtfParseable::Result result = state.GetTarget()->Parse(state, m_TokenCurrent);
 
 			if (m_TokenCurrent.type == RtfToken::eParseType_CommandExtended && result == IRtfParseable::eResult_Propagate)
 			{
 				// skip until next group
 
-				int group_previous = state.group_index - 1;
+				int group_index = state.GetGroupIndex();
+				int group_previous = group_index - 1;
 
 				while (m_TokenCurrent.type != RtfToken::eParseType_Invalid)
 				{
 					if (m_TokenCurrent.type == RtfToken::eParseType_GroupOpen)
 					{
-						state.group_index++;
+						group_index++;
 					}
 					else if (m_TokenCurrent.type == RtfToken::eParseType_GroupClose)
 					{
-						state.group_index--;
-						if (state.group_index == group_previous)
+						group_index--;
+						if (group_index == group_previous)
 						{
 							result = IRtfParseable::eResult_Handled;
 
@@ -221,11 +222,7 @@ namespace ExLibris
 			return false;
 		}
 
-		a_State.group_current = new RtfParserGroup;
-		a_State.group_index = 0;
-		a_State.group_current->index = a_State.group_index;
-
-		a_State.groups.push_back(a_State.group_current);
+		a_State.PushGroup();
 
 		m_GroupIndex = 0;
 
@@ -244,7 +241,7 @@ namespace ExLibris
 			return false;
 		}
 
-		a_State.target_current = m_Document;
+		a_State.SetTarget(m_Document);
 
 		return true;
 	}

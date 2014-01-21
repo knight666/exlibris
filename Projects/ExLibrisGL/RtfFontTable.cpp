@@ -129,7 +129,7 @@ namespace ExLibris
 			}
 
 			RtfFont* font = GetFont(a_Token.parameter);
-			a_State.target_current = font;
+			a_State.SetTarget(font);
 
 			return eResult_Handled;
 		}
