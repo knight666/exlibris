@@ -36,13 +36,13 @@ namespace ExLibris
 
 	RtfAssociatedProperties::RtfAssociatedProperties(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
-		, m_Font(nullptr)
-		, m_FontSize(12.0f)
-		, m_Locale(nullptr)
-		, m_Encoding(eRtfCharacterEncoding_SingleByteLowAnsi)
-		, m_Bold(false)
-		, m_Italic(false)
 		, m_Specified(0)
+		, m_Font(nullptr, m_Specified)
+		, m_FontSize(12.0f, m_Specified)
+		, m_Locale(nullptr, m_Specified)
+		, m_Encoding(eRtfCharacterEncoding_SingleByteLowAnsi, m_Specified)
+		, m_Bold(false, m_Specified)
+		, m_Italic(false, m_Specified)
 	{
 	}
 
@@ -56,102 +56,76 @@ namespace ExLibris
 		m_FontSize = a_TextFormat.GetFontSize();
 		m_Locale = a_TextFormat.GetLocale();
 		m_Encoding = a_TextFormat.GetCharacterEncoding();
-
-		m_Specified = eSpecified_Font | eSpecified_FontSize | eSpecified_Locale | eSpecified_CharacterEncoding;
 	}
 
 	RtfFont* RtfAssociatedProperties::GetFont() const
 	{
-		return m_Font;
+		return m_Font.Get();
 	}
 
 	void RtfAssociatedProperties::SetFont(RtfFont* a_Font)
 	{
 		m_Font = a_Font;
-		m_Specified |= eSpecified_Font;
 	}
 
 	float RtfAssociatedProperties::GetFontSize() const
 	{
-		return m_FontSize;
+		return m_FontSize.Get();
 	}
 
 	void RtfAssociatedProperties::SetFontSize(float a_Size)
 	{
 		m_FontSize = a_Size;
-		m_Specified |= eSpecified_FontSize;
 	}
 
 	const RtfLocale* RtfAssociatedProperties::GetLocale() const
 	{
-		return m_Locale;
+		return m_Locale.Get();
 	}
 
 	void RtfAssociatedProperties::SetLocale(const RtfLocale* a_Locale)
 	{
 		m_Locale = a_Locale;
-		m_Specified |= eSpecified_Locale;
 	}
 
 	RtfCharacterEncoding RtfAssociatedProperties::GetCharacterEncoding() const
 	{
-		return m_Encoding;
+		return m_Encoding.Get();
 	}
 
 	void RtfAssociatedProperties::SetCharacterEncoding(RtfCharacterEncoding a_Encoding)
 	{
 		m_Encoding = a_Encoding;
-		m_Specified |= eSpecified_CharacterEncoding;
 	}
 
 	bool RtfAssociatedProperties::IsBold() const
 	{
-		return m_Bold;
+		return m_Bold.Get();
 	}
 
 	void RtfAssociatedProperties::SetBold(bool a_Value)
 	{
 		m_Bold = a_Value;
-		m_Specified |= eSpecified_Bold;
 	}
 
 	bool RtfAssociatedProperties::IsItalic() const
 	{
-		return m_Italic;
+		return m_Italic.Get();
 	}
 
 	void RtfAssociatedProperties::SetItalic(bool a_Italic)
 	{
 		m_Italic = a_Italic;
-		m_Specified |= eSpecified_Italic;
 	}
 
 	void RtfAssociatedProperties::Combine(const RtfAssociatedProperties& a_Other)
 	{
-		if (a_Other.m_Specified & eSpecified_Font)
-		{
-			SetFont(a_Other.GetFont());
-		}
-		if (a_Other.m_Specified & eSpecified_FontSize)
-		{
-			SetFontSize(a_Other.GetFontSize());
-		}
-		if (a_Other.m_Specified & eSpecified_Locale)
-		{
-			SetLocale(a_Other.GetLocale());
-		}
-		if (a_Other.m_Specified & eSpecified_CharacterEncoding)
-		{
-			SetCharacterEncoding(a_Other.GetCharacterEncoding());
-		}
-		if (a_Other.m_Specified & eSpecified_Bold)
-		{
-			SetBold(a_Other.IsBold());
-		}
-		if (a_Other.m_Specified & eSpecified_Italic)
-		{
-			SetItalic(a_Other.IsItalic());
-		}
+		m_Font = a_Other.m_Font;
+		m_FontSize = a_Other.m_FontSize;
+		m_Locale = a_Other.m_Locale;
+		m_Encoding = a_Other.m_Encoding;
+		m_Bold = a_Other.m_Bold;
+		m_Italic = a_Other.m_Italic;
 	}
 
 	IRtfParseable::Result RtfAssociatedProperties::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)

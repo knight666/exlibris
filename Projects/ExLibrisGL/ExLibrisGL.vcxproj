@@ -157,6 +157,7 @@
     <ClInclude Include="RtfLogMessage.h" />
     <ClInclude Include="RtfParserGroup.h" />
     <ClInclude Include="RtfParserState.h" />
+    <ClInclude Include="RtfProperty.h" />
     <ClInclude Include="RtfStyle.h" />
     <ClInclude Include="RtfStyleSheet.h" />
     <ClInclude Include="RtfTextFormat.h" />
