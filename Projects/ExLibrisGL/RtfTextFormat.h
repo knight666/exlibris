@@ -62,7 +62,6 @@ namespace ExLibris
 	public:
 
 		RtfTextFormat(RtfDomDocument& a_Document, RtfTextFormat* a_Parent = nullptr);
-		RtfTextFormat(const RtfTextFormat& a_Other);
 		~RtfTextFormat();
 
 		RtfDomDocument& GetDocument() const;
