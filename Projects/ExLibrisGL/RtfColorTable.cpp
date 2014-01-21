@@ -26,6 +26,8 @@
 
 #include "RtfColorTable.h"
 
+#include "RtfDomDocument.h"
+
 namespace ExLibris
 {
 
@@ -48,7 +50,8 @@ namespace ExLibris
 	};
 
 	RtfColorTable::RtfColorTable(RtfDomDocument& a_Document)
-		: m_Document(a_Document)
+		: IRtfParseable(&m_Document)
+		, m_Document(a_Document)
 		, m_IndexNext(1)
 		, m_IndexDefault(0)
 		, m_ColorDefault(new RtfColor(0, 0, 0))
@@ -191,26 +194,6 @@ namespace ExLibris
 		else
 		{
 			return eResult_Invalid;
-		}
-	}
-
-	IRtfParseable::Result RtfColorTable::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
-	{
-		if (a_State.group_current == m_State->group_parent)
-		{
-			m_State->table_started = false;
-
-			return eResult_Finished;
-		}
-		else if (a_State.group_current == m_State->group_container)
-		{
-			a_State.target_current = this;
-
-			return eResult_Handled;
-		}
-		else
-		{
-			return eResult_Handled;
 		}
 	}
 

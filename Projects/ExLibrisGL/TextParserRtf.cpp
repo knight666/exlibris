@@ -186,8 +186,6 @@ namespace ExLibris
 			else if (result == IRtfParseable::eResult_Propagate)
 			{
 				LOG_WARNING(m_TokenCurrent) << "Unhandled token \"" << m_TokenCurrent.value << "\" of type " << m_TokenCurrent.type << ".";
-
-				break;
 			}
 		}
 

@@ -50,6 +50,50 @@ namespace ExLibris
 			}
 		}
 
+		struct Entry
+		{
+			RtfParserGroup* group_container;
+			int group_index;
+			IRtfParseable* target;
+		};
+
+		void PushGroup()
+		{
+			RtfParserGroup* group_create = new RtfParserGroup;
+			group_create->index = group_index;
+			group_create->parent = group_current;
+
+			Entry entry;
+			entry.group_container = group_create;
+			entry.group_index = group_index;
+			entry.target = target_current;
+			entries.push(entry);
+
+			group_current = group_create;
+			group_index++;
+
+			groups.push_back(group_create);
+		}
+
+		bool PopGroup()
+		{
+			if (entries.size() == 0)
+			{
+				return false;
+			}
+
+			Entry& entry = entries.top();
+			group_current = entry.group_container;
+			group_index = entry.group_index;
+			target_current = entry.target;
+
+			entries.pop();
+
+			return true;
+		}
+
+		std::stack<Entry> entries;
+
 		int group_index;
 		std::vector<RtfParserGroup*> groups;
 		RtfParserGroup* group_current;

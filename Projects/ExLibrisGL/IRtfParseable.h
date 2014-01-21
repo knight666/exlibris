@@ -63,46 +63,17 @@ namespace ExLibris
 
 			case RtfToken::eParseType_GroupOpen:
 				{
-					RtfParserGroup* group_create = new RtfParserGroup;
-					group_create->index = ++a_State.group_index;
-					group_create->parent = a_State.group_current;
+					a_State.PushGroup();
 
-					a_State.groups.push_back(group_create);
-					a_State.group_current = group_create;
-
-					result = _ParseGroupOpen(a_State, a_Token);
+					result = eResult_Handled;
 
 				} break;
 
 			case RtfToken::eParseType_GroupClose:
 				{
-					a_State.group_index--;
+					a_State.PopGroup();
 
-					if (a_State.group_current != nullptr)
-					{
-						a_State.group_current = a_State.group_current->parent;
-					}
-
-					IRtfParseable* current = this;
-					for (; current != nullptr; current = current->GetParserParent())
-					{
-						result = current->_ParseGroupClose(a_State, a_Token);
-						if (result != eResult_Propagate)
-						{
-							break;
-						}
-					}
-
-					if (result == eResult_Finished)
-					{
-						a_State.target_current = current->GetParserParent();
-
-						return eResult_Handled;
-					}
-					else if (result == eResult_Propagate)
-					{
-						return eResult_Handled;
-					}
+					result = eResult_Handled;
 
 				} break;
 
@@ -132,16 +103,7 @@ namespace ExLibris
 
 			}
 
-			if (result == eResult_Finished)
-			{
-				_PopTarget(a_State);
-
-				return eResult_Handled;
-			}
-			else
-			{
-				return result;
-			}
+			return result;
 		}
 
 		IRtfParseable* GetParserParent() const
@@ -150,16 +112,6 @@ namespace ExLibris
 		}
 
 	protected:
-
-		virtual Result _ParseGroupOpen(RtfParserState& a_State, const RtfToken& a_Token)
-		{
-			return eResult_Handled;
-		}
-
-		virtual Result _ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
-		{
-			return eResult_Propagate;
-		}
 
 		virtual Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 		{
@@ -179,28 +131,6 @@ namespace ExLibris
 		virtual Result _ParseText(RtfParserState& a_State, const RtfToken& a_Token)
 		{
 			return eResult_Propagate;
-		}
-
-		void _PushTarget(RtfParserState& a_State, IRtfParseable* a_Target)
-		{
-			if (a_Target == nullptr)
-			{
-				return;
-			}
-
-			a_State.target_current = a_Target;
-			a_State.targets.push(this);
-		}
-
-		void _PopTarget(RtfParserState& a_State)
-		{
-			if (a_State.targets.size() == 0)
-			{
-				return;
-			}
-
-			a_State.target_current = a_State.targets.top();
-			a_State.targets.pop();
 		}
 
 		IRtfParseable* m_ParserParent;

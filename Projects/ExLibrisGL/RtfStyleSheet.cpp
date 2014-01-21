@@ -110,29 +110,13 @@ namespace ExLibris
 			}
 
 			RtfStyle* style = GetStyle(a_Token.parameter);
-			_PushTarget(a_State, style);
+			a_State.target_current = style;
 
 			return eResult_Handled;
 		}
 		else
 		{
 			return eResult_Propagate;
-		}
-	}
-
-	IRtfParseable::Result RtfStyleSheet::_ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token)
-	{
-		IRtfParseable::_ParseGroupClose(a_State, a_Token);
-
-		if (a_State.group_current == m_State->parent)
-		{
-			m_State->sheet_started = false;
-
-			return eResult_Finished;
-		}
-		else
-		{
-			return eResult_Handled;
 		}
 	}
 

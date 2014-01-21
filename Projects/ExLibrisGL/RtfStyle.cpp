@@ -26,6 +26,7 @@
 
 #include "RtfStyle.h"
 
+#include "RtfDomDocument.h"
 #include "RtfStyleSheet.h"
 
 namespace ExLibris
@@ -46,7 +47,7 @@ namespace ExLibris
 	RtfStyle::RtfStyle(RtfStyleSheet& a_Parent, RtfDomDocument& a_Document)
 		: m_Parent(a_Parent)
 		, m_Document(a_Document)
-		, m_TextFormat(new RtfTextFormat(m_Document))
+		, m_TextFormat(new RtfTextFormat(m_Document, &m_Document.GetTextFormat()))
 		, m_State(new ParseState)
 	{
 		m_StyleNextParagraph = this;
@@ -177,7 +178,7 @@ namespace ExLibris
 		}
 		else
 		{
-			Result result = eResult_Invalid;
+			Result result = eResult_Propagate;
 
 			if (m_State->properties != nullptr)
 			{
@@ -188,7 +189,7 @@ namespace ExLibris
 				}
 			}
 
-			if (result == eResult_Invalid)
+			if (result == eResult_Propagate)
 			{
 				result = m_TextFormat->Parse(a_State, a_Token);
 				if (result == eResult_Propagate)

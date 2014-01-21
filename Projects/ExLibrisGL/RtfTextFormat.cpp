@@ -378,7 +378,7 @@ namespace ExLibris
 
 		// language
 
-		else if (a_Token.value == "lang")
+		else if (a_Token.value == "lang" || a_Token.value == "langfe")
 		{
 			if (a_Token.parameter < 0 || m_Document.GetWorld() == nullptr)
 			{

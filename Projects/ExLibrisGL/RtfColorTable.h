@@ -57,7 +57,6 @@ namespace ExLibris
 
 		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
 		IRtfParseable::Result _ParseValue(RtfParserState& a_State, const RtfToken& a_Token);
-		IRtfParseable::Result _ParseGroupClose(RtfParserState& a_State, const RtfToken& a_Token);
 
 	private:
 
