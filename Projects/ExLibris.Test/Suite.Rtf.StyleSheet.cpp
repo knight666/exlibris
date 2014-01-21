@@ -26,11 +26,8 @@ TEST(RtfStyleSheet, ParseStylesheetAndClose)
 	RtfDomDocument doc(nullptr);
 	RtfStyleSheet ss(doc);
 
-	RtfParserGroup root;
-	root.index = 0;
-
 	RtfParserState s;
-	s.group_current = &root;
+	s.PushGroup();
 
 	RtfToken t;
 
@@ -44,10 +41,8 @@ TEST(RtfStyleSheet, ParseStylesheetAndClose)
 	t.type = RtfToken::eParseType_GroupClose;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ss.Parse(s, t));
 
-	EXPECT_EQ(0, s.targets.size());
-	EXPECT_EQ(nullptr, s.target_current);
-	EXPECT_EQ(0, s.group_index);
-	EXPECT_EQ(&root, s.group_current);
+	EXPECT_EQ(nullptr, s.GetTarget());
+	EXPECT_EQ(0, s.GetGroupIndex());
 }
 
 TEST(RtfStyleSheet, ParseStyle)
@@ -67,8 +62,7 @@ TEST(RtfStyleSheet, ParseStyle)
 	t.parameter = 0;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, ss.Parse(s, t));
 
-	EXPECT_EQ(1, s.targets.size());
-	EXPECT_EQ(ss.GetStyle(0), s.target_current);
+	EXPECT_EQ(ss.GetStyle(0), s.GetTarget());
 }
 
 TEST(RtfStyleSheet, ParseStyleInvalid)

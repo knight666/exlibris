@@ -35,12 +35,10 @@ namespace ExLibris
 	struct RtfStyle::ParseState
 	{
 		ParseState()
-			: parent(nullptr)
-			, properties(nullptr)
+			: properties(nullptr)
 		{
 		}
 
-		RtfParserGroup* parent;
 		RtfAssociatedProperties* properties;
 	};
 
@@ -141,7 +139,6 @@ namespace ExLibris
 	{
 		if (a_Token.value == "s")
 		{
-			m_State->parent = a_State.group_current;
 			m_State->properties = nullptr;
 
 			return eResult_Handled;

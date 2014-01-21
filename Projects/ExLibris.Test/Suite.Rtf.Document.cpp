@@ -53,18 +53,18 @@ TEST(RtfDomDocument, ParseFontTable)
 	t.value = "fonttbl";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
 
-	EXPECT_EQ(doc.GetFontTable(), s.target_current);
+	EXPECT_EQ(doc.GetFontTable(), s.GetTarget());
 
 	t.value = "f";
 	t.parameter = 5;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.value = "froman";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.type = RtfToken::eParseType_Value;
 	t.value = "Comical";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	RtfFont* font = doc.GetFontTable()->GetFont(5);
 	EXPECT_EQ(RtfFont::eFamilyType_Roman, font->GetFamilyType());
@@ -86,19 +86,19 @@ TEST(RtfDomDocument, ParseColorTable)
 	t.value = "colortbl";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
 
-	EXPECT_EQ(doc.GetColorTable(), s.target_current);
+	EXPECT_EQ(doc.GetColorTable(), s.GetTarget());
 
 	t.value = "red";
 	t.parameter = 128;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.value = "green";
 	t.parameter = 128;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.value = "blue";
 	t.parameter = 128;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.type = RtfToken::eParseType_GroupClose;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
@@ -122,19 +122,19 @@ TEST(RtfDomDocument, ParseStyleSheet)
 	t.value = "stylesheet";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
 
-	EXPECT_EQ(doc.GetStyleSheet(), s.target_current);
+	EXPECT_EQ(doc.GetStyleSheet(), s.GetTarget());
 
 	t.value = "s";
 	t.parameter = 0;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.value = "kerning";
 	t.parameter = 1;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	t.type = RtfToken::eParseType_Value;
 	t.value = "Awesome";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.target_current->Parse(s, t));
+	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	RtfStyle* st = doc.GetStyleSheet()->GetStyle(0);
 	EXPECT_STREQ("Awesome", st->GetName().c_str());

@@ -99,6 +99,7 @@
     <ClCompile Include="RtfFont.cpp" />
     <ClCompile Include="RtfFontTable.cpp" />
     <ClCompile Include="RtfLogMessage.cpp" />
+    <ClCompile Include="RtfParserState.cpp" />
     <ClCompile Include="RtfStyle.cpp" />
     <ClCompile Include="RtfStyleSheet.cpp" />
     <ClCompile Include="RtfTextFormat.cpp" />

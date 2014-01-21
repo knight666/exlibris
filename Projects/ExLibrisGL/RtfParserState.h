@@ -33,22 +33,10 @@ namespace ExLibris
 namespace ExLibris
 {
 
-	struct RtfParserState
+	class RtfParserState
 	{
-		RtfParserState()
-			: group_current(nullptr)
-			, group_index(0)
-			, target_current(nullptr)
-		{
-		}
 
-		~RtfParserState()
-		{
-			for (std::vector<RtfParserGroup*>::iterator group_it = groups.begin(); group_it != groups.end(); ++group_it)
-			{
-				delete *group_it;
-			}
-		}
+	private:
 
 		struct Entry
 		{
@@ -57,48 +45,29 @@ namespace ExLibris
 			IRtfParseable* target;
 		};
 
-		void PushGroup()
-		{
-			RtfParserGroup* group_create = new RtfParserGroup;
-			group_create->index = group_index;
-			group_create->parent = group_current;
+	public:
 
-			Entry entry;
-			entry.group_container = group_create;
-			entry.group_index = group_index;
-			entry.target = target_current;
-			entries.push(entry);
+		RtfParserState();
+		~RtfParserState();
 
-			group_current = group_create;
-			group_index++;
+		void PushGroup();
+		bool PopGroup();
 
-			groups.push_back(group_create);
-		}
+		int GetGroupIndex() const;
 
-		bool PopGroup()
-		{
-			if (entries.size() == 0)
-			{
-				return false;
-			}
+		RtfParserGroup* GetGroup() const;
 
-			Entry& entry = entries.top();
-			group_current = entry.group_container;
-			group_index = entry.group_index;
-			target_current = entry.target;
+		IRtfParseable* GetTarget() const;
+		void SetTarget(IRtfParseable* a_Target);
 
-			entries.pop();
+	private:
 
-			return true;
-		}
+		std::vector<RtfParserGroup*> m_Groups;
+		int m_GroupIndex;
+		RtfParserGroup* m_GroupCurrent;
+		IRtfParseable* m_TargetCurrent;
+		std::stack<Entry> m_Entries;
 
-		std::stack<Entry> entries;
-
-		int group_index;
-		std::vector<RtfParserGroup*> groups;
-		RtfParserGroup* group_current;
-		std::stack<IRtfParseable*> targets;
-		IRtfParseable* target_current;
-	};
+	}; // class RtfParserState
 
 }; // namespace ExLibris
