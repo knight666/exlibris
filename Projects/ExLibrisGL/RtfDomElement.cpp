@@ -79,7 +79,7 @@ namespace ExLibris
 	{
 		RtfDomElement* child = new RtfDomElement(m_Document);
 		child->m_Parent = this;
-		child->m_TextFormat = new RtfTextFormat(*m_TextFormat);
+		child->m_TextFormat = new RtfTextFormat(m_Document, m_TextFormat);
 		child->m_SiblingPrevious = m_ChildPrevious;
 
 		if (m_ChildPrevious != nullptr)

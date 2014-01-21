@@ -64,23 +64,6 @@ namespace ExLibris
 		m_ForegroundColor = m_BackgroundColor;
 	}
 
-	RtfTextFormat::RtfTextFormat(const RtfTextFormat& a_Other)
-		: m_Document(a_Other.GetDocument())
-		, m_Properties(a_Other.m_Properties)
-		, m_CharacterSet(a_Other.GetCharacterSet())
-		, m_CharacterEncoding(a_Other.GetCharacterEncoding())
-		, m_Font(a_Other.GetFont())
-		, m_FontSize(a_Other.GetFontSize())
-		, m_Locale(a_Other.GetLocale())
-		, m_BackgroundColor(a_Other.GetBackgroundColor())
-		, m_ForegroundColor(a_Other.GetForegroundColor())
-		, m_ParagraphWidowControl(a_Other.GetParagraphWidowControl())
-		, m_KerningEnabled(a_Other.IsKerningEnabled())
-		, m_KerningMinimumSize(a_Other.GetMinimumKerningSize())
-		, m_State(new ParseState)
-	{
-	}
-
 	RtfTextFormat::~RtfTextFormat()
 	{
 		delete m_State;
