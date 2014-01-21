@@ -26,6 +26,7 @@
 
 #include "IRtfParseable.h"
 #include "RtfCharacterEncoding.h"
+#include "RtfProperty.h"
 
 namespace ExLibris
 {
@@ -43,16 +44,6 @@ namespace ExLibris
 	{
 
 		friend class RtfAssociatedProperties;
-
-		enum Specified
-		{
-			eSpecified_Font = (1 << 0),
-			eSpecified_FontSize = (1 << 1),
-			eSpecified_Locale = (1 << 2),
-			eSpecified_CharacterEncoding = (1 << 3),
-			eSpecified_Bold = (1 << 4),
-			eSpecified_Italic = (1 << 5),
-		};
 
 	public:
 
@@ -88,13 +79,13 @@ namespace ExLibris
 	private:
 
 		RtfDomDocument& m_Document;
-		RtfFont* m_Font;
-		float m_FontSize;
-		const RtfLocale* m_Locale;
-		RtfCharacterEncoding m_Encoding;
-		bool m_Bold;
-		bool m_Italic;
 		unsigned int m_Specified;
+		RtfProperty<RtfFont*, 0> m_Font;
+		RtfProperty<float, 1> m_FontSize;
+		RtfProperty<const RtfLocale*, 2> m_Locale;
+		RtfProperty<RtfCharacterEncoding, 3> m_Encoding;
+		RtfProperty<bool, 4> m_Bold;
+		RtfProperty<bool, 5> m_Italic;
 
 	}; // class RtfAssociatedProperties
 

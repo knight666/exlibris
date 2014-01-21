@@ -83,6 +83,7 @@
     <ClCompile Include="Suite.Rtf.Element.cpp" />
     <ClCompile Include="Suite.Rtf.Font.cpp" />
     <ClCompile Include="Suite.Rtf.FontTable.cpp" />
+    <ClCompile Include="Suite.Rtf.Property.cpp" />
     <ClCompile Include="Suite.Rtf.Style.cpp" />
     <ClCompile Include="Suite.Rtf.StyleSheet.cpp" />
     <ClCompile Include="Suite.Rtf.TextFormat.cpp" />
