@@ -32,8 +32,7 @@ namespace ExLibris
 {
 
 	RtfFont::RtfFont(RtfFontTable& a_FontTable)
-		: IRtfParseable(&a_FontTable)
-		, m_FontTable(a_FontTable)
+		: m_FontTable(a_FontTable)
 		, m_Family(eFamilyType_Nil)
 		, m_Pitch(ePitch_Default)
 		, m_CharacterSet(eRtfCharacterSet_Default)

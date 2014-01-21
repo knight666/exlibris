@@ -173,11 +173,7 @@ namespace ExLibris
 				}
 			}
 
-			if (result == IRtfParseable::eResult_Finished)
-			{
-				break;
-			}
-			else if (result == IRtfParseable::eResult_Invalid)
+			if (result == IRtfParseable::eResult_Invalid)
 			{
 				LOG_ERROR(m_TokenCurrent) << "Invalid token.";
 

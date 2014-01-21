@@ -34,20 +34,15 @@ namespace ExLibris
 	struct RtfFontTable::ParseState
 	{
 		ParseState()
-			: group_parent(nullptr)
-			, group_container(nullptr)
-			, table_started(false)
+			: table_started(false)
 		{
 		}
 
-		RtfParserGroup* group_parent;
-		RtfParserGroup* group_container;
 		bool table_started;
 	};
 
 	RtfFontTable::RtfFontTable(RtfDomDocument& a_Document)
-		: IRtfParseable(&a_Document)
-		, m_Document(a_Document)
+		: m_Document(a_Document)
 		, m_Default(nullptr)
 		, m_State(new ParseState)
 	{
@@ -111,8 +106,6 @@ namespace ExLibris
 	{
 		if (a_Token.value == "fonttbl")
 		{
-			m_State->group_container = a_State.group_current;
-			m_State->group_parent = a_State.group_current ? a_State.group_current->parent : nullptr;
 			m_State->table_started = true;
 
 			return eResult_Handled;

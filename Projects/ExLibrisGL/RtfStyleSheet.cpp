@@ -32,12 +32,10 @@ namespace ExLibris
 	struct RtfStyleSheet::ParseState
 	{
 		ParseState()
-			: parent(nullptr)
-			, sheet_started(false)
+			: sheet_started(false)
 		{
 		}
 
-		RtfParserGroup* parent;
 		bool sheet_started;
 	};
 
@@ -97,7 +95,6 @@ namespace ExLibris
 	{
 		if (a_Token.value == "stylesheet")
 		{
-			m_State->parent = a_State.group_current ? a_State.group_current->parent : nullptr;
 			m_State->sheet_started = true;
 
 			return eResult_Handled;
