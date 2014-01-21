@@ -27,6 +27,7 @@
 #include "IRtfParseable.h"
 #include "RtfCharacterEncoding.h"
 #include "RtfCharacterSet.h"
+#include "RtfProperty.h"
 
 namespace ExLibris
 {
@@ -42,22 +43,6 @@ namespace ExLibris
 	class RtfTextFormat
 		: public IRtfParseable
 	{
-
-	private:
-
-		enum Property
-		{
-			eProperty_CharacterSet = (1 << 0),
-			eProperty_CharacterEncoding = (1 << 1),
-			eProperty_Locale = (1 << 2),
-			eProperty_Font = (1 << 3),
-			eProperty_FontSize = (1 << 4),
-			eProperty_BackgroundColor = (1 << 5),
-			eProperty_ForegroundColor = (1 << 6),
-			eProperty_ParagraphWidowControl = (1 << 7),
-			eProperty_KerningEnabled = (1 << 8),
-			eProperty_MinimumKerningSize = (1 << 9),
-		};
 
 	public:
 
@@ -105,16 +90,16 @@ namespace ExLibris
 		RtfDomDocument& m_Document;
 		RtfTextFormat* m_Parent;
 		unsigned int m_Properties;
-		RtfCharacterSet m_CharacterSet;
-		RtfCharacterEncoding m_CharacterEncoding;
-		const RtfLocale* m_Locale;
-		RtfFont* m_Font;
-		float m_FontSize;
-		RtfColor* m_BackgroundColor;
-		RtfColor* m_ForegroundColor;
-		bool m_ParagraphWidowControl;
-		bool m_KerningEnabled;
-		int m_KerningMinimumSize;
+		RtfProperty<RtfCharacterSet, 0> m_CharacterSet;
+		RtfProperty<RtfCharacterEncoding, 1> m_CharacterEncoding;
+		RtfProperty<const RtfLocale*, 2> m_Locale;
+		RtfProperty<RtfFont*, 3> m_Font;
+		RtfProperty<float, 4> m_FontSize;
+		RtfProperty<RtfColor*, 5> m_BackgroundColor;
+		RtfProperty<RtfColor*, 6> m_ForegroundColor;
+		RtfProperty<bool, 7> m_ParagraphWidowControl;
+		RtfProperty<bool, 8> m_KerningEnabled;
+		RtfProperty<int, 9> m_KerningMinimumSize;
 
 		struct ParseState;
 		ParseState* m_State;

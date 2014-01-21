@@ -48,20 +48,20 @@ namespace ExLibris
 		: m_Document(a_Document)
 		, m_Parent(a_Parent)
 		, m_Properties(0)
-		, m_CharacterSet(eRtfCharacterSet_Invalid)
-		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi)
-		, m_Font(nullptr)
-		, m_FontSize(12.0f)
-		, m_Locale(nullptr)
-		, m_BackgroundColor(nullptr)
-		, m_ForegroundColor(nullptr)
-		, m_ParagraphWidowControl(true)
-		, m_KerningEnabled(true)
-		, m_KerningMinimumSize(1)
+		, m_CharacterSet(eRtfCharacterSet_Invalid, m_Properties)
+		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi, m_Properties)
+		, m_Font(nullptr, m_Properties)
+		, m_FontSize(12.0f, m_Properties)
+		, m_Locale(nullptr, m_Properties)
+		, m_BackgroundColor(nullptr, m_Properties)
+		, m_ForegroundColor(nullptr, m_Properties)
+		, m_ParagraphWidowControl(true, m_Properties)
+		, m_KerningEnabled(true, m_Properties)
+		, m_KerningMinimumSize(1, m_Properties)
 		, m_State(new ParseState)
 	{
 		m_BackgroundColor = a_Document.GetColorTable()->GetColor(0);
-		m_ForegroundColor = m_BackgroundColor;
+		m_ForegroundColor = m_BackgroundColor.Get();
 	}
 
 	RtfTextFormat::~RtfTextFormat()
@@ -76,192 +76,172 @@ namespace ExLibris
 
 	RtfCharacterSet RtfTextFormat::GetCharacterSet() const
 	{
-		if ((m_Properties & eProperty_CharacterSet) == 0 && m_Parent != nullptr)
+		if (!m_CharacterSet.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetCharacterSet();
 		}
 		else
 		{
-			return m_CharacterSet;
+			return m_CharacterSet.Get();
 		}
 	}
 
 	void RtfTextFormat::SetCharacterSet(RtfCharacterSet a_CharacterSet)
 	{
 		m_CharacterSet = a_CharacterSet;
-
-		m_Properties |= eProperty_CharacterSet;
 	}
 
 	RtfCharacterEncoding RtfTextFormat::GetCharacterEncoding() const
 	{
-		if ((m_Properties & eProperty_CharacterEncoding) == 0 && m_Parent != nullptr)
+		if (!m_CharacterEncoding.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetCharacterEncoding();
 		}
 		else
 		{
-			return m_CharacterEncoding;
+			return m_CharacterEncoding.Get();
 		}
 	}
 
 	void RtfTextFormat::SetCharacterEncoding(RtfCharacterEncoding a_Encoding)
 	{
 		m_CharacterEncoding = a_Encoding;
-
-		m_Properties |= eProperty_CharacterEncoding;
 	}
 
 	const RtfLocale* RtfTextFormat::GetLocale() const
 	{
-		if ((m_Properties & eProperty_Locale) == 0 && m_Parent != nullptr)
+		if (!m_Locale.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetLocale();
 		}
 		else
 		{
-			return m_Locale;
+			return m_Locale.Get();
 		}
 	}
 
 	void RtfTextFormat::SetLocale(const RtfLocale* a_Locale)
 	{
 		m_Locale = a_Locale;
-
-		m_Properties |= eProperty_Locale;
 	}
 
 	RtfFont* RtfTextFormat::GetFont() const
 	{
-		if ((m_Properties & eProperty_Font) == 0 && m_Parent != nullptr)
+		if (!m_Font.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetFont();
 		}
 		else
 		{
-			return m_Font;
+			return m_Font.Get();
 		}
 	}
 
 	void RtfTextFormat::SetFont(RtfFont* a_Font)
 	{
 		m_Font = a_Font;
-
-		m_Properties |= eProperty_Font;
 	}
 
 	float RtfTextFormat::GetFontSize() const
 	{
-		if ((m_Properties & eProperty_FontSize) == 0 && m_Parent != nullptr)
+		if (!m_FontSize.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetFontSize();
 		}
 		else
 		{
-			return m_FontSize;
+			return m_FontSize.Get();
 		}
 	}
 
 	void RtfTextFormat::SetFontSize(float a_Size)
 	{
 		m_FontSize = a_Size;
-
-		m_Properties |= eProperty_FontSize;
 	}
 
 	RtfColor* RtfTextFormat::GetBackgroundColor() const
 	{
-		if ((m_Properties & eProperty_BackgroundColor) == 0 && m_Parent != nullptr)
+		if (!m_BackgroundColor.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetBackgroundColor();
 		}
 		else
 		{
-			return m_BackgroundColor;
+			return m_BackgroundColor.Get();
 		}
 	}
 
 	void RtfTextFormat::SetBackgroundColor(RtfColor* a_Color)
 	{
 		m_BackgroundColor = a_Color;
-
-		m_Properties |= eProperty_BackgroundColor;
 	}
 
 	RtfColor* RtfTextFormat::GetForegroundColor() const
 	{
-		if ((m_Properties & eProperty_ForegroundColor) == 0 && m_Parent != nullptr)
+		if (!m_ForegroundColor.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetForegroundColor();
 		}
 		else
 		{
-			return m_ForegroundColor;
+			return m_ForegroundColor.Get();
 		}
 	}
 
 	void RtfTextFormat::SetForegroundColor(RtfColor* a_Color)
 	{
 		m_ForegroundColor = a_Color;
-
-		m_Properties |= eProperty_ForegroundColor;
 	}
 
 	bool RtfTextFormat::GetParagraphWidowControl() const
 	{
-		if ((m_Properties & eProperty_ParagraphWidowControl) == 0 && m_Parent != nullptr)
+		if (!m_ParagraphWidowControl.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetParagraphWidowControl();
 		}
 		else
 		{
-			return m_ParagraphWidowControl;
+			return m_ParagraphWidowControl.Get();
 		}
 	}
 
 	void RtfTextFormat::SetParagraphWidowControl(bool a_Value)
 	{
 		m_ParagraphWidowControl = a_Value;
-
-		m_Properties |= eProperty_ParagraphWidowControl;
 	}
 
 	bool RtfTextFormat::IsKerningEnabled() const
 	{
-		if ((m_Properties & eProperty_KerningEnabled) == 0 && m_Parent != nullptr)
+		if (!m_KerningEnabled.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->IsKerningEnabled();
 		}
 		else
 		{
-			return m_KerningEnabled;
+			return m_KerningEnabled.Get();
 		}
 	}
 
 	void RtfTextFormat::SetKerningEnabled(bool a_Value)
 	{
 		m_KerningEnabled = a_Value;
-
-		m_Properties |= eProperty_KerningEnabled;
 	}
 
 	int RtfTextFormat::GetMinimumKerningSize() const
 	{
-		if ((m_Properties & eProperty_MinimumKerningSize) == 0 && m_Parent != nullptr)
+		if (!m_KerningMinimumSize.IsSet() && m_Parent != nullptr)
 		{
 			return m_Parent->GetMinimumKerningSize();
 		}
 		else
 		{
-			return m_KerningMinimumSize;
+			return m_KerningMinimumSize.Get();
 		}
 	}
 
 	void RtfTextFormat::SetMinimumKerningSize(int a_Size)
 	{
 		m_KerningMinimumSize = a_Size;
-
-		m_Properties |= eProperty_MinimumKerningSize;
 	}
 
 	IRtfParseable::Result RtfTextFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
