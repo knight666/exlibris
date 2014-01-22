@@ -53,10 +53,12 @@ namespace ExLibris
 		RtfStyle* GetNextParagraphStyle() const;
 		void SetNextParagraphStyle(RtfStyle* a_Style);
 
-		RtfAssociatedProperties* GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding);
-		RtfAssociatedProperties GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding);
+		RtfAssociatedProperties* GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding) const;
+		RtfAssociatedProperties GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding) const;
 
-		RtfTextFormat& GetTextFormat();
+		RtfTextFormat& GetTextFormat() const;
+
+		void BaseOn(const RtfStyle& a_Other);
 
 	private:
 
