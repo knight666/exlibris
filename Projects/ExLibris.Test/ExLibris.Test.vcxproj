@@ -87,6 +87,7 @@
     <ClCompile Include="Suite.Rtf.Style.cpp" />
     <ClCompile Include="Suite.Rtf.StyleSheet.cpp" />
     <ClCompile Include="Suite.Rtf.TextFormat.cpp" />
+    <ClCompile Include="Suite.Rtf.Unit.cpp" />
     <ClCompile Include="Suite.Rtf.World.cpp" />
     <ClCompile Include="Suite.Streambuf.cpp" />
     <ClCompile Include="Suite.Library.cpp" />

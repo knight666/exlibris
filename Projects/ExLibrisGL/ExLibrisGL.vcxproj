@@ -103,6 +103,7 @@
     <ClCompile Include="RtfStyle.cpp" />
     <ClCompile Include="RtfStyleSheet.cpp" />
     <ClCompile Include="RtfTextFormat.cpp" />
+    <ClCompile Include="RtfUnit.cpp" />
     <ClCompile Include="RtfWorld.cpp" />
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TextParserMarkdown.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="RtfStyleSheet.h" />
     <ClInclude Include="RtfTextFormat.h" />
     <ClInclude Include="RtfToken.h" />
+    <ClInclude Include="RtfUnit.h" />
     <ClInclude Include="RtfWorld.h" />
     <ClInclude Include="SizePolicy.h" />
     <ClInclude Include="Style.h" />
