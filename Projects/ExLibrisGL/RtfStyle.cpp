@@ -89,7 +89,7 @@ namespace ExLibris
 		m_StyleNextParagraph = a_Style;
 	}
 
-	RtfAssociatedProperties* RtfStyle::GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding)
+	RtfAssociatedProperties* RtfStyle::GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding) const
 	{
 		switch (a_Encoding)
 		{
@@ -116,7 +116,7 @@ namespace ExLibris
 		return nullptr;
 	}
 
-	RtfAssociatedProperties RtfStyle::GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding)
+	RtfAssociatedProperties RtfStyle::GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding) const
 	{
 		RtfAssociatedProperties combined(m_Document);
 		combined.FromTextFormat(*m_TextFormat);
@@ -130,9 +130,18 @@ namespace ExLibris
 		return combined;
 	}
 
-	RtfTextFormat& RtfStyle::GetTextFormat()
+	RtfTextFormat& RtfStyle::GetTextFormat() const
 	{
 		return *m_TextFormat;
+	}
+
+	void RtfStyle::BaseOn(const RtfStyle& a_Other)
+	{
+		m_TextFormat->Combine(a_Other.GetTextFormat());
+
+		m_PropertiesLowAnsi->Combine(*a_Other.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi));
+		m_PropertiesHighAnsi->Combine(*a_Other.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi));
+		m_PropertiesDoubleByte->Combine(*a_Other.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte));
 	}
 
 	IRtfParseable::Result RtfStyle::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
@@ -152,6 +161,23 @@ namespace ExLibris
 
 			RtfStyle* style_next = m_Parent.GetStyle(a_Token.parameter);
 			SetNextParagraphStyle(style_next);
+
+			return eResult_Handled;
+		}
+		else if (a_Token.value == "sbasedon")
+		{
+			if (a_Token.parameter < 0)
+			{
+				return eResult_Invalid;
+			}
+
+			RtfStyle* style_basedon = m_Parent.GetStyle(a_Token.parameter);
+			if (style_basedon == nullptr)
+			{
+				return eResult_Invalid;
+			}
+
+			BaseOn(*style_basedon);
 
 			return eResult_Handled;
 		}
