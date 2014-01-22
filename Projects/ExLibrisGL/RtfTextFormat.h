@@ -44,6 +44,8 @@ namespace ExLibris
 		: public IRtfParseable
 	{
 
+		friend class RtfTextFormat;
+
 	public:
 
 		RtfTextFormat(RtfDomDocument& a_Document, RtfTextFormat* a_Parent = nullptr);
@@ -80,6 +82,8 @@ namespace ExLibris
 
 		int GetMinimumKerningSize() const;
 		void SetMinimumKerningSize(int a_Size);
+
+		void Combine(const RtfTextFormat& a_Other);
 
 	private:
 
