@@ -68,7 +68,22 @@ namespace ExLibris
 
 	IRtfParseable::Result RtfParagraphFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		return IRtfParseable::eResult_Propagate;
+		if (a_Token.value == "sb")
+		{
+			SetSpaceBefore(RtfUnit(RtfUnit::eType_Twips, (float)a_Token.parameter));
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "sa")
+		{
+			SetSpaceAfter(RtfUnit(RtfUnit::eType_Twips, (float)a_Token.parameter));
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else
+		{
+			return IRtfParseable::eResult_Propagate;
+		}
 	}
 
 }; // namespace ExLibris
