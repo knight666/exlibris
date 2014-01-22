@@ -28,6 +28,38 @@ TEST(RtfTextFormat, Construct)
 	EXPECT_TRUE(tf.GetParagraphWidowControl());
 }
 
+TEST(RtfTextFormat, Combine)
+{
+	RtfWorld w;
+	RtfDomDocument doc(&w);
+	RtfTextFormat tf_left(doc);
+
+	RtfTextFormat tf_right(doc);
+	tf_right.SetCharacterSet(eRtfCharacterSet_IbmPcCodePage437);
+	tf_right.SetCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+	tf_right.SetFont(doc.GetFontTable()->GetFont(15));
+	tf_right.SetFontSize(17.9f);
+	tf_right.SetLocale(w.GetLocaleByIdentifier(16393));
+	tf_right.SetBackgroundColor(doc.GetColorTable()->GetColor(3));
+	tf_right.SetForegroundColor(doc.GetColorTable()->GetColor(21));
+	tf_right.SetKerningEnabled(false);
+	tf_right.SetMinimumKerningSize(16);
+	tf_right.SetParagraphWidowControl(false);
+
+	tf_left.Combine(tf_right);
+
+	EXPECT_EQ(eRtfCharacterSet_IbmPcCodePage437, tf_left.GetCharacterSet());
+	EXPECT_EQ(eRtfCharacterEncoding_SingleByteHighAnsi, tf_left.GetCharacterEncoding());
+	EXPECT_EQ(doc.GetFontTable()->GetFont(15), tf_left.GetFont());
+	EXPECT_FLOAT_EQ(17.9f, tf_left.GetFontSize());
+	EXPECT_EQ(w.GetLocaleByIdentifier(16393), tf_left.GetLocale());
+	EXPECT_EQ(doc.GetColorTable()->GetColor(3), tf_left.GetBackgroundColor());
+	EXPECT_EQ(doc.GetColorTable()->GetColor(21), tf_left.GetForegroundColor());
+	EXPECT_FALSE(tf_left.IsKerningEnabled());
+	EXPECT_EQ(16, tf_left.GetMinimumKerningSize());
+	EXPECT_FALSE(tf_left.GetParagraphWidowControl());
+}
+
 TEST(RtfTextFormat, ParseCharacterSet)
 {
 	RtfDomDocument doc(nullptr);

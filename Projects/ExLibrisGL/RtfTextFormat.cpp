@@ -244,6 +244,20 @@ namespace ExLibris
 		m_KerningMinimumSize = a_Size;
 	}
 
+	void RtfTextFormat::Combine(const RtfTextFormat& a_Other)
+	{
+		m_CharacterSet = a_Other.m_CharacterSet;
+		m_CharacterEncoding = a_Other.m_CharacterEncoding;
+		m_Locale = a_Other.m_Locale;
+		m_Font = a_Other.m_Font;
+		m_FontSize = a_Other.m_FontSize;
+		m_BackgroundColor = a_Other.m_BackgroundColor;
+		m_ForegroundColor = a_Other.m_ForegroundColor;
+		m_ParagraphWidowControl = a_Other.m_ParagraphWidowControl;
+		m_KerningEnabled = a_Other.m_KerningEnabled;
+		m_KerningMinimumSize = a_Other.m_KerningMinimumSize;
+	}
+
 	IRtfParseable::Result RtfTextFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
 		// character set
