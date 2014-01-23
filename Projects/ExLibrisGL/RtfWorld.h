@@ -39,10 +39,10 @@ namespace ExLibris
 
 		const RtfLocale* GetLocaleByIdentifier(unsigned int a_Index) const;
 
-		unsigned int GetLocaleIdentifierByLanguageAndCountry(RtfLanguage a_Language, RtfCountry a_Country) const;
+		unsigned int GetLocaleIdentifierByLanguageAndCountry(RtfLanguage a_Language, Rtf::Country a_Country) const;
 
-		std::set<RtfLanguage> GetLanguagesForCountry(RtfCountry a_Country) const;
-		std::set<RtfCountry> GetCountriesForLanguage(RtfLanguage a_Language) const;
+		std::set<RtfLanguage> GetLanguagesForCountry(Rtf::Country a_Country) const;
+		std::set<Rtf::Country> GetCountriesForLanguage(RtfLanguage a_Language) const;
 
 	private:
 

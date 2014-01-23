@@ -213,7 +213,7 @@ TEST(RtfTextFormat, ParseLocale)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, tf.Parse(s, t));
 
 	ASSERT_NE(nullptr, tf.GetLocale());
-	EXPECT_EQ(eRtfCountry_Estonia, tf.GetLocale()->country);
+	EXPECT_EQ(Rtf::eCountry_Estonia, tf.GetLocale()->country);
 	EXPECT_EQ(eRtfLanguage_Estonian, tf.GetLocale()->language);
 }
 
