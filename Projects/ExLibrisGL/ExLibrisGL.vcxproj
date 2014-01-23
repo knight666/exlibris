@@ -99,6 +99,7 @@
     <ClCompile Include="RtfFont.cpp" />
     <ClCompile Include="RtfFontTable.cpp" />
     <ClCompile Include="RtfLogMessage.cpp" />
+    <ClCompile Include="RtfParagraphFormat.cpp" />
     <ClCompile Include="RtfParserState.cpp" />
     <ClCompile Include="RtfStyle.cpp" />
     <ClCompile Include="RtfStyleSheet.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="RtfFontTable.h" />
     <ClInclude Include="RtfLocale.h" />
     <ClInclude Include="RtfLogMessage.h" />
+    <ClInclude Include="RtfParagraphFormat.h" />
     <ClInclude Include="RtfParserGroup.h" />
     <ClInclude Include="RtfParserState.h" />
     <ClInclude Include="RtfProperty.h" />
