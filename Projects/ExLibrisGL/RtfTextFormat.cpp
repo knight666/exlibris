@@ -48,7 +48,7 @@ namespace ExLibris
 		: m_Document(a_Document)
 		, m_Parent(a_Parent)
 		, m_Properties(0)
-		, m_CharacterSet(eRtfCharacterSet_Invalid, m_Properties)
+		, m_CharacterSet(Rtf::eCharacterSet_Invalid, m_Properties)
 		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi, m_Properties)
 		, m_Font(nullptr, m_Properties)
 		, m_FontSize(12.0f, m_Properties)
@@ -74,7 +74,7 @@ namespace ExLibris
 		return m_Document;
 	}
 
-	RtfCharacterSet RtfTextFormat::GetCharacterSet() const
+	Rtf::CharacterSet RtfTextFormat::GetCharacterSet() const
 	{
 		if (!m_CharacterSet.IsSet() && m_Parent != nullptr)
 		{
@@ -86,7 +86,7 @@ namespace ExLibris
 		}
 	}
 
-	void RtfTextFormat::SetCharacterSet(RtfCharacterSet a_CharacterSet)
+	void RtfTextFormat::SetCharacterSet(Rtf::CharacterSet a_CharacterSet)
 	{
 		m_CharacterSet = a_CharacterSet;
 	}
@@ -269,7 +269,7 @@ namespace ExLibris
 				return eResult_Invalid;
 			}
 
-			SetCharacterSet(eRtfCharacterSet_Ansi);
+			SetCharacterSet(Rtf::eCharacterSet_Ansi);
 
 			m_State->character_encoding_found = true;
 
@@ -282,7 +282,7 @@ namespace ExLibris
 				return eResult_Invalid;
 			}
 
-			SetCharacterSet(eRtfCharacterSet_AppleMacintoshRoman);
+			SetCharacterSet(Rtf::eCharacterSet_AppleMacintoshRoman);
 
 			m_State->character_encoding_found = true;
 
@@ -295,7 +295,7 @@ namespace ExLibris
 				return eResult_Invalid;
 			}
 
-			SetCharacterSet(eRtfCharacterSet_IbmPcCodePage437);
+			SetCharacterSet(Rtf::eCharacterSet_IbmPcCodePage437);
 
 			m_State->character_encoding_found = true;
 
@@ -308,7 +308,7 @@ namespace ExLibris
 				return eResult_Invalid;
 			}
 
-			SetCharacterSet(eRtfCharacterSet_Oem);
+			SetCharacterSet(Rtf::eCharacterSet_Oem);
 
 			m_State->character_encoding_found = true;
 

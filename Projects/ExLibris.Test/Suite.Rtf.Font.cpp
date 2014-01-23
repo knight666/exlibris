@@ -127,15 +127,15 @@ TEST(RtfFont, ParseCharacterSet)
 
 	t.parameter = 0;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_Ansi, f.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Ansi, f.GetCharacterSet());
 
 	t.parameter = 82;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshJohabOld, f.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_AppleMacintoshJohabOld, f.GetCharacterSet());
 
 	t.parameter = 222;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_Thai, f.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Thai, f.GetCharacterSet());
 }
 
 TEST(RtfFont, ParseCharacterSetUnknown)
@@ -152,7 +152,7 @@ TEST(RtfFont, ParseCharacterSetUnknown)
 
 	t.parameter = 120;
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, f.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_Default, f.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Default, f.GetCharacterSet());
 }
 
 TEST(RtfFont, ParseCharacterSetInvalid)
@@ -169,11 +169,11 @@ TEST(RtfFont, ParseCharacterSetInvalid)
 
 	t.parameter =-12;
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, f.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_Default, f.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Default, f.GetCharacterSet());
 
 	t.parameter = 312;
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, f.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_Default, f.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Default, f.GetCharacterSet());
 }
 
 TEST(RtfFont, ParseValue)

@@ -115,7 +115,7 @@ TEST(RtfDomElement, ParseTextFormatProperty)
 	t.value = "pca";
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, e.Parse(s, t));
-	EXPECT_EQ(eRtfCharacterSet_Oem, e.GetTextFormat().GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Oem, e.GetTextFormat().GetCharacterSet());
 }
 
 TEST(RtfDomElement, ParseUnhandled)

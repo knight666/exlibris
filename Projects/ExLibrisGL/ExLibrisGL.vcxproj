@@ -146,7 +146,6 @@
     <ClInclude Include="Quad.h" />
     <ClInclude Include="RtfAssociatedProperties.h" />
     <ClInclude Include="RtfCharacterEncoding.h" />
-    <ClInclude Include="RtfCharacterSet.h" />
     <ClInclude Include="RtfColor.h" />
     <ClInclude Include="RtfColorTable.h" />
     <ClInclude Include="RtfDomElement.h" />
