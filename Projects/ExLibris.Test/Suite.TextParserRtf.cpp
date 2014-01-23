@@ -190,7 +190,7 @@ TEST(TextParserRtf, StyleSheet)
 
 	RtfTextFormat& tf = style->GetTextFormat();
 	EXPECT_EQ(Rtf::eCharacterSet_Ansi, tf.GetCharacterSet());
-	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
+	EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
 	ASSERT_NE(nullptr, tf.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Netherlands, tf.GetLocale()->country);
 	EXPECT_EQ(Rtf::eLanguage_Dutch, tf.GetLocale()->language);
@@ -205,8 +205,8 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_TRUE(tf.IsKerningEnabled());
 	EXPECT_EQ(1, tf.GetMinimumKerningSize());
 
-	RtfAssociatedProperties p0 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
-	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, p0.GetCharacterEncoding());
+	RtfAssociatedProperties p0 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
+	EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, p0.GetCharacterEncoding());
 	ASSERT_NE(nullptr, p0.GetFont());
 	EXPECT_STREQ("Times New Roman", p0.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(8.0f, p0.GetFontSize());
@@ -214,8 +214,8 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_EQ(Rtf::eCountry_Netherlands, p0.GetLocale()->country);
 	EXPECT_EQ(Rtf::eLanguage_Dutch, p0.GetLocale()->language);
 
-	RtfAssociatedProperties p1 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
-	EXPECT_EQ(eRtfCharacterEncoding_SingleByteHighAnsi, p1.GetCharacterEncoding());
+	RtfAssociatedProperties p1 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
+	EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteHighAnsi, p1.GetCharacterEncoding());
 	ASSERT_NE(nullptr, p1.GetFont());
 	EXPECT_STREQ("Times New Roman", p1.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(8.0f, p1.GetFontSize());
@@ -223,8 +223,8 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_EQ(Rtf::eCountry_Netherlands, p1.GetLocale()->country);
 	EXPECT_EQ(Rtf::eLanguage_Dutch, p1.GetLocale()->language);
 
-	RtfAssociatedProperties p2 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
-	EXPECT_EQ(eRtfCharacterEncoding_DoubleByte, p2.GetCharacterEncoding());
+	RtfAssociatedProperties p2 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
+	EXPECT_EQ(Rtf::eCharacterEncoding_DoubleByte, p2.GetCharacterEncoding());
 	ASSERT_NE(nullptr, p2.GetFont());
 	EXPECT_STREQ("Symbol", p2.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(16.0f, p2.GetFontSize());

@@ -15,7 +15,7 @@ TEST(RtfTextFormat, Construct)
 	RtfTextFormat tf(doc);
 
 	EXPECT_EQ(Rtf::eCharacterSet_Invalid, tf.GetCharacterSet());
-	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
+	EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
 	EXPECT_EQ(nullptr, tf.GetFont());
 	EXPECT_FLOAT_EQ(12.0f, tf.GetFontSize());
 	EXPECT_EQ(nullptr, tf.GetLocale());
@@ -36,7 +36,7 @@ TEST(RtfTextFormat, Combine)
 
 	RtfTextFormat tf_right(doc);
 	tf_right.SetCharacterSet(Rtf::eCharacterSet_IbmPcCodePage437);
-	tf_right.SetCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+	tf_right.SetCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
 	tf_right.SetFont(doc.GetFontTable()->GetFont(15));
 	tf_right.SetFontSize(17.9f);
 	tf_right.SetLocale(w.GetLocaleByIdentifier(16393));
@@ -49,7 +49,7 @@ TEST(RtfTextFormat, Combine)
 	tf_left.Combine(tf_right);
 
 	EXPECT_EQ(Rtf::eCharacterSet_IbmPcCodePage437, tf_left.GetCharacterSet());
-	EXPECT_EQ(eRtfCharacterEncoding_SingleByteHighAnsi, tf_left.GetCharacterEncoding());
+	EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteHighAnsi, tf_left.GetCharacterEncoding());
 	EXPECT_EQ(doc.GetFontTable()->GetFont(15), tf_left.GetFont());
 	EXPECT_FLOAT_EQ(17.9f, tf_left.GetFontSize());
 	EXPECT_EQ(w.GetLocaleByIdentifier(16393), tf_left.GetLocale());

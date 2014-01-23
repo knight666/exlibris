@@ -49,7 +49,7 @@ namespace ExLibris
 		, m_Parent(a_Parent)
 		, m_Properties(0)
 		, m_CharacterSet(Rtf::eCharacterSet_Invalid, m_Properties)
-		, m_CharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi, m_Properties)
+		, m_CharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi, m_Properties)
 		, m_Font(nullptr, m_Properties)
 		, m_FontSize(12.0f, m_Properties)
 		, m_Locale(nullptr, m_Properties)
@@ -91,7 +91,7 @@ namespace ExLibris
 		m_CharacterSet = a_CharacterSet;
 	}
 
-	RtfCharacterEncoding RtfTextFormat::GetCharacterEncoding() const
+	Rtf::CharacterEncoding RtfTextFormat::GetCharacterEncoding() const
 	{
 		if (!m_CharacterEncoding.IsSet() && m_Parent != nullptr)
 		{
@@ -103,7 +103,7 @@ namespace ExLibris
 		}
 	}
 
-	void RtfTextFormat::SetCharacterEncoding(RtfCharacterEncoding a_Encoding)
+	void RtfTextFormat::SetCharacterEncoding(Rtf::CharacterEncoding a_Encoding)
 	{
 		m_CharacterEncoding = a_Encoding;
 	}

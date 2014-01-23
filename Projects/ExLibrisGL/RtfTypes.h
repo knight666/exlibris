@@ -27,6 +27,13 @@
 namespace ExLibris {
 namespace Rtf {
 
+	enum CharacterEncoding
+	{
+		eCharacterEncoding_SingleByteLowAnsi,
+		eCharacterEncoding_SingleByteHighAnsi,
+		eCharacterEncoding_DoubleByte
+	};
+
 	enum CharacterSet
 	{
 		eCharacterSet_Invalid,

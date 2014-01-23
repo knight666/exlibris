@@ -25,8 +25,8 @@
 #pragma once
 
 #include "IRtfParseable.h"
-#include "RtfCharacterEncoding.h"
 #include "RtfProperty.h"
+#include "RtfTypes.h"
 
 namespace ExLibris
 {
@@ -61,8 +61,8 @@ namespace ExLibris
 		const RtfLocale* GetLocale() const;
 		void SetLocale(const RtfLocale* a_Locale);
 
-		RtfCharacterEncoding GetCharacterEncoding() const;
-		void SetCharacterEncoding(RtfCharacterEncoding a_Encoding);
+		Rtf::CharacterEncoding GetCharacterEncoding() const;
+		void SetCharacterEncoding(Rtf::CharacterEncoding a_Encoding);
 
 		bool IsBold() const;
 		void SetBold(bool a_Value);
@@ -83,7 +83,7 @@ namespace ExLibris
 		RtfProperty<RtfFont*, 0> m_Font;
 		RtfProperty<float, 1> m_FontSize;
 		RtfProperty<const RtfLocale*, 2> m_Locale;
-		RtfProperty<RtfCharacterEncoding, 3> m_Encoding;
+		RtfProperty<Rtf::CharacterEncoding, 3> m_Encoding;
 		RtfProperty<bool, 4> m_Bold;
 		RtfProperty<bool, 5> m_Italic;
 

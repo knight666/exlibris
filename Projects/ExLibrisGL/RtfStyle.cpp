@@ -51,13 +51,13 @@ namespace ExLibris
 		m_StyleNextParagraph = this;
 
 		m_PropertiesLowAnsi = new RtfAssociatedProperties(m_Document);
-		m_PropertiesLowAnsi->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+		m_PropertiesLowAnsi->SetCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
 
 		m_PropertiesHighAnsi = new RtfAssociatedProperties(m_Document);
-		m_PropertiesHighAnsi->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+		m_PropertiesHighAnsi->SetCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
 
 		m_PropertiesDoubleByte = new RtfAssociatedProperties(m_Document);
-		m_PropertiesDoubleByte->SetCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+		m_PropertiesDoubleByte->SetCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
 	}
 
 	RtfStyle::~RtfStyle()
@@ -89,24 +89,24 @@ namespace ExLibris
 		m_StyleNextParagraph = a_Style;
 	}
 
-	RtfAssociatedProperties* RtfStyle::GetPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding) const
+	RtfAssociatedProperties* RtfStyle::GetPropertiesForCharacterEncoding(Rtf::CharacterEncoding a_Encoding) const
 	{
 		switch (a_Encoding)
 		{
 
-		case eRtfCharacterEncoding_SingleByteLowAnsi:
+		case Rtf::eCharacterEncoding_SingleByteLowAnsi:
 			{
 				return m_PropertiesLowAnsi;
 
 			} break;
 
-		case eRtfCharacterEncoding_SingleByteHighAnsi:
+		case Rtf::eCharacterEncoding_SingleByteHighAnsi:
 			{
 				return m_PropertiesHighAnsi;
 
 			} break;
 
-		case eRtfCharacterEncoding_DoubleByte:
+		case Rtf::eCharacterEncoding_DoubleByte:
 			{
 				return m_PropertiesDoubleByte;
 
@@ -116,7 +116,7 @@ namespace ExLibris
 		return nullptr;
 	}
 
-	RtfAssociatedProperties RtfStyle::GetCombinedPropertiesForCharacterEncoding(RtfCharacterEncoding a_Encoding) const
+	RtfAssociatedProperties RtfStyle::GetCombinedPropertiesForCharacterEncoding(Rtf::CharacterEncoding a_Encoding) const
 	{
 		RtfAssociatedProperties combined(m_Document);
 		combined.FromTextFormat(*m_TextFormat);
@@ -139,9 +139,9 @@ namespace ExLibris
 	{
 		m_TextFormat->Combine(a_Other.GetTextFormat());
 
-		m_PropertiesLowAnsi->Combine(*a_Other.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi));
-		m_PropertiesHighAnsi->Combine(*a_Other.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi));
-		m_PropertiesDoubleByte->Combine(*a_Other.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte));
+		m_PropertiesLowAnsi->Combine(*a_Other.GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi));
+		m_PropertiesHighAnsi->Combine(*a_Other.GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi));
+		m_PropertiesDoubleByte->Combine(*a_Other.GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte));
 	}
 
 	IRtfParseable::Result RtfStyle::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
@@ -183,19 +183,19 @@ namespace ExLibris
 		}
 		else if (a_Token.value == "loch")
 		{
-			m_State->properties = GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+			m_State->properties = GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "hich")
 		{
-			m_State->properties = GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+			m_State->properties = GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "dbch")
 		{
-			m_State->properties = GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+			m_State->properties = GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
 
 			return eResult_Handled;
 		}

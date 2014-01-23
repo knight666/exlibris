@@ -15,7 +15,7 @@ TEST(RtfAssociatedProperties, Construct)
 	EXPECT_EQ(nullptr, p.GetFont());
 	EXPECT_FLOAT_EQ(12.0f, p.GetFontSize());
 	EXPECT_EQ(nullptr, p.GetLocale());
-	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, p.GetCharacterEncoding());
+	EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, p.GetCharacterEncoding());
 	EXPECT_FALSE(p.IsBold());
 	EXPECT_FALSE(p.IsItalic());
 }

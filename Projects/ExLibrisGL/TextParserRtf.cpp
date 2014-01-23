@@ -964,15 +964,15 @@ namespace ExLibris
 						}
 						else if (m_TokenCurrent.value == "loch")
 						{
-							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+							properties = style->GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
 						}
 						else if (m_TokenCurrent.value == "hich")
 						{
-							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
+							properties = style->GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
 						}
 						else if (m_TokenCurrent.value == "dbch")
 						{
-							properties = style->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+							properties = style->GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
 						}
 						else if (m_TokenCurrent.value == "af")
 						{

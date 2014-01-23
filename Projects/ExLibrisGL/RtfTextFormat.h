@@ -25,7 +25,6 @@
 #pragma once
 
 #include "IRtfParseable.h"
-#include "RtfCharacterEncoding.h"
 #include "RtfProperty.h"
 #include "RtfTypes.h"
 
@@ -56,8 +55,8 @@ namespace ExLibris
 		Rtf::CharacterSet GetCharacterSet() const;
 		void SetCharacterSet(Rtf::CharacterSet a_CharacterSet);
 
-		RtfCharacterEncoding GetCharacterEncoding() const;
-		void SetCharacterEncoding(RtfCharacterEncoding a_Encoding);
+		Rtf::CharacterEncoding GetCharacterEncoding() const;
+		void SetCharacterEncoding(Rtf::CharacterEncoding a_Encoding);
 
 		const RtfLocale* GetLocale() const;
 		void SetLocale(const RtfLocale* a_Locale);
@@ -95,7 +94,7 @@ namespace ExLibris
 		RtfTextFormat* m_Parent;
 		unsigned int m_Properties;
 		RtfProperty<Rtf::CharacterSet, 0> m_CharacterSet;
-		RtfProperty<RtfCharacterEncoding, 1> m_CharacterEncoding;
+		RtfProperty<Rtf::CharacterEncoding, 1> m_CharacterEncoding;
 		RtfProperty<const RtfLocale*, 2> m_Locale;
 		RtfProperty<RtfFont*, 3> m_Font;
 		RtfProperty<float, 4> m_FontSize;
