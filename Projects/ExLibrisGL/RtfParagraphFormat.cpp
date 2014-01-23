@@ -37,6 +37,8 @@ namespace ExLibris
 		, m_AutoSpacingBefore(false, m_Specified)
 		, m_AutoSpacingAfter(false, m_Specified)
 		, m_SnapLineToGrid(true, m_Specified)
+		, m_LineHeightRule(eLineHeightRule_Automatic, m_Specified)
+		, m_LineHeight(RtfUnit(200.0f), m_Specified)
 	{
 	}
 
@@ -99,6 +101,26 @@ namespace ExLibris
 		m_SnapLineToGrid = a_Value;
 	}
 
+	RtfParagraphFormat::LineHeightRule RtfParagraphFormat::GetLineHeightRule() const
+	{
+		return m_LineHeightRule.Get();
+	}
+
+	void RtfParagraphFormat::SetLineHeightRule(RtfParagraphFormat::LineHeightRule a_Rule)
+	{
+		m_LineHeightRule = a_Rule;
+	}
+
+	const RtfUnit& RtfParagraphFormat::GetLineHeight() const
+	{
+		return m_LineHeight.Get();
+	}
+
+	void RtfParagraphFormat::SetLineHeight(const RtfUnit& a_Value)
+	{
+		m_LineHeight = a_Value;
+	}
+
 	IRtfParseable::Result RtfParagraphFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
 		if (a_Token.value == "sb")
@@ -128,6 +150,27 @@ namespace ExLibris
 		else if (a_Token.value == "nosnaplinegrid")
 		{
 			SetSnapLineToGridEnabled(false);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "sl")
+		{
+			if (a_Token.parameter < 0)
+			{
+				SetLineHeightRule(eLineHeightRule_Absolute);
+
+				SetLineHeight(RtfUnit((float)-a_Token.parameter));
+			}
+			else if (a_Token.parameter == 0)
+			{
+				SetLineHeightRule(eLineHeightRule_Automatic);
+			}
+			else
+			{
+				SetLineHeightRule(eLineHeightRule_Maximum);
+
+				SetLineHeight(RtfUnit((float)a_Token.parameter));
+			}
 
 			return IRtfParseable::eResult_Handled;
 		}

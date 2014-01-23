@@ -42,6 +42,15 @@ namespace ExLibris
 
 	public:
 
+		enum LineHeightRule
+		{
+			eLineHeightRule_Automatic,
+			eLineHeightRule_Absolute,
+			eLineHeightRule_Maximum
+		};
+
+	public:
+
 		RtfParagraphFormat(RtfDomDocument& a_Document);
 		~RtfParagraphFormat();
 
@@ -62,6 +71,12 @@ namespace ExLibris
 		bool IsSnapLineToGridEnabled() const;
 		void SetSnapLineToGridEnabled(bool a_Value);
 
+		LineHeightRule GetLineHeightRule() const;
+		void SetLineHeightRule(LineHeightRule a_Rule);
+
+		const RtfUnit& GetLineHeight() const;
+		void SetLineHeight(const RtfUnit& a_Value);
+
 	private:
 
 		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
@@ -75,6 +90,8 @@ namespace ExLibris
 		RtfProperty<bool, 2> m_AutoSpacingBefore;
 		RtfProperty<bool, 3> m_AutoSpacingAfter;
 		RtfProperty<bool, 4> m_SnapLineToGrid;
+		RtfProperty<LineHeightRule, 5> m_LineHeightRule;
+		RtfProperty<RtfUnit, 6> m_LineHeight;
 
 	}; // class RtfParagraphFormat
 
