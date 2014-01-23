@@ -14,7 +14,7 @@ TEST(RtfTextFormat, Construct)
 	RtfDomDocument doc(nullptr);
 	RtfTextFormat tf(doc);
 
-	EXPECT_EQ(eRtfCharacterSet_Invalid, tf.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Invalid, tf.GetCharacterSet());
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
 	EXPECT_EQ(nullptr, tf.GetFont());
 	EXPECT_FLOAT_EQ(12.0f, tf.GetFontSize());
@@ -35,7 +35,7 @@ TEST(RtfTextFormat, Combine)
 	RtfTextFormat tf_left(doc);
 
 	RtfTextFormat tf_right(doc);
-	tf_right.SetCharacterSet(eRtfCharacterSet_IbmPcCodePage437);
+	tf_right.SetCharacterSet(Rtf::eCharacterSet_IbmPcCodePage437);
 	tf_right.SetCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
 	tf_right.SetFont(doc.GetFontTable()->GetFont(15));
 	tf_right.SetFontSize(17.9f);
@@ -48,7 +48,7 @@ TEST(RtfTextFormat, Combine)
 
 	tf_left.Combine(tf_right);
 
-	EXPECT_EQ(eRtfCharacterSet_IbmPcCodePage437, tf_left.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_IbmPcCodePage437, tf_left.GetCharacterSet());
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteHighAnsi, tf_left.GetCharacterEncoding());
 	EXPECT_EQ(doc.GetFontTable()->GetFont(15), tf_left.GetFont());
 	EXPECT_FLOAT_EQ(17.9f, tf_left.GetFontSize());
@@ -73,7 +73,7 @@ TEST(RtfTextFormat, ParseCharacterSet)
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, tf.Parse(s, t));
 
-	EXPECT_EQ(eRtfCharacterSet_Ansi, tf.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Ansi, tf.GetCharacterSet());
 }
 
 TEST(RtfTextFormat, ParseCharacterSetTwice)
@@ -92,7 +92,7 @@ TEST(RtfTextFormat, ParseCharacterSetTwice)
 	t.value = "pca";
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, tf.Parse(s, t));
 
-	EXPECT_EQ(eRtfCharacterSet_IbmPcCodePage437, tf.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_IbmPcCodePage437, tf.GetCharacterSet());
 }
 
 TEST(RtfTextFormat, ParseFont)

@@ -27,6 +27,46 @@
 namespace ExLibris {
 namespace Rtf {
 
+	enum CharacterSet
+	{
+		eCharacterSet_Invalid,
+		eCharacterSet_Ansi,
+		eCharacterSet_Default,
+		eCharacterSet_Symbol,
+		eCharacterSet_AppleMacintoshRoman,
+		eCharacterSet_AppleMacintoshShiftJis,
+		eCharacterSet_AppleMacintoshHangul,
+		eCharacterSet_AppleMacintoshGb2332,
+		eCharacterSet_AppleMacintoshBig5,
+		eCharacterSet_AppleMacintoshJohabOld,
+		eCharacterSet_AppleMacintoshHebrew,
+		eCharacterSet_AppleMacintoshArabic,
+		eCharacterSet_AppleMacintoshGreek,
+		eCharacterSet_AppleMacintoshTurkish,
+		eCharacterSet_AppleMacintoshThai,
+		eCharacterSet_AppleMacintoshEasternEuropean,
+		eCharacterSet_AppleMacintoshRussian,
+		eCharacterSet_ShiftJis,
+		eCharacterSet_Hangul,
+		eCharacterSet_Johab,
+		eCharacterSet_Gb2332,
+		eCharacterSet_Big5,
+		eCharacterSet_Greek,
+		eCharacterSet_Turkish,
+		eCharacterSet_Vietnamese,
+		eCharacterSet_Hebrew,
+		eCharacterSet_Arabic,
+		eCharacterSet_ArabicTraditionalOld,
+		eCharacterSet_ArabicUserOld,
+		eCharacterSet_HebrewUserOld,
+		eCharacterSet_Baltic,
+		eCharacterSet_Russian,
+		eCharacterSet_Thai,
+		eCharacterSet_EasternEuropean,
+		eCharacterSet_IbmPcCodePage437,
+		eCharacterSet_Oem,
+	};
+
 	enum Country
 	{
 		eCountry_None,

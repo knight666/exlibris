@@ -25,7 +25,6 @@
 #pragma once
 
 #include "IRtfParseable.h"
-#include "RtfCharacterSet.h"
 #include "RtfTypes.h"
 
 namespace ExLibris
@@ -55,8 +54,8 @@ namespace ExLibris
 		Rtf::Pitch GetPitch() const;
 		void SetPitch(Rtf::Pitch a_Pitch);
 
-		RtfCharacterSet GetCharacterSet() const;
-		void SetCharacterSet(RtfCharacterSet a_CharacterSet);
+		Rtf::CharacterSet GetCharacterSet() const;
+		void SetCharacterSet(Rtf::CharacterSet a_CharacterSet);
 
 	private:
 
@@ -69,7 +68,7 @@ namespace ExLibris
 		std::string m_Name;
 		Rtf::FamilyType m_Family;
 		Rtf::Pitch m_Pitch;
-		RtfCharacterSet m_CharacterSet;
+		Rtf::CharacterSet m_CharacterSet;
 
 	}; // struct RtfFont
 

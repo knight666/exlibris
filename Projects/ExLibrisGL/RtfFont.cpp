@@ -35,7 +35,7 @@ namespace ExLibris
 		: m_FontTable(a_FontTable)
 		, m_Family(Rtf::eFamilyType_Nil)
 		, m_Pitch(Rtf::ePitch_Default)
-		, m_CharacterSet(eRtfCharacterSet_Default)
+		, m_CharacterSet(Rtf::eCharacterSet_Default)
 	{
 	}
 
@@ -74,12 +74,12 @@ namespace ExLibris
 		m_Pitch = a_Pitch;
 	}
 
-	RtfCharacterSet RtfFont::GetCharacterSet() const
+	Rtf::CharacterSet RtfFont::GetCharacterSet() const
 	{
 		return m_CharacterSet;
 	}
 
-	void RtfFont::SetCharacterSet(RtfCharacterSet a_CharacterSet)
+	void RtfFont::SetCharacterSet(Rtf::CharacterSet a_CharacterSet)
 	{
 		m_CharacterSet = a_CharacterSet;
 	}
@@ -164,41 +164,41 @@ namespace ExLibris
 
 			switch (a_Token.parameter)
 			{
-				CHARSET_CASE(0, eRtfCharacterSet_Ansi);
-				CHARSET_CASE(1, eRtfCharacterSet_Default);
-				CHARSET_CASE(2, eRtfCharacterSet_Symbol);
-				CHARSET_CASE(77, eRtfCharacterSet_AppleMacintoshRoman);
-				CHARSET_CASE(78, eRtfCharacterSet_AppleMacintoshShiftJis);
-				CHARSET_CASE(79, eRtfCharacterSet_AppleMacintoshHangul);
-				CHARSET_CASE(80, eRtfCharacterSet_AppleMacintoshGb2332);
-				CHARSET_CASE(81, eRtfCharacterSet_AppleMacintoshBig5);
-				CHARSET_CASE(82, eRtfCharacterSet_AppleMacintoshJohabOld);
-				CHARSET_CASE(83, eRtfCharacterSet_AppleMacintoshHebrew);
-				CHARSET_CASE(84, eRtfCharacterSet_AppleMacintoshArabic);
-				CHARSET_CASE(85, eRtfCharacterSet_AppleMacintoshGreek);
-				CHARSET_CASE(86, eRtfCharacterSet_AppleMacintoshTurkish);
-				CHARSET_CASE(87, eRtfCharacterSet_AppleMacintoshThai);
-				CHARSET_CASE(88, eRtfCharacterSet_AppleMacintoshEasternEuropean);
-				CHARSET_CASE(89, eRtfCharacterSet_AppleMacintoshRussian);
-				CHARSET_CASE(128, eRtfCharacterSet_ShiftJis);
-				CHARSET_CASE(129, eRtfCharacterSet_Hangul);
-				CHARSET_CASE(130, eRtfCharacterSet_Johab);
-				CHARSET_CASE(134, eRtfCharacterSet_Gb2332);
-				CHARSET_CASE(136, eRtfCharacterSet_Big5);
-				CHARSET_CASE(161, eRtfCharacterSet_Greek);
-				CHARSET_CASE(162, eRtfCharacterSet_Turkish);
-				CHARSET_CASE(163, eRtfCharacterSet_Vietnamese);
-				CHARSET_CASE(177, eRtfCharacterSet_Hebrew);
-				CHARSET_CASE(178, eRtfCharacterSet_Arabic);
-				CHARSET_CASE(179, eRtfCharacterSet_ArabicTraditionalOld);
-				CHARSET_CASE(180, eRtfCharacterSet_ArabicUserOld);
-				CHARSET_CASE(181, eRtfCharacterSet_HebrewUserOld);
-				CHARSET_CASE(186, eRtfCharacterSet_Baltic);
-				CHARSET_CASE(204, eRtfCharacterSet_Russian);
-				CHARSET_CASE(222, eRtfCharacterSet_Thai);
-				CHARSET_CASE(238, eRtfCharacterSet_EasternEuropean);
-				CHARSET_CASE(254, eRtfCharacterSet_IbmPcCodePage437);
-				CHARSET_CASE(255, eRtfCharacterSet_Oem);
+				CHARSET_CASE(0, Rtf::eCharacterSet_Ansi);
+				CHARSET_CASE(1, Rtf::eCharacterSet_Default);
+				CHARSET_CASE(2, Rtf::eCharacterSet_Symbol);
+				CHARSET_CASE(77, Rtf::eCharacterSet_AppleMacintoshRoman);
+				CHARSET_CASE(78, Rtf::eCharacterSet_AppleMacintoshShiftJis);
+				CHARSET_CASE(79, Rtf::eCharacterSet_AppleMacintoshHangul);
+				CHARSET_CASE(80, Rtf::eCharacterSet_AppleMacintoshGb2332);
+				CHARSET_CASE(81, Rtf::eCharacterSet_AppleMacintoshBig5);
+				CHARSET_CASE(82, Rtf::eCharacterSet_AppleMacintoshJohabOld);
+				CHARSET_CASE(83, Rtf::eCharacterSet_AppleMacintoshHebrew);
+				CHARSET_CASE(84, Rtf::eCharacterSet_AppleMacintoshArabic);
+				CHARSET_CASE(85, Rtf::eCharacterSet_AppleMacintoshGreek);
+				CHARSET_CASE(86, Rtf::eCharacterSet_AppleMacintoshTurkish);
+				CHARSET_CASE(87, Rtf::eCharacterSet_AppleMacintoshThai);
+				CHARSET_CASE(88, Rtf::eCharacterSet_AppleMacintoshEasternEuropean);
+				CHARSET_CASE(89, Rtf::eCharacterSet_AppleMacintoshRussian);
+				CHARSET_CASE(128, Rtf::eCharacterSet_ShiftJis);
+				CHARSET_CASE(129, Rtf::eCharacterSet_Hangul);
+				CHARSET_CASE(130, Rtf::eCharacterSet_Johab);
+				CHARSET_CASE(134, Rtf::eCharacterSet_Gb2332);
+				CHARSET_CASE(136, Rtf::eCharacterSet_Big5);
+				CHARSET_CASE(161, Rtf::eCharacterSet_Greek);
+				CHARSET_CASE(162, Rtf::eCharacterSet_Turkish);
+				CHARSET_CASE(163, Rtf::eCharacterSet_Vietnamese);
+				CHARSET_CASE(177, Rtf::eCharacterSet_Hebrew);
+				CHARSET_CASE(178, Rtf::eCharacterSet_Arabic);
+				CHARSET_CASE(179, Rtf::eCharacterSet_ArabicTraditionalOld);
+				CHARSET_CASE(180, Rtf::eCharacterSet_ArabicUserOld);
+				CHARSET_CASE(181, Rtf::eCharacterSet_HebrewUserOld);
+				CHARSET_CASE(186, Rtf::eCharacterSet_Baltic);
+				CHARSET_CASE(204, Rtf::eCharacterSet_Russian);
+				CHARSET_CASE(222, Rtf::eCharacterSet_Thai);
+				CHARSET_CASE(238, Rtf::eCharacterSet_EasternEuropean);
+				CHARSET_CASE(254, Rtf::eCharacterSet_IbmPcCodePage437);
+				CHARSET_CASE(255, Rtf::eCharacterSet_Oem);
 
 			default:
 				{

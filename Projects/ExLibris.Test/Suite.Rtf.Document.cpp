@@ -13,16 +13,16 @@ TEST(RtfDomDocument, Construct)
 {
 	RtfDomDocument doc(nullptr);
 
-	EXPECT_EQ(eRtfCharacterSet_Invalid, doc.GetTextFormat().GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Invalid, doc.GetTextFormat().GetCharacterSet());
 }
 
 TEST(RtfDomDocument, CharacterSet)
 {
 	RtfDomDocument doc(nullptr);
 
-	doc.GetTextFormat().SetCharacterSet(eRtfCharacterSet_AppleMacintoshRoman);
+	doc.GetTextFormat().SetCharacterSet(Rtf::eCharacterSet_AppleMacintoshRoman);
 
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, doc.GetTextFormat().GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_AppleMacintoshRoman, doc.GetTextFormat().GetCharacterSet());
 }
 
 TEST(RtfDomDocument, ParseDefaultFont)

@@ -25,11 +25,11 @@
 #pragma once
 
 #include "ITextParser.h"
-#include "RtfCharacterSet.h"
 #include "RtfDomElement.h"
 #include "RtfDomDocument.h"
 #include "RtfLogMessage.h"
 #include "RtfToken.h"
+#include "RtfTypes.h"
 #include "Token.h"
 
 namespace ExLibris
@@ -90,7 +90,7 @@ namespace ExLibris
 		void _GroupOpen();
 		void _GroupClose();
 		bool _ProcessToken(const RtfToken& a_Token);
-		RtfCharacterSet _TokenToCharset(const RtfToken& a_Token);
+		Rtf::CharacterSet _TokenToCharset(const RtfToken& a_Token);
 
 		bool _ProcessTextFormatToken(const RtfToken& a_Token, RtfTextFormat& a_TextFormat) const;
 

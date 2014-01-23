@@ -27,7 +27,7 @@ TEST(TextParserRtf, HelloWorld)
 
 	RtfDomElement* root = doc->GetRootElement();
 
-	EXPECT_EQ(eRtfCharacterSet_Ansi, root->GetTextFormat().GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Ansi, root->GetTextFormat().GetCharacterSet());
 	EXPECT_STREQ("Hello World!", root->InnerText.c_str());
 
 	EXPECT_EQ(1, root->GetChildrenCount());
@@ -135,13 +135,13 @@ TEST(TextParserRtf, FontTableSetCharacterSet)
 	RtfFontTable* ft = doc->GetFontTable();
 
 	EXPECT_STREQ("Tester", ft->GetFont(0)->GetName().c_str());
-	EXPECT_EQ(eRtfCharacterSet_AppleMacintoshRoman, ft->GetFont(0)->GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_AppleMacintoshRoman, ft->GetFont(0)->GetCharacterSet());
 
 	EXPECT_STREQ("Band-Maid", ft->GetFont(1)->GetName().c_str());
-	EXPECT_EQ(eRtfCharacterSet_Baltic, ft->GetFont(1)->GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Baltic, ft->GetFont(1)->GetCharacterSet());
 
 	EXPECT_STREQ("Tingling", ft->GetFont(2)->GetName().c_str());
-	EXPECT_EQ(eRtfCharacterSet_ShiftJis, ft->GetFont(2)->GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_ShiftJis, ft->GetFont(2)->GetCharacterSet());
 }
 
 TEST(TextParserRtf, ColorTable)
@@ -189,7 +189,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_STREQ("Standaard", style->GetName().c_str());
 
 	RtfTextFormat& tf = style->GetTextFormat();
-	EXPECT_EQ(eRtfCharacterSet_Ansi, tf.GetCharacterSet());
+	EXPECT_EQ(Rtf::eCharacterSet_Ansi, tf.GetCharacterSet());
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
 	ASSERT_NE(nullptr, tf.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Netherlands, tf.GetLocale()->country);
