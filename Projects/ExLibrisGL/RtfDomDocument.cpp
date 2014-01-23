@@ -56,7 +56,7 @@ namespace ExLibris
 
 		m_TextFormat = new RtfTextFormat(*this);
 		m_TextFormat->SetCharacterSet(Rtf::eCharacterSet_Invalid);
-		m_TextFormat->SetCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+		m_TextFormat->SetCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
 		m_TextFormat->SetFont(m_FontTable->GetFont(0));
 		m_TextFormat->SetLocale(nullptr);
 		m_TextFormat->SetBackgroundColor(m_ColorTable->GetColor(0));

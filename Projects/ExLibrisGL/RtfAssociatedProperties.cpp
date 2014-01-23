@@ -40,7 +40,7 @@ namespace ExLibris
 		, m_Font(nullptr, m_Specified)
 		, m_FontSize(12.0f, m_Specified)
 		, m_Locale(nullptr, m_Specified)
-		, m_Encoding(eRtfCharacterEncoding_SingleByteLowAnsi, m_Specified)
+		, m_Encoding(Rtf::eCharacterEncoding_SingleByteLowAnsi, m_Specified)
 		, m_Bold(false, m_Specified)
 		, m_Italic(false, m_Specified)
 	{
@@ -88,12 +88,12 @@ namespace ExLibris
 		m_Locale = a_Locale;
 	}
 
-	RtfCharacterEncoding RtfAssociatedProperties::GetCharacterEncoding() const
+	Rtf::CharacterEncoding RtfAssociatedProperties::GetCharacterEncoding() const
 	{
 		return m_Encoding.Get();
 	}
 
-	void RtfAssociatedProperties::SetCharacterEncoding(RtfCharacterEncoding a_Encoding)
+	void RtfAssociatedProperties::SetCharacterEncoding(Rtf::CharacterEncoding a_Encoding)
 	{
 		m_Encoding = a_Encoding;
 	}

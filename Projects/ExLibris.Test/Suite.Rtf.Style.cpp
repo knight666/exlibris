@@ -107,7 +107,7 @@ TEST(RtfStyle, ParseBasedOn)
 	tf_parent.SetFont(doc.GetFontTable()->GetFont(5));
 	tf_parent.SetFontSize(14.5f);
 
-	RtfAssociatedProperties* p_parent = st_parent->GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+	RtfAssociatedProperties* p_parent = st_parent->GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
 	p_parent->SetFontSize(25.0f);
 	p_parent->SetBold(true);
 
@@ -124,7 +124,7 @@ TEST(RtfStyle, ParseBasedOn)
 	EXPECT_EQ(doc.GetFontTable()->GetFont(5), tf.GetFont());
 	EXPECT_FLOAT_EQ(14.5f, tf.GetFontSize());
 
-	RtfAssociatedProperties* p = st.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
+	RtfAssociatedProperties* p = st.GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
 	EXPECT_FLOAT_EQ(25.0f, p->GetFontSize());
 	EXPECT_TRUE(p->IsBold());
 }
@@ -186,7 +186,7 @@ TEST(RtfStyle, ParseAssociatedFontProperty)
 	t.parameter = 12;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
 
-	RtfAssociatedProperties* props = st.GetPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteLowAnsi);
+	RtfAssociatedProperties* props = st.GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
 	ASSERT_NE(nullptr, props);
 	
 	EXPECT_EQ(doc.GetFontTable()->GetFont(12), props->GetFont());
