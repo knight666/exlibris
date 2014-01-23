@@ -37,7 +37,7 @@ namespace ExLibris
 		, m_AutoSpacingBefore(false, m_Specified)
 		, m_AutoSpacingAfter(false, m_Specified)
 		, m_SnapLineToGrid(true, m_Specified)
-		, m_LineHeightRule(eLineHeightRule_Automatic, m_Specified)
+		, m_LineHeightRule(Rtf::eLineHeightRule_Automatic, m_Specified)
 		, m_LineHeight(RtfUnit(200.0f), m_Specified)
 	{
 	}
@@ -101,12 +101,12 @@ namespace ExLibris
 		m_SnapLineToGrid = a_Value;
 	}
 
-	RtfParagraphFormat::LineHeightRule RtfParagraphFormat::GetLineHeightRule() const
+	Rtf::LineHeightRule RtfParagraphFormat::GetLineHeightRule() const
 	{
 		return m_LineHeightRule.Get();
 	}
 
-	void RtfParagraphFormat::SetLineHeightRule(RtfParagraphFormat::LineHeightRule a_Rule)
+	void RtfParagraphFormat::SetLineHeightRule(Rtf::LineHeightRule a_Rule)
 	{
 		m_LineHeightRule = a_Rule;
 	}
@@ -157,17 +157,17 @@ namespace ExLibris
 		{
 			if (a_Token.parameter < 0)
 			{
-				SetLineHeightRule(eLineHeightRule_Absolute);
+				SetLineHeightRule(Rtf::eLineHeightRule_Absolute);
 
 				SetLineHeight(RtfUnit((float)-a_Token.parameter));
 			}
 			else if (a_Token.parameter == 0)
 			{
-				SetLineHeightRule(eLineHeightRule_Automatic);
+				SetLineHeightRule(Rtf::eLineHeightRule_Automatic);
 			}
 			else
 			{
-				SetLineHeightRule(eLineHeightRule_Maximum);
+				SetLineHeightRule(Rtf::eLineHeightRule_Maximum);
 
 				SetLineHeight(RtfUnit((float)a_Token.parameter));
 			}
