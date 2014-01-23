@@ -33,8 +33,8 @@ namespace ExLibris
 
 	RtfFont::RtfFont(RtfFontTable& a_FontTable)
 		: m_FontTable(a_FontTable)
-		, m_Family(eFamilyType_Nil)
-		, m_Pitch(ePitch_Default)
+		, m_Family(Rtf::eFamilyType_Nil)
+		, m_Pitch(Rtf::ePitch_Default)
 		, m_CharacterSet(eRtfCharacterSet_Default)
 	{
 	}
@@ -54,22 +54,22 @@ namespace ExLibris
 		m_Name = a_Name;
 	}
 
-	RtfFont::FamilyType RtfFont::GetFamilyType() const
+	Rtf::FamilyType RtfFont::GetFamilyType() const
 	{
 		return m_Family;
 	}
 
-	void RtfFont::SetFamilyType(RtfFont::FamilyType a_Type)
+	void RtfFont::SetFamilyType(Rtf::FamilyType a_Type)
 	{
 		m_Family = a_Type;
 	}
 
-	RtfFont::Pitch RtfFont::GetPitch() const
+	Rtf::Pitch RtfFont::GetPitch() const
 	{
 		return m_Pitch;
 	}
 
-	void RtfFont::SetPitch(Pitch a_Pitch)
+	void RtfFont::SetPitch(Rtf::Pitch a_Pitch)
 	{
 		m_Pitch = a_Pitch;
 	}
@@ -90,49 +90,49 @@ namespace ExLibris
 
 		if (a_Token.value == "froman")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Roman);
+			SetFamilyType(Rtf::eFamilyType_Roman);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "fswiss")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Swiss);
+			SetFamilyType(Rtf::eFamilyType_Swiss);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "fmodern")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Modern);
+			SetFamilyType(Rtf::eFamilyType_Modern);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "fscript")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Script);
+			SetFamilyType(Rtf::eFamilyType_Script);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "fdecor")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Decor);
+			SetFamilyType(Rtf::eFamilyType_Decor);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "ftech")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Tech);
+			SetFamilyType(Rtf::eFamilyType_Tech);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "fbidi")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Bidi);
+			SetFamilyType(Rtf::eFamilyType_Bidi);
 
 			return eResult_Handled;
 		}
 		else if (a_Token.value == "fnil")
 		{
-			SetFamilyType(RtfFont::eFamilyType_Nil);
+			SetFamilyType(Rtf::eFamilyType_Nil);
 
 			return eResult_Handled;
 		}
@@ -141,12 +141,12 @@ namespace ExLibris
 
 		else if (a_Token.value == "fprq")
 		{
-			if (a_Token.parameter < ePitch_Default || a_Token.parameter > ePitch_Variable)
+			if (a_Token.parameter < Rtf::ePitch_Default || a_Token.parameter > Rtf::ePitch_Variable)
 			{
 				return eResult_Invalid;
 			}
 
-			SetPitch((Pitch)a_Token.parameter);
+			SetPitch((Rtf::Pitch)a_Token.parameter);
 
 			return eResult_Handled;
 		}

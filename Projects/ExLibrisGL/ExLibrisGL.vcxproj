@@ -163,6 +163,7 @@
     <ClInclude Include="RtfStyleSheet.h" />
     <ClInclude Include="RtfTextFormat.h" />
     <ClInclude Include="RtfToken.h" />
+    <ClInclude Include="RtfTypes.h" />
     <ClInclude Include="RtfUnit.h" />
     <ClInclude Include="RtfWorld.h" />
     <ClInclude Include="SizePolicy.h" />

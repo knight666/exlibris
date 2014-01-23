@@ -67,7 +67,7 @@ TEST(RtfDomDocument, ParseFontTable)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
 
 	RtfFont* font = doc.GetFontTable()->GetFont(5);
-	EXPECT_EQ(RtfFont::eFamilyType_Roman, font->GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Roman, font->GetFamilyType());
 	EXPECT_STREQ("Comical", font->GetName().c_str());
 }
 

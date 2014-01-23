@@ -730,45 +730,45 @@ namespace ExLibris
 
 						if (m_TokenCurrent.value == "froman")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Roman);
+							font->SetFamilyType(Rtf::eFamilyType_Roman);
 						}
 						else if (m_TokenCurrent.value == "fswiss")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Swiss);
+							font->SetFamilyType(Rtf::eFamilyType_Swiss);
 						}
 						else if (m_TokenCurrent.value == "fmodern")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Modern);
+							font->SetFamilyType(Rtf::eFamilyType_Modern);
 						}
 						else if (m_TokenCurrent.value == "fscript")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Script);
+							font->SetFamilyType(Rtf::eFamilyType_Script);
 						}
 						else if (m_TokenCurrent.value == "fdecor")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Decor);
+							font->SetFamilyType(Rtf::eFamilyType_Decor);
 						}
 						else if (m_TokenCurrent.value == "ftech")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Tech);
+							font->SetFamilyType(Rtf::eFamilyType_Tech);
 						}
 						else if (m_TokenCurrent.value == "fbidi")
 						{
-							font->SetFamilyType(RtfFont::eFamilyType_Bidi);
+							font->SetFamilyType(Rtf::eFamilyType_Bidi);
 						}
 
 						// pitch
 
 						else if (m_TokenCurrent.value == "fprq")
 						{
-							if (m_TokenCurrent.parameter < RtfFont::ePitch_Default || m_TokenCurrent.parameter > RtfFont::ePitch_Variable)
+							if (m_TokenCurrent.parameter < Rtf::ePitch_Default || m_TokenCurrent.parameter > Rtf::ePitch_Variable)
 							{
 								LOG_ERROR(m_TokenCurrent) << "Invalid pitch (" << m_TokenCurrent.parameter << ") specified for font.";
 
 								return false;
 							}
 
-							font->SetPitch((RtfFont::Pitch)m_TokenCurrent.parameter);
+							font->SetPitch((Rtf::Pitch)m_TokenCurrent.parameter);
 						}
 
 						// characterset

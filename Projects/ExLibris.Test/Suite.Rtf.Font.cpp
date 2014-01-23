@@ -21,35 +21,35 @@ TEST(RtfFont, ParseFamilyType)
 
 	t.value = "fnil";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Nil, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Nil, f.GetFamilyType());
 
 	t.value = "froman";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Roman, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Roman, f.GetFamilyType());
 
 	t.value = "fswiss";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Swiss, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Swiss, f.GetFamilyType());
 
 	t.value = "fmodern";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Modern, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Modern, f.GetFamilyType());
 
 	t.value = "fscript";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Script, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Script, f.GetFamilyType());
 
 	t.value = "fdecor";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Decor, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Decor, f.GetFamilyType());
 
 	t.value = "ftech";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Tech, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Tech, f.GetFamilyType());
 
 	t.value = "fbidi";
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::eFamilyType_Bidi, f.GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Bidi, f.GetFamilyType());
 }
 
 TEST(RtfFont, ParseFamilyTypeInvalid)
@@ -81,15 +81,15 @@ TEST(RtfFont, ParsePitch)
 
 	t.parameter = 0;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::ePitch_Default, f.GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Default, f.GetPitch());
 
 	t.parameter = 1;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::ePitch_Fixed, f.GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Fixed, f.GetPitch());
 
 	t.parameter = 2;
 	EXPECT_EQ(IRtfParseable::eResult_Handled, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::ePitch_Variable, f.GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Variable, f.GetPitch());
 }
 
 TEST(RtfFont, ParsePitchInvalid)
@@ -106,11 +106,11 @@ TEST(RtfFont, ParsePitchInvalid)
 
 	t.parameter = -3;
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::ePitch_Default, f.GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Default, f.GetPitch());
 
 	t.parameter = 12;
 	EXPECT_EQ(IRtfParseable::eResult_Invalid, f.Parse(s, t));
-	EXPECT_EQ(RtfFont::ePitch_Default, f.GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Default, f.GetPitch());
 }
 
 TEST(RtfFont, ParseCharacterSet)
