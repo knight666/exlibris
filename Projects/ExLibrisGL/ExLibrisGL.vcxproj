@@ -152,7 +152,6 @@
     <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
     <ClInclude Include="RtfFontTable.h" />
-    <ClInclude Include="RtfLanguage.h" />
     <ClInclude Include="RtfLocale.h" />
     <ClInclude Include="RtfLogMessage.h" />
     <ClInclude Include="RtfParserGroup.h" />
