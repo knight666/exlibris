@@ -193,7 +193,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
 	ASSERT_NE(nullptr, tf.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Netherlands, tf.GetLocale()->country);
-	EXPECT_EQ(eRtfLanguage_Dutch, tf.GetLocale()->language);
+	EXPECT_EQ(Rtf::eLanguage_Dutch, tf.GetLocale()->language);
 	ASSERT_NE(nullptr, tf.GetFont());
 	EXPECT_STREQ("Times New Roman", tf.GetFont()->GetName().c_str());
 	EXPECT_FLOAT_EQ(8.0f, tf.GetFontSize());
@@ -212,7 +212,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_FLOAT_EQ(8.0f, p0.GetFontSize());
 	ASSERT_NE(nullptr, p0.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Netherlands, p0.GetLocale()->country);
-	EXPECT_EQ(eRtfLanguage_Dutch, p0.GetLocale()->language);
+	EXPECT_EQ(Rtf::eLanguage_Dutch, p0.GetLocale()->language);
 
 	RtfAssociatedProperties p1 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_SingleByteHighAnsi);
 	EXPECT_EQ(eRtfCharacterEncoding_SingleByteHighAnsi, p1.GetCharacterEncoding());
@@ -221,7 +221,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_FLOAT_EQ(8.0f, p1.GetFontSize());
 	ASSERT_NE(nullptr, p1.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Netherlands, p1.GetLocale()->country);
-	EXPECT_EQ(eRtfLanguage_Dutch, p1.GetLocale()->language);
+	EXPECT_EQ(Rtf::eLanguage_Dutch, p1.GetLocale()->language);
 
 	RtfAssociatedProperties p2 = style->GetCombinedPropertiesForCharacterEncoding(eRtfCharacterEncoding_DoubleByte);
 	EXPECT_EQ(eRtfCharacterEncoding_DoubleByte, p2.GetCharacterEncoding());
@@ -230,7 +230,7 @@ TEST(TextParserRtf, StyleSheet)
 	EXPECT_FLOAT_EQ(16.0f, p2.GetFontSize());
 	ASSERT_NE(nullptr, p2.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_India, p2.GetLocale()->country);
-	EXPECT_EQ(eRtfLanguage_Hindi, p2.GetLocale()->language);
+	EXPECT_EQ(Rtf::eLanguage_Hindi, p2.GetLocale()->language);
 }
 
 TEST(TextParserRtf, ControlTrailingWhitespace)

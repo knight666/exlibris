@@ -105,7 +105,7 @@ TEST(RtfAssociatedProperties, ParseLocale)
 
 	ASSERT_NE(nullptr, p.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Switzerland, p.GetLocale()->country);
-	EXPECT_EQ(eRtfLanguage_German, p.GetLocale()->language);
+	EXPECT_EQ(Rtf::eLanguage_German, p.GetLocale()->language);
 }
 
 TEST(RtfAssociatedProperties, ParseLocaleNotFound)
