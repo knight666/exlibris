@@ -24,53 +24,27 @@
 
 #pragma once
 
-#include "IRtfParseable.h"
-#include "RtfCharacterSet.h"
-#include "RtfTypes.h"
+namespace ExLibris {
+namespace Rtf {
 
-namespace ExLibris
-{
-	class RtfFontTable;
-}
-
-namespace ExLibris
-{
-
-	class RtfFont
-		: public IRtfParseable
+	enum FamilyType
 	{
+		eFamilyType_Nil,
+		eFamilyType_Roman,
+		eFamilyType_Swiss,
+		eFamilyType_Modern,
+		eFamilyType_Script,
+		eFamilyType_Decor,
+		eFamilyType_Tech,
+		eFamilyType_Bidi,
+	};
 
-	public:
+	enum Pitch
+	{
+		ePitch_Default  = 0,
+		ePitch_Fixed    = 1,
+		ePitch_Variable = 2
+	};
 
-		RtfFont(RtfFontTable& a_FontTable);
-
-		RtfFontTable& GetFontTable() const;
-
-		const std::string& GetName() const;
-		void SetName(const std::string& a_Name);
-
-		Rtf::FamilyType GetFamilyType() const;
-		void SetFamilyType(Rtf::FamilyType a_Type);
-
-		Rtf::Pitch GetPitch() const;
-		void SetPitch(Rtf::Pitch a_Pitch);
-
-		RtfCharacterSet GetCharacterSet() const;
-		void SetCharacterSet(RtfCharacterSet a_CharacterSet);
-
-	private:
-
-		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
-		IRtfParseable::Result _ParseValue(RtfParserState& a_State, const RtfToken& a_Token);
-
-	private:
-
-		RtfFontTable& m_FontTable;
-		std::string m_Name;
-		Rtf::FamilyType m_Family;
-		Rtf::Pitch m_Pitch;
-		RtfCharacterSet m_CharacterSet;
-
-	}; // struct RtfFont
-
+}; // namespace Rtf
 }; // namespace ExLibris

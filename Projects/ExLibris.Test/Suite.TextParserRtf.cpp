@@ -22,7 +22,7 @@ TEST(TextParserRtf, HelloWorld)
 
 	RtfFontTable* ft = doc->GetFontTable();
 
-	EXPECT_EQ(RtfFont::eFamilyType_Swiss, ft->GetFont(0)->GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Swiss, ft->GetFont(0)->GetFamilyType());
 	EXPECT_STREQ("Helvetica", ft->GetFont(0)->GetName().c_str());
 
 	RtfDomElement* root = doc->GetRootElement();
@@ -77,7 +77,7 @@ TEST(TextParserRtf, FontTableUseDefaultFont)
 
 	ASSERT_NE(nullptr, root->GetTextFormat().GetFont());
 
-	EXPECT_EQ(RtfFont::eFamilyType_Nil, root->GetTextFormat().GetFont()->GetFamilyType());
+	EXPECT_EQ(Rtf::eFamilyType_Nil, root->GetTextFormat().GetFont()->GetFamilyType());
 	EXPECT_STREQ("Robotica", root->GetTextFormat().GetFont()->GetName().c_str());
 	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
 }
@@ -104,13 +104,13 @@ TEST(TextParserRtf, FontTableSetPitch)
 	RtfFontTable* ft = doc->GetFontTable();
 
 	EXPECT_STREQ("Magnified", ft->GetFont(0)->GetName().c_str());
-	EXPECT_EQ(RtfFont::ePitch_Fixed, ft->GetFont(0)->GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Fixed, ft->GetFont(0)->GetPitch());
 
 	EXPECT_STREQ("Simplified", ft->GetFont(1)->GetName().c_str());
-	EXPECT_EQ(RtfFont::ePitch_Default, ft->GetFont(1)->GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Default, ft->GetFont(1)->GetPitch());
 
 	EXPECT_STREQ("Testified", ft->GetFont(2)->GetName().c_str());
-	EXPECT_EQ(RtfFont::ePitch_Variable, ft->GetFont(2)->GetPitch());
+	EXPECT_EQ(Rtf::ePitch_Variable, ft->GetFont(2)->GetPitch());
 }
 
 TEST(TextParserRtf, FontTableSetCharacterSet)
