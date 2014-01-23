@@ -16,7 +16,7 @@ TEST(RtfParagraphFormat, Construct)
 	EXPECT_FALSE(pf.IsAutoSpacingBeforeEnabled());
 	EXPECT_FALSE(pf.IsAutoSpacingAfterEnabled());
 	EXPECT_TRUE(pf.IsSnapLineToGridEnabled());
-	EXPECT_EQ(RtfParagraphFormat::eLineHeightRule_Automatic, pf.GetLineHeightRule());
+	EXPECT_EQ(Rtf::eLineHeightRule_Automatic, pf.GetLineHeightRule());
 	EXPECT_FLOAT_EQ(200.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
 }
 
@@ -152,7 +152,7 @@ TEST(RtfParagraphFormat, ParseLineHeightPositive)
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
-	EXPECT_EQ(RtfParagraphFormat::eLineHeightRule_Maximum, pf.GetLineHeightRule());
+	EXPECT_EQ(Rtf::eLineHeightRule_Maximum, pf.GetLineHeightRule());
 	EXPECT_FLOAT_EQ(250.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
 }
 
@@ -170,7 +170,7 @@ TEST(RtfParagraphFormat, ParseLineHeightNegative)
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
-	EXPECT_EQ(RtfParagraphFormat::eLineHeightRule_Absolute, pf.GetLineHeightRule());
+	EXPECT_EQ(Rtf::eLineHeightRule_Absolute, pf.GetLineHeightRule());
 	EXPECT_FLOAT_EQ(333.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
 }
 
@@ -188,6 +188,6 @@ TEST(RtfParagraphFormat, ParseLineHeightZero)
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
-	EXPECT_EQ(RtfParagraphFormat::eLineHeightRule_Automatic, pf.GetLineHeightRule());
+	EXPECT_EQ(Rtf::eLineHeightRule_Automatic, pf.GetLineHeightRule());
 	EXPECT_FLOAT_EQ(200.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
 }

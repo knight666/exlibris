@@ -393,6 +393,13 @@ namespace Rtf {
 		eLanguage_Yoruba,
 	};
 
+	enum LineHeightRule
+	{
+		eLineHeightRule_Automatic,
+		eLineHeightRule_Absolute,
+		eLineHeightRule_Maximum
+	};
+
 	enum Pitch
 	{
 		ePitch_Default  = 0,
