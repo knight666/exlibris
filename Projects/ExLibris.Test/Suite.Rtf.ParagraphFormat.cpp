@@ -13,6 +13,8 @@ TEST(RtfParagraphFormat, Construct)
 
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceBefore().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceAfter().GetValue(RtfUnit::eType_Twips));
+	EXPECT_FALSE(pf.IsAutoSpacingBefore());
+	EXPECT_FALSE(pf.IsAutoSpacingAfter());
 }
 
 TEST(RtfParagraphFormat, ParseSpaceBefore)
@@ -81,4 +83,38 @@ TEST(RtfParagraphFormat, ParseSpaceAfterNegative)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
 	EXPECT_FLOAT_EQ(-7.0f, pf.GetSpaceAfter().GetValue(RtfUnit::eType_Twips));
+}
+
+TEST(RtfParagraphFormat, ParseAutoSpacingBefore)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "sbauto";
+	t.parameter = 1;
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_TRUE(pf.IsAutoSpacingBefore());
+}
+
+TEST(RtfParagraphFormat, ParseAutoSpacingBeforeInvalid)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "sbauto";
+	t.parameter = -33;
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_FALSE(pf.IsAutoSpacingBefore());
 }

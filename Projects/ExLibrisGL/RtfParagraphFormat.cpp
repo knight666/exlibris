@@ -34,6 +34,8 @@ namespace ExLibris
 		, m_Specified(0)
 		, m_SpaceBefore(RtfUnit(0.0f), m_Specified)
 		, m_SpaceAfter(RtfUnit(0.0f), m_Specified)
+		, m_AutoSpacingBefore(false, m_Specified)
+		, m_AutoSpacingAfter(false, m_Specified)
 	{
 	}
 
@@ -66,6 +68,26 @@ namespace ExLibris
 		m_SpaceAfter = a_Value;
 	}
 
+	bool RtfParagraphFormat::IsAutoSpacingBefore() const
+	{
+		return m_AutoSpacingBefore.Get();
+	}
+
+	void RtfParagraphFormat::SetAutoSpacingBefore(bool a_Value)
+	{
+		m_AutoSpacingBefore = a_Value;
+	}
+
+	bool RtfParagraphFormat::IsAutoSpacingAfter() const
+	{
+		return m_AutoSpacingAfter.Get();
+	}
+
+	void RtfParagraphFormat::SetAutoSpacingAfter(bool a_Value)
+	{
+		m_AutoSpacingAfter = a_Value;
+	}
+
 	IRtfParseable::Result RtfParagraphFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
 		if (a_Token.value == "sb")
@@ -77,6 +99,18 @@ namespace ExLibris
 		else if (a_Token.value == "sa")
 		{
 			SetSpaceAfter(RtfUnit(RtfUnit::eType_Twips, (float)a_Token.parameter));
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "sbauto")
+		{
+			SetAutoSpacingBefore(a_Token.parameter == 1);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "saauto")
+		{
+			SetAutoSpacingAfter(a_Token.parameter == 1);
 
 			return IRtfParseable::eResult_Handled;
 		}
