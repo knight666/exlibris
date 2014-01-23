@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include "RtfCountry.h"
 #include "RtfLanguage.h"
+#include "RtfTypes.h"
 
 namespace ExLibris
 {
@@ -33,7 +33,7 @@ namespace ExLibris
 	struct RtfLocale
 	{
 
-		RtfLocale(unsigned int a_Identifier, RtfCountry a_Country, RtfLanguage a_Language)
+		RtfLocale(unsigned int a_Identifier, Rtf::Country a_Country, RtfLanguage a_Language)
 			: identifier(a_Identifier)
 			, country(a_Country)
 			, language(a_Language)
@@ -41,7 +41,7 @@ namespace ExLibris
 		}
 	
 		unsigned int identifier;
-		RtfCountry country;
+		Rtf::Country country;
 		RtfLanguage language;
 	
 	}; // struct RtfLocale

@@ -149,7 +149,6 @@
     <ClInclude Include="RtfCharacterSet.h" />
     <ClInclude Include="RtfColor.h" />
     <ClInclude Include="RtfColorTable.h" />
-    <ClInclude Include="RtfCountry.h" />
     <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
     <ClInclude Include="RtfFontTable.h" />
