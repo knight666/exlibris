@@ -53,11 +53,14 @@ namespace ExLibris
 		const RtfUnit& GetSpaceAfter() const;
 		void SetSpaceAfter(const RtfUnit& a_Value);
 
-		bool IsAutoSpacingBefore() const;
-		void SetAutoSpacingBefore(bool a_Value);
+		bool IsAutoSpacingBeforeEnabled() const;
+		void SetAutoSpacingBeforeEnabled(bool a_Value);
 
-		bool IsAutoSpacingAfter() const;
-		void SetAutoSpacingAfter(bool a_Value);
+		bool IsAutoSpacingAfterEnabled() const;
+		void SetAutoSpacingAfterEnabled(bool a_Value);
+
+		bool IsSnapLineToGridEnabled() const;
+		void SetSnapLineToGridEnabled(bool a_Value);
 
 	private:
 
@@ -71,6 +74,7 @@ namespace ExLibris
 		RtfProperty<RtfUnit, 1> m_SpaceAfter;
 		RtfProperty<bool, 2> m_AutoSpacingBefore;
 		RtfProperty<bool, 3> m_AutoSpacingAfter;
+		RtfProperty<bool, 4> m_SnapLineToGrid;
 
 	}; // class RtfParagraphFormat
 

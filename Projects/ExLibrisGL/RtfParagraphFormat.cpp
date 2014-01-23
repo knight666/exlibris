@@ -36,6 +36,7 @@ namespace ExLibris
 		, m_SpaceAfter(RtfUnit(0.0f), m_Specified)
 		, m_AutoSpacingBefore(false, m_Specified)
 		, m_AutoSpacingAfter(false, m_Specified)
+		, m_SnapLineToGrid(true, m_Specified)
 	{
 	}
 
@@ -68,24 +69,34 @@ namespace ExLibris
 		m_SpaceAfter = a_Value;
 	}
 
-	bool RtfParagraphFormat::IsAutoSpacingBefore() const
+	bool RtfParagraphFormat::IsAutoSpacingBeforeEnabled() const
 	{
 		return m_AutoSpacingBefore.Get();
 	}
 
-	void RtfParagraphFormat::SetAutoSpacingBefore(bool a_Value)
+	void RtfParagraphFormat::SetAutoSpacingBeforeEnabled(bool a_Value)
 	{
 		m_AutoSpacingBefore = a_Value;
 	}
 
-	bool RtfParagraphFormat::IsAutoSpacingAfter() const
+	bool RtfParagraphFormat::IsAutoSpacingAfterEnabled() const
 	{
 		return m_AutoSpacingAfter.Get();
 	}
 
-	void RtfParagraphFormat::SetAutoSpacingAfter(bool a_Value)
+	void RtfParagraphFormat::SetAutoSpacingAfterEnabled(bool a_Value)
 	{
 		m_AutoSpacingAfter = a_Value;
+	}
+
+	bool RtfParagraphFormat::IsSnapLineToGridEnabled() const
+	{
+		return m_SnapLineToGrid.Get();
+	}
+
+	void RtfParagraphFormat::SetSnapLineToGridEnabled(bool a_Value)
+	{
+		m_SnapLineToGrid = a_Value;
 	}
 
 	IRtfParseable::Result RtfParagraphFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
@@ -104,13 +115,19 @@ namespace ExLibris
 		}
 		else if (a_Token.value == "sbauto")
 		{
-			SetAutoSpacingBefore(a_Token.parameter == 1);
+			SetAutoSpacingBeforeEnabled(a_Token.parameter == 1);
 
 			return IRtfParseable::eResult_Handled;
 		}
 		else if (a_Token.value == "saauto")
 		{
-			SetAutoSpacingAfter(a_Token.parameter == 1);
+			SetAutoSpacingAfterEnabled(a_Token.parameter == 1);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "nosnaplinegrid")
+		{
+			SetSnapLineToGridEnabled(false);
 
 			return IRtfParseable::eResult_Handled;
 		}
