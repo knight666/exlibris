@@ -13,8 +13,9 @@ TEST(RtfParagraphFormat, Construct)
 
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceBefore().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceAfter().GetValue(RtfUnit::eType_Twips));
-	EXPECT_FALSE(pf.IsAutoSpacingBefore());
-	EXPECT_FALSE(pf.IsAutoSpacingAfter());
+	EXPECT_FALSE(pf.IsAutoSpacingBeforeEnabled());
+	EXPECT_FALSE(pf.IsAutoSpacingAfterEnabled());
+	EXPECT_TRUE(pf.IsSnapLineToGridEnabled());
 }
 
 TEST(RtfParagraphFormat, ParseSpaceBefore)
@@ -99,7 +100,7 @@ TEST(RtfParagraphFormat, ParseAutoSpacingBefore)
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
-	EXPECT_TRUE(pf.IsAutoSpacingBefore());
+	EXPECT_TRUE(pf.IsAutoSpacingBeforeEnabled());
 }
 
 TEST(RtfParagraphFormat, ParseAutoSpacingBeforeInvalid)
@@ -116,5 +117,21 @@ TEST(RtfParagraphFormat, ParseAutoSpacingBeforeInvalid)
 
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
-	EXPECT_FALSE(pf.IsAutoSpacingBefore());
+	EXPECT_FALSE(pf.IsAutoSpacingBeforeEnabled());
+}
+
+TEST(RtfParagraphFormat, ParseSnapToGridDisabled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "nosnaplinegrid";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_FALSE(pf.IsSnapLineToGridEnabled());
 }
