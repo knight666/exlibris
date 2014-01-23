@@ -53,6 +53,12 @@ namespace ExLibris
 		const RtfUnit& GetSpaceAfter() const;
 		void SetSpaceAfter(const RtfUnit& a_Value);
 
+		bool IsAutoSpacingBefore() const;
+		void SetAutoSpacingBefore(bool a_Value);
+
+		bool IsAutoSpacingAfter() const;
+		void SetAutoSpacingAfter(bool a_Value);
+
 	private:
 
 		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
@@ -63,6 +69,8 @@ namespace ExLibris
 		unsigned int m_Specified;
 		RtfProperty<RtfUnit, 0> m_SpaceBefore;
 		RtfProperty<RtfUnit, 1> m_SpaceAfter;
+		RtfProperty<bool, 2> m_AutoSpacingBefore;
+		RtfProperty<bool, 3> m_AutoSpacingAfter;
 
 	}; // class RtfParagraphFormat
 
