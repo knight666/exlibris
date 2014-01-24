@@ -11,6 +11,8 @@ TEST(RtfParagraphFormat, Construct)
 	RtfDomDocument doc(nullptr);
 	RtfParagraphFormat pf(doc);
 
+	EXPECT_FALSE(pf.IsKeepIntactEnabled());
+	EXPECT_FALSE(pf.IsKeepWithNextEnabled());
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceBefore().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceAfter().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FALSE(pf.IsAutoSpacingBeforeEnabled());
@@ -18,6 +20,38 @@ TEST(RtfParagraphFormat, Construct)
 	EXPECT_TRUE(pf.IsSnapLineToGridEnabled());
 	EXPECT_EQ(Rtf::eLineHeightRule_Automatic, pf.GetLineHeightRule());
 	EXPECT_FLOAT_EQ(100.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
+}
+
+TEST(RtfParagraphFormat, ParseKeepIntactEnabled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "keep";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_TRUE(pf.IsKeepIntactEnabled());
+}
+
+TEST(RtfParagraphFormat, ParseKeepWithNextEnabled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "keepn";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_TRUE(pf.IsKeepWithNextEnabled());
 }
 
 TEST(RtfParagraphFormat, ParseSpaceBefore)

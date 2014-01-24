@@ -48,6 +48,16 @@ namespace ExLibris
 
 		RtfDomDocument& GetDocument() const;
 
+		// General
+
+		bool IsKeepIntactEnabled() const;
+		void SetKeepIntactEnabled(bool a_Value);
+
+		bool IsKeepWithNextEnabled() const;
+		void SetKeepWithNextEnabled(bool a_Value);
+
+		// Spacing
+
 		const RtfUnit& GetSpaceBefore() const;
 		void SetSpaceBefore(const RtfUnit& a_Value);
 
@@ -76,7 +86,10 @@ namespace ExLibris
 	private:
 
 		RtfDomDocument& m_Document;
-		unsigned int m_Specified;
+		unsigned int m_SpecifiedGeneral;
+		RtfProperty<bool, 0> m_KeepIntactEnabled;
+		RtfProperty<bool, 1> m_KeepWithNextEnabled;
+		unsigned int m_SpecifiedSpacing;
 		RtfProperty<RtfUnit, 0> m_SpaceBefore;
 		RtfProperty<RtfUnit, 1> m_SpaceAfter;
 		RtfProperty<bool, 2> m_AutoSpacingBefore;
