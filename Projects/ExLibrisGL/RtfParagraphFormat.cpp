@@ -38,7 +38,7 @@ namespace ExLibris
 		, m_AutoSpacingAfter(false, m_Specified)
 		, m_SnapLineToGrid(true, m_Specified)
 		, m_LineHeightRule(Rtf::eLineHeightRule_Automatic, m_Specified)
-		, m_LineHeight(RtfUnit(200.0f), m_Specified)
+		, m_LineHeight(RtfUnit(100.0f), m_Specified)
 	{
 	}
 
@@ -171,6 +171,18 @@ namespace ExLibris
 
 				SetLineHeight(RtfUnit((float)a_Token.parameter));
 			}
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "slmult")
+		{
+			if (a_Token.parameter < 0 || !m_LineHeight.IsSet())
+			{
+				return IRtfParseable::eResult_Invalid;
+			}
+
+			SetLineHeight(RtfUnit(GetLineHeight().GetValue(RtfUnit::eType_Twips) * 100.0f));
+			SetLineHeightRule(Rtf::eLineHeightRule_Automatic);
 
 			return IRtfParseable::eResult_Handled;
 		}

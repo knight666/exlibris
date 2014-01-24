@@ -17,7 +17,7 @@ TEST(RtfParagraphFormat, Construct)
 	EXPECT_FALSE(pf.IsAutoSpacingAfterEnabled());
 	EXPECT_TRUE(pf.IsSnapLineToGridEnabled());
 	EXPECT_EQ(Rtf::eLineHeightRule_Automatic, pf.GetLineHeightRule());
-	EXPECT_FLOAT_EQ(200.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
+	EXPECT_FLOAT_EQ(100.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
 }
 
 TEST(RtfParagraphFormat, ParseSpaceBefore)
@@ -189,5 +189,30 @@ TEST(RtfParagraphFormat, ParseLineHeightZero)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
 	EXPECT_EQ(Rtf::eLineHeightRule_Automatic, pf.GetLineHeightRule());
+	EXPECT_FLOAT_EQ(100.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
+}
+
+TEST(RtfParagraphFormat, ParseLineHeightMultiple)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+
+	t.value = "sl";
+	t.parameter = 2;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_FLOAT_EQ(2.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
+
+	t.value = "slmult";
+	t.parameter = 1;
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_EQ(Rtf::eLineHeightRule_Automatic, pf.GetLineHeightRule());
+
 	EXPECT_FLOAT_EQ(200.0f, pf.GetLineHeight().GetValue(RtfUnit::eType_Twips));
 }
