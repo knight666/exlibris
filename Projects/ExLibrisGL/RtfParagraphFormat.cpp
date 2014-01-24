@@ -32,8 +32,9 @@ namespace ExLibris
 	RtfParagraphFormat::RtfParagraphFormat(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
 		, m_SpecifiedGeneral(0)
-		, m_KeepIntactEnabled(false, m_SpecifiedSpacing)
-		, m_KeepWithNextEnabled(false, m_SpecifiedSpacing)
+		, m_KeepIntactEnabled(false, m_SpecifiedGeneral)
+		, m_KeepWithNextEnabled(false, m_SpecifiedGeneral)
+		, m_LineNumberingEnabled(true, m_SpecifiedGeneral)
 		, m_SpecifiedSpacing(0)
 		, m_SpaceBefore(RtfUnit(0.0f), m_SpecifiedSpacing)
 		, m_SpaceAfter(RtfUnit(0.0f), m_SpecifiedSpacing)
@@ -74,6 +75,16 @@ namespace ExLibris
 	void RtfParagraphFormat::SetKeepWithNextEnabled(bool a_Value)
 	{
 		m_KeepWithNextEnabled = a_Value;
+	}
+
+	bool RtfParagraphFormat::IsLineNumberingEnabled() const
+	{
+		return m_LineNumberingEnabled.Get();
+	}
+
+	void RtfParagraphFormat::SetLineNumberingEnabled(bool a_Value)
+	{
+		m_LineNumberingEnabled = a_Value;
 	}
 
 	// spacing
@@ -163,6 +174,12 @@ namespace ExLibris
 		else if (a_Token.value == "keepn")
 		{
 			SetKeepWithNextEnabled(true);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "noline")
+		{
+			SetLineNumberingEnabled(false);
 
 			return IRtfParseable::eResult_Handled;
 		}
