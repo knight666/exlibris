@@ -14,6 +14,7 @@ TEST(RtfParagraphFormat, Construct)
 	EXPECT_FALSE(pf.IsKeepIntactEnabled());
 	EXPECT_FALSE(pf.IsKeepWithNextEnabled());
 	EXPECT_TRUE(pf.IsLineNumberingEnabled());
+	EXPECT_FALSE(pf.IsWidowControlEnabled());
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceBefore().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceAfter().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FALSE(pf.IsAutoSpacingBeforeEnabled());
@@ -69,6 +70,38 @@ TEST(RtfParagraphFormat, ParseLineNumberingDisabled)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
 	EXPECT_FALSE(pf.IsLineNumberingEnabled());
+}
+
+TEST(RtfParagraphFormat, ParseWidowControlEnabled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "widctlpar";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_TRUE(pf.IsWidowControlEnabled());
+}
+
+TEST(RtfParagraphFormat, ParseWidowControlDisabled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "nowidctlpar";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_FALSE(pf.IsWidowControlEnabled());
 }
 
 TEST(RtfParagraphFormat, ParseSpaceBefore)
