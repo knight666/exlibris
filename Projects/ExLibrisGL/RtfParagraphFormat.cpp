@@ -35,6 +35,7 @@ namespace ExLibris
 		, m_KeepIntactEnabled(false, m_SpecifiedGeneral)
 		, m_KeepWithNextEnabled(false, m_SpecifiedGeneral)
 		, m_LineNumberingEnabled(true, m_SpecifiedGeneral)
+		, m_WidowControlEnabled(false, m_SpecifiedGeneral)
 		, m_SpecifiedSpacing(0)
 		, m_SpaceBefore(RtfUnit(0.0f), m_SpecifiedSpacing)
 		, m_SpaceAfter(RtfUnit(0.0f), m_SpecifiedSpacing)
@@ -85,6 +86,16 @@ namespace ExLibris
 	void RtfParagraphFormat::SetLineNumberingEnabled(bool a_Value)
 	{
 		m_LineNumberingEnabled = a_Value;
+	}
+
+	bool RtfParagraphFormat::IsWidowControlEnabled() const
+	{
+		return m_WidowControlEnabled.Get();
+	}
+
+	void RtfParagraphFormat::SetWidowControlEnabled(bool a_Value)
+	{
+		m_WidowControlEnabled = a_Value;
 	}
 
 	// spacing
@@ -180,6 +191,18 @@ namespace ExLibris
 		else if (a_Token.value == "noline")
 		{
 			SetLineNumberingEnabled(false);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "widctlpar")
+		{
+			SetWidowControlEnabled(true);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "nowidctlpar")
+		{
+			SetWidowControlEnabled(false);
 
 			return IRtfParseable::eResult_Handled;
 		}
