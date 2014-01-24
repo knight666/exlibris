@@ -13,6 +13,7 @@ TEST(RtfParagraphFormat, Construct)
 
 	EXPECT_FALSE(pf.IsKeepIntactEnabled());
 	EXPECT_FALSE(pf.IsKeepWithNextEnabled());
+	EXPECT_TRUE(pf.IsLineNumberingEnabled());
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceBefore().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FLOAT_EQ(0.0f, pf.GetSpaceAfter().GetValue(RtfUnit::eType_Twips));
 	EXPECT_FALSE(pf.IsAutoSpacingBeforeEnabled());
@@ -52,6 +53,22 @@ TEST(RtfParagraphFormat, ParseKeepWithNextEnabled)
 	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
 
 	EXPECT_TRUE(pf.IsKeepWithNextEnabled());
+}
+
+TEST(RtfParagraphFormat, ParseLineNumberingDisabled)
+{
+	RtfDomDocument doc(nullptr);
+	RtfParagraphFormat pf(doc);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "noline";
+
+	EXPECT_EQ(IRtfParseable::eResult_Handled, pf.Parse(s, t));
+
+	EXPECT_FALSE(pf.IsLineNumberingEnabled());
 }
 
 TEST(RtfParagraphFormat, ParseSpaceBefore)

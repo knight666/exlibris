@@ -56,6 +56,9 @@ namespace ExLibris
 		bool IsKeepWithNextEnabled() const;
 		void SetKeepWithNextEnabled(bool a_Value);
 
+		bool IsLineNumberingEnabled() const;
+		void SetLineNumberingEnabled(bool a_Value);
+
 		// Spacing
 
 		const RtfUnit& GetSpaceBefore() const;
@@ -89,6 +92,7 @@ namespace ExLibris
 		unsigned int m_SpecifiedGeneral;
 		RtfProperty<bool, 0> m_KeepIntactEnabled;
 		RtfProperty<bool, 1> m_KeepWithNextEnabled;
+		RtfProperty<bool, 2> m_LineNumberingEnabled;
 		unsigned int m_SpecifiedSpacing;
 		RtfProperty<RtfUnit, 0> m_SpaceBefore;
 		RtfProperty<RtfUnit, 1> m_SpaceAfter;
