@@ -31,14 +31,17 @@ namespace ExLibris
 
 	RtfParagraphFormat::RtfParagraphFormat(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
-		, m_Specified(0)
-		, m_SpaceBefore(RtfUnit(0.0f), m_Specified)
-		, m_SpaceAfter(RtfUnit(0.0f), m_Specified)
-		, m_AutoSpacingBefore(false, m_Specified)
-		, m_AutoSpacingAfter(false, m_Specified)
-		, m_SnapLineToGrid(true, m_Specified)
-		, m_LineHeightRule(Rtf::eLineHeightRule_Automatic, m_Specified)
-		, m_LineHeight(RtfUnit(100.0f), m_Specified)
+		, m_SpecifiedGeneral(0)
+		, m_KeepIntactEnabled(false, m_SpecifiedSpacing)
+		, m_KeepWithNextEnabled(false, m_SpecifiedSpacing)
+		, m_SpecifiedSpacing(0)
+		, m_SpaceBefore(RtfUnit(0.0f), m_SpecifiedSpacing)
+		, m_SpaceAfter(RtfUnit(0.0f), m_SpecifiedSpacing)
+		, m_AutoSpacingBefore(false, m_SpecifiedSpacing)
+		, m_AutoSpacingAfter(false, m_SpecifiedSpacing)
+		, m_SnapLineToGrid(true, m_SpecifiedSpacing)
+		, m_LineHeightRule(Rtf::eLineHeightRule_Automatic, m_SpecifiedSpacing)
+		, m_LineHeight(RtfUnit(100.0f), m_SpecifiedSpacing)
 	{
 	}
 
@@ -50,6 +53,30 @@ namespace ExLibris
 	{
 		return m_Document;
 	}
+
+	// general
+
+	bool RtfParagraphFormat::IsKeepIntactEnabled() const
+	{
+		return m_KeepIntactEnabled.Get();
+	}
+
+	void RtfParagraphFormat::SetKeepIntactEnabled(bool a_Value)
+	{
+		m_KeepIntactEnabled = a_Value;
+	}
+
+	bool RtfParagraphFormat::IsKeepWithNextEnabled() const
+	{
+		return m_KeepWithNextEnabled.Get();
+	}
+
+	void RtfParagraphFormat::SetKeepWithNextEnabled(bool a_Value)
+	{
+		m_KeepWithNextEnabled = a_Value;
+	}
+
+	// spacing
 
 	const RtfUnit& RtfParagraphFormat::GetSpaceBefore() const
 	{
@@ -121,9 +148,28 @@ namespace ExLibris
 		m_LineHeight = a_Value;
 	}
 
+	// parsing
+
 	IRtfParseable::Result RtfParagraphFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		if (a_Token.value == "sb")
+		// general
+
+		if (a_Token.value == "keep")
+		{
+			SetKeepIntactEnabled(true);
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "keepn")
+		{
+			SetKeepWithNextEnabled(true);
+
+			return IRtfParseable::eResult_Handled;
+		}
+
+		// spacing
+
+		else if (a_Token.value == "sb")
 		{
 			SetSpaceBefore(RtfUnit(RtfUnit::eType_Twips, (float)a_Token.parameter));
 
