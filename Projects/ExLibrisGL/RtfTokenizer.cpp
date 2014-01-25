@@ -38,6 +38,7 @@ namespace Rtf {
 			} \
 	}
 
+	TYPE_CLASS(Digit, (c >= '0' && c <= '9'));
 	TYPE_CLASS(Alphabetical, (
 		(c >= 'A' && c <= 'Z') ||
 		(c >= 'a' && c <= 'z')
@@ -53,6 +54,8 @@ namespace Rtf {
 	{
 		m_Current.type = RtfToken::eParseType_End;
 		m_Current.value.clear();
+		m_Current.parameter = -1;
+		m_Current.group = 0;
 		m_Current.column = 1;
 		m_Current.line = 1;
 	}
@@ -71,6 +74,8 @@ namespace Rtf {
 
 		m_Current.type = RtfToken::eParseType_End;
 		m_Current.value.clear();
+		m_Current.parameter = -1;
+		m_Current.group = 0;
 		m_Current.column = 1;
 		m_Current.line = 1;
 	}
@@ -88,9 +93,10 @@ namespace Rtf {
 	bool Tokenizer::Read()
 	{
 		m_Current.value.clear();
+		m_Current.parameter = -1;
+		m_Current.group = m_Group;
 		m_Current.column = m_Column;
 		m_Current.line = m_Line;
-		m_Current.group = m_Group;
 
 		if (!_NextCharacter())
 		{
@@ -158,9 +164,45 @@ namespace Rtf {
 					_AddCurrentToToken();
 				}
 
-				if (m_Consumed == 0)
+				if (m_Consumed == 1)
 				{
+					// just a forwards slash
+
 					m_Current.type = RtfToken::eParseType_Invalid;
+
+					return true;
+				}
+				else if (_Match('-') || _MatchType<CharacterTypeDigit>())
+				{
+					// read parameter
+
+					std::string parameter;
+
+					if (_Match('-'))
+					{
+						parameter.push_back(m_Character);
+						m_Consumed++;
+
+						if (!_NextCharacter())
+						{
+							m_Current.type = RtfToken::eParseType_Invalid;
+
+							return true;
+						}
+					}
+
+					while (_MatchType<CharacterTypeDigit>())
+					{
+						parameter.push_back(m_Character);
+						m_Consumed++;
+
+						if (!_NextCharacter())
+						{
+							break;
+						}
+					}
+
+					m_Current.parameter = atoi(parameter.c_str());
 				}
 
 			} break;

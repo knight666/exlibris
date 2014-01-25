@@ -257,6 +257,32 @@ TEST(RtfTokenizer, ReadCommand)
 	EXPECT_END_TOKEN(0, 6, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandParameter)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\b1";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("\\b", 1, 0, 1, 1);
+	EXPECT_END_TOKEN(0, 4, 1);
+}
+
+TEST(RtfTokenizer, ReadCommandParameterNegative)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\fs-228";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("\\fs", -228, 0, 1, 1);
+	EXPECT_END_TOKEN(0, 8, 1);
+}
+
 TEST(RtfTokenizer, ReadCommandInvalid)
 {
 	Tokenizer tk;

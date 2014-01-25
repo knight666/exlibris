@@ -50,22 +50,27 @@ namespace Rtf {
 
 		bool _NextCharacter();
 
-		inline bool _Match(char a_Character) const
-		{
-			return (m_Character == a_Character);
-		}
-
 		inline void _AddCurrentToToken()
 		{
 			m_Current.value.push_back(m_Character);
 			m_Consumed++;
 		}
 
+		inline bool _Match(char a_Character) const
+		{
+			return (m_Character == a_Character);
+		}
+		template<typename CharacterType>
+		inline bool _MatchType() const
+		{
+			return (CharacterType::Match(m_Character));
+		}
+
 		inline bool _Consume(char a_Character)
 		{
 			if (m_Character == a_Character)
 			{
-				m_Current.value.push_back(m_Character);
+				_AddCurrentToToken();
 
 				return true;
 			}
@@ -74,11 +79,19 @@ namespace Rtf {
 				return false;
 			}
 		}
-
 		template<typename CharacterType>
-		inline bool _MatchType() const
+		inline bool _ConsumeType()
 		{
-			return (CharacterType::Match(m_Character));
+			if (CharacterType::Match(m_Character))
+			{
+				_AddCurrentToToken();
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		bool _RecursiveRead();
