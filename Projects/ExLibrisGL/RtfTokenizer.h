@@ -55,6 +55,34 @@ namespace Rtf {
 			return (m_Character == a_Character);
 		}
 
+		inline void _AddCurrentToToken()
+		{
+			m_Current.value.push_back(m_Character);
+			m_Consumed++;
+		}
+
+		inline bool _Consume(char a_Character)
+		{
+			if (m_Character == a_Character)
+			{
+				m_Current.value.push_back(m_Character);
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template<typename CharacterType>
+		inline bool _MatchType() const
+		{
+			return (CharacterType::Match(m_Character));
+		}
+
+		bool _RecursiveRead();
+
 	private:
 
 		std::basic_istream<char>* m_Input;
@@ -63,6 +91,7 @@ namespace Rtf {
 		int m_Column;
 		int m_Line;
 		char m_Character;
+		int m_Consumed;
 
 	}; // class Tokenizer
 
