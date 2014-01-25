@@ -35,7 +35,7 @@ namespace Rtf {
 		, m_Line(1)
 		, m_Character(0)
 	{
-		m_Current.type = RtfToken::eParseType_Invalid;
+		m_Current.type = RtfToken::eParseType_End;
 		m_Current.value.clear();
 		m_Current.column = 1;
 		m_Current.line = 1;
@@ -52,7 +52,7 @@ namespace Rtf {
 		m_Column = 1;
 		m_Line = 1;
 
-		m_Current.type = RtfToken::eParseType_Invalid;
+		m_Current.type = RtfToken::eParseType_End;
 		m_Current.value.clear();
 		m_Current.column = 1;
 		m_Current.line = 1;
@@ -74,12 +74,20 @@ namespace Rtf {
 		m_Current.column = m_Column;
 		m_Current.line = m_Line;
 
+		if (!_NextCharacter())
+		{
+			m_Current.type = RtfToken::eParseType_End;
+
+			return false;
+		}
+
 		m_Current.type = RtfToken::eParseType_Text;
 
-		while (_NextCharacter())
+		do
 		{
 			m_Current.value.push_back(m_Character);
 		}
+		while (_NextCharacter());
 
 		return true;
 	}
@@ -92,6 +100,8 @@ namespace Rtf {
 		}
 
 		m_Character = (char)m_Input->get();
+
+		m_Column++;
 
 		return !m_Input->eof();
 	}
