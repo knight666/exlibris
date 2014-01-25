@@ -38,7 +38,8 @@ namespace ExLibris
 			eParseType_Command,
 			eParseType_CommandExtended,
 			eParseType_Value,
-			eParseType_Text
+			eParseType_Text,
+			eParseType_End
 		};
 
 	public:
