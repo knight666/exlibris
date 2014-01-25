@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "RtfToken.h"
 #include <istream>
 
 namespace ExLibris {
@@ -41,9 +42,21 @@ namespace Rtf {
 
 		bool IsNextAvailable() const;
 
+		const RtfToken& GetCurrent() const;
+
+		bool Read();
+
+	private:
+
+		bool _NextCharacter();
+
 	private:
 
 		std::basic_istream<char>* m_Input;
+		RtfToken m_Current;
+		int m_Column;
+		int m_Line;
+		char m_Character;
 
 	}; // class Tokenizer
 
