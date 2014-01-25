@@ -66,6 +66,19 @@ inline ::testing::AssertionResult CompareToken(
 		<< " Position: " << "column: " << a_TokenLeft.column << " line: " << a_TokenLeft.line;
 }
 
+#define EXPECT_INVALID_TOKEN(_value, _group, _column, _line) { \
+	EXPECT_TRUE(tk.Read()); \
+	const RtfToken& a = tk.GetCurrent(); \
+	RtfToken e; \
+	e.type = RtfToken::eParseType_Invalid; \
+	e.value = _value; \
+	e.parameter = -1; \
+	e.group = 0; \
+	e.column = _column; \
+	e.line = _line; \
+	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
+}
+
 #define EXPECT_TEXT_TOKEN(_value, _group, _column, _line) { \
 	EXPECT_TRUE(tk.Read()); \
 	const RtfToken& a = tk.GetCurrent(); \
@@ -99,6 +112,19 @@ inline ::testing::AssertionResult CompareToken(
 	e.type = RtfToken::eParseType_GroupClose; \
 	e.value = ""; \
 	e.parameter = -1; \
+	e.group = _group; \
+	e.column = _column; \
+	e.line = _line; \
+	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
+}
+
+#define EXPECT_COMMAND_TOKEN(_value, _parameter, _group, _column, _line) { \
+	EXPECT_TRUE(tk.Read()); \
+	const RtfToken& a = tk.GetCurrent(); \
+	RtfToken e; \
+	e.type = RtfToken::eParseType_Command; \
+	e.value = _value; \
+	e.parameter = _parameter; \
 	e.group = _group; \
 	e.column = _column; \
 	e.line = _line; \
@@ -169,7 +195,7 @@ TEST(RtfTokenizer, ReadText)
 	tk.SetInput(&ss);
 
 	EXPECT_TEXT_TOKEN("Hotdogs.", 0, 1, 1);
-	EXPECT_END_TOKEN(0, 10, 1);
+	EXPECT_END_TOKEN(0, 9, 1);
 }
 
 TEST(RtfTokenizer, ReadGroupOpen)
@@ -216,6 +242,45 @@ TEST(RtfTokenizer, ReadGroups)
 	EXPECT_GROUP_CLOSE_TOKEN(1, 7, 1);
 	EXPECT_GROUP_CLOSE_TOKEN(0, 8, 1);
 	EXPECT_END_TOKEN(0, 9, 1);
+}
+
+TEST(RtfTokenizer, ReadCommand)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\ansi";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("\\ansi", -1, 0, 1, 1);
+	EXPECT_END_TOKEN(0, 6, 1);
+}
+
+TEST(RtfTokenizer, ReadCommandInvalid)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\0";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 3, 1);
+}
+
+TEST(RtfTokenizer, ReadCommandNoData)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 2, 1);
 }
 
 TEST(RtfTokenizer, ReadNoInput)

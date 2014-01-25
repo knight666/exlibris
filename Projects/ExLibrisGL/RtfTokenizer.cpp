@@ -29,12 +29,27 @@
 namespace ExLibris {
 namespace Rtf {
 
+#define TYPE_CLASS_NAME(_name) CharacterType##_name
+#define TYPE_CLASS(_name, _condition) \
+	class TYPE_CLASS_NAME(_name) { \
+		public: \
+			static inline bool Match(char c) { \
+				return _condition; \
+			} \
+	}
+
+	TYPE_CLASS(Alphabetical, (
+		(c >= 'A' && c <= 'Z') ||
+		(c >= 'a' && c <= 'z')
+	));
+
 	Tokenizer::Tokenizer()
 		: m_Input(nullptr)
 		, m_Column(1)
 		, m_Line(1)
 		, m_Group(0)
 		, m_Character(0)
+		, m_Consumed(0)
 	{
 		m_Current.type = RtfToken::eParseType_End;
 		m_Current.value.clear();
@@ -84,28 +99,32 @@ namespace Rtf {
 			return false;
 		}
 
+		m_Consumed = 0;
+
 		if (_Match('{'))
 		{
 			m_Current.type = RtfToken::eParseType_GroupOpen;
 			m_Current.group = ++m_Group;
+
+			return true;
 		}
 		else if (_Match('}'))
 		{
 			m_Current.type = RtfToken::eParseType_GroupClose;
 			m_Current.group = --m_Group;
+
+			return true;
+		}
+		else if (_Consume('\\'))
+		{
+			m_Current.type = RtfToken::eParseType_Command;
 		}
 		else
 		{
 			m_Current.type = RtfToken::eParseType_Text;
-
-			do
-			{
-				m_Current.value.push_back(m_Character);
-			}
-			while (_NextCharacter());
 		}
 
-		return true;
+		return _RecursiveRead();
 	}
 
 	bool Tokenizer::_NextCharacter()
@@ -117,9 +136,48 @@ namespace Rtf {
 
 		m_Character = (char)m_Input->get();
 
-		m_Column++;
+		bool next = !m_Input->eof();
 
-		return !m_Input->eof();
+		if (next)
+		{
+			m_Column++;
+		}
+
+		return next;
+	}
+
+	bool Tokenizer::_RecursiveRead()
+	{
+		switch (m_Current.type)
+		{
+
+		case RtfToken::eParseType_Command:
+			{
+				while (_NextCharacter() && _MatchType<CharacterTypeAlphabetical>())
+				{
+					_AddCurrentToToken();
+				}
+
+				if (m_Consumed == 0)
+				{
+					m_Current.type = RtfToken::eParseType_Invalid;
+				}
+
+			} break;
+
+		case RtfToken::eParseType_Text:
+			{
+				do
+				{
+					_AddCurrentToToken();
+				}
+				while (_NextCharacter());
+
+			} break;
+
+		}
+
+		return true;
 	}
 
 }; // namespace Rtf
