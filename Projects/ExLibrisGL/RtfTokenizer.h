@@ -50,10 +50,16 @@ namespace Rtf {
 
 		bool _NextCharacter();
 
+		inline bool _Match(char a_Character) const
+		{
+			return (m_Character == a_Character);
+		}
+
 	private:
 
 		std::basic_istream<char>* m_Input;
 		RtfToken m_Current;
+		int m_Group;
 		int m_Column;
 		int m_Line;
 		char m_Character;

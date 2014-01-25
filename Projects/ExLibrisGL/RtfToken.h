@@ -45,18 +45,20 @@ namespace ExLibris
 	public:
 
 		RtfToken()
-			: column(0)
-			, line(0)
-			, type(eParseType_Invalid)
+			: type(eParseType_End)
 			, parameter(-1)
+			, group(0)
+			, column(0)
+			, line(0)
 		{
 		}
 
-		int column;
-		int line;
 		ParseType type;
 		std::string value;
 		int parameter;
+		int group;
+		int column;
+		int line;
 	};
 
 }; // namespace ExLibris
