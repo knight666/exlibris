@@ -26,6 +26,7 @@
 
 #include "IRtfParseable.h"
 #include "RtfAssociatedProperties.h"
+#include "RtfParagraphFormat.h"
 #include "RtfTextFormat.h"
 
 namespace ExLibris
@@ -58,6 +59,8 @@ namespace ExLibris
 
 		RtfTextFormat& GetTextFormat() const;
 
+		RtfParagraphFormat& GetParagraphFormat();
+
 		void BaseOn(const RtfStyle& a_Other);
 
 	private:
@@ -72,6 +75,7 @@ namespace ExLibris
 		std::string m_Name;
 		RtfStyle* m_StyleNextParagraph;
 		RtfTextFormat* m_TextFormat;
+		RtfParagraphFormat m_ParagraphFormat;
 		RtfAssociatedProperties* m_PropertiesLowAnsi;
 		RtfAssociatedProperties* m_PropertiesHighAnsi;
 		RtfAssociatedProperties* m_PropertiesDoubleByte;
