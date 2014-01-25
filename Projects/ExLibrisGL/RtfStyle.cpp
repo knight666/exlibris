@@ -46,6 +46,7 @@ namespace ExLibris
 		: m_Parent(a_Parent)
 		, m_Document(a_Document)
 		, m_TextFormat(new RtfTextFormat(m_Document, &m_Document.GetTextFormat()))
+		, m_ParagraphFormat(m_Document)
 		, m_State(new ParseState)
 	{
 		m_StyleNextParagraph = this;
@@ -135,6 +136,11 @@ namespace ExLibris
 		return *m_TextFormat;
 	}
 
+	RtfParagraphFormat& RtfStyle::GetParagraphFormat()
+	{
+		return m_ParagraphFormat;
+	}
+
 	void RtfStyle::BaseOn(const RtfStyle& a_Other)
 	{
 		m_TextFormat->Combine(a_Other.GetTextFormat());
@@ -210,6 +216,11 @@ namespace ExLibris
 				{
 					return result;
 				}
+			}
+
+			if (result == eResult_Propagate)
+			{
+				result = m_ParagraphFormat.Parse(a_State, a_Token);
 			}
 
 			if (result == eResult_Propagate)
