@@ -31,7 +31,14 @@ namespace Rtf {
 
 	Tokenizer::Tokenizer()
 		: m_Input(nullptr)
+		, m_Column(1)
+		, m_Line(1)
+		, m_Character(0)
 	{
+		m_Current.type = RtfToken::eParseType_Invalid;
+		m_Current.value.clear();
+		m_Current.column = 1;
+		m_Current.line = 1;
 	}
 
 	Tokenizer::~Tokenizer()
@@ -41,11 +48,52 @@ namespace Rtf {
 	void Tokenizer::SetInput(std::basic_istream<char>* a_Stream)
 	{
 		m_Input = a_Stream;
+
+		m_Column = 1;
+		m_Line = 1;
+
+		m_Current.type = RtfToken::eParseType_Invalid;
+		m_Current.value.clear();
+		m_Current.column = 1;
+		m_Current.line = 1;
 	}
 
 	bool Tokenizer::IsNextAvailable() const
 	{
 		return (m_Input != nullptr && !m_Input->eof());
+	}
+
+	const RtfToken& Tokenizer::GetCurrent() const
+	{
+		return m_Current;
+	}
+
+	bool Tokenizer::Read()
+	{
+		m_Current.value.clear();
+		m_Current.column = m_Column;
+		m_Current.line = m_Line;
+
+		m_Current.type = RtfToken::eParseType_Text;
+
+		while (_NextCharacter())
+		{
+			m_Current.value.push_back(m_Character);
+		}
+
+		return true;
+	}
+
+	bool Tokenizer::_NextCharacter()
+	{
+		if (m_Input == nullptr || m_Input->eof())
+		{
+			return false;
+		}
+
+		m_Character = (char)m_Input->get();
+
+		return !m_Input->eof();
 	}
 
 }; // namespace Rtf
