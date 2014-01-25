@@ -33,6 +33,7 @@ namespace Rtf {
 		: m_Input(nullptr)
 		, m_Column(1)
 		, m_Line(1)
+		, m_Group(0)
 		, m_Character(0)
 	{
 		m_Current.type = RtfToken::eParseType_End;
@@ -51,6 +52,7 @@ namespace Rtf {
 
 		m_Column = 1;
 		m_Line = 1;
+		m_Group = 0;
 
 		m_Current.type = RtfToken::eParseType_End;
 		m_Current.value.clear();
@@ -73,6 +75,7 @@ namespace Rtf {
 		m_Current.value.clear();
 		m_Current.column = m_Column;
 		m_Current.line = m_Line;
+		m_Current.group = m_Group;
 
 		if (!_NextCharacter())
 		{
@@ -81,13 +84,26 @@ namespace Rtf {
 			return false;
 		}
 
-		m_Current.type = RtfToken::eParseType_Text;
-
-		do
+		if (_Match('{'))
 		{
-			m_Current.value.push_back(m_Character);
+			m_Current.type = RtfToken::eParseType_GroupOpen;
+			m_Current.group = ++m_Group;
 		}
-		while (_NextCharacter());
+		else if (_Match('}'))
+		{
+			m_Current.type = RtfToken::eParseType_GroupClose;
+			m_Current.group = --m_Group;
+		}
+		else
+		{
+			m_Current.type = RtfToken::eParseType_Text;
+
+			do
+			{
+				m_Current.value.push_back(m_Character);
+			}
+			while (_NextCharacter());
+		}
 
 		return true;
 	}

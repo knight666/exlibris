@@ -40,6 +40,8 @@ inline ::testing::AssertionResult CompareToken(
 	if (
 		a_TokenLeft.type == a_TokenRight.type && 
 		a_TokenLeft.value == a_TokenRight.value &&
+		a_TokenLeft.parameter == a_TokenRight.parameter &&
+		a_TokenLeft.group == a_TokenRight.group &&
 		a_TokenLeft.column == a_TokenRight.column &&
 		a_TokenLeft.line == a_TokenRight.line
 	)
@@ -52,31 +54,65 @@ inline ::testing::AssertionResult CompareToken(
 		<< " [ Actual ]" << std::endl
 		<< "     Type: " << TokenTypeToString(a_TokenRight.type) << std::endl
 		<< "    Value: " << a_TokenRight.value << std::endl
+		<< "Parameter: " << a_TokenRight.parameter << std::endl
+		<< "    Group: " << a_TokenRight.group << std::endl
 		<< " Position: " << "column: " << a_TokenRight.column << " line: " << a_TokenRight.line << std::endl
 		<< std::endl
 		<< "[ Expected ]" << std::endl
 		<< "     Type: " << TokenTypeToString(a_TokenLeft.type) << std::endl
 		<< "    Value: " << a_TokenLeft.value << std::endl
+		<< "Parameter: " << a_TokenLeft.parameter << std::endl
+		<< "    Group: " << a_TokenLeft.group << std::endl
 		<< " Position: " << "column: " << a_TokenLeft.column << " line: " << a_TokenLeft.line;
 }
 
-#define EXPECT_TEXT_TOKEN(_value, _column, _line) { \
+#define EXPECT_TEXT_TOKEN(_value, _group, _column, _line) { \
 	EXPECT_TRUE(tk.Read()); \
 	const RtfToken& a = tk.GetCurrent(); \
 	RtfToken e; \
 	e.type = RtfToken::eParseType_Text; \
 	e.value = _value; \
+	e.parameter = -1; \
+	e.group = 0; \
 	e.column = _column; \
 	e.line = _line; \
 	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
 }
 
-#define EXPECT_END_TOKEN(_column, _line) { \
+#define EXPECT_GROUP_OPEN_TOKEN(_group, _column, _line) { \
+	EXPECT_TRUE(tk.Read()); \
+	const RtfToken& a = tk.GetCurrent(); \
+	RtfToken e; \
+	e.type = RtfToken::eParseType_GroupOpen; \
+	e.value = ""; \
+	e.parameter = -1; \
+	e.group = _group; \
+	e.column = _column; \
+	e.line = _line; \
+	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
+}
+
+#define EXPECT_GROUP_CLOSE_TOKEN(_group, _column, _line) { \
+	EXPECT_TRUE(tk.Read()); \
+	const RtfToken& a = tk.GetCurrent(); \
+	RtfToken e; \
+	e.type = RtfToken::eParseType_GroupClose; \
+	e.value = ""; \
+	e.parameter = -1; \
+	e.group = _group; \
+	e.column = _column; \
+	e.line = _line; \
+	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
+}
+
+#define EXPECT_END_TOKEN(_group, _column, _line) { \
 	EXPECT_FALSE(tk.Read()); \
 	const RtfToken& a = tk.GetCurrent(); \
 	RtfToken e; \
 	e.type = RtfToken::eParseType_End; \
 	e.value = ""; \
+	e.parameter = -1; \
+	e.group = _group; \
 	e.column = _column; \
 	e.line = _line; \
 	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
@@ -87,7 +123,7 @@ TEST(RtfTokenizer, Construct)
 	Tokenizer tk;
 
 	EXPECT_FALSE(tk.IsNextAvailable());
-	EXPECT_END_TOKEN(1, 1);
+	EXPECT_END_TOKEN(0, 1, 1);
 }
 
 TEST(RtfTokenizer, IsNextAvailable)
@@ -132,15 +168,61 @@ TEST(RtfTokenizer, ReadText)
 
 	tk.SetInput(&ss);
 
-	EXPECT_TEXT_TOKEN("Hotdogs.", 1, 1);
-	EXPECT_END_TOKEN(10, 1);
+	EXPECT_TEXT_TOKEN("Hotdogs.", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 10, 1);
+}
+
+TEST(RtfTokenizer, ReadGroupOpen)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "{";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_OPEN_TOKEN(1, 1, 1);
+	EXPECT_END_TOKEN(1, 2, 1);
+}
+
+TEST(RtfTokenizer, ReadGroupClose)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "}";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_CLOSE_TOKEN(-1, 1, 1);
+	EXPECT_END_TOKEN(-1, 2, 1);
+}
+
+TEST(RtfTokenizer, ReadGroups)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "{{{}}{}}";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_OPEN_TOKEN(1, 1, 1);
+	EXPECT_GROUP_OPEN_TOKEN(2, 2, 1);
+	EXPECT_GROUP_OPEN_TOKEN(3, 3, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(2, 4, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(1, 5, 1);
+	EXPECT_GROUP_OPEN_TOKEN(2, 6, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(1, 7, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(0, 8, 1);
+	EXPECT_END_TOKEN(0, 9, 1);
 }
 
 TEST(RtfTokenizer, ReadNoInput)
 {
 	Tokenizer tk;
 
-	EXPECT_END_TOKEN(1, 1);
+	EXPECT_END_TOKEN(0, 1, 1);
 }
 
 TEST(RtfTokenizer, ReadNoData)
@@ -150,5 +232,5 @@ TEST(RtfTokenizer, ReadNoData)
 	std::stringstream ss;
 	tk.SetInput(&ss);
 
-	EXPECT_END_TOKEN(1, 1);
+	EXPECT_END_TOKEN(0, 1, 1);
 }
