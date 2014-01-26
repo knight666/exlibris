@@ -121,7 +121,7 @@ namespace Rtf {
 
 			return true;
 		}
-		else if (_Consume('\\'))
+		else if (_Match('\\'))
 		{
 			m_Current.type = RtfToken::eParseType_Command;
 		}
@@ -157,14 +157,47 @@ namespace Rtf {
 		switch (m_Current.type)
 		{
 
+		case RtfToken::eParseType_CommandExtended:
 		case RtfToken::eParseType_Command:
 			{
-				while (_NextCharacter() && _MatchType<CharacterTypeAlphabetical>())
+				if (!_Consume('\\') || !_NextCharacter())
 				{
-					_AddCurrentToToken();
+					m_Current.type = RtfToken::eParseType_Invalid;
+
+					return true;
 				}
 
-				if (m_Consumed == 1)
+				if (m_Current.type != RtfToken::eParseType_CommandExtended && _Consume('*'))
+				{
+					if (!_NextCharacter())
+					{
+						// not enough input
+
+						m_Current.type = RtfToken::eParseType_Invalid;
+
+						return true;
+					}
+
+					// extended control word
+
+					m_Current.type = RtfToken::eParseType_CommandExtended;
+
+					return _RecursiveRead();
+				}
+
+				int command_start = m_Consumed;
+
+				while (_MatchType<CharacterTypeAlphabetical>())
+				{
+					_AddCurrentToToken();
+
+					if (!_NextCharacter())
+					{
+						break;
+					}
+				}
+
+				if ((m_Consumed - command_start) == 0)
 				{
 					// just a forwards slash
 
@@ -209,11 +242,12 @@ namespace Rtf {
 
 		case RtfToken::eParseType_Text:
 			{
-				do
+				_AddCurrentToToken();
+
+				while (_NextCharacter())
 				{
 					_AddCurrentToToken();
 				}
-				while (_NextCharacter());
 
 			} break;
 
