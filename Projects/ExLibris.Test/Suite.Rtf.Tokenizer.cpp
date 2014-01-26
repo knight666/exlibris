@@ -131,6 +131,19 @@ inline ::testing::AssertionResult CompareToken(
 	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
 }
 
+#define EXPECT_EXTENDED_COMMAND_TOKEN(_value, _parameter, _group, _column, _line) { \
+	EXPECT_TRUE(tk.Read()); \
+	const RtfToken& a = tk.GetCurrent(); \
+	RtfToken e; \
+	e.type = RtfToken::eParseType_CommandExtended; \
+	e.value = _value; \
+	e.parameter = _parameter; \
+	e.group = _group; \
+	e.column = _column; \
+	e.line = _line; \
+	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
+}
+
 #define EXPECT_END_TOKEN(_group, _column, _line) { \
 	EXPECT_FALSE(tk.Read()); \
 	const RtfToken& a = tk.GetCurrent(); \
@@ -257,6 +270,32 @@ TEST(RtfTokenizer, ReadCommand)
 	EXPECT_END_TOKEN(0, 6, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandInvalid)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\0";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 3, 1);
+}
+
+TEST(RtfTokenizer, ReadCommandNoData)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 2, 1);
+}
+
 TEST(RtfTokenizer, ReadCommandParameter)
 {
 	Tokenizer tk;
@@ -283,30 +322,43 @@ TEST(RtfTokenizer, ReadCommandParameterNegative)
 	EXPECT_END_TOKEN(0, 8, 1);
 }
 
-TEST(RtfTokenizer, ReadCommandInvalid)
+TEST(RtfTokenizer, ReadExtendedCommand)
 {
 	Tokenizer tk;
 
 	std::stringstream ss;
-	ss << "\\0";
+	ss << "\\*\\bloop";
 
 	tk.SetInput(&ss);
 
-	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
-	EXPECT_END_TOKEN(0, 3, 1);
+	EXPECT_EXTENDED_COMMAND_TOKEN("\\*\\bloop", -1, 0, 1, 1);
+	EXPECT_END_TOKEN(0, 9, 1);
 }
 
-TEST(RtfTokenizer, ReadCommandNoData)
+TEST(RtfTokenizer, ReadExtendedCommandInvalid)
 {
 	Tokenizer tk;
 
 	std::stringstream ss;
-	ss << "\\";
+	ss << "\\*\\1";
 
 	tk.SetInput(&ss);
 
-	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
-	EXPECT_END_TOKEN(0, 2, 1);
+	EXPECT_INVALID_TOKEN("\\*\\", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 5, 1);
+}
+
+TEST(RtfTokenizer, ReadExtendedCommandNotEnoughData)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\*";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\*", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 3, 1);
 }
 
 TEST(RtfTokenizer, ReadNoInput)
