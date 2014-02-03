@@ -94,7 +94,35 @@ namespace Rtf {
 			}
 		}
 
+		template<typename CharacterType>
+		inline bool _ReadTyped()
+		{
+			if (_NextCharacter())
+			{
+				if (_MatchType<CharacterType>())
+				{
+					return true;
+				}
+				else
+				{
+					_RevertCurrent();
+
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		bool _RecursiveRead();
+
+		inline void _RevertCurrent()
+		{
+			m_CharacterQueued = m_Character;
+			m_Column--;
+		}
 
 	private:
 
@@ -104,6 +132,7 @@ namespace Rtf {
 		int m_Column;
 		int m_Line;
 		char m_Character;
+		char m_CharacterQueued;
 		int m_Consumed;
 
 	}; // class Tokenizer
