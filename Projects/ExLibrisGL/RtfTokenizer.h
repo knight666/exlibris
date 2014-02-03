@@ -50,10 +50,14 @@ namespace Rtf {
 
 		bool _NextCharacter();
 
+		inline void _AddToToken(char a_Character)
+		{
+			m_Current.value.push_back(a_Character);
+			m_Consumed++;
+		}
 		inline void _AddCurrentToToken()
 		{
-			m_Current.value.push_back(m_Character);
-			m_Consumed++;
+			_AddToToken(m_Character);
 		}
 
 		inline bool _Match(char a_Character) const
@@ -105,7 +109,7 @@ namespace Rtf {
 				}
 				else
 				{
-					_RevertCurrent();
+					_Revert(1);
 
 					return false;
 				}
@@ -116,13 +120,9 @@ namespace Rtf {
 			}
 		}
 
-		bool _RecursiveRead();
+		void _Revert(int a_Count);
 
-		inline void _RevertCurrent()
-		{
-			m_CharacterQueued = m_Character;
-			m_Column--;
-		}
+		bool _RecursiveRead();
 
 	private:
 
@@ -132,7 +132,8 @@ namespace Rtf {
 		int m_Column;
 		int m_Line;
 		char m_Character;
-		char m_CharacterQueued;
+		std::string m_CharactersRead;
+		std::deque<char> m_CharactersQueued;
 		int m_Consumed;
 
 	}; // class Tokenizer
