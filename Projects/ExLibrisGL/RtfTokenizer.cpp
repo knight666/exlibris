@@ -43,7 +43,7 @@ namespace Rtf {
 		(c >= 'A' && c <= 'Z') ||
 		(c >= 'a' && c <= 'z')
 	));
-	TYPE_CLASS(Text, (c != '{' && c != '}' && c != '\\'));
+	TYPE_CLASS(Escaped, (c == '{' || c == '}' || c == '\\'));
 
 	Tokenizer::Tokenizer()
 		: m_Input(nullptr)
@@ -51,7 +51,7 @@ namespace Rtf {
 		, m_Line(1)
 		, m_Group(0)
 		, m_Character(0)
-		, m_CharacterQueued(0)
+		, m_CharactersQueued(0)
 		, m_Consumed(0)
 	{
 		m_Current.type = RtfToken::eParseType_End;
@@ -129,6 +129,8 @@ namespace Rtf {
 		}
 		else
 		{
+			_AddCurrentToToken();
+
 			m_Current.type = RtfToken::eParseType_Text;
 		}
 
@@ -139,10 +141,10 @@ namespace Rtf {
 	{
 		bool next = false;
 
-		if (m_CharacterQueued != 0)
+		if (m_CharactersQueued.size() > 0)
 		{
-			m_Character = m_CharacterQueued;
-			m_CharacterQueued = 0;
+			m_Character = m_CharactersQueued.front();
+			m_CharactersQueued.pop_front();
 
 			next = true;
 		}
@@ -155,10 +157,27 @@ namespace Rtf {
 
 		if (next)
 		{
+			m_CharactersRead.push_back(m_Character);
+
 			m_Column++;
 		}
 
 		return next;
+	}
+
+	void Tokenizer::_Revert(int a_Count)
+	{
+		int added = 0;
+
+		while (added < a_Count && m_CharactersRead.size() > 0)
+		{
+			m_CharactersQueued.push_front(m_CharactersRead.back());
+			m_CharactersRead.pop_back();
+
+			++added;
+		}
+
+		m_Column -= added;
 	}
 
 	bool Tokenizer::_RecursiveRead()
@@ -169,11 +188,29 @@ namespace Rtf {
 		case RtfToken::eParseType_CommandExtended:
 		case RtfToken::eParseType_Command:
 			{
-				if (!_Consume('\\') || !_NextCharacter())
+				if (!_Consume('\\'))
 				{
 					m_Current.type = RtfToken::eParseType_Invalid;
 
 					return true;
+				}
+
+				if (!_NextCharacter())
+				{
+					// just a slash
+
+					m_Current.type = RtfToken::eParseType_Text;
+
+					return true;
+				}
+				
+				if (_Match('\\'))
+				{
+					// it's escaped, skip the second slash
+
+					m_Current.type = RtfToken::eParseType_Text;
+
+					return _RecursiveRead();
 				}
 
 				if (m_Current.type != RtfToken::eParseType_CommandExtended && _Consume('*'))
@@ -198,14 +235,9 @@ namespace Rtf {
 
 				if (_ConsumeType<CharacterTypeAlphabetical>())
 				{
-					while (_NextCharacter())
+					while (_ReadTyped<CharacterTypeAlphabetical>())
 					{
-						if (!_ConsumeType<CharacterTypeAlphabetical>())
-						{
-							_RevertCurrent();
-
-							break;
-						}
+						_AddCurrentToToken();
 					}
 				}
 
@@ -262,7 +294,7 @@ namespace Rtf {
 					{
 						// skip trailing space
 
-						_RevertCurrent();
+						_Revert(1);
 					}
 				}
 
@@ -270,11 +302,44 @@ namespace Rtf {
 
 		case RtfToken::eParseType_Text:
 			{
-				_AddCurrentToToken();
-
-				while (_ReadTyped<CharacterTypeText>())
+				while (_NextCharacter())
 				{
-					_AddCurrentToToken();
+					if (_Match('\\'))
+					{
+						// check if it's an escaped character
+
+						if (!_NextCharacter())
+						{
+							// slash at end of input
+
+							_AddToToken('\\');
+
+							return true;
+						}
+
+						if (!_MatchType<CharacterTypeEscaped>())
+						{
+							// not an escaped character
+
+							_Revert(2);
+
+							return true;
+						}
+
+						_AddCurrentToToken();
+					}
+					else if (_Match('{') || _Match('}'))
+					{
+						// group control word
+
+						_Revert(1);
+
+						return true;
+					}
+					else
+					{
+						_AddCurrentToToken();
+					}
 				}
 
 			} break;
