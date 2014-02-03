@@ -43,6 +43,7 @@ namespace Rtf {
 		(c >= 'A' && c <= 'Z') ||
 		(c >= 'a' && c <= 'z')
 	));
+	TYPE_CLASS(Text, (c != '{' && c != '}' && c != '\\'));
 
 	Tokenizer::Tokenizer()
 		: m_Input(nullptr)
@@ -50,6 +51,7 @@ namespace Rtf {
 		, m_Line(1)
 		, m_Group(0)
 		, m_Character(0)
+		, m_CharacterQueued(0)
 		, m_Consumed(0)
 	{
 		m_Current.type = RtfToken::eParseType_End;
@@ -135,14 +137,21 @@ namespace Rtf {
 
 	bool Tokenizer::_NextCharacter()
 	{
-		if (m_Input == nullptr || m_Input->eof())
+		bool next = false;
+
+		if (m_CharacterQueued != 0)
 		{
-			return false;
+			m_Character = m_CharacterQueued;
+			m_CharacterQueued = 0;
+
+			next = true;
 		}
+		else if (m_Input != nullptr && !m_Input->eof())
+		{
+			m_Character = (char)m_Input->get();
 
-		m_Character = (char)m_Input->get();
-
-		bool next = !m_Input->eof();
+			next = !m_Input->eof();
+		}
 
 		if (next)
 		{
@@ -187,13 +196,16 @@ namespace Rtf {
 
 				int command_start = m_Consumed;
 
-				while (_MatchType<CharacterTypeAlphabetical>())
+				if (_ConsumeType<CharacterTypeAlphabetical>())
 				{
-					_AddCurrentToToken();
-
-					if (!_NextCharacter())
+					while (_NextCharacter())
 					{
-						break;
+						if (!_ConsumeType<CharacterTypeAlphabetical>())
+						{
+							_RevertCurrent();
+
+							break;
+						}
 					}
 				}
 
@@ -205,7 +217,15 @@ namespace Rtf {
 
 					return true;
 				}
-				else if (_Match('-') || _MatchType<CharacterTypeDigit>())
+				
+				if (!_NextCharacter() || _Match(' '))
+				{
+					// skip trailing space
+
+					return true;
+				}
+
+				if (_Match('-') || _MatchType<CharacterTypeDigit>())
 				{
 					// read parameter
 
@@ -224,18 +244,26 @@ namespace Rtf {
 						}
 					}
 
-					while (_MatchType<CharacterTypeDigit>())
+					if (_MatchType<CharacterTypeDigit>())
 					{
 						parameter.push_back(m_Character);
 						m_Consumed++;
 
-						if (!_NextCharacter())
+						while (_ReadTyped<CharacterTypeDigit>())
 						{
-							break;
+							parameter.push_back(m_Character);
+							m_Consumed++;
 						}
+
+						m_Current.parameter = atoi(parameter.c_str());
 					}
 
-					m_Current.parameter = atoi(parameter.c_str());
+					if (_NextCharacter() && !_Match(' '))
+					{
+						// skip trailing space
+
+						_RevertCurrent();
+					}
 				}
 
 			} break;
@@ -244,7 +272,7 @@ namespace Rtf {
 			{
 				_AddCurrentToToken();
 
-				while (_NextCharacter())
+				while (_ReadTyped<CharacterTypeText>())
 				{
 					_AddCurrentToToken();
 				}

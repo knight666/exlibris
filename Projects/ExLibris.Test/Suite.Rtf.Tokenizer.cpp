@@ -73,7 +73,7 @@ inline ::testing::AssertionResult CompareToken(
 	e.type = RtfToken::eParseType_Invalid; \
 	e.value = _value; \
 	e.parameter = -1; \
-	e.group = 0; \
+	e.group = _group; \
 	e.column = _column; \
 	e.line = _line; \
 	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
@@ -86,7 +86,7 @@ inline ::testing::AssertionResult CompareToken(
 	e.type = RtfToken::eParseType_Text; \
 	e.value = _value; \
 	e.parameter = -1; \
-	e.group = 0; \
+	e.group = _group; \
 	e.column = _column; \
 	e.line = _line; \
 	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
@@ -270,6 +270,21 @@ TEST(RtfTokenizer, ReadCommand)
 	EXPECT_END_TOKEN(0, 6, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandTrailingSpace)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\brr    \\sum ";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("\\brr", -1, 0, 1, 1);
+	EXPECT_TEXT_TOKEN("   ", 0, 6, 1);
+	EXPECT_COMMAND_TOKEN("\\sum", -1, 0, 9, 1);
+	EXPECT_END_TOKEN(0, 14, 1);
+}
+
 TEST(RtfTokenizer, ReadCommandInvalid)
 {
 	Tokenizer tk;
@@ -322,6 +337,21 @@ TEST(RtfTokenizer, ReadCommandParameterNegative)
 	EXPECT_END_TOKEN(0, 8, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandParameterTrailingSpace)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\magic128     \\magic0 ";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("\\magic", 128, 0, 1, 1);
+	EXPECT_TEXT_TOKEN("    ", 0, 11, 1);
+	EXPECT_COMMAND_TOKEN("\\magic", 0, 0, 15, 1);
+	EXPECT_END_TOKEN(0, 23, 1);
+}
+
 TEST(RtfTokenizer, ReadExtendedCommand)
 {
 	Tokenizer tk;
@@ -359,6 +389,63 @@ TEST(RtfTokenizer, ReadExtendedCommandNotEnoughData)
 
 	EXPECT_INVALID_TOKEN("\\*", 0, 1, 1);
 	EXPECT_END_TOKEN(0, 3, 1);
+}
+
+TEST(RtfTokenizer, ReadTextEncapsulatedByCommands)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "That's a \\b1bold\\b0 move there.";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TEXT_TOKEN("That's a ", 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("\\b", 1, 0, 10, 1);
+	EXPECT_TEXT_TOKEN("bold", 0, 13, 1);
+	EXPECT_COMMAND_TOKEN("\\b", 0, 0, 17, 1);
+	EXPECT_TEXT_TOKEN("move there.", 0, 21, 1);
+	EXPECT_END_TOKEN(0, 32, 1);
+}
+
+TEST(RtfTokenizer, ReadTextInsideGroup)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "Uniting {them {under {a common goal.}}}";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TEXT_TOKEN("Uniting ", 0, 1, 1);
+	EXPECT_GROUP_OPEN_TOKEN(1, 9, 1);
+	EXPECT_TEXT_TOKEN("them ", 1, 10, 1);
+	EXPECT_GROUP_OPEN_TOKEN(2, 15, 1);
+	EXPECT_TEXT_TOKEN("under ", 2, 16, 1);
+	EXPECT_GROUP_OPEN_TOKEN(3, 22, 1);
+	EXPECT_TEXT_TOKEN("a common goal.", 3, 23, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(2, 37, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(1, 38, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(0, 39, 1);
+	EXPECT_END_TOKEN(0, 40, 1);
+}
+
+TEST(RtfTokenizer, ReadTextAfterCommandInsideGroup)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "This standard {\\lsb can be} pretty weird.";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TEXT_TOKEN("This standard ", 0, 1, 1);
+	EXPECT_GROUP_OPEN_TOKEN(1, 15, 1);
+	EXPECT_COMMAND_TOKEN("\\lsb", -1, 1, 16, 1);
+	EXPECT_TEXT_TOKEN("can be", 1, 21, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(0, 27, 1);
+	EXPECT_TEXT_TOKEN(" pretty weird.", 0, 28, 1);
+	EXPECT_END_TOKEN(0, 42, 1);
 }
 
 TEST(RtfTokenizer, ReadNoInput)
