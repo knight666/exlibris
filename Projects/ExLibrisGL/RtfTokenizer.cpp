@@ -188,38 +188,31 @@ namespace Rtf {
 		case RtfToken::eParseType_CommandExtended:
 		case RtfToken::eParseType_Command:
 			{
-				if (!_Consume('\\'))
+				if (!_Match('\\'))
 				{
 					m_Current.type = RtfToken::eParseType_Invalid;
 
 					return true;
 				}
-
-				if (!_NextCharacter())
-				{
-					// just a slash
-
-					m_Current.type = RtfToken::eParseType_Text;
-
-					return true;
-				}
 				
-				if (_Match('\\'))
+				if (!_NextCharacter() || _Match('\\'))
 				{
 					// it's escaped, skip the second slash
 
 					m_Current.type = RtfToken::eParseType_Text;
+					_AddToToken('\\');
 
 					return _RecursiveRead();
 				}
 
-				if (m_Current.type != RtfToken::eParseType_CommandExtended && _Consume('*'))
+				if (m_Current.type != RtfToken::eParseType_CommandExtended && _Match('*'))
 				{
 					if (!_NextCharacter())
 					{
 						// not enough input
 
 						m_Current.type = RtfToken::eParseType_Invalid;
+						m_Current.value = m_CharactersRead;
 
 						return true;
 					}
@@ -246,6 +239,7 @@ namespace Rtf {
 					// just a forwards slash
 
 					m_Current.type = RtfToken::eParseType_Invalid;
+					m_Current.value = m_CharactersRead;
 
 					return true;
 				}

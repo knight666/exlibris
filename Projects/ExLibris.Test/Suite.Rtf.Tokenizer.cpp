@@ -221,9 +221,9 @@ TEST(RtfTokenizer, ReadTextEncapsulatedByCommands)
 	tk.SetInput(&ss);
 
 	EXPECT_TEXT_TOKEN("That's a ", 0, 1, 1);
-	EXPECT_COMMAND_TOKEN("\\b", 1, 0, 10, 1);
+	EXPECT_COMMAND_TOKEN("b", 1, 0, 10, 1);
 	EXPECT_TEXT_TOKEN("bold", 0, 13, 1);
-	EXPECT_COMMAND_TOKEN("\\b", 0, 0, 17, 1);
+	EXPECT_COMMAND_TOKEN("b", 0, 0, 17, 1);
 	EXPECT_TEXT_TOKEN("move there.", 0, 21, 1);
 	EXPECT_END_TOKEN(0, 32, 1);
 }
@@ -261,7 +261,7 @@ TEST(RtfTokenizer, ReadTextAfterCommandInsideGroup)
 
 	EXPECT_TEXT_TOKEN("This standard ", 0, 1, 1);
 	EXPECT_GROUP_OPEN_TOKEN(1, 15, 1);
-	EXPECT_COMMAND_TOKEN("\\lsb", -1, 1, 16, 1);
+	EXPECT_COMMAND_TOKEN("lsb", -1, 1, 16, 1);
 	EXPECT_TEXT_TOKEN("can be", 1, 21, 1);
 	EXPECT_GROUP_CLOSE_TOKEN(0, 27, 1);
 	EXPECT_TEXT_TOKEN(" pretty weird.", 0, 28, 1);
@@ -349,7 +349,7 @@ TEST(RtfTokenizer, ReadCommand)
 
 	tk.SetInput(&ss);
 
-	EXPECT_COMMAND_TOKEN("\\ansi", -1, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("ansi", -1, 0, 1, 1);
 	EXPECT_END_TOKEN(0, 6, 1);
 }
 
@@ -362,9 +362,9 @@ TEST(RtfTokenizer, ReadCommandTrailingSpace)
 
 	tk.SetInput(&ss);
 
-	EXPECT_COMMAND_TOKEN("\\brr", -1, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("brr", -1, 0, 1, 1);
 	EXPECT_TEXT_TOKEN("   ", 0, 6, 1);
-	EXPECT_COMMAND_TOKEN("\\sum", -1, 0, 9, 1);
+	EXPECT_COMMAND_TOKEN("sum", -1, 0, 9, 1);
 	EXPECT_END_TOKEN(0, 14, 1);
 }
 
@@ -403,7 +403,7 @@ TEST(RtfTokenizer, ReadCommandInvalid)
 
 	tk.SetInput(&ss);
 
-	EXPECT_INVALID_TOKEN("\\", 0, 1, 1);
+	EXPECT_INVALID_TOKEN("\\0", 0, 1, 1);
 	EXPECT_END_TOKEN(0, 3, 1);
 }
 
@@ -416,7 +416,7 @@ TEST(RtfTokenizer, ReadCommandParameter)
 
 	tk.SetInput(&ss);
 
-	EXPECT_COMMAND_TOKEN("\\b", 1, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("b", 1, 0, 1, 1);
 	EXPECT_END_TOKEN(0, 4, 1);
 }
 
@@ -429,7 +429,7 @@ TEST(RtfTokenizer, ReadCommandParameterNegative)
 
 	tk.SetInput(&ss);
 
-	EXPECT_COMMAND_TOKEN("\\fs", -228, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("fs", -228, 0, 1, 1);
 	EXPECT_END_TOKEN(0, 8, 1);
 }
 
@@ -442,9 +442,9 @@ TEST(RtfTokenizer, ReadCommandParameterTrailingSpace)
 
 	tk.SetInput(&ss);
 
-	EXPECT_COMMAND_TOKEN("\\magic", 128, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("magic", 128, 0, 1, 1);
 	EXPECT_TEXT_TOKEN("    ", 0, 11, 1);
-	EXPECT_COMMAND_TOKEN("\\magic", 0, 0, 15, 1);
+	EXPECT_COMMAND_TOKEN("magic", 0, 0, 15, 1);
 	EXPECT_END_TOKEN(0, 23, 1);
 }
 
@@ -457,7 +457,7 @@ TEST(RtfTokenizer, ReadExtendedCommand)
 
 	tk.SetInput(&ss);
 
-	EXPECT_EXTENDED_COMMAND_TOKEN("\\*\\bloop", -1, 0, 1, 1);
+	EXPECT_EXTENDED_COMMAND_TOKEN("bloop", -1, 0, 1, 1);
 	EXPECT_END_TOKEN(0, 9, 1);
 }
 
@@ -470,7 +470,7 @@ TEST(RtfTokenizer, ReadExtendedCommandInvalid)
 
 	tk.SetInput(&ss);
 
-	EXPECT_INVALID_TOKEN("\\*\\", 0, 1, 1);
+	EXPECT_INVALID_TOKEN("\\*\\1", 0, 1, 1);
 	EXPECT_END_TOKEN(0, 5, 1);
 }
 
