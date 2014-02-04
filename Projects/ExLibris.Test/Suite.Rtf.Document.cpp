@@ -140,3 +140,31 @@ TEST(RtfDomDocument, ParseStyleSheet)
 	EXPECT_STREQ("Awesome", st->GetName().c_str());
 	EXPECT_TRUE(st->GetTextFormat().IsKerningEnabled());
 }
+
+TEST(RtfDomDocument, ParseFromSourceHelloWorld)
+{
+	RtfWorld w;
+
+	RtfDomDocument doc(&w);
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi{\\fonttbl\\f0\\fswiss Helvetica;}\\f0\\pard\nHello World!\\par\n}";
+
+	bool result = false;
+	EXPECT_NO_THROW({
+		result = doc.ParseFromSource(&input);
+	});
+	EXPECT_TRUE(result);
+
+	RtfFontTable* ft = doc.GetFontTable();
+
+	EXPECT_EQ(Rtf::eFamilyType_Swiss, ft->GetFont(0)->GetFamilyType());
+	EXPECT_STREQ("Helvetica", ft->GetFont(0)->GetName().c_str());
+
+	RtfDomElement* root = doc.GetRootElement();
+
+	EXPECT_EQ(Rtf::eCharacterSet_Ansi, root->GetTextFormat().GetCharacterSet());
+	EXPECT_STREQ("Hello World!", root->InnerText.c_str());
+
+	EXPECT_EQ(1, root->GetChildrenCount());
+}

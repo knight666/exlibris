@@ -24,8 +24,10 @@
 
 #pragma once
 
+#include "Exception.h"
 #include "IRtfParseable.h"
 #include "RtfColorTable.h"
+#include "RtfDomElement.h"
 #include "RtfFontTable.h"
 #include "RtfStyleSheet.h"
 #include "RtfTextFormat.h"
@@ -34,6 +36,11 @@
 namespace ExLibris
 {
 	class RtfDomElement;
+
+	namespace Rtf
+	{
+		class Tokenizer;
+	}
 };
 
 namespace ExLibris
@@ -60,6 +67,8 @@ namespace ExLibris
 		bool GetWidowControl() const;
 		void SetWidowControl(bool a_Value);
 
+		bool ParseFromSource(std::basic_istream<char>* a_Stream);
+
 	private:
 
 		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
@@ -77,6 +86,8 @@ namespace ExLibris
 		RtfStyleSheet* m_StyleSheet;
 
 		bool m_WidowControl;
+
+		Rtf::Tokenizer* m_Tokenizer;
 
 		struct ParseState;
 		ParseState* m_State;
