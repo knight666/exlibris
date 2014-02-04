@@ -49,6 +49,7 @@ namespace Rtf {
 	private:
 
 		bool _NextCharacter();
+		bool _ParseNewLine();
 
 		inline void _AddToToken(char a_Character)
 		{

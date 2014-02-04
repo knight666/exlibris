@@ -100,14 +100,15 @@ namespace Rtf {
 		m_Current.column = m_Column;
 		m_Current.line = m_Line;
 
+		m_CharactersRead.clear();
+		m_Consumed = 0;
+
 		if (!_NextCharacter())
 		{
 			m_Current.type = RtfToken::eParseType_End;
 
 			return false;
 		}
-
-		m_Consumed = 0;
 
 		if (_Match('{'))
 		{
@@ -129,6 +130,13 @@ namespace Rtf {
 		}
 		else
 		{
+			if (_ParseNewLine() && !_NextCharacter())
+			{
+				m_Current.type = RtfToken::eParseType_End;
+
+				return false;
+			}
+
 			_AddCurrentToToken();
 
 			m_Current.type = RtfToken::eParseType_Text;
@@ -163,6 +171,47 @@ namespace Rtf {
 		}
 
 		return next;
+	}
+
+	bool Tokenizer::_ParseNewLine()
+	{
+		switch (m_Character)
+		{
+
+		case '\n':
+			{
+				m_CharactersRead.pop_back();
+
+				m_Column = 1;
+				m_Line++;
+
+				return true;
+
+			} break;
+
+		case '\r':
+			{
+				m_CharactersRead.pop_back();
+
+				if (_NextCharacter() && _Match('\n'))
+				{
+					m_CharactersRead.pop_back();
+
+					m_Column = 1;
+					m_Line++;
+				}
+				
+				return true;
+
+			} break;
+
+		default:
+			{
+				return false;
+
+			} break;
+
+		}
 	}
 
 	void Tokenizer::_Revert(int a_Count)
@@ -207,9 +256,9 @@ namespace Rtf {
 
 				if (m_Current.type != RtfToken::eParseType_CommandExtended && _Match('*'))
 				{
-					if (!_NextCharacter())
+					if (!_NextCharacter() || _ParseNewLine())
 					{
-						// not enough input
+						// not enough input or new line
 
 						m_Current.type = RtfToken::eParseType_Invalid;
 						m_Current.value = m_CharactersRead;
@@ -243,10 +292,10 @@ namespace Rtf {
 
 					return true;
 				}
-				
-				if (!_NextCharacter() || _Match(' '))
+
+				if (!_NextCharacter() || _Match(' ') || _ParseNewLine())
 				{
-					// skip trailing space
+					// skip trailing space or new line
 
 					return true;
 				}
@@ -259,12 +308,15 @@ namespace Rtf {
 
 					if (_Match('-'))
 					{
+						// negative parameter
+
 						parameter.push_back(m_Character);
 						m_Consumed++;
 
-						if (!_NextCharacter())
+						if (!_NextCharacter() || _ParseNewLine())
 						{
 							m_Current.type = RtfToken::eParseType_Invalid;
+							m_Current.value = m_CharactersRead;
 
 							return true;
 						}
@@ -284,7 +336,7 @@ namespace Rtf {
 						m_Current.parameter = atoi(parameter.c_str());
 					}
 
-					if (_NextCharacter() && !_Match(' '))
+					if (_NextCharacter() && !_ParseNewLine() && !_Match(' '))
 					{
 						// skip trailing space
 
@@ -330,7 +382,7 @@ namespace Rtf {
 
 						return true;
 					}
-					else
+					else if (!_ParseNewLine())
 					{
 						_AddCurrentToToken();
 					}
