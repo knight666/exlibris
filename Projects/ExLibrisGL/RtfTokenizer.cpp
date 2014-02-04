@@ -145,6 +145,29 @@ namespace Rtf {
 		return _RecursiveRead();
 	}
 
+	bool Tokenizer::SkipCurrentGroup()
+	{
+		if (m_Group <= 0)
+		{
+			return false;
+		}
+
+		m_CharactersRead.clear();
+		m_Consumed = 0;
+
+		while (_NextCharacter())
+		{
+			if (_Match('}'))
+			{
+				m_Group--;
+
+				break;
+			}
+		}
+
+		return (m_CharactersRead.size() > 0);
+	}
+
 	bool Tokenizer::_NextCharacter()
 	{
 		bool next = false;

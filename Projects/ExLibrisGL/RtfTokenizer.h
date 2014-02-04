@@ -46,6 +46,8 @@ namespace Rtf {
 
 		bool Read();
 
+		bool SkipCurrentGroup();
+
 	private:
 
 		bool _NextCharacter();

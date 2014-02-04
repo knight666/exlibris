@@ -53,14 +53,14 @@ inline ::testing::AssertionResult CompareToken(
 		::testing::AssertionFailure() << "Incorrect token." << std::endl
 		<< " [ Actual ]" << std::endl
 		<< "     Type: " << TokenTypeToString(a_TokenRight.type) << std::endl
-		<< "    Value: " << a_TokenRight.value << std::endl
+		<< "    Value: " << "\"" << a_TokenRight.value << "\"" << std::endl
 		<< "Parameter: " << a_TokenRight.parameter << std::endl
 		<< "    Group: " << a_TokenRight.group << std::endl
 		<< " Position: " << "column: " << a_TokenRight.column << " line: " << a_TokenRight.line << std::endl
 		<< std::endl
 		<< "[ Expected ]" << std::endl
 		<< "     Type: " << TokenTypeToString(a_TokenLeft.type) << std::endl
-		<< "    Value: " << a_TokenLeft.value << std::endl
+		<< "    Value: " << "\"" << a_TokenLeft.value << "\"" << std::endl
 		<< "Parameter: " << a_TokenLeft.parameter << std::endl
 		<< "    Group: " << a_TokenLeft.group << std::endl
 		<< " Position: " << "column: " << a_TokenLeft.column << " line: " << a_TokenLeft.line;
@@ -620,4 +620,65 @@ TEST(RtfTokenizer, ReadNoData)
 	tk.SetInput(&ss);
 
 	EXPECT_END_TOKEN(0, 1, 1);
+}
+
+TEST(RtfTokenizer, SkipCurrentGroup)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "{this is my {skip me please} group}";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_OPEN_TOKEN(1, 1, 1);
+	EXPECT_TEXT_TOKEN("this is my ", 1, 2, 1);
+	EXPECT_GROUP_OPEN_TOKEN(2, 13, 1);
+	EXPECT_TRUE(tk.SkipCurrentGroup());
+	EXPECT_TEXT_TOKEN(" group", 1, 29, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(0, 35, 1);
+	EXPECT_END_TOKEN(0, 36, 1);
+}
+
+TEST(RtfTokenizer, SkipCurrentGroupNotInsideAGroup)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "Bring it on\\man .";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TEXT_TOKEN("Bring it on", 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("man", -1, 0, 12, 1);
+	EXPECT_FALSE(tk.SkipCurrentGroup());
+	EXPECT_TEXT_TOKEN(".", 0, 17, 1);
+	EXPECT_END_TOKEN(0, 18, 1);
+}
+
+TEST(RtfTokenizer, SkipCurrentGroupNegativeGroupIndex)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "}}}";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_CLOSE_TOKEN(-1, 1, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(-2, 2, 1);
+	EXPECT_FALSE(tk.SkipCurrentGroup());
+	EXPECT_GROUP_CLOSE_TOKEN(-3, 3, 1);
+	EXPECT_END_TOKEN(-3, 4, 1);
+}
+
+TEST(RtfTokenizer, SkipCurrentGroupNoData)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+
+	tk.SetInput(&ss);
+
+	EXPECT_FALSE(tk.SkipCurrentGroup());
 }
