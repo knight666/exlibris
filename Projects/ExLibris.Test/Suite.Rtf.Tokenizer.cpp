@@ -294,6 +294,19 @@ TEST(RtfTokenizer, ReadTextSlashAtEnd)
 	EXPECT_END_TOKEN(0, 11, 1);
 }
 
+TEST(RtfTokenizer, ReadTextSplitByNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "Lo and behold,\nhe said,\nnothing.";
+
+	tk.SetInput(&ss);
+
+	EXPECT_TEXT_TOKEN("Lo and behold,he said,nothing.", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 9, 3);
+}
+
 TEST(RtfTokenizer, ReadGroupOpen)
 {
 	Tokenizer tk;
@@ -381,6 +394,20 @@ TEST(RtfTokenizer, ReadCommandSlashOnly)
 	EXPECT_END_TOKEN(0, 2, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandSplitByNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\brain\nsquisher";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("brain", -1, 0, 1, 1);
+	EXPECT_TEXT_TOKEN("squisher", 0, 1, 2);
+	EXPECT_END_TOKEN(0, 9, 2);
+}
+
 TEST(RtfTokenizer, ReadCommandEscaped)
 {
 	Tokenizer tk;
@@ -420,6 +447,20 @@ TEST(RtfTokenizer, ReadCommandParameter)
 	EXPECT_END_TOKEN(0, 4, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandParameterSplitByNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\bringit12\n912";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("bringit", 12, 0, 1, 1);
+	EXPECT_TEXT_TOKEN("912", 0, 1, 2);
+	EXPECT_END_TOKEN(0, 4, 2);
+}
+
 TEST(RtfTokenizer, ReadCommandParameterNegative)
 {
 	Tokenizer tk;
@@ -431,6 +472,33 @@ TEST(RtfTokenizer, ReadCommandParameterNegative)
 
 	EXPECT_COMMAND_TOKEN("fs", -228, 0, 1, 1);
 	EXPECT_END_TOKEN(0, 8, 1);
+}
+
+TEST(RtfTokenizer, ReadCommandParameterNegativeSplitByNewline)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\bam-\r\n128";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\bam-", 0, 1, 1);
+	EXPECT_TEXT_TOKEN("128", 0, 1, 2);
+	EXPECT_END_TOKEN(0, 4, 2);
+}
+
+TEST(RtfTokenizer, ReadCommandParameterNegativeNotEnoughData)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\shed-";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\shed-", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 7, 1);
 }
 
 TEST(RtfTokenizer, ReadCommandParameterTrailingSpace)
@@ -461,6 +529,20 @@ TEST(RtfTokenizer, ReadExtendedCommand)
 	EXPECT_END_TOKEN(0, 9, 1);
 }
 
+TEST(RtfTokenizer, ReadExtendedCommandSplitByNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\*\r\n\\newline";
+
+	tk.SetInput(&ss);
+
+	EXPECT_INVALID_TOKEN("\\*", 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("newline", -1, 0, 1, 2);
+	EXPECT_END_TOKEN(0, 9, 2);
+}
+
 TEST(RtfTokenizer, ReadExtendedCommandInvalid)
 {
 	Tokenizer tk;
@@ -485,6 +567,42 @@ TEST(RtfTokenizer, ReadExtendedCommandNotEnoughData)
 
 	EXPECT_INVALID_TOKEN("\\*", 0, 1, 1);
 	EXPECT_END_TOKEN(0, 3, 1);
+}
+
+TEST(RtfTokenizer, ReadNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\n";
+
+	tk.SetInput(&ss);
+
+	EXPECT_END_TOKEN(0, 1, 1);
+}
+
+TEST(RtfTokenizer, ReadCarriageFeedAndNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\r\n";
+
+	tk.SetInput(&ss);
+
+	EXPECT_END_TOKEN(0, 1, 1);
+}
+
+TEST(RtfTokenizer, ReadCarriageFeed)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\r";
+
+	tk.SetInput(&ss);
+
+	EXPECT_END_TOKEN(0, 1, 1);
 }
 
 TEST(RtfTokenizer, ReadNoInput)
