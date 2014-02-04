@@ -27,6 +27,7 @@
 #include "RtfDomDocument.h"
 
 #include "RtfDomElement.h"
+#include "RtfTokenizer.h"
 
 namespace ExLibris
 {
@@ -48,6 +49,7 @@ namespace ExLibris
 		, m_RootElement(nullptr)
 		, m_TextFormat(nullptr)
 		, m_WidowControl(true)
+		, m_Tokenizer(new Rtf::Tokenizer())
 		, m_State(new ParseState)
 	{
 		m_FontTable = new RtfFontTable(*this);
@@ -76,6 +78,7 @@ namespace ExLibris
 		{
 			delete m_RootElement;
 		}
+		delete m_Tokenizer;
 		delete m_State;
 	}
 
@@ -117,6 +120,85 @@ namespace ExLibris
 	void RtfDomDocument::SetWidowControl(bool a_Value)
 	{
 		m_WidowControl = a_Value;
+	}
+
+	bool RtfDomDocument::ParseFromSource(std::basic_istream<char>* a_Stream)
+	{
+		m_Tokenizer->SetInput(a_Stream);
+
+		const RtfToken& token = m_Tokenizer->GetCurrent();
+
+		if (!m_Tokenizer->Read() || token.type != RtfToken::eParseType_GroupOpen)
+		{
+			EXL_THROW("RtfDocument", "Document did not start with a group.");
+
+			return false;
+		}
+
+		RtfParserState state;
+
+		state.PushGroup();
+
+		if (!m_Tokenizer->Read() || token.type != RtfToken::eParseType_Command || token.value != "rtf" || token.parameter != 1)
+		{
+			EXL_THROW("RtfDocument", "Document does not have a valid header.");
+
+			return false;
+		}
+
+		state.SetTarget(this);
+
+		while (m_Tokenizer->Read() && token.type != RtfToken::eParseType_End)
+		{
+			if (token.type == RtfToken::eParseType_Invalid)
+			{
+				std::stringstream ss;
+				ss << "Invalid token: \"" << token.value << "\" at column " << token.column << " on line " << token.line << ".";
+				EXL_THROW("RtfDocument", ss.str().c_str());
+
+				return false;
+			}
+
+			if (state.GetTarget() == nullptr)
+			{
+				EXL_THROW("RtfDocument", "Lost target element.");
+
+				return false;
+			}
+
+			IRtfParseable::Result result = state.GetTarget()->Parse(state, token);
+
+			switch (result)
+			{
+
+			case IRtfParseable::eResult_Propagate:
+				{
+					if (token.type == RtfToken::eParseType_CommandExtended)
+					{
+						if (!m_Tokenizer->SkipCurrentGroup())
+						{
+							EXL_THROW("RtfDocument", "Could not skip current group.");
+
+							return false;
+						}
+					}
+
+				} break;
+
+			case IRtfParseable::eResult_Invalid:
+				{
+					std::stringstream ss;
+					ss << "Invalid token: \"" << token.value << "\" at column " << token.column << " on line " << token.line << ".";
+					EXL_THROW("RtfDocument", ss.str().c_str());
+
+					return false;
+
+				} break;
+
+			}
+		}
+
+		return true;
 	}
 
 	IRtfParseable::Result RtfDomDocument::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
