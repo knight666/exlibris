@@ -296,6 +296,8 @@ namespace Rtf {
 					return _RecursiveRead();
 				}
 
+				// read command
+
 				int command_start = m_Consumed;
 
 				if (_ConsumeType<CharacterTypeAlphabetical>())
@@ -316,9 +318,9 @@ namespace Rtf {
 					return true;
 				}
 
-				if (!_NextCharacter() || _Match(' ') || _ParseNewLine())
+				if (!_NextCharacter() || _ParseNewLine())
 				{
-					// skip trailing space or new line
+					// end of input
 
 					return true;
 				}
@@ -361,10 +363,22 @@ namespace Rtf {
 
 					if (_NextCharacter() && !_ParseNewLine() && !_Match(' '))
 					{
-						// skip trailing space
+						// wasn't part of the command
 
 						_Revert(1);
 					}
+				}
+				else if (_Match(' '))
+				{
+					// consume trailing space, but don't add it to command
+
+					return true;
+				}
+				else
+				{
+					// wasn't part of the command
+
+					_Revert(1);
 				}
 
 			} break;
