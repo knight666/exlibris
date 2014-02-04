@@ -366,6 +366,20 @@ TEST(RtfTokenizer, ReadCommand)
 	EXPECT_END_TOKEN(0, 6, 1);
 }
 
+TEST(RtfTokenizer, ReadCommandDouble)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\f\\fswiss";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("f", -1, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("fswiss", -1, 0, 3, 1);
+	EXPECT_END_TOKEN(0, 10, 1);
+}
+
 TEST(RtfTokenizer, ReadCommandTrailingSpace)
 {
 	Tokenizer tk;
@@ -445,6 +459,20 @@ TEST(RtfTokenizer, ReadCommandParameter)
 
 	EXPECT_COMMAND_TOKEN("b", 1, 0, 1, 1);
 	EXPECT_END_TOKEN(0, 4, 1);
+}
+
+TEST(RtfTokenizer, ReadCommandParameterDouble)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "\\double33\\trouble12";
+
+	tk.SetInput(&ss);
+
+	EXPECT_COMMAND_TOKEN("double", 33, 0, 1, 1);
+	EXPECT_COMMAND_TOKEN("trouble", 12, 0, 10, 1);
+	EXPECT_END_TOKEN(0, 20, 1);
 }
 
 TEST(RtfTokenizer, ReadCommandParameterSplitByNewLine)
