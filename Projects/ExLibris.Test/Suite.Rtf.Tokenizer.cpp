@@ -144,6 +144,19 @@ inline ::testing::AssertionResult CompareToken(
 	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
 }
 
+#define EXPECT_VALUE_TOKEN(_value, _group, _column, _line) { \
+	EXPECT_TRUE(tk.Read()); \
+	const RtfToken& a = tk.GetCurrent(); \
+	RtfToken e; \
+	e.type = RtfToken::eParseType_Value; \
+	e.value = _value; \
+	e.parameter = -1; \
+	e.group = _group; \
+	e.column = _column; \
+	e.line = _line; \
+	EXPECT_PRED_FORMAT2(CompareToken, e, a); \
+}
+
 #define EXPECT_END_TOKEN(_group, _column, _line) { \
 	EXPECT_FALSE(tk.Read()); \
 	const RtfToken& a = tk.GetCurrent(); \
@@ -631,6 +644,48 @@ TEST(RtfTokenizer, ReadCarriageFeed)
 	tk.SetInput(&ss);
 
 	EXPECT_END_TOKEN(0, 1, 1);
+}
+
+TEST(RtfTokenizer, ReadValue)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "Apple Tree;";
+
+	tk.SetInput(&ss);
+
+	EXPECT_VALUE_TOKEN("Apple Tree", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 12, 1);
+}
+
+TEST(RtfTokenizer, ReadValueTriple)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "red;green;blue;colors";
+
+	tk.SetInput(&ss);
+
+	EXPECT_VALUE_TOKEN("red", 0, 1, 1);
+	EXPECT_VALUE_TOKEN("green", 0, 5, 1);
+	EXPECT_VALUE_TOKEN("blue", 0, 11, 1);
+	EXPECT_TEXT_TOKEN("colors", 0, 16, 1);
+	EXPECT_END_TOKEN(0, 22, 1);
+}
+
+TEST(RtfTokenizer, ReadValueEmpty)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << ";";
+
+	tk.SetInput(&ss);
+
+	EXPECT_VALUE_TOKEN("", 0, 1, 1);
+	EXPECT_END_TOKEN(0, 2, 1);
 }
 
 TEST(RtfTokenizer, ReadNoInput)

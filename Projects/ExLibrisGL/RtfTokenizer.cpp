@@ -128,6 +128,10 @@ namespace Rtf {
 		{
 			m_Current.type = RtfToken::eParseType_Command;
 		}
+		else if (_Match(';'))
+		{
+			m_Current.type = RtfToken::eParseType_Value;
+		}
 		else
 		{
 			if (_ParseNewLine() && !_NextCharacter())
@@ -416,6 +420,14 @@ namespace Rtf {
 						// group control word
 
 						_Revert(1);
+
+						return true;
+					}
+					else if (_Match(';'))
+					{
+						// consume control word, but don't add it to the value
+
+						m_Current.type = RtfToken::eParseType_Value;
 
 						return true;
 					}
