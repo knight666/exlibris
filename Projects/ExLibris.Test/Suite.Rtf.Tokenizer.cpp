@@ -755,6 +755,21 @@ TEST(RtfTokenizer, SkipCurrentGroupNegativeGroupIndex)
 	EXPECT_END_TOKEN(-3, 4, 1);
 }
 
+TEST(RtfTokenizer, SkipCurrentGroupWithSubGroups)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "{Skip this group{\\maybe Or don't} please.} Fact.";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_OPEN_TOKEN(1, 1, 1);
+	EXPECT_TRUE(tk.SkipCurrentGroup());
+	EXPECT_TEXT_TOKEN(" Fact.", 0, 43, 1);
+	EXPECT_END_TOKEN(0, 49, 1);
+}
+
 TEST(RtfTokenizer, SkipCurrentGroupNoData)
 {
 	Tokenizer tk;

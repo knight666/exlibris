@@ -159,17 +159,26 @@ namespace Rtf {
 		m_CharactersRead.clear();
 		m_Consumed = 0;
 
+		int group_target = m_Group - 1;
+
 		while (_NextCharacter())
 		{
-			if (_Match('}'))
+			if (_Match('{'))
+			{
+				m_Group++;
+			}
+			else if (_Match('}'))
 			{
 				m_Group--;
 
-				break;
+				if (m_Group == group_target)
+				{
+					break;
+				}
 			}
 		}
 
-		return (m_CharactersRead.size() > 0);
+		return ((m_CharactersRead.size() > 0) && (m_Group == group_target));
 	}
 
 	bool Tokenizer::_NextCharacter()

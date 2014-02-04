@@ -144,7 +144,6 @@ TEST(RtfDomDocument, ParseStyleSheet)
 TEST(RtfDomDocument, ParseFromSourceHelloWorld)
 {
 	RtfWorld w;
-
 	RtfDomDocument doc(&w);
 
 	std::stringstream input;
@@ -167,4 +166,27 @@ TEST(RtfDomDocument, ParseFromSourceHelloWorld)
 	EXPECT_STREQ("Hello World!", root->InnerText.c_str());
 
 	EXPECT_EQ(1, root->GetChildrenCount());
+}
+
+TEST(RtfDomDocument, ParseFromSourceSkipUnknownExtendedCommand)
+{
+	RtfWorld w;
+	RtfDomDocument doc(&w);
+
+	std::stringstream input;
+	input << "{\\rtf1\\ansi";
+	input << "{\\*\\zanzibar{\\new\\group\\please}This text should be ignored.}";
+	input << "This text is totally rad.";
+	input << "}";
+
+	bool result = false;
+	EXPECT_NO_THROW({
+		result = doc.ParseFromSource(&input);
+	});
+	EXPECT_TRUE(result);
+
+	RtfDomElement* root = doc.GetRootElement();
+
+	EXPECT_EQ(0, root->GetChildrenCount());
+	EXPECT_STREQ("This text is totally rad.", root->InnerText.c_str());
 }
