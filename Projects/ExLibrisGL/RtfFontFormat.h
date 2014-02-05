@@ -44,6 +44,9 @@ namespace Rtf {
 
 		void Reset();
 
+		const RtfLocale* GetLocale() const;
+		void SetLocale(const RtfLocale* a_Locale);
+
 		bool IsBold() const;
 		void SetBold(bool a_Value);
 
@@ -60,6 +63,7 @@ namespace Rtf {
 		unsigned int m_Specified;
 		RtfProperty<bool, 0> m_Bold;
 		RtfProperty<bool, 1> m_Italic;
+		RtfProperty<const RtfLocale*, 2> m_Locale;
 
 	}; // class FontFormat
 
