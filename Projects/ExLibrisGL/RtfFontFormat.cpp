@@ -46,6 +46,12 @@ namespace Rtf {
 		return m_Document;
 	}
 
+	void FontFormat::Reset()
+	{
+		SetBold(false);
+		SetItalic(false);
+	}
+
 	bool FontFormat::IsBold() const
 	{
 		return m_Bold.Get();
@@ -68,7 +74,13 @@ namespace Rtf {
 
 	IRtfParseable::Result FontFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
 	{
-		if (a_Token.value == "i")
+		if (a_Token.value == "plain")
+		{
+			Reset();
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "i")
 		{
 			SetItalic(!(a_Token.parameter == 0));
 

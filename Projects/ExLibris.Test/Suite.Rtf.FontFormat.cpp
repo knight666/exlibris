@@ -17,6 +17,36 @@ TEST(RtfFontFormat, Construct)
 	EXPECT_FALSE(ff.IsItalic());
 }
 
+TEST(RtfFontFormat, Reset)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	ff.Reset();
+
+	EXPECT_FALSE(ff.IsBold());
+	EXPECT_FALSE(ff.IsItalic());
+}
+
+TEST(RtfFontFormat, ParsePlain)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "plain";
+
+	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
+
+	EXPECT_FALSE(ff.IsBold());
+	EXPECT_FALSE(ff.IsItalic());
+}
+
 TEST(RtfFontFormat, ParseBoldOn)
 {
 	RtfWorld w;
