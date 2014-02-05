@@ -79,13 +79,13 @@ namespace Rtf {
 		if (a_Checked == eSpellingCheck_Enabled)
 		{
 			m_LocalesChecked[a_Language] = a_Locale;
+
+			SetProofing(a_Locale->identifier != 1024);
 		}
 		else
 		{
 			m_LocalesUnchecked[a_Language] = a_Locale;
 		}
-
-		SetProofing(a_Locale->identifier != 1024);
 	}
 
 	bool FontFormat::IsBold() const
@@ -126,7 +126,7 @@ namespace Rtf {
 
 			return IRtfParseable::eResult_Handled;
 		}
-		else if (a_Token.value == "lang" || a_Token.value == "langfe")
+		else if (a_Token.value == "lang" || a_Token.value == "langfe" || a_Token.value == "langnp" || a_Token.value == "langfenp")
 		{
 			if (m_Document.GetWorld() == nullptr || a_Token.parameter < 0)
 			{
@@ -139,14 +139,22 @@ namespace Rtf {
 				return IRtfParseable::eResult_Invalid;
 			}
 
-			TextLanguage language = eTextLanguage_Default;
-
 			if (a_Token.value == "langfe")
 			{
-				language = eTextLanguage_EastAsian;
+				SetLocale(eTextLanguage_EastAsian, eSpellingCheck_Enabled, locale);
 			}
-
-			SetLocale(language, eSpellingCheck_Enabled, locale);
+			else if (a_Token.value == "langnp")
+			{
+				SetLocale(eTextLanguage_Default, eSpellingCheck_Disabled, locale);
+			}
+			else if (a_Token.value == "langfenp")
+			{
+				SetLocale(eTextLanguage_EastAsian, eSpellingCheck_Disabled, locale);
+			}
+			else
+			{
+				SetLocale(eTextLanguage_Default, eSpellingCheck_Enabled, locale);
+			}
 
 			return IRtfParseable::eResult_Handled;
 		}
