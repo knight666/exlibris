@@ -33,10 +33,12 @@ namespace ExLibris
 	{
 		ParseState()
 			: sheet_started(false)
+			, style(nullptr)
 		{
 		}
 
 		bool sheet_started;
+		RtfStyle* style;
 	};
 
 	RtfStyleSheet::RtfStyleSheet(RtfDomDocument& a_Document)
@@ -96,6 +98,9 @@ namespace ExLibris
 		if (a_Token.value == "stylesheet")
 		{
 			m_State->sheet_started = true;
+			m_State->style = nullptr;
+
+			a_State.SetTarget(this);
 
 			return eResult_Handled;
 		}
@@ -106,15 +111,35 @@ namespace ExLibris
 				return eResult_Invalid;
 			}
 
-			RtfStyle* style = GetStyle(a_Token.parameter);
-			a_State.SetTarget(style);
-
-			return eResult_Handled;
+			m_State->style = GetStyle(a_Token.parameter);
 		}
-		else
+		else if (!m_State->sheet_started)
 		{
-			return eResult_Propagate;
+			return eResult_Invalid;
 		}
+
+		Result result = eResult_Propagate;
+
+		if (m_State->style != nullptr)
+		{
+			result = m_State->style->Parse(a_State, a_Token);
+			if (result != eResult_Propagate)
+			{
+				return result;
+			}
+		}
+			
+		return result;
+	}
+
+	IRtfParseable::Result RtfStyleSheet::_ParseValue(RtfParserState& a_State, const RtfToken& a_Token)
+	{
+		if (!m_State->sheet_started || m_State->style == nullptr)
+		{
+			return eResult_Invalid;
+		}
+
+		return m_State->style->Parse(a_State, a_Token);
 	}
 
 }; // namespace ExLibris

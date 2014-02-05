@@ -6,6 +6,7 @@
 #include <RtfFontTable.h>
 
 #include "Tools.Color.h"
+#include "Tools.Parseable.h"
 
 using namespace ExLibris;
 
@@ -36,7 +37,7 @@ TEST(RtfDomDocument, ParseDefaultFont)
 	t.value = "deff";
 	t.parameter = 2;
 
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	EXPECT_EQ(doc.GetFontTable()->GetFont(2), doc.GetFontTable()->GetDefault());
 }
@@ -51,20 +52,20 @@ TEST(RtfDomDocument, ParseFontTable)
 	t.type = RtfToken::eParseType_Command;
 
 	t.value = "fonttbl";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	EXPECT_EQ(doc.GetFontTable(), s.GetTarget());
 
 	t.value = "f";
 	t.parameter = 5;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.value = "froman";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.type = RtfToken::eParseType_Value;
 	t.value = "Comical";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	RtfFont* font = doc.GetFontTable()->GetFont(5);
 	EXPECT_EQ(Rtf::eFamilyType_Roman, font->GetFamilyType());
@@ -80,28 +81,28 @@ TEST(RtfDomDocument, ParseColorTable)
 	RtfToken t;
 
 	t.type = RtfToken::eParseType_GroupOpen;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	t.type = RtfToken::eParseType_Command;
 	t.value = "colortbl";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	EXPECT_EQ(doc.GetColorTable(), s.GetTarget());
 
 	t.value = "red";
 	t.parameter = 128;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.value = "green";
 	t.parameter = 128;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.value = "blue";
 	t.parameter = 128;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.type = RtfToken::eParseType_GroupClose;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	RtfColor* color = doc.GetColorTable()->GetColor(0);
 	EXPECT_COLOR_RGB(128, 128, 128, *color);
@@ -116,25 +117,25 @@ TEST(RtfDomDocument, ParseStyleSheet)
 	RtfToken t;
 
 	t.type = RtfToken::eParseType_GroupOpen;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	t.type = RtfToken::eParseType_Command;
 	t.value = "stylesheet";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, doc.Parse(s, t));
+	EXPECT_PARSE_HANDLED(doc.Parse(s, t));
 
 	EXPECT_EQ(doc.GetStyleSheet(), s.GetTarget());
 
 	t.value = "s";
 	t.parameter = 0;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.value = "kerning";
 	t.parameter = 1;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	t.type = RtfToken::eParseType_Value;
 	t.value = "Awesome";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, s.GetTarget()->Parse(s, t));
+	EXPECT_PARSE_HANDLED(s.GetTarget()->Parse(s, t));
 
 	RtfStyle* st = doc.GetStyleSheet()->GetStyle(0);
 	EXPECT_STREQ("Awesome", st->GetName().c_str());

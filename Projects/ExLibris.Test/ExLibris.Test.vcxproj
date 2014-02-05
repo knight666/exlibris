@@ -125,6 +125,7 @@
     <ClInclude Include="Mock.TextLayoutVisitor.h" />
     <ClInclude Include="Mock.TextParser.h" />
     <ClInclude Include="Tools.Color.h" />
+    <ClInclude Include="Tools.Parseable.h" />
     <ClInclude Include="Tools.Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

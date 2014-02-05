@@ -6,6 +6,8 @@
 #include <RtfFontTable.h>
 #include <RtfStyleSheet.h>
 
+#include "Tools.Parseable.h"
+
 using namespace ExLibris;
 
 TEST(RtfStyle, Construct)
@@ -31,7 +33,7 @@ TEST(RtfStyle, ParseStyle)
 	t.value = "s";
 	t.parameter = 1;
 
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 }
 
 TEST(RtfStyle, ParseStyleAndClose)
@@ -45,15 +47,15 @@ TEST(RtfStyle, ParseStyleAndClose)
 	RtfToken t;
 
 	t.type = RtfToken::eParseType_GroupOpen;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	t.type = RtfToken::eParseType_Command;
 	t.value = "s";
 	t.parameter = 1;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	t.type = RtfToken::eParseType_GroupClose;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	EXPECT_EQ(nullptr, s.GetTarget());
 	EXPECT_EQ(0, s.GetGroupIndex());
@@ -72,7 +74,7 @@ TEST(RtfStyle, ParseNextParagraphStyle)
 	t.value = "snext";
 	t.parameter = 1;
 
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	EXPECT_EQ(ss.GetStyle(1), st.GetNextParagraphStyle());
 }
@@ -90,7 +92,7 @@ TEST(RtfStyle, ParseNextParagraphStyleInvalid)
 	t.value = "snext";
 	t.parameter = -7;
 
-	EXPECT_EQ(IRtfParseable::eResult_Invalid, st->Parse(s, t));
+	EXPECT_PARSE_INVALID(st->Parse(s, t));
 
 	EXPECT_EQ(ss.GetStyle(0), st->GetNextParagraphStyle());
 }
@@ -118,7 +120,7 @@ TEST(RtfStyle, ParseBasedOn)
 	t.value = "sbasedon";
 	t.parameter = 12;
 
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	RtfTextFormat& tf = st.GetTextFormat();
 	EXPECT_EQ(doc.GetFontTable()->GetFont(5), tf.GetFont());
@@ -142,7 +144,7 @@ TEST(RtfStyle, ParseBasedOnInvalid)
 	t.value = "sbasedon";
 	t.parameter = -8;
 
-	EXPECT_EQ(IRtfParseable::eResult_Invalid, st.Parse(s, t));
+	EXPECT_PARSE_INVALID(st.Parse(s, t));
 }
 
 TEST(RtfStyle, ParseCharacterEncoding)
@@ -158,13 +160,13 @@ TEST(RtfStyle, ParseCharacterEncoding)
 	t.parameter = -1;
 
 	t.value = "loch";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	t.value = "hich";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	t.value = "dbch";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 }
 
 TEST(RtfStyle, ParseAssociatedFontProperty)
@@ -180,11 +182,11 @@ TEST(RtfStyle, ParseAssociatedFontProperty)
 	t.parameter = -1;
 
 	t.value = "loch";
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	t.value = "af";
 	t.parameter = 12;
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	RtfAssociatedProperties* props = st.GetPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
 	ASSERT_NE(nullptr, props);
@@ -205,7 +207,7 @@ TEST(RtfStyle, ParseAssociatedFontPropertyNotSet)
 	t.value = "af";
 	t.parameter = 12;
 
-	EXPECT_EQ(IRtfParseable::eResult_Invalid, st.Parse(s, t));
+	EXPECT_PARSE_INVALID(st.Parse(s, t));
 }
 
 TEST(RtfStyle, ParseAssociatedFontPropertyInvalid)
@@ -221,7 +223,7 @@ TEST(RtfStyle, ParseAssociatedFontPropertyInvalid)
 	t.value = "afs";
 	t.parameter = -128;
 
-	EXPECT_EQ(IRtfParseable::eResult_Invalid, st.Parse(s, t));
+	EXPECT_PARSE_INVALID(st.Parse(s, t));
 }
 
 TEST(RtfStyle, ParseTextFormatProperty)
@@ -237,7 +239,7 @@ TEST(RtfStyle, ParseTextFormatProperty)
 	t.value = "fs";
 	t.parameter = 180;
 
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	EXPECT_FLOAT_EQ(90.0f, st.GetTextFormat().GetFontSize());
 }
@@ -255,7 +257,7 @@ TEST(RtfStyle, ParseTextFormatPropertyInvalid)
 	t.value = "fs";
 	t.parameter = -129;
 
-	EXPECT_EQ(IRtfParseable::eResult_Invalid, st.Parse(s, t));
+	EXPECT_PARSE_INVALID(st.Parse(s, t));
 
 	EXPECT_FLOAT_EQ(12.0f, st.GetTextFormat().GetFontSize());
 }
@@ -272,7 +274,7 @@ TEST(RtfStyle, ParseName)
 	t.type = RtfToken::eParseType_Value;
 	t.value = "Ring-a-ding";
 
-	EXPECT_EQ(IRtfParseable::eResult_Handled, st.Parse(s, t));
+	EXPECT_PARSE_HANDLED(st.Parse(s, t));
 
 	EXPECT_STREQ("Ring-a-ding", st.GetName().c_str());
 }
@@ -290,5 +292,5 @@ TEST(RtfStyle, ParseUnhandled)
 	t.value = "brillo";
 	t.parameter = -1;
 
-	EXPECT_EQ(IRtfParseable::eResult_Invalid, st.Parse(s, t));
+	EXPECT_PARSE_INVALID(st.Parse(s, t));
 }
