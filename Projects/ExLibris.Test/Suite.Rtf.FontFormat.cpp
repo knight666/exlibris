@@ -14,7 +14,7 @@ TEST(RtfFontFormat, Construct)
 	FontFormat ff(d);
 
 	EXPECT_EQ(nullptr, ff.GetLocale());
-	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
+	EXPECT_EQ(nullptr, ff.GetLocale(eTextLanguage_EastAsian));
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
 	EXPECT_FALSE(ff.GetProofing());
@@ -29,7 +29,7 @@ TEST(RtfFontFormat, Reset)
 	ff.Reset();
 
 	EXPECT_EQ(nullptr, ff.GetLocale());
-	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
+	EXPECT_EQ(nullptr, ff.GetLocale(eTextLanguage_EastAsian));
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
 	EXPECT_FALSE(ff.GetProofing());
@@ -50,7 +50,7 @@ TEST(RtfFontFormat, ParsePlain)
 	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
 
 	EXPECT_EQ(nullptr, ff.GetLocale());
-	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
+	EXPECT_EQ(nullptr, ff.GetLocale(eTextLanguage_EastAsian));
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
 	EXPECT_FALSE(ff.GetProofing());
@@ -265,9 +265,9 @@ TEST(RtfFontFormat, ParseLanguageEastAsian)
 
 	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
 
-	ASSERT_NE(nullptr, ff.GetLocaleEastAsian());
-	EXPECT_EQ(Rtf::eCountry_Japan, ff.GetLocaleEastAsian()->country);
-	EXPECT_EQ(Rtf::eLanguage_Japanese, ff.GetLocaleEastAsian()->language);
+	ASSERT_NE(nullptr, ff.GetLocale(eTextLanguage_EastAsian));
+	EXPECT_EQ(Rtf::eCountry_Japan, ff.GetLocale(eTextLanguage_EastAsian)->country);
+	EXPECT_EQ(Rtf::eLanguage_Japanese, ff.GetLocale(eTextLanguage_EastAsian)->language);
 }
 
 TEST(RtfFontFormat, ParseLanguageEastAsianInvalidParameter)
