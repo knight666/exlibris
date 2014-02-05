@@ -2,6 +2,8 @@
 
 #include <RtfDomDocument.h>
 
+#include "Tools.Color.h"
+
 using namespace ExLibris;
 
 class DocumentParsingContext
@@ -104,4 +106,15 @@ TEST_F(DocumentParsingContext, FontTable)
 	RtfDomElement* root = m_Document->GetRootElement();
 	EXPECT_EQ(ft->GetFont(1), root->GetTextFormat().GetFont());
 	EXPECT_STREQ("Bleep bloop.", root->InnerText.c_str());
+}
+
+TEST_F(DocumentParsingContext, ColorTable)
+{
+	OpenTestFile("Tests/RTF/ColorTable.rtf");
+
+	RtfColorTable* ct = m_Document->GetColorTable();
+
+	EXPECT_COLOR_RGBA(0, 0, 0, 255, *ct->GetColor(0));
+	EXPECT_COLOR_RGBA(65, 12, 78, 255, *ct->GetColor(1));
+	EXPECT_COLOR_RGBA(128, 128, 128, 255, *ct->GetColor(2));
 }
