@@ -35,6 +35,7 @@ namespace Rtf {
 		, m_Bold(false, m_Specified)
 		, m_Italic(false, m_Specified)
 		, m_Locale(nullptr, m_Specified)
+		, m_LocaleEastAsian(nullptr, m_Specified)
 	{
 	}
 
@@ -50,6 +51,7 @@ namespace Rtf {
 	void FontFormat::Reset()
 	{
 		SetLocale(nullptr);
+		SetLocaleEastAsian(nullptr);
 		SetBold(false);
 		SetItalic(false);
 	}
@@ -62,6 +64,16 @@ namespace Rtf {
 	void FontFormat::SetLocale(const RtfLocale* a_Locale)
 	{
 		m_Locale = a_Locale;
+	}
+
+	const RtfLocale* FontFormat::GetLocaleEastAsian() const
+	{
+		return m_LocaleEastAsian.Get();
+	}
+
+	void FontFormat::SetLocaleEastAsian(const RtfLocale* a_Locale)
+	{
+		m_LocaleEastAsian = a_Locale;
 	}
 
 	bool FontFormat::IsBold() const
@@ -92,7 +104,7 @@ namespace Rtf {
 
 			return IRtfParseable::eResult_Handled;
 		}
-		else if (a_Token.value == "lang")
+		else if (a_Token.value == "lang" || a_Token.value == "langfe")
 		{
 			if (m_Document.GetWorld() == nullptr || a_Token.parameter < 0)
 			{
@@ -105,7 +117,14 @@ namespace Rtf {
 				return IRtfParseable::eResult_Invalid;
 			}
 
-			SetLocale(locale);
+			if (a_Token.value == "lang")
+			{
+				SetLocale(locale);
+			}
+			else
+			{
+				SetLocaleEastAsian(locale);
+			}
 
 			return IRtfParseable::eResult_Handled;
 		}
