@@ -118,3 +118,112 @@ TEST_F(DocumentParsingContext, ColorTable)
 	EXPECT_COLOR_RGBA(65, 12, 78, 255, *ct->GetColor(1));
 	EXPECT_COLOR_RGBA(128, 128, 128, 255, *ct->GetColor(2));
 }
+
+TEST_F(DocumentParsingContext, StyleSheet)
+{
+	OpenTestFile("Tests/RTF/StyleSheet.rtf");
+
+	// style 0
+	{
+		RtfStyle* style = m_Document->GetStyleSheet()->GetStyle(0);
+
+		ASSERT_NE(nullptr, style);
+		EXPECT_STREQ("Standaard", style->GetName().c_str());
+
+		RtfTextFormat& tf = style->GetTextFormat();
+		EXPECT_EQ(Rtf::eCharacterSet_Ansi, tf.GetCharacterSet());
+		EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
+		ASSERT_NE(nullptr, tf.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_Netherlands, tf.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Dutch, tf.GetLocale()->language);
+		ASSERT_NE(nullptr, tf.GetFont());
+		EXPECT_STREQ("Times New Roman", tf.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(8.0f, tf.GetFontSize());
+		ASSERT_NE(nullptr, tf.GetBackgroundColor());
+		EXPECT_COLOR_RGB(0, 0, 0, *tf.GetBackgroundColor());
+		ASSERT_NE(nullptr, tf.GetForegroundColor());
+		EXPECT_COLOR_RGB(65, 12, 78, *tf.GetForegroundColor());
+		EXPECT_TRUE(tf.GetParagraphWidowControl());
+		EXPECT_TRUE(tf.IsKerningEnabled());
+		EXPECT_EQ(1, tf.GetMinimumKerningSize());
+
+		RtfAssociatedProperties p0 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
+		EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, p0.GetCharacterEncoding());
+		ASSERT_NE(nullptr, p0.GetFont());
+		EXPECT_STREQ("Times New Roman", p0.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(8.0f, p0.GetFontSize());
+		ASSERT_NE(nullptr, p0.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_Netherlands, p0.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Dutch, p0.GetLocale()->language);
+
+		RtfAssociatedProperties p1 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
+		EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteHighAnsi, p1.GetCharacterEncoding());
+		ASSERT_NE(nullptr, p1.GetFont());
+		EXPECT_STREQ("Times New Roman", p1.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(8.0f, p1.GetFontSize());
+		ASSERT_NE(nullptr, p1.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_Netherlands, p1.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Dutch, p1.GetLocale()->language);
+
+		RtfAssociatedProperties p2 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
+		EXPECT_EQ(Rtf::eCharacterEncoding_DoubleByte, p2.GetCharacterEncoding());
+		ASSERT_NE(nullptr, p2.GetFont());
+		EXPECT_STREQ("Symbol", p2.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(16.0f, p2.GetFontSize());
+		ASSERT_NE(nullptr, p2.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_India, p2.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Hindi, p2.GetLocale()->language);
+	}
+
+	// style 15
+	{
+		RtfStyle* style = m_Document->GetStyleSheet()->GetStyle(15);
+
+		ASSERT_NE(nullptr, style);
+		EXPECT_STREQ("Kop", style->GetName().c_str());
+
+		RtfTextFormat& tf = style->GetTextFormat();
+		EXPECT_EQ(Rtf::eCharacterSet_Ansi, tf.GetCharacterSet());
+		EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, tf.GetCharacterEncoding());
+		ASSERT_NE(nullptr, tf.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_Netherlands, tf.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Dutch, tf.GetLocale()->language);
+		ASSERT_NE(nullptr, tf.GetFont());
+		EXPECT_STREQ("Arial", tf.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(14.0f, tf.GetFontSize());
+		ASSERT_NE(nullptr, tf.GetBackgroundColor());
+		EXPECT_COLOR_RGB(0, 0, 0, *tf.GetBackgroundColor());
+		ASSERT_NE(nullptr, tf.GetForegroundColor());
+		EXPECT_COLOR_RGB(65, 12, 78, *tf.GetForegroundColor());
+		EXPECT_TRUE(tf.GetParagraphWidowControl());
+		EXPECT_TRUE(tf.IsKerningEnabled());
+		EXPECT_EQ(1, tf.GetMinimumKerningSize());
+
+		RtfAssociatedProperties p0 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteLowAnsi);
+		EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteLowAnsi, p0.GetCharacterEncoding());
+		ASSERT_NE(nullptr, p0.GetFont());
+		EXPECT_STREQ("Arial", p0.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(14.0f, p0.GetFontSize());
+		ASSERT_NE(nullptr, p0.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_Netherlands, p0.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Dutch, p0.GetLocale()->language);
+
+		RtfAssociatedProperties p1 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_SingleByteHighAnsi);
+		EXPECT_EQ(Rtf::eCharacterEncoding_SingleByteHighAnsi, p1.GetCharacterEncoding());
+		ASSERT_NE(nullptr, p1.GetFont());
+		EXPECT_STREQ("Arial", p1.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(14.0f, p1.GetFontSize());
+		ASSERT_NE(nullptr, p1.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_Netherlands, p1.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Dutch, p1.GetLocale()->language);
+
+		RtfAssociatedProperties p2 = style->GetCombinedPropertiesForCharacterEncoding(Rtf::eCharacterEncoding_DoubleByte);
+		EXPECT_EQ(Rtf::eCharacterEncoding_DoubleByte, p2.GetCharacterEncoding());
+		ASSERT_NE(nullptr, p2.GetFont());
+		EXPECT_STREQ("Mangal", p2.GetFont()->GetName().c_str());
+		EXPECT_FLOAT_EQ(14.0f, p2.GetFontSize());
+		ASSERT_NE(nullptr, p2.GetLocale());
+		EXPECT_EQ(Rtf::eCountry_India, p2.GetLocale()->country);
+		EXPECT_EQ(Rtf::eLanguage_Hindi, p2.GetLocale()->language);
+	}
+}
