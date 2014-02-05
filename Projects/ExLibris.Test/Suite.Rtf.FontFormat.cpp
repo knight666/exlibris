@@ -177,9 +177,10 @@ TEST(RtfFontFormat, ParseLanguage)
 
 	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
 
-	ASSERT_NE(nullptr, ff.GetLocale());
-	EXPECT_EQ(Rtf::eCountry_Tunisia, ff.GetLocale()->country);
-	EXPECT_EQ(Rtf::eLanguage_Arabic, ff.GetLocale()->language);
+	const RtfLocale* l = ff.GetLocale();
+	ASSERT_NE(nullptr, l);
+	EXPECT_EQ(eCountry_Tunisia, l->country);
+	EXPECT_EQ(eLanguage_Arabic, l->language);
 	EXPECT_TRUE(ff.GetProofing());
 }
 
@@ -198,9 +199,10 @@ TEST(RtfFontFormat, ParseLanguageUndefined)
 
 	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
 
-	ASSERT_NE(nullptr, ff.GetLocale());
-	EXPECT_EQ(Rtf::eCountry_None, ff.GetLocale()->country);
-	EXPECT_EQ(Rtf::eLanguage_None, ff.GetLocale()->language);
+	const RtfLocale* l = ff.GetLocale();
+	ASSERT_NE(nullptr, l);
+	EXPECT_EQ(eCountry_None, l->country);
+	EXPECT_EQ(eLanguage_None, l->language);
 	EXPECT_FALSE(ff.GetProofing());
 }
 
@@ -265,9 +267,10 @@ TEST(RtfFontFormat, ParseLanguageEastAsian)
 
 	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
 
-	ASSERT_NE(nullptr, ff.GetLocale(eTextLanguage_EastAsian));
-	EXPECT_EQ(Rtf::eCountry_Japan, ff.GetLocale(eTextLanguage_EastAsian)->country);
-	EXPECT_EQ(Rtf::eLanguage_Japanese, ff.GetLocale(eTextLanguage_EastAsian)->language);
+	const RtfLocale* l = ff.GetLocale(eTextLanguage_EastAsian);
+	ASSERT_NE(nullptr, l);
+	EXPECT_EQ(eCountry_Japan, l->country);
+	EXPECT_EQ(eLanguage_Japanese, l->language);
 }
 
 TEST(RtfFontFormat, ParseLanguageEastAsianInvalidParameter)
@@ -312,6 +315,142 @@ TEST(RtfFontFormat, ParseLanguageEastAsianNoWorld)
 	t.type = RtfToken::eParseType_Command;
 	t.value = "langfe";
 	t.parameter = 1031;
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguage)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langnp";
+	t.parameter = 1097;
+
+	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
+
+	const RtfLocale* l = ff.GetLocale(eTextLanguage_Default, eSpellingCheck_Disabled);
+	ASSERT_NE(nullptr, l);
+	EXPECT_EQ(eCountry_India, l->country);
+	EXPECT_EQ(eLanguage_Tamil, l->language);
+	EXPECT_FALSE(ff.GetProofing());
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageInvalidParameter)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langnp";
+	t.parameter = 333812;
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageNoParameter)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langnp";
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageNoWorld)
+{
+	RtfDomDocument d(nullptr);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langnp";
+	t.parameter = 1055;
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageEastAsian)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfenp";
+	t.parameter = 2143;
+
+	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
+
+	const RtfLocale* l = ff.GetLocale(eTextLanguage_EastAsian, eSpellingCheck_Disabled);
+	ASSERT_NE(nullptr, l);
+	EXPECT_EQ(eCountry_Algeria, l->country);
+	EXPECT_EQ(eLanguage_TamazightLatin, l->language);
+	EXPECT_FALSE(ff.GetProofing());
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageEastAsianInvalidParameter)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfenp";
+	t.parameter = 98121;
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageEastAsianNoParameter)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfenp";
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseUncheckedLanguageEastAsianNoWorld)
+{
+	RtfDomDocument d(nullptr);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfenp";
+	t.parameter = 1055;
 
 	EXPECT_PARSE_INVALID(ff.Parse(s, t));
 }
