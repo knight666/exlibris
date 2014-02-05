@@ -25,8 +25,8 @@
 #pragma once
 
 #include "IRtfParseable.h"
+#include "RtfDomDocument.h"
 #include "RtfProperty.h"
-#include "RtfWorld.h"
 
 namespace ExLibris {
 namespace Rtf {
@@ -37,10 +37,10 @@ namespace Rtf {
 
 	public:
 
-		FontFormat(RtfWorld& a_World);
+		FontFormat(RtfDomDocument& a_Document);
 		~FontFormat();
 
-		RtfWorld& GetWorld() const;
+		RtfDomDocument& GetDocument() const;
 
 		bool IsBold() const;
 		void SetBold(bool a_Value);
@@ -54,7 +54,7 @@ namespace Rtf {
 
 	private:
 
-		RtfWorld& m_World;
+		RtfDomDocument& m_Document;
 		unsigned int m_Specified;
 		RtfProperty<bool, 0> m_Bold;
 		RtfProperty<bool, 1> m_Italic;
