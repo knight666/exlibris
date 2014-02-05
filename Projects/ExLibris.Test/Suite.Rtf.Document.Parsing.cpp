@@ -227,3 +227,10 @@ TEST_F(DocumentParsingContext, StyleSheet)
 		EXPECT_EQ(Rtf::eLanguage_Hindi, p2.GetLocale()->language);
 	}
 }
+
+TEST_F(DocumentParsingContext, LibreOfficeBasic)
+{
+	OpenTestFile("Tests/RTF/LibreOfficeBasic.rtf");
+
+	int i = 0;
+}

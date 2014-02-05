@@ -29,6 +29,7 @@
 #include "RtfColorTable.h"
 #include "RtfDomElement.h"
 #include "RtfFontTable.h"
+#include "RtfLogMessage.h"
 #include "RtfStyleSheet.h"
 #include "RtfTextFormat.h"
 #include "RtfWorld.h"
@@ -69,6 +70,9 @@ namespace ExLibris
 
 		bool ParseFromSource(std::basic_istream<char>* a_Stream);
 
+		const std::vector<RtfLogMessage>& GetWarnings() const;
+		const std::vector<RtfLogMessage>& GetErrors() const;
+
 	private:
 
 		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
@@ -86,6 +90,9 @@ namespace ExLibris
 		RtfStyleSheet* m_StyleSheet;
 
 		bool m_WidowControl;
+
+		std::vector<RtfLogMessage> m_LogWarnings;
+		std::vector<RtfLogMessage> m_LogErrors;
 
 		Rtf::Tokenizer* m_Tokenizer;
 

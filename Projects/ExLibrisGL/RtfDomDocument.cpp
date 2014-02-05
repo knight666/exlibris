@@ -32,6 +32,26 @@
 namespace ExLibris
 {
 
+	class MessageFinisher
+	{
+
+	public:
+
+		void operator = (RtfLogMessage& a_Message)
+		{
+			a_Message.Finish();
+		}
+
+	};
+
+#define LOG_WARNING(_token) \
+	::ExLibris::MessageFinisher() = \
+	::ExLibris::RtfLogMessage(&m_LogWarnings, (_token).column, (_token).line)
+
+#define LOG_ERROR(_token) \
+	::ExLibris::MessageFinisher() = \
+	::ExLibris::RtfLogMessage(&m_LogErrors, (_token).column, (_token).line)
+
 	struct RtfDomDocument::ParseState
 	{
 		ParseState()
@@ -124,6 +144,14 @@ namespace ExLibris
 
 	bool RtfDomDocument::ParseFromSource(std::basic_istream<char>* a_Stream)
 	{
+		if (a_Stream == nullptr)
+		{
+			return false;
+		}
+
+		m_LogWarnings.clear();
+		m_LogErrors.clear();
+
 		m_Tokenizer->SetInput(a_Stream);
 
 		const RtfToken& token = m_Tokenizer->GetCurrent();
@@ -183,6 +211,8 @@ namespace ExLibris
 						}
 					}
 
+					LOG_WARNING(token) << "Unhandled token \"" << token.value << "\" of type " << token.type << ".";
+
 				} break;
 
 			case IRtfParseable::eResult_Invalid:
@@ -199,6 +229,16 @@ namespace ExLibris
 		}
 
 		return true;
+	}
+
+	const std::vector<RtfLogMessage>& RtfDomDocument::GetWarnings() const
+	{
+		return m_LogWarnings;
+	}
+
+	const std::vector<RtfLogMessage>& RtfDomDocument::GetErrors() const
+	{
+		return m_LogErrors;
 	}
 
 	IRtfParseable::Result RtfDomDocument::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
