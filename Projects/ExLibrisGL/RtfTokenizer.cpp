@@ -132,15 +132,12 @@ namespace Rtf {
 		{
 			m_Current.type = RtfToken::eParseType_Value;
 		}
+		else if (_ParseNewLine())
+		{
+			return Read();
+		}
 		else
 		{
-			if (_ParseNewLine() && !_NextCharacter())
-			{
-				m_Current.type = RtfToken::eParseType_End;
-
-				return false;
-			}
-
 			_AddCurrentToToken();
 
 			m_Current.type = RtfToken::eParseType_Text;

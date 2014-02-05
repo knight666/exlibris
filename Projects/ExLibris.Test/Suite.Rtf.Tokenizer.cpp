@@ -366,6 +366,21 @@ TEST(RtfTokenizer, ReadGroups)
 	EXPECT_END_TOKEN(0, 9, 1);
 }
 
+TEST(RtfTokenizer, ReadGroupSplitByNewLine)
+{
+	Tokenizer tk;
+
+	std::stringstream ss;
+	ss << "{}\n{";
+
+	tk.SetInput(&ss);
+
+	EXPECT_GROUP_OPEN_TOKEN(1, 1, 1);
+	EXPECT_GROUP_CLOSE_TOKEN(0, 2, 1);
+	EXPECT_GROUP_OPEN_TOKEN(1, 1, 2);
+	EXPECT_END_TOKEN(1, 2, 2);
+}
+
 TEST(RtfTokenizer, ReadCommand)
 {
 	Tokenizer tk;
@@ -619,7 +634,7 @@ TEST(RtfTokenizer, ReadNewLine)
 
 	tk.SetInput(&ss);
 
-	EXPECT_END_TOKEN(0, 1, 1);
+	EXPECT_END_TOKEN(0, 1, 2);
 }
 
 TEST(RtfTokenizer, ReadCarriageFeedAndNewLine)
@@ -631,7 +646,7 @@ TEST(RtfTokenizer, ReadCarriageFeedAndNewLine)
 
 	tk.SetInput(&ss);
 
-	EXPECT_END_TOKEN(0, 1, 1);
+	EXPECT_END_TOKEN(0, 1, 2);
 }
 
 TEST(RtfTokenizer, ReadCarriageFeed)
@@ -643,7 +658,7 @@ TEST(RtfTokenizer, ReadCarriageFeed)
 
 	tk.SetInput(&ss);
 
-	EXPECT_END_TOKEN(0, 1, 1);
+	EXPECT_END_TOKEN(0, 2, 1);
 }
 
 TEST(RtfTokenizer, ReadValue)
