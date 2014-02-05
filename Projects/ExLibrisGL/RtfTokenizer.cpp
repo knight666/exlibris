@@ -124,13 +124,15 @@ namespace Rtf {
 
 			return true;
 		}
-		else if (_Match('\\'))
-		{
-			m_Current.type = RtfToken::eParseType_Command;
-		}
 		else if (_Match(';'))
 		{
 			m_Current.type = RtfToken::eParseType_Value;
+
+			return true;
+		}
+		else if (_Match('\\'))
+		{
+			m_Current.type = RtfToken::eParseType_Command;
 		}
 		else if (_ParseNewLine())
 		{
