@@ -17,6 +17,7 @@ TEST(RtfFontFormat, Construct)
 	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
+	EXPECT_FALSE(ff.GetProofing());
 }
 
 TEST(RtfFontFormat, Reset)
@@ -31,6 +32,7 @@ TEST(RtfFontFormat, Reset)
 	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
+	EXPECT_FALSE(ff.GetProofing());
 }
 
 TEST(RtfFontFormat, ParsePlain)
@@ -51,6 +53,7 @@ TEST(RtfFontFormat, ParsePlain)
 	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
+	EXPECT_FALSE(ff.GetProofing());
 }
 
 TEST(RtfFontFormat, ParseBoldOn)
@@ -177,6 +180,28 @@ TEST(RtfFontFormat, ParseLanguage)
 	ASSERT_NE(nullptr, ff.GetLocale());
 	EXPECT_EQ(Rtf::eCountry_Tunisia, ff.GetLocale()->country);
 	EXPECT_EQ(Rtf::eLanguage_Arabic, ff.GetLocale()->language);
+	EXPECT_TRUE(ff.GetProofing());
+}
+
+TEST(RtfFontFormat, ParseLanguageUndefined)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "lang";
+	t.parameter = 1024;
+
+	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
+
+	ASSERT_NE(nullptr, ff.GetLocale());
+	EXPECT_EQ(Rtf::eCountry_None, ff.GetLocale()->country);
+	EXPECT_EQ(Rtf::eLanguage_None, ff.GetLocale()->language);
+	EXPECT_FALSE(ff.GetProofing());
 }
 
 TEST(RtfFontFormat, ParseLanguageInvalidParameter)
@@ -289,4 +314,20 @@ TEST(RtfFontFormat, ParseLanguageEastAsianNoWorld)
 	t.parameter = 1031;
 
 	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseProofingOff)
+{
+	RtfDomDocument d(nullptr);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "noproof";
+
+	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
+
+	EXPECT_FALSE(ff.GetProofing());
 }

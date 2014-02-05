@@ -31,12 +31,8 @@ namespace Rtf {
 
 	FontFormat::FontFormat(RtfDomDocument& a_Document)
 		: m_Document(a_Document)
-		, m_Specified(0)
-		, m_Bold(false, m_Specified)
-		, m_Italic(false, m_Specified)
-		, m_Locale(nullptr, m_Specified)
-		, m_LocaleEastAsian(nullptr, m_Specified)
 	{
+		Reset();
 	}
 
 	FontFormat::~FontFormat()
@@ -54,21 +50,27 @@ namespace Rtf {
 		SetLocaleEastAsian(nullptr);
 		SetBold(false);
 		SetItalic(false);
+		SetProofing(false);
 	}
 
 	const RtfLocale* FontFormat::GetLocale() const
 	{
-		return m_Locale.Get();
+		return m_Locale;
 	}
 
 	void FontFormat::SetLocale(const RtfLocale* a_Locale)
 	{
 		m_Locale = a_Locale;
+
+		if (m_Locale != nullptr)
+		{
+			SetProofing(m_Locale->identifier != 1024);
+		}
 	}
 
 	const RtfLocale* FontFormat::GetLocaleEastAsian() const
 	{
-		return m_LocaleEastAsian.Get();
+		return m_LocaleEastAsian;
 	}
 
 	void FontFormat::SetLocaleEastAsian(const RtfLocale* a_Locale)
@@ -78,7 +80,7 @@ namespace Rtf {
 
 	bool FontFormat::IsBold() const
 	{
-		return m_Bold.Get();
+		return m_Bold;
 	}
 
 	void FontFormat::SetBold(bool a_Value)
@@ -88,12 +90,22 @@ namespace Rtf {
 
 	bool FontFormat::IsItalic() const
 	{
-		return m_Italic.Get();
+		return m_Italic;
 	}
 
 	void FontFormat::SetItalic(bool a_Value)
 	{
 		m_Italic = a_Value;
+	}
+
+	bool FontFormat::GetProofing() const
+	{
+		return m_Proofing;
+	}
+	
+	void FontFormat::SetProofing(bool a_Proofing)
+	{
+		m_Proofing = a_Proofing;
 	}
 
 	IRtfParseable::Result FontFormat::_ParseCommand(RtfParserState& a_State, const RtfToken& a_Token)
@@ -137,6 +149,12 @@ namespace Rtf {
 		else if (a_Token.value == "b")
 		{
 			SetBold(!(a_Token.parameter == 0));
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "noproof")
+		{
+			SetProofing(false);
 
 			return IRtfParseable::eResult_Handled;
 		}

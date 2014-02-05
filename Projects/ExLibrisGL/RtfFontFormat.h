@@ -26,7 +26,6 @@
 
 #include "IRtfParseable.h"
 #include "RtfDomDocument.h"
-#include "RtfProperty.h"
 
 namespace ExLibris {
 namespace Rtf {
@@ -56,6 +55,9 @@ namespace Rtf {
 		bool IsItalic() const;
 		void SetItalic(bool a_Value);
 
+		bool GetProofing() const;
+		void SetProofing(bool a_Proofing);
+
 	private:
 
 		IRtfParseable::Result _ParseCommand(RtfParserState& a_State, const RtfToken& a_Token);
@@ -63,11 +65,11 @@ namespace Rtf {
 	private:
 
 		RtfDomDocument& m_Document;
-		unsigned int m_Specified;
-		RtfProperty<bool, 0> m_Bold;
-		RtfProperty<bool, 1> m_Italic;
-		RtfProperty<const RtfLocale*, 2> m_Locale;
-		RtfProperty<const RtfLocale*, 3> m_LocaleEastAsian;
+		bool m_Bold;
+		bool m_Italic;
+		const RtfLocale* m_Locale;
+		const RtfLocale* m_LocaleEastAsian;
+		bool m_Proofing;
 
 	}; // class FontFormat
 
