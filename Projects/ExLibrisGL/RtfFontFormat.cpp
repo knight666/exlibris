@@ -34,6 +34,7 @@ namespace Rtf {
 		, m_Specified(0)
 		, m_Bold(false, m_Specified)
 		, m_Italic(false, m_Specified)
+		, m_Locale(nullptr, m_Specified)
 	{
 	}
 
@@ -48,8 +49,19 @@ namespace Rtf {
 
 	void FontFormat::Reset()
 	{
+		SetLocale(nullptr);
 		SetBold(false);
 		SetItalic(false);
+	}
+
+	const RtfLocale* FontFormat::GetLocale() const
+	{
+		return m_Locale.Get();
+	}
+
+	void FontFormat::SetLocale(const RtfLocale* a_Locale)
+	{
+		m_Locale = a_Locale;
 	}
 
 	bool FontFormat::IsBold() const
@@ -77,6 +89,23 @@ namespace Rtf {
 		if (a_Token.value == "plain")
 		{
 			Reset();
+
+			return IRtfParseable::eResult_Handled;
+		}
+		else if (a_Token.value == "lang")
+		{
+			if (m_Document.GetWorld() == nullptr || a_Token.parameter < 0)
+			{
+				return IRtfParseable::eResult_Invalid;
+			}
+
+			const RtfLocale* locale = m_Document.GetWorld()->GetLocaleByIdentifier(a_Token.parameter);
+			if (locale == nullptr)
+			{
+				return IRtfParseable::eResult_Invalid;
+			}
+
+			SetLocale(locale);
 
 			return IRtfParseable::eResult_Handled;
 		}
