@@ -42,6 +42,8 @@ namespace Rtf {
 
 		RtfDomDocument& GetDocument() const;
 
+		void Reset();
+
 		bool IsBold() const;
 		void SetBold(bool a_Value);
 
