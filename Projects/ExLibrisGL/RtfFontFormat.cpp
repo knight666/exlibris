@@ -46,36 +46,46 @@ namespace Rtf {
 
 	void FontFormat::Reset()
 	{
-		SetLocale(nullptr);
-		SetLocaleEastAsian(nullptr);
+		m_LocalesChecked[0] = nullptr;
+		m_LocalesChecked[1] = nullptr;
+		m_LocalesChecked[2] = nullptr;
+		m_LocalesUnchecked[0] = nullptr;
+		m_LocalesUnchecked[1] = nullptr;
+		m_LocalesUnchecked[2] = nullptr;
 		SetBold(false);
 		SetItalic(false);
 		SetProofing(false);
 	}
 
-	const RtfLocale* FontFormat::GetLocale() const
+	const RtfLocale* FontFormat::GetLocale(TextLanguage a_Language /*= eTextLanguage_Default*/, SpellingCheck a_Checked /*= eSpellingCheck_Enabled*/) const
 	{
-		return m_Locale;
-	}
-
-	void FontFormat::SetLocale(const RtfLocale* a_Locale)
-	{
-		m_Locale = a_Locale;
-
-		if (m_Locale != nullptr)
+		if (a_Checked == eSpellingCheck_Enabled)
 		{
-			SetProofing(m_Locale->identifier != 1024);
+			return m_LocalesChecked[a_Language];
+		}
+		else
+		{
+			return m_LocalesUnchecked[a_Language];
 		}
 	}
 
-	const RtfLocale* FontFormat::GetLocaleEastAsian() const
+	void FontFormat::SetLocale(TextLanguage a_Language, SpellingCheck a_Checked, const RtfLocale* a_Locale)
 	{
-		return m_LocaleEastAsian;
-	}
+		if (a_Locale == nullptr)
+		{
+			return;
+		}
 
-	void FontFormat::SetLocaleEastAsian(const RtfLocale* a_Locale)
-	{
-		m_LocaleEastAsian = a_Locale;
+		if (a_Checked == eSpellingCheck_Enabled)
+		{
+			m_LocalesChecked[a_Language] = a_Locale;
+		}
+		else
+		{
+			m_LocalesUnchecked[a_Language] = a_Locale;
+		}
+
+		SetProofing(a_Locale->identifier != 1024);
 	}
 
 	bool FontFormat::IsBold() const
@@ -129,14 +139,14 @@ namespace Rtf {
 				return IRtfParseable::eResult_Invalid;
 			}
 
-			if (a_Token.value == "lang")
+			TextLanguage language = eTextLanguage_Default;
+
+			if (a_Token.value == "langfe")
 			{
-				SetLocale(locale);
+				language = eTextLanguage_EastAsian;
 			}
-			else
-			{
-				SetLocaleEastAsian(locale);
-			}
+
+			SetLocale(language, eSpellingCheck_Enabled, locale);
 
 			return IRtfParseable::eResult_Handled;
 		}

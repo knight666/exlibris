@@ -43,11 +43,8 @@ namespace Rtf {
 
 		void Reset();
 
-		const RtfLocale* GetLocale() const;
-		void SetLocale(const RtfLocale* a_Locale);
-
-		const RtfLocale* GetLocaleEastAsian() const;
-		void SetLocaleEastAsian(const RtfLocale* a_Locale);
+		const RtfLocale* GetLocale(TextLanguage a_Language = eTextLanguage_Default, SpellingCheck a_Checked = eSpellingCheck_Enabled) const;
+		void SetLocale(TextLanguage a_Language, SpellingCheck a_Checked, const RtfLocale* a_Locale);
 
 		bool IsBold() const;
 		void SetBold(bool a_Value);
@@ -67,8 +64,8 @@ namespace Rtf {
 		RtfDomDocument& m_Document;
 		bool m_Bold;
 		bool m_Italic;
-		const RtfLocale* m_Locale;
-		const RtfLocale* m_LocaleEastAsian;
+		const RtfLocale* m_LocalesChecked[3];
+		const RtfLocale* m_LocalesUnchecked[3];
 		bool m_Proofing;
 
 	}; // class FontFormat

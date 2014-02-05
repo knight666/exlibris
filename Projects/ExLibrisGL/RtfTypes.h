@@ -407,5 +407,18 @@ namespace Rtf {
 		ePitch_Variable = 2
 	};
 
+	enum SpellingCheck
+	{
+		eSpellingCheck_Enabled,
+		eSpellingCheck_Disabled
+	};
+
+	enum TextLanguage
+	{
+		eTextLanguage_Default,
+		eTextLanguage_EastAsian,
+		eTextLanguage_MiddleEastern
+	};
+
 }; // namespace Rtf
 }; // namespace ExLibris
