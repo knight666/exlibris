@@ -29,8 +29,8 @@
 namespace ExLibris {
 namespace Rtf {
 
-	FontFormat::FontFormat(RtfWorld& a_World)
-		: m_World(a_World)
+	FontFormat::FontFormat(RtfDomDocument& a_Document)
+		: m_Document(a_Document)
 		, m_Specified(0)
 		, m_Bold(false, m_Specified)
 		, m_Italic(false, m_Specified)
@@ -41,9 +41,9 @@ namespace Rtf {
 	{
 	}
 
-	RtfWorld& FontFormat::GetWorld() const
+	RtfDomDocument& FontFormat::GetDocument() const
 	{
-		return m_World;
+		return m_Document;
 	}
 
 	bool FontFormat::IsBold() const

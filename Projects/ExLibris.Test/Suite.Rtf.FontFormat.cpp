@@ -10,7 +10,8 @@ using namespace ExLibris::Rtf;
 TEST(RtfFontFormat, Construct)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
@@ -19,7 +20,8 @@ TEST(RtfFontFormat, Construct)
 TEST(RtfFontFormat, ParseBoldOn)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	RtfParserState s;
 
@@ -35,7 +37,8 @@ TEST(RtfFontFormat, ParseBoldOn)
 TEST(RtfFontFormat, ParseBoldOff)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	RtfParserState s;
 
@@ -52,7 +55,8 @@ TEST(RtfFontFormat, ParseBoldOff)
 TEST(RtfFontFormat, ParseBoldInvalidParameter)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	RtfParserState s;
 
@@ -69,7 +73,8 @@ TEST(RtfFontFormat, ParseBoldInvalidParameter)
 TEST(RtfFontFormat, ParseItalicOn)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	RtfParserState s;
 
@@ -85,7 +90,8 @@ TEST(RtfFontFormat, ParseItalicOn)
 TEST(RtfFontFormat, ParseItalicOff)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	RtfParserState s;
 
@@ -102,7 +108,8 @@ TEST(RtfFontFormat, ParseItalicOff)
 TEST(RtfFontFormat, ParseItalicInvalidParameter)
 {
 	RtfWorld w;
-	FontFormat ff(w);
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
 
 	RtfParserState s;
 
