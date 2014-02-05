@@ -97,6 +97,7 @@
     <ClCompile Include="RtfDomDocument.cpp" />
     <ClCompile Include="RtfDomElement.cpp" />
     <ClCompile Include="RtfFont.cpp" />
+    <ClCompile Include="RtfFontFormat.cpp" />
     <ClCompile Include="RtfFontTable.cpp" />
     <ClCompile Include="RtfLogMessage.cpp" />
     <ClCompile Include="RtfParagraphFormat.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="RtfColorTable.h" />
     <ClInclude Include="RtfDomElement.h" />
     <ClInclude Include="RtfFont.h" />
+    <ClInclude Include="RtfFontFormat.h" />
     <ClInclude Include="RtfFontTable.h" />
     <ClInclude Include="RtfLocale.h" />
     <ClInclude Include="RtfLogMessage.h" />
