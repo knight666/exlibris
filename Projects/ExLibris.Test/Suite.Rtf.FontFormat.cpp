@@ -13,6 +13,8 @@ TEST(RtfFontFormat, Construct)
 	RtfDomDocument d(&w);
 	FontFormat ff(d);
 
+	EXPECT_EQ(nullptr, ff.GetLocale());
+	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
 }
@@ -25,6 +27,8 @@ TEST(RtfFontFormat, Reset)
 
 	ff.Reset();
 
+	EXPECT_EQ(nullptr, ff.GetLocale());
+	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
 }
@@ -43,6 +47,8 @@ TEST(RtfFontFormat, ParsePlain)
 
 	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
 
+	EXPECT_EQ(nullptr, ff.GetLocale());
+	EXPECT_EQ(nullptr, ff.GetLocaleEastAsian());
 	EXPECT_FALSE(ff.IsBold());
 	EXPECT_FALSE(ff.IsItalic());
 }
@@ -215,6 +221,72 @@ TEST(RtfFontFormat, ParseLanguageNoWorld)
 	t.type = RtfToken::eParseType_Command;
 	t.value = "lang";
 	t.parameter = 1050;
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseLanguageEastAsian)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfe";
+	t.parameter = 1041;
+
+	EXPECT_PARSE_HANDLED(ff.Parse(s, t));
+
+	ASSERT_NE(nullptr, ff.GetLocaleEastAsian());
+	EXPECT_EQ(Rtf::eCountry_Japan, ff.GetLocaleEastAsian()->country);
+	EXPECT_EQ(Rtf::eLanguage_Japanese, ff.GetLocaleEastAsian()->language);
+}
+
+TEST(RtfFontFormat, ParseLanguageEastAsianInvalidParameter)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfe";
+	t.parameter = 9128;
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseLanguageEastAsianNoParameter)
+{
+	RtfWorld w;
+	RtfDomDocument d(&w);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfe";
+
+	EXPECT_PARSE_INVALID(ff.Parse(s, t));
+}
+
+TEST(RtfFontFormat, ParseLanguageEastAsianNoWorld)
+{
+	RtfDomDocument d(nullptr);
+	FontFormat ff(d);
+
+	RtfParserState s;
+
+	RtfToken t;
+	t.type = RtfToken::eParseType_Command;
+	t.value = "langfe";
+	t.parameter = 1031;
 
 	EXPECT_PARSE_INVALID(ff.Parse(s, t));
 }
