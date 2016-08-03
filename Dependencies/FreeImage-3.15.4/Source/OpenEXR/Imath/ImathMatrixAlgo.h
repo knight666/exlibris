@@ -55,6 +55,7 @@
 #include "ImathVec.h"
 #include "ImathLimits.h"
 #include <math.h>
+#include <algorithm>
 
 
 #ifdef OPENEXR_DLL
