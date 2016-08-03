@@ -24,20 +24,21 @@
 					['OS=="win"', {
 						'defines': [ '_WINDOWS', '_CRT_SECURE_NO_WARNINGS' ],
 						'msvs_configuration_attributes': {
-							'OutputDirectory': '$(SolutionDir)output\\<(platform_name)\\<(architecture_name)\\$(ConfigurationName)',
-							'IntermediateDirectory': '$(SolutionDir)intermediate\\$(ProjectName)\\<(architecture_name)\\$(ConfigurationName)',
+							'OutputDirectory': '$(SolutionDir)Build\\',
+							'IntermediateDirectory': '$(SolutionDir)Intermediate\\$(ProjectName)\\<(architecture_name)\\$(ConfigurationName)',
 							'CharacterSet': '1', # unicode
 						},
 						'msvs_settings': {
 							'VCCLCompilerTool': {
 								'WarningLevel': 3, # /W3
 								# 'WarnAsError': 'true' # TODO
+								'ProgramDataBaseFileName': '$(TargetDir)$(TargetName)-<(architecture_name)-$(ConfigurationName).pdb',
 							},
 							'VCLibrarianTool': {
-								'OutputFile': '$(OutDir)$(TargetName)$(TargetExt)',
+								'OutputFile': '$(OutDir)$(TargetName)-<(architecture_name)-$(ConfigurationName)$(TargetExt)',
 							},
 							'VCLinkerTool': {
-								'OutputFile': '$(OutDir)$(TargetName)$(TargetExt)',
+								'OutputFile': '$(OutDir)$(TargetName)-<(architecture_name)-$(ConfigurationName)$(TargetExt)',
 							},
 						},
 					}],
@@ -90,7 +91,6 @@
 								'Optimization': 0, # /Od
 								'BasicRuntimeChecks': 3, # /RTC1
 								'RuntimeLibrary': 3, # /MDd (dynamic debug)
-								'ProgramDataBaseFileName': '$(TargetDir)$(ProjectName).pdb',
 							},
 							'VCLinkerTool': {
 								'LinkIncremental': 2, # /INCREMENTAL
