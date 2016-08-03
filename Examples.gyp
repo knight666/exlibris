@@ -50,11 +50,97 @@
 				'Dependencies/glew-1.10.0/glew.gyp:glew',
 				'Dependencies/glfw-3.0.2/glfw.gyp:glfw',
 				'Dependencies/glm-0.9.4.5/glm.gyp:glm',
-				'Framework',
+				'Dependencies/VisualLeakDetector-2.3/vld.gyp:vld',
 				'ExLibris.gyp:ExLibris',
+				'Framework',
 			],
 			'sources': [
 				'Projects/Example/Main.cpp',
+			],
+			'conditions': [
+				['OS!="win"', {
+					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
+				}]
+			],
+		},
+		{
+			'target_name': 'ExampleFaceSelection',
+			'type': 'executable',
+			'dependencies': [
+				'Dependencies/freetype-2.5.0.1/freetype.gyp:freetype',
+				'Dependencies/glew-1.10.0/glew.gyp:glew',
+				'Dependencies/glfw-3.0.2/glfw.gyp:glfw',
+				'Dependencies/glm-0.9.4.5/glm.gyp:glm',
+				'Dependencies/VisualLeakDetector-2.3/vld.gyp:vld',
+				'ExLibris.gyp:ExLibris',
+				'Framework',
+			],
+			'sources': [
+				'Projects/ExampleFaceSelection/ExampleFaceSelection.cpp',
+			],
+			'conditions': [
+				['OS!="win"', {
+					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
+				}]
+			],
+		},
+		{
+			'target_name': 'ExampleFontOutline',
+			'type': 'executable',
+			'dependencies': [
+				'Dependencies/freetype-2.5.0.1/freetype.gyp:freetype',
+				'Dependencies/glew-1.10.0/glew.gyp:glew',
+				'Dependencies/glfw-3.0.2/glfw.gyp:glfw',
+				'Dependencies/glm-0.9.4.5/glm.gyp:glm',
+				'Dependencies/poly2tri-0.3.3/poly2tri.gyp:poly2tri',
+				'Dependencies/VisualLeakDetector-2.3/vld.gyp:vld',
+				'ExLibris.gyp:ExLibris',
+				'Framework',
+			],
+			'sources': [
+				'Projects/ExampleFontOutline/ExampleFontOutline.cpp',
+			],
+			'conditions': [
+				['OS!="win"', {
+					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
+				}]
+			],
+		},
+		{
+			'target_name': 'ExampleLineDrawing',
+			'type': 'executable',
+			'dependencies': [
+				'Dependencies/glew-1.10.0/glew.gyp:glew',
+				'Dependencies/glfw-3.0.2/glfw.gyp:glfw',
+				'Dependencies/glm-0.9.4.5/glm.gyp:glm',
+				'Dependencies/poly2tri-0.3.3/poly2tri.gyp:poly2tri',
+				'Dependencies/VisualLeakDetector-2.3/vld.gyp:vld',
+				'ExLibris.gyp:ExLibris',
+				'Framework',
+			],
+			'sources': [
+				'Projects/ExampleLineDrawing/ExampleLineDrawing.cpp',
+			],
+			'conditions': [
+				['OS!="win"', {
+					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
+				}]
+			],
+		},
+		{
+			'target_name': 'ExampleTextField',
+			'type': 'executable',
+			'dependencies': [
+				'Dependencies/freetype-2.5.0.1/freetype.gyp:freetype',
+				'Dependencies/glew-1.10.0/glew.gyp:glew',
+				'Dependencies/glfw-3.0.2/glfw.gyp:glfw',
+				'Dependencies/glm-0.9.4.5/glm.gyp:glm',
+				'Dependencies/VisualLeakDetector-2.3/vld.gyp:vld',
+				'ExLibris.gyp:ExLibris',
+				'Framework',
+			],
+			'sources': [
+				'Projects/FrameworkGL/ExampleTextField/ExampleTextField.cpp',
 			],
 			'conditions': [
 				['OS!="win"', {
