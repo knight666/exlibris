@@ -15,19 +15,25 @@ syntax: glob
 *INSTALL.vcxproj
 *ZERO_CHECK.vcxproj
 
-# Visual Studio 2010
+# GYP
 syntax: glob
-Intermediate/*
+*.pyc
+
+# Visual Studio
+syntax: glob
+intermediate/*
 ipch/*
 *_UpgradeReport_Files/*
 *.vcxproj.filters
 *.vcxproj.user
+*.vcxproj
 *.idb
 *.ilk
 *.pdb
 *.ncb
 *.opensdf
 *.sdf
+*.sln
 *.suo
 syntax: regexp
 .*UpgradeLog([0-9]*)\.XML
