@@ -6,13 +6,8 @@
 		{
 			'target_name': 'ExLibris',
 			'type': 'static_library',
-			'variables': {
-				'project_dir': 'Projects/ExLibrisGL',
-			},
 			'dependencies': [
 				'Dependencies/freetype-2.5.0.1/freetype.gyp:freetype',
-				'Dependencies/glew-1.10.0/glew.gyp:glew',
-				'Dependencies/glfw-3.0.2/glfw.gyp:glfw',
 				'Dependencies/glm-0.9.4.5/glm.gyp:glm',
 				'Dependencies/poly2tri-0.3.3/poly2tri.gyp:poly2tri',
 			],
@@ -76,6 +71,11 @@
 				'Projects/ExLibrisGL/TriangleOrientation.h',
 				'Projects/ExLibrisGL/Weight.h',
 			],
+			'direct_dependent_settings': {
+				'include_dirs': [
+					'Projects/ExLibrisGL',
+				],
+			},
 			'conditions': [
 				['OS!="win"', {
 					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
