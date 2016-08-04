@@ -1,4 +1,6 @@
-#include "Memory.h"
+#include "Base.h"
+
+#include "Memory/Memory.h"
 
 namespace ExLibris {
 
