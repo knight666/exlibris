@@ -14,7 +14,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glfw',
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 			],
 			'sources': [
 				'<(project_dir)/Application.cpp',
@@ -54,7 +54,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glfw',
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 				'Framework',
 			],
 			'sources': [
@@ -75,7 +75,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glfw',
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 				'Framework',
 			],
 			'sources': [
@@ -97,7 +97,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:poly2tri',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 				'Framework',
 			],
 			'sources': [
@@ -118,7 +118,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:poly2tri',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 				'Framework',
 			],
 			'sources': [
@@ -139,7 +139,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glfw',
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 				'Framework',
 			],
 			'sources': [
@@ -165,7 +165,7 @@
 				'Dependencies/ExLibris-Dependencies.gyp:gtest',
 				'Dependencies/ExLibris-Dependencies.gyp:poly2tri',
 				'Dependencies/ExLibris-Dependencies.gyp:vld',
-				'ExLibris.gyp:ExLibris',
+				'ExLibris-SDK.gyp:ExLibris',
 				'Framework',
 			],
 			'sources': [
