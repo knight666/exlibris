@@ -25,6 +25,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <Memory/AllocatorDefault.h>
 #include <FontLoaderFreetype.h>
 #include <GlyphBitmap.h>
 #include <Library.h>
@@ -207,7 +208,7 @@ public:
 	{
 		m_Text.push_back((char)a_Character);
 
-		m_Layout->SetText(m_Text);
+		m_Layout->SetText(m_Text.c_str());
 		BuildTexture();
 	}
 
@@ -217,7 +218,7 @@ public:
 		{
 			m_Text.pop_back();
 
-			m_Layout->SetText(m_Text);
+			m_Layout->SetText(m_Text.c_str());
 			BuildTexture();
 		}
 	}
@@ -755,6 +756,9 @@ private:
 
 int main(int argc, const char** argv)
 {
+	exl::AllocatorDefault allocator;
+	exl::InstallAllocator(&allocator);
+
 	ExampleTextField application(argc, argv);
 	return application.Run();
 }

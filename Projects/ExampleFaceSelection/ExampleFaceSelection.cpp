@@ -22,6 +22,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <Memory/AllocatorDefault.h>
 #include <FontLoaderFreetype.h>
 #include <GlyphBitmap.h>
 #include <ITextLayoutVisitor.h>
@@ -173,9 +174,9 @@ public:
 		m_Layout->Accept(*this);
 	}
 
-	void SetText(const std::string& a_Text)
+	void SetText(const std::string& text)
 	{
-		m_Layout->SetText(a_Text);
+		m_Layout->SetText(text.c_str());
 
 		m_Layout->Accept(*this);
 	}
@@ -415,17 +416,17 @@ public:
 		return true;
 	}
 
-	void CreateLabel(const std::string& a_Text, const std::string& a_Family, float a_Size, const glm::vec2& a_Position)
+	void CreateLabel(const std::string& text, const std::string& family, float size, const glm::vec2& position)
 	{
 		GUILabel* label = new GUILabel(m_Library);
 
 		exl::FaceRequest label_request;
-		label_request.SetFamilyName(a_Family);
-		label_request.SetSize(a_Size);
+		label_request.SetFamilyName(family.c_str());
+		label_request.SetSize(size);
 		label->SetFace(label_request);
 
-		label->SetText(a_Text);
-		label->SetPosition(a_Position);
+		label->SetText(text);
+		label->SetPosition(position);
 
 		m_Labels.push_back(label);
 	}
@@ -470,6 +471,9 @@ private:
 
 int main(int argc, const char** argv)
 {
+	exl::AllocatorDefault allocator;
+	exl::InstallAllocator(&allocator);
+
 	ExampleFaceSelection application(argc, argv);
 	return application.Run();
 }
