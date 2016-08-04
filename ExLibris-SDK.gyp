@@ -21,6 +21,7 @@
 				'<(project_dir)/Memory/Memory.cpp',
 				'<(project_dir)/Memory/Memory.h',
 				'<(project_dir)/Alignment.h',
+				'<(project_dir)/Base.h',
 				'<(project_dir)/BoundingBox.cpp',
 				'<(project_dir)/BoundingBox.h',
 				'<(project_dir)/CurvePath.cpp',
@@ -77,6 +78,7 @@
 				'<(project_dir)/Triangle.h',
 				'<(project_dir)/TriangleList.h',
 				'<(project_dir)/TriangleOrientation.h',
+				'<(project_dir)/Types.h',
 				'<(project_dir)/Weight.h',
 			],
 			'direct_dependent_settings': {

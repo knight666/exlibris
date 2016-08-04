@@ -24,31 +24,32 @@
 
 #pragma once
 
-namespace ExLibris
-{
+#include "Base.h"
 
-	inline std::string GetFilenameFromMacroPath(const char* a_FilePath)
+namespace ExLibris {
+
+	inline String GetFilenameFromMacroPath(const char* filePath)
 	{
-		const char* found = strrchr(a_FilePath, '\\');
+		const char* found = strrchr(filePath, '\\');
 		if (found == nullptr)
 		{
-			found = strrchr(a_FilePath, '//');
+			found = strrchr(filePath, '//');
 		}
 
 		if (found != nullptr)
 		{
-			return std::string(&a_FilePath[found - a_FilePath + 1]);
+			return String(&filePath[found - filePath + 1]);
 		}
 		else
 		{
-			return std::string("<unknown>");
+			return String("<unknown>");
 		}
 	}
 
 #ifdef EXL_NO_EXCEPTIONS
-#	define EXL_THROW(_module, _what) { std::cerr << "[" << ExLibris::GetFilenameFromMacroPath(__FILE__) << ":" << __LINE__ << "] (" << (_module) << ") " << (_what) << std::endl; }
+	#define EXL_THROW(_module, _what) { std::cerr << "[" << ExLibris::GetFilenameFromMacroPath(__FILE__) << ":" << __LINE__ << "] (" << (_module) << ") " << (_what) << std::endl; }
 #else
-#	define EXL_THROW(_module, _what) { throw ExLibris::Exception((_module), (_what), __FILE__, __LINE__); }
+	#define EXL_THROW(_module, _what) { throw ExLibris::Exception((_module), (_what), __FILE__, __LINE__); }
 
 	class Exception
 		: public std::exception
@@ -56,21 +57,20 @@ namespace ExLibris
 	
 	public:
 	
-		Exception(const char* a_Module, const char* a_Description, const char* a_FilePath, int a_Line);
+		Exception(const char* module, const char* description, const char* filePath, int line);
 	
-		const std::string& GetModule() const;
+		const String& GetModule() const;
 
-		const std::string& GetFilename() const;
+		const String& GetFilename() const;
 		int GetLine() const;
 
 	private:
 
-		std::string m_Module;
-		std::string m_Filename;
+		String m_Module;
+		String m_Filename;
 		int m_Line;
 	
-	}; // class Exception
+	};
+#endif
 
-#endif // EXL_NO_EXCEPTIONS
-
-}; // namespace ExLibris
+};

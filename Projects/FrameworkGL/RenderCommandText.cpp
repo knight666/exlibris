@@ -170,7 +170,7 @@ namespace Framework
 
 	void RenderCommandText::SetText(const std::string& a_Text)
 	{
-		m_Layout->SetText(a_Text);
+		m_Layout->SetText(a_Text.c_str());
 	}
 
 	void RenderCommandText::SetPosition(const glm::vec2& a_Position)

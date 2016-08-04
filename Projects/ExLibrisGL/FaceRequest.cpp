@@ -22,12 +22,12 @@ namespace ExLibris
 		return m_HasFamilyName;
 	}
 
-	const std::string& FaceRequest::GetFamilyName() const
+	const String& FaceRequest::GetFamilyName() const
 	{
 		return m_FamilyName;
 	}
 
-	void FaceRequest::SetFamilyName(const std::string& a_Name)
+	void FaceRequest::SetFamilyName(const String& a_Name)
 	{
 		m_FamilyName = a_Name;
 		m_HasFamilyName = true;

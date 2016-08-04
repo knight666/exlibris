@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "Base.h"
+
 #include "Style.h"
 #include "Weight.h"
 
@@ -33,20 +35,18 @@ namespace ExLibris
 	class Library;
 };
 
-namespace ExLibris
-{
+namespace ExLibris {
 
 	class Family
 	{
 	
 	public:
-	
-		Family(Library* a_Library, const std::string& a_Name);
+		Family(Library* a_Library, const String& a_Name);
 		~Family();
 	
 		Library* GetLibrary() const;
 
-		const std::string& GetName() const;
+		const String& GetName() const;
 
 		size_t GetGlyphProviderCount() const;
 		void AddGlyphProvider(IGlyphProvider* a_Provider);
@@ -55,9 +55,9 @@ namespace ExLibris
 	private:
 
 		Library* m_Library;
-		std::string m_Name;
+		String m_Name;
 		std::set<IGlyphProvider*> m_GlyphProviders;
 	
-	}; // class Family
+	};
 
-}; // namespace ExLibris
+};
