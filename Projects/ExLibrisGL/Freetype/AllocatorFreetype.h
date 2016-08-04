@@ -1,7 +1,7 @@
 /*
  * This file is a part of the ExLibris project.
  *
- * Copyright (C) 2013 Quinten Lansu
+ * Copyright (C) 2013-2016 Quinten Lansu
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -24,27 +24,17 @@
 
 #pragma once
 
-#include "FreetypeErrors.h"
-#include "IFontLoader.h"
+#include <ft2build.h>
+#include <freetype/freetype.h>
+
+#include "Base.h"
 
 namespace ExLibris {
+namespace Freetype {
 
-	class FontLoaderFreetype
-		: public IFontLoader
-	{
-	
-	public:
-		FontLoaderFreetype(Library* library);
-		~FontLoaderFreetype();
+	void* Allocate(FT_Memory memory, long size) { return GetAllocator()->Allocate(size); }
+	void* Reallocate(FT_Memory memory, long cur_size, long new_size, void* block) { return GetAllocator()->Reallocate(block, new_size); }
+	void Free(FT_Memory memory, void* block) { return GetAllocator()->Free(block); }
 
-		FT_Library GetFreetypeLibrary() const;
-
-		IGlyphProvider* LoadGlyphProvider(std::istream& stream);
-	
-	private:
-		FT_Memory m_Memory;
-		FT_Library m_FreetypeLibrary;
-	
-	};
-
+};
 };
