@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "IAllocator.h"
 
 namespace ExLibris {
@@ -11,9 +9,18 @@ namespace ExLibris {
 
 };
 
-__forceinline void* operator new (size_t size){ return ExLibris::GetAllocator()->Allocate(size); }
-__forceinline void* operator new [](size_t size) { return ExLibris::GetAllocator()->Allocate(size); }
-__forceinline void* operator new(std::size_t size, const std::nothrow_t&){ return ExLibris::GetAllocator()->Allocate(size); }
-__forceinline void* operator new [](std::size_t size, const std::nothrow_t&) { return ExLibris::GetAllocator()->Allocate(size); }
-__forceinline void operator delete (void* p) _THROW0() { return ExLibris::GetAllocator()->Free(p); }
-__forceinline void operator delete[](void* pArray) _THROW0() { return ExLibris::GetAllocator()->Free(pArray); }
+#if EXL_OVERLOAD_NEW
+	__forceinline void* operator new (size_t size){ return ExLibris::GetAllocator()->Allocate(size); }
+	__forceinline void* operator new [](size_t size) { return ExLibris::GetAllocator()->Allocate(size); }
+	__forceinline void* operator new(std::size_t size, const std::nothrow_t&) { return ExLibris::GetAllocator()->Allocate(size); }
+	__forceinline void* operator new [](std::size_t size, const std::nothrow_t&) { return ExLibris::GetAllocator()->Allocate(size); }
+	__forceinline void operator delete (void* data) _THROW0() { return ExLibris::GetAllocator()->Free(data); }
+	__forceinline void operator delete[](void* arrayData) _THROW0() { return ExLibris::GetAllocator()->Free(arrayData); }
+#else
+	void* operator new (size_t size);
+	void* operator new [](size_t size);
+	void* operator new(std::size_t size, const std::nothrow_t&);
+	void* operator new [](std::size_t size, const std::nothrow_t&);
+	void operator delete (void* data) _THROW0();
+	void operator delete[](void* arrayData) _THROW0();
+#endif

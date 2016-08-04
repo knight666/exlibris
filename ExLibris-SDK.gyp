@@ -14,6 +14,12 @@
 				'Dependencies/ExLibris-Dependencies.gyp:glm',
 				'Dependencies/ExLibris-Dependencies.gyp:poly2tri',
 			],
+			'defines': [
+				'EXL_OVERLOAD_NEW=1',
+			],
+			'include_dirs': [
+				'<(project_dir)',
+			],
 			'sources': [
 				'<(project_dir)/Memory/AllocatorDefault.cpp',
 				'<(project_dir)/Memory/AllocatorDefault.h',
