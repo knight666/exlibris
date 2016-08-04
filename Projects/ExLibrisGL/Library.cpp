@@ -26,6 +26,7 @@
 
 #include "Library.h"
 
+#include "Memory/Memory.h"
 #include "Exception.h"
 #include "FaceOptions.h"
 #include "Family.h"

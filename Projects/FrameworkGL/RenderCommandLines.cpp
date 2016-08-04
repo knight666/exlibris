@@ -14,7 +14,7 @@
 namespace Framework
 {
 	
-	static const std::string g_LinesSourceVertex = "\
+	static const char* g_LinesSourceVertex = "\
 		#version 330 core\n \
 		in vec2 attrPosition; \
 		uniform mat4 matModelViewProjection; \
@@ -23,7 +23,7 @@ namespace Framework
 			gl_Position = matModelViewProjection * vec4(attrPosition, 0.0, 1.0); \
 		}";
 
-	static const std::string g_LinesSourceFragment = "\
+	static const char* g_LinesSourceFragment = "\
 		#version 330 core\n\
 		uniform vec4 uniColor; \
 		out vec4 fragColor; \

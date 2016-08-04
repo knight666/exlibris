@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Memory/IAllocator.h"
 #include "FaceRequest.h"
 
 namespace ExLibris
