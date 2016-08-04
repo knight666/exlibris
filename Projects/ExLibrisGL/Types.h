@@ -36,12 +36,12 @@ namespace ExLibris {
 
 		pointer allocate(size_type count, const void* hint = nullptr)
 		{
-			return (pointer)GetAllocator()->Allocate(count * sizeof(Type));
+			return (pointer)GetAllocator()->Allocate("stl", count * sizeof(Type));
 		}
 
 		void deallocate(pointer data, size_type count)
 		{
-			GetAllocator()->Free(data);
+			GetAllocator()->Free("stl", data);
 		}
 
 	};

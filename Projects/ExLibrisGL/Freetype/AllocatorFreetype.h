@@ -32,9 +32,9 @@
 namespace ExLibris {
 namespace Freetype {
 
-	void* Allocate(FT_Memory memory, long size) { return GetAllocator()->Allocate(size); }
-	void* Reallocate(FT_Memory memory, long cur_size, long new_size, void* block) { return GetAllocator()->Reallocate(block, new_size); }
-	void Free(FT_Memory memory, void* block) { return GetAllocator()->Free(block); }
+	void* Allocate(FT_Memory memory, long size) { return GetAllocator()->Allocate("freetype", size); }
+	void* Reallocate(FT_Memory memory, long cur_size, long new_size, void* block) { return GetAllocator()->Reallocate("freetype", block, new_size); }
+	void Free(FT_Memory memory, void* block) { return GetAllocator()->Free("freetype", block); }
 
 };
 };

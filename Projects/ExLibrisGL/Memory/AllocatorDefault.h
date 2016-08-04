@@ -9,9 +9,9 @@ namespace ExLibris {
 	{
 
 	public:
-		virtual void* Allocate(size_t size) override;
-		virtual void* Reallocate(void* allocated, size_t size) override;
-		virtual void Free(void* allocated) override;
+		virtual void* Allocate(const char* tag, size_t size) override;
+		virtual void* Reallocate(const char* tag, void* allocated, size_t size) override;
+		virtual void Free(const char* tag, void* allocated) override;
 
 	};
 
