@@ -32,6 +32,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <Memory/AllocatorDefault.h>
 #include <CurvePath.h>
 #include <CurveSettings.h>
 #include <Family.h>
@@ -84,9 +85,9 @@ public:
 		delete m_HelperGlyphs;
 	}
 
-	void SetText(const std::string& a_Text)
+	void SetText(const std::string& text)
 	{
-		m_Layout->SetText(a_Text);
+		m_Layout->SetText(text.c_str());
 
 		m_LayoutDirty = true;
 	}
@@ -811,6 +812,9 @@ private:
 
 int main(int argc, const char** argv)
 {
+	exl::AllocatorDefault allocator;
+	exl::InstallAllocator(&allocator);
+
 	ExampleFontOutline application(argc, argv);
 	return application.Run();
 }

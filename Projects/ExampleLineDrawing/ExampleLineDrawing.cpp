@@ -25,6 +25,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <Memory/AllocatorDefault.h>
 #include <LineShape.h>
 #include <Polygon.h>
 
@@ -269,6 +270,9 @@ private:
 
 int main(int argc, const char** argv)
 {
+	ExLibris::AllocatorDefault allocator;
+	ExLibris::InstallAllocator(&allocator);
+
 	ExampleLineDrawing application(argc, argv);
 	return application.Run();
 }
