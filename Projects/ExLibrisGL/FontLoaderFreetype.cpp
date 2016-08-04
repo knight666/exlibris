@@ -26,34 +26,50 @@
 
 #include "FontLoaderFreetype.h"
 
+#include "Freetype/AllocatorFreetype.h"
 #include "FreetypeErrors.h"
 #include "GlyphProviderFreetype.h"
 #include "Library.h"
 
-namespace ExLibris
-{
+extern "C" FT_Error FT_New_Library(FT_Memory memory, FT_Library *alibrary);
+extern "C" void FT_Add_Default_Modules(FT_Library library);
+extern "C" FT_Error FT_Done_Library(FT_Library library);
 
-	FontLoaderFreetype::FontLoaderFreetype(Library* a_Library)
-		: IFontLoader(a_Library)
+namespace ExLibris {
+
+	FontLoaderFreetype::FontLoaderFreetype(Library* library)
+		: IFontLoader(library)
+		, m_Memory(nullptr)
+		, m_FreetypeLibrary(nullptr)
 	{
 		FT_Error errors = 0;
-		
-		errors = FT_Init_FreeType(&m_FreetypeLibrary);
+
+		m_Memory = new FT_MemoryRec_;
+		memset(m_Memory, 0, sizeof(FT_MemoryRec_));
+		m_Memory->alloc = Freetype::Allocate;
+		m_Memory->free = Freetype::Free;
+		m_Memory->realloc = Freetype::Reallocate;
+
+		errors = FT_New_Library(m_Memory, &m_FreetypeLibrary);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::FontLoaderFreetype", errors);
 		}
+
+		FT_Add_Default_Modules(m_FreetypeLibrary);
 	}
 
 	FontLoaderFreetype::~FontLoaderFreetype()
 	{
 		FT_Error errors = 0;
 
-		errors = FT_Done_FreeType(m_FreetypeLibrary);
+		errors = FT_Done_Library(m_FreetypeLibrary);
 		if (errors != FT_Err_Ok)
 		{
 			EXL_FT_THROW("FontLoaderFreetype::~FontLoaderFreetype", errors);
 		}
+
+		delete m_Memory;
 	}
 
 	FT_Library FontLoaderFreetype::GetFreetypeLibrary() const
@@ -61,11 +77,11 @@ namespace ExLibris
 		return m_FreetypeLibrary;
 	}
 
-	IGlyphProvider* FontLoaderFreetype::LoadGlyphProvider(std::istream& a_Stream)
+	IGlyphProvider* FontLoaderFreetype::LoadGlyphProvider(std::istream& stream)
 	{
-		a_Stream.seekg(0, std::ios_base::end);
-		std::streamoff font_file_size = a_Stream.tellg();
-		a_Stream.seekg(0, std::ios_base::beg);
+		stream.seekg(0, std::ios_base::end);
+		std::streamoff font_file_size = stream.tellg();
+		stream.seekg(0, std::ios_base::beg);
 
 		if (font_file_size <= 0)
 		{
@@ -73,7 +89,7 @@ namespace ExLibris
 		}
 
 		FT_Byte* font_file_data = new FT_Byte[(unsigned int)font_file_size];
-		a_Stream.read((char*)font_file_data, font_file_size);
+		stream.read((char*)font_file_data, font_file_size);
 
 		FT_Error errors = 0;
 
