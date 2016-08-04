@@ -15,6 +15,11 @@
 				'Dependencies/ExLibris-Dependencies.gyp:poly2tri',
 			],
 			'sources': [
+				'<(project_dir)/Memory/AllocatorDefault.cpp',
+				'<(project_dir)/Memory/AllocatorDefault.h',
+				'<(project_dir)/Memory/IAllocator.h',
+				'<(project_dir)/Memory/Memory.cpp',
+				'<(project_dir)/Memory/Memory.h',
 				'<(project_dir)/Alignment.h',
 				'<(project_dir)/BoundingBox.cpp',
 				'<(project_dir)/BoundingBox.h',

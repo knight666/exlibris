@@ -21,7 +21,7 @@ syntax: glob
 
 # Visual Studio
 syntax: glob
-intermediate/*
+Intermediate/*
 ipch/*
 *_UpgradeReport_Files/*
 *.vcxproj.filters
