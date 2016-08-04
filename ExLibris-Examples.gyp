@@ -40,11 +40,6 @@
 					'<(project_dir)',
 				],
 			},
-			'conditions': [
-				['OS!="win"', {
-					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
-				}]
-			],
 		},
 		{
 			'target_name': 'Example',
@@ -59,11 +54,6 @@
 			],
 			'sources': [
 				'Projects/Example/Main.cpp',
-			],
-			'conditions': [
-				['OS!="win"', {
-					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
-				}]
 			],
 		},
 		{
@@ -80,11 +70,6 @@
 			],
 			'sources': [
 				'Projects/ExampleFaceSelection/ExampleFaceSelection.cpp',
-			],
-			'conditions': [
-				['OS!="win"', {
-					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
-				}]
 			],
 		},
 		{
@@ -103,11 +88,6 @@
 			'sources': [
 				'Projects/ExampleFontOutline/ExampleFontOutline.cpp',
 			],
-			'conditions': [
-				['OS!="win"', {
-					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
-				}]
-			],
 		},
 		{
 			'target_name': 'ExampleLineDrawing',
@@ -124,11 +104,6 @@
 			'sources': [
 				'Projects/ExampleLineDrawing/ExampleLineDrawing.cpp',
 			],
-			'conditions': [
-				['OS!="win"', {
-					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
-				}]
-			],
 		},
 		{
 			'target_name': 'ExampleTextField',
@@ -144,11 +119,6 @@
 			],
 			'sources': [
 				'Projects/FrameworkGL/ExampleTextField/ExampleTextField.cpp',
-			],
-			'conditions': [
-				['OS!="win"', {
-					'product_dir': 'output/<(platform_name)/<(architecture_name)/<(CONFIGURATION_NAME)',
-				}]
 			],
 		},
 		{
