@@ -34,8 +34,7 @@
 #include "IFontLoader.h"
 #include "IGlyphProvider.h"
 
-namespace ExLibris
-{
+namespace ExLibris {
 
 	Library::Library()
 	{
@@ -45,7 +44,7 @@ namespace ExLibris
 	
 	Library::~Library()
 	{
-		for (std::map<std::string, Family*>::iterator family_it = m_Families.begin(); family_it != m_Families.end(); ++family_it)
+		for (std::map<String, Family*>::iterator family_it = m_Families.begin(); family_it != m_Families.end(); ++family_it)
 		{
 			delete family_it->second;
 		}
@@ -63,24 +62,17 @@ namespace ExLibris
 		return m_Loaders.size();
 	}
 
-	void Library::AddLoader(IFontLoader* a_Loader)
+	void Library::AddLoader(IFontLoader* loader)
 	{
-		for (std::vector<IFontLoader*>::iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		if (std::find(m_Loaders.begin(), m_Loaders.end(), loader) == m_Loaders.end())
 		{
-			IFontLoader* loader = *loader_it;
-
-			if (loader == a_Loader)
-			{
-				return;
-			}
+			m_Loaders.push_back(loader);
 		}
-
-		m_Loaders.push_back(a_Loader);
 	}
 
-	bool Library::MapFontToFile(const std::string& a_Path) const
+	bool Library::MapFontToFile(const String& path) const
 	{
-		std::fstream file_stream(a_Path, std::ios::in | std::ios::binary);
+		std::fstream file_stream(path.c_str(), std::ios::in | std::ios::binary);
 		if (!file_stream.is_open())
 		{
 			return false;
@@ -93,13 +85,11 @@ namespace ExLibris
 		return result;
 	}
 
-	bool Library::MapFontToStream(std::istream& a_Stream) const
+	bool Library::MapFontToStream(std::istream& stream) const
 	{
-		for (std::vector<IFontLoader*>::const_iterator loader_it = m_Loaders.begin(); loader_it != m_Loaders.end(); ++loader_it)
+		for (IFontLoader* loader : m_Loaders)
 		{
-			IFontLoader* loader = *loader_it;
-
-			IGlyphProvider* provider = provider = loader->LoadGlyphProvider(a_Stream);
+			IGlyphProvider* provider = provider = loader->LoadGlyphProvider(stream);
 			if (provider != nullptr)
 			{
 				if (provider->GetFamily() != nullptr)
@@ -119,25 +109,25 @@ namespace ExLibris
 		return m_Families.size();
 	}
 
-	Family* Library::CreateFamily(const std::string& a_Name)
+	Family* Library::CreateFamily(const String& name)
 	{
-		std::map<std::string, Family*>::iterator found = m_Families.find(a_Name);
+		FamilyMap::iterator found = m_Families.find(name);
 		if (found != m_Families.end())
 		{
 			return found->second;
 		}
 		else
 		{
-			Family* family = new Family(this, a_Name);
-			m_Families.insert(std::make_pair(a_Name, family));
+			Family* family = new Family(this, name);
+			m_Families.insert(std::make_pair(name, family));
 
 			return family;
 		}
 	}
 
-	Family* Library::FindFamily(const std::string& a_Name) const
+	Family* Library::FindFamily(const String& name) const
 	{
-		std::map<std::string, Family*>::const_iterator found = m_Families.find(a_Name);
+		FamilyMap::const_iterator found = m_Families.find(name);
 		if (found != m_Families.end())
 		{
 			return found->second;
@@ -148,17 +138,17 @@ namespace ExLibris
 		}
 	}
 
-	Face* Library::RequestFace(const FaceRequest& a_Request) const
+	Face* Library::RequestFace(const FaceRequest& request) const
 	{
 		Family* family = nullptr;
-		if (a_Request.HasFamilyName())
+		if (request.HasFamilyName())
 		{
-			family = FindFamily(a_Request.GetFamilyName());
+			family = FindFamily(request.GetFamilyName());
 
 			if (family == nullptr)
 			{
-				std::stringstream ss;
-				ss << "Could not find family named \"" << a_Request.GetFamilyName() << "\".";
+				StringStream ss;
+				ss << "Could not find family named \"" << request.GetFamilyName() << "\".";
 				EXL_THROW("Library::RequestFace", ss.str().c_str());
 
 				return nullptr;
@@ -170,21 +160,21 @@ namespace ExLibris
 		}
 
 		Weight weight = eWeight_Normal;
-		if (a_Request.HasWeight())
+		if (request.HasWeight())
 		{
-			weight = a_Request.GetWeight();
+			weight = request.GetWeight();
 		}
 
 		Style style = eStyle_None;
-		if (a_Request.HasStyle())
+		if (request.HasStyle())
 		{
-			style = a_Request.GetStyle();
+			style = request.GetStyle();
 		}
 
 		float size = 10.0f;
-		if (a_Request.HasSize())
+		if (request.HasSize())
 		{
-			size = a_Request.GetSize();
+			size = request.GetSize();
 		}
 
 		IGlyphProvider* provider = family->FindGlyphProvider(size, weight, style);
@@ -196,4 +186,4 @@ namespace ExLibris
 		return provider->CreateFace(size);
 	}
 
-}; // namespace ExLibris
+};

@@ -10,11 +10,11 @@ namespace Freetype {
 #define TRANSLATE_CASE(_name, _translation) \
 	case CASE_LABEL(Err_, ##_name): \
 		{ \
-			static const std::string CASE_LABEL(translated_, ##_name) = _translation; \
+			static const String CASE_LABEL(translated_, ##_name) = _translation; \
 			return CASE_LABEL(translated_, ##_name); \
 		} break;
 
-	std::string TranslateError(FT_Error a_Error)
+	String TranslateError(FT_Error a_Error)
 	{
 		switch (a_Error)
 		{

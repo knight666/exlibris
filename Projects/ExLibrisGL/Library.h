@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Memory/IAllocator.h"
+#include "Types.h"
 #include "FaceRequest.h"
 
 namespace ExLibris
@@ -35,34 +35,34 @@ namespace ExLibris
 	class IGlyphProvider;
 }
 
-namespace ExLibris
-{
+namespace ExLibris {
 
 	class Library
 	{
 	
 	public:
-	
 		Library();
 		~Library();
 
 		size_t GetLoaderCount() const;
-		void AddLoader(IFontLoader* a_Loader);
+		void AddLoader(IFontLoader* loader);
 
-		bool MapFontToFile(const std::string& a_Path) const;
-		bool MapFontToStream(std::istream& a_Stream) const;
+		bool MapFontToFile(const String& path) const;
+		bool MapFontToStream(std::istream& stream) const;
 
 		size_t GetFamilyCount() const;
-		Family* CreateFamily(const std::string& a_Name);
-		Family* FindFamily(const std::string& a_Name) const;
+		Family* CreateFamily(const String& name);
+		Family* FindFamily(const String& name) const;
 
-		Face* RequestFace(const FaceRequest& a_Request) const;
+		Face* RequestFace(const FaceRequest& request) const;
 
 	private:
+		typedef Vector<IFontLoader*>::type LoaderList;
+		LoaderList m_Loaders;
 
-		std::vector<IFontLoader*> m_Loaders;
-		std::map<std::string, Family*> m_Families;
+		typedef Map<String, Family*>::type FamilyMap;
+		FamilyMap m_Families;
 	
-	}; // class Library
+	};
 
-}; // namespace ExLibris
+};

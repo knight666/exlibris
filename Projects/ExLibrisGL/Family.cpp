@@ -31,7 +31,7 @@
 namespace ExLibris
 {
 
-	Family::Family(Library* a_Library, const std::string& a_Name)
+	Family::Family(Library* a_Library, const String& a_Name)
 		: m_Library(a_Library)
 		, m_Name(a_Name)
 	{
@@ -51,7 +51,7 @@ namespace ExLibris
 		return m_Library;
 	}
 
-	const std::string& Family::GetName() const
+	const String& Family::GetName() const
 	{
 		return m_Name;
 	}

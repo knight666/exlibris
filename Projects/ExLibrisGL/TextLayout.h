@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "Base.h"
+
 #include "Alignment.h"
 #include "Face.h"
 #include "ITextLayoutVisitor.h"
@@ -53,8 +55,8 @@ namespace ExLibris
 		Face* GetFace() const;
 		void SetFace(Face* a_Face);
 
-		const std::string& GetText() const;
-		void SetText(const std::string& a_Text);
+		const String& GetText() const;
+		void SetText(const String& a_Text);
 
 		const glm::vec2& GetSizeHint() const;
 		void SetSizeHint(const glm::vec2& a_SizeHint);
@@ -79,7 +81,7 @@ namespace ExLibris
 
 	private:
 
-		std::vector<int> _AsciiToUtf32(const std::string& a_Text);
+		std::vector<int> _AsciiToUtf32(const String& a_Text);
 		void _ConvertTextToGlyphs();
 		void _ConvertGlyphsToLines();
 		void _WordWrappingNone(bool a_WidthFixed, bool a_HeightFixed);
@@ -93,7 +95,7 @@ namespace ExLibris
 	private:
 
 		Face* m_Face;
-		std::string m_Text;
+		String m_Text;
 
 		std::vector<TextCharacter*> m_Glyphs;
 		bool m_GlyphsDirty;

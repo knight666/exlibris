@@ -24,22 +24,22 @@
 
 #pragma once
 
+#include "Base.h"
+
 #include "Style.h"
 #include "Weight.h"
 
-namespace ExLibris
-{
+namespace ExLibris {
 
 	class FaceRequest
 	{
 	
 	public:
-	
 		FaceRequest();
 
 		bool HasFamilyName() const;
-		const std::string& GetFamilyName() const;
-		void SetFamilyName(const std::string& a_Name);
+		const String& GetFamilyName() const;
+		void SetFamilyName(const String& a_Name);
 
 		bool HasSize() const;
 		float GetSize() const;
@@ -54,8 +54,7 @@ namespace ExLibris
 		void SetStyle(Style a_Style);
 	
 	private:
-
-		std::string m_FamilyName;
+		String m_FamilyName;
 		bool m_HasFamilyName;
 
 		float m_Size;
@@ -67,6 +66,6 @@ namespace ExLibris
 		Style m_Style;
 		bool m_HasStyle;
 	
-	}; // class FaceRequest
+	};
 
-}; // namespace ExLibris
+};

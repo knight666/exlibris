@@ -56,12 +56,12 @@ namespace ExLibris
 		m_GlyphsDirty = true;
 	}
 
-	const std::string& TextLayout::GetText() const
+	const String& TextLayout::GetText() const
 	{
 		return m_Text;
 	}
 
-	void TextLayout::SetText(const std::string& a_Text)
+	void TextLayout::SetText(const String& a_Text)
 	{
 		m_Text = a_Text;
 
@@ -212,12 +212,12 @@ namespace ExLibris
 		a_Visitor.VisitTextEnd();
 	}
 
-	std::vector<int> TextLayout::_AsciiToUtf32(const std::string& a_Text)
+	std::vector<int> TextLayout::_AsciiToUtf32(const String& a_Text)
 	{
 		std::vector<int> result;
 		result.reserve(a_Text.size());
 
-		for (std::string::const_iterator char_it = a_Text.begin(); char_it != a_Text.end(); ++char_it)
+		for (String::const_iterator char_it = a_Text.begin(); char_it != a_Text.end(); ++char_it)
 		{
 			result.push_back((int)*char_it);
 		}

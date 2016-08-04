@@ -24,15 +24,13 @@
 
 #pragma once
 
-#include <sstream>
-
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
 #include "Exception.h"
 
 #define EXL_FT_THROW(_module, _error) { \
-	std::stringstream what; \
+	ExLibris::StringStream what; \
 	what << "Error: "; \
 	what << ExLibris::Freetype::TranslateError((_error)); \
 	what << " [" << (_error) << "]"; \
@@ -42,7 +40,7 @@
 namespace ExLibris {
 namespace Freetype {
 
-	std::string TranslateError(FT_Error a_Error);
+	String TranslateError(FT_Error a_Error);
 
-}; // namespace Freetype
-}; // namespace ExLibris
+};
+};

@@ -320,7 +320,7 @@ namespace ExLibris
 		}
 		else
 		{
-			std::stringstream ss;
+			StringStream ss;
 			ss << "Unhandled bitmap type: " << glyph_bitmap.pixel_mode << std::endl;
 			EXL_THROW("GlyphProviderFreetype::CreateBitmap", ss.str().c_str());
 
