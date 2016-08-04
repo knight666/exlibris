@@ -18,6 +18,7 @@ namespace fw = Framework;
 
 // ExLibris
 
+#include <Memory/AllocatorDefault.h>
 #include <Library.h>
 
 namespace exl = ExLibris;
@@ -28,8 +29,8 @@ class Example
 
 public:
 
-	Example(int a_ArgumentCount, const char** a_Arguments)
-		: fw::Application(a_ArgumentCount, a_Arguments)
+	Example(int argumentCount, const char** arguments)
+		: fw::Application(argumentCount, arguments)
 	{
 	}
 
@@ -37,14 +38,14 @@ public:
 	{
 	}
 
-	bool ParseCommandLine(int a_ArgumentCount, const char** a_Arguments)
+	bool ParseCommandLine(int argumentCount, const char** arguments)
 	{
 		return true;
 	}
 
 	bool Initialize()
 	{
-		m_Library = new exl::Library;
+		m_Library = new exl::Library();
 
 		try
 		{
@@ -92,6 +93,9 @@ private:
 
 int main(int argc, const char** argv)
 {
+	exl::AllocatorDefault allocator;
+	exl::InstallAllocator(&allocator);
+
 	Example application(argc, argv);
 	return application.Run();
 

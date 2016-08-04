@@ -20,7 +20,7 @@
 namespace Framework
 {
 	
-	static const std::string g_TextSourceVertex = "\
+	static const char* g_TextSourceVertex = "\
 		#version 330 core\n \
 		in vec2 attrPosition; \
 		in vec2 attrTextureCoordinate0; \
@@ -32,7 +32,7 @@ namespace Framework
 			vertTextureCoordinate = attrTextureCoordinate0; \
 		}";
 
-	static const std::string g_TextSourceFragment = "\
+	static const char* g_TextSourceFragment = "\
 		#version 330 core\n \
 		in vec2 vertTextureCoordinate; \
 		uniform sampler2D texTexture0; \

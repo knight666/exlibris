@@ -2,7 +2,7 @@
 
 namespace ExLibris {
 
-	static IAllocator* g_Allocator;
+	static IAllocator* g_Allocator = nullptr;
 
 	IAllocator* GetAllocator()
 	{
