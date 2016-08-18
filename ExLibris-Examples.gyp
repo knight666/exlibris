@@ -122,6 +122,22 @@
 			],
 		},
 		{
+			'target_name': 'ExampleAllocator',
+			'type': 'executable',
+			'dependencies': [
+				'Dependencies/ExLibris-Dependencies.gyp:freetype',
+				'Dependencies/ExLibris-Dependencies.gyp:glew',
+				'Dependencies/ExLibris-Dependencies.gyp:glfw',
+				'Dependencies/ExLibris-Dependencies.gyp:glm',
+				'Dependencies/ExLibris-Dependencies.gyp:vld',
+				'ExLibris-SDK.gyp:ExLibris',
+				'Framework',
+			],
+			'sources': [
+				'Source/Examples/ExampleAllocator.cpp',
+			],
+		},
+		{
 			'target_name': 'ExLibris.Test',
 			'type': 'executable',
 			'variables': {
